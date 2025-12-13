@@ -2,7 +2,7 @@
 
 import type React from 'react'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -24,6 +24,7 @@ import {
   Moon,
   Sun,
   ChevronDown,
+  ChevronRight,
   Menu,
   X,
   Store,
@@ -61,12 +62,43 @@ const menuItems = [
 export function AdminLayout({ children }: AdminLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [isDark, setIsDark] = useState(false)
+  const [openSubmenus, setOpenSubmenus] = useState<Set<string>>(new Set())
   const pathname = usePathname()
 
   const toggleTheme = () => {
     setIsDark(!isDark)
     document.documentElement.classList.toggle('dark')
   }
+
+  const toggleSubmenu = (itemLabel: string) => {
+    setOpenSubmenus((prev) => {
+      const newSet = new Set(prev)
+      if (newSet.has(itemLabel)) {
+        newSet.delete(itemLabel)
+      } else {
+        newSet.add(itemLabel)
+      }
+      return newSet
+    })
+  }
+
+  // Tự động mở submenu khi pathname match với submenu item
+  useEffect(() => {
+    menuItems.forEach((item) => {
+      if (item.subItems) {
+        const shouldBeOpen = item.subItems.some(
+          (subItem) => pathname === subItem.href || pathname?.startsWith(subItem.href),
+        )
+        if (shouldBeOpen) {
+          setOpenSubmenus((prev) => {
+            const newSet = new Set(prev)
+            newSet.add(item.label)
+            return newSet
+          })
+        }
+      }
+    })
+  }, [pathname])
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
@@ -108,44 +140,81 @@ export function AdminLayout({ children }: AdminLayoutProps) {
           {/* Menu */}
           <nav className="flex-1 space-y-1 px-3 py-4">
             {menuItems.map((item) => {
-              const isActive = pathname === item.href || pathname?.startsWith(item.href)
               const hasSubItems = item.subItems && item.subItems.length > 0
+              const isActive =
+                pathname === item.href ||
+                pathname?.startsWith(item.href) ||
+                (hasSubItems &&
+                  item.subItems?.some(
+                    (subItem) => pathname === subItem.href || pathname?.startsWith(subItem.href),
+                  ))
+
+              const isSubmenuOpen = hasSubItems && openSubmenus.has(item.label)
 
               return (
                 <div key={item.label}>
-                  <Link
-                    href={item.href}
-                    className={cn(
-                      'flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-colors',
-                      isActive
-                        ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400'
-                        : 'text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800',
-                    )}
-                  >
-                    <item.icon className="h-5 w-5" />
-                    {item.label}
-                  </Link>
+                  {hasSubItems ? (
+                    <button
+                      onClick={() => toggleSubmenu(item.label)}
+                      className={cn(
+                        'flex w-full items-center justify-between gap-3 rounded-xl px-4 py-3 text-left text-sm font-medium transition-colors',
+                        isActive
+                          ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400'
+                          : 'text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800',
+                      )}
+                    >
+                      <div className="flex items-center gap-3">
+                        <item.icon className="h-5 w-5" />
+                        {item.label}
+                      </div>
+                      {isSubmenuOpen ? (
+                        <ChevronDown className="h-4 w-4 transition-transform" />
+                      ) : (
+                        <ChevronRight className="h-4 w-4 transition-transform" />
+                      )}
+                    </button>
+                  ) : (
+                    <Link
+                      href={item.href}
+                      className={cn(
+                        'flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-colors',
+                        isActive
+                          ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400'
+                          : 'text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800',
+                      )}
+                    >
+                      <item.icon className="h-5 w-5" />
+                      {item.label}
+                    </Link>
+                  )}
 
-                  {hasSubItems && isActive && (
-                    <div className="mt-1 ml-4 space-y-1 border-l-2 border-emerald-200 pl-4 dark:border-emerald-500/20">
-                      {item.subItems?.map((subItem) => {
-                        const isSubActive = pathname === subItem.href
-                        return (
-                          <Link
-                            key={subItem.href}
-                            href={subItem.href}
-                            className={cn(
-                              'flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium transition-colors',
-                              isSubActive
-                                ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400'
-                                : 'text-slate-500 hover:bg-slate-100 dark:text-slate-500 dark:hover:bg-slate-800',
-                            )}
-                          >
-                            <subItem.icon className="h-4 w-4" />
-                            {subItem.label}
-                          </Link>
-                        )
-                      })}
+                  {hasSubItems && (
+                    <div
+                      className={cn(
+                        'overflow-hidden transition-all duration-300 ease-in-out',
+                        isSubmenuOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0',
+                      )}
+                    >
+                      <div className="mt-1 ml-4 space-y-1 border-l-2 border-emerald-200 pl-4 dark:border-emerald-500/20">
+                        {item.subItems?.map((subItem) => {
+                          const isSubActive = pathname === subItem.href
+                          return (
+                            <Link
+                              key={subItem.href}
+                              href={subItem.href}
+                              className={cn(
+                                'flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium transition-colors',
+                                isSubActive
+                                  ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400'
+                                  : 'text-slate-500 hover:bg-slate-100 dark:text-slate-500 dark:hover:bg-slate-800',
+                              )}
+                            >
+                              <subItem.icon className="h-4 w-4" />
+                              {subItem.label}
+                            </Link>
+                          )
+                        })}
+                      </div>
                     </div>
                   )}
                 </div>
