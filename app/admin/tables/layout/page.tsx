@@ -20,6 +20,55 @@ export interface TableItem {
   notes?: string
 }
 
+// Mock data for tables from table list (should come from API/state management)
+const mockAvailableTables = [
+  {
+    id: '1',
+    number: '1',
+    seats: 4,
+    area: 'Tầng 1 - Khu cửa sổ',
+    status: 'Occupied' as const,
+    currentOrder: '#ORD-1234',
+  },
+  { id: '2', number: '2', seats: 2, area: 'Tầng 1 - Khu cửa sổ', status: 'Available' as const },
+  {
+    id: '3',
+    number: '3',
+    seats: 6,
+    area: 'Tầng 1 - Trung tâm',
+    status: 'Waiting for bill' as const,
+    currentOrder: '#ORD-1235',
+  },
+  { id: '4', number: '4', seats: 4, area: 'Tầng 1 - Trung tâm', status: 'Available' as const },
+  {
+    id: '5',
+    number: '5',
+    seats: 4,
+    area: 'Tầng 2 - VIP',
+    status: 'Occupied' as const,
+    currentOrder: '#ORD-1236',
+  },
+  { id: '6', number: '6', seats: 8, area: 'Tầng 2 - VIP', status: 'Available' as const },
+  { id: '7', number: '7', seats: 2, area: 'Tầng 2 - Khu ban công', status: 'Available' as const },
+  {
+    id: '8',
+    number: '8',
+    seats: 4,
+    area: 'Khu ngoài trời',
+    status: 'Occupied' as const,
+    currentOrder: '#ORD-1237',
+  },
+  { id: '9', number: '9', seats: 4, area: 'Khu ngoài trời', status: 'Needs cleaning' as const },
+  {
+    id: '10',
+    number: '10',
+    seats: 6,
+    area: 'Tầng 1 - Trung tâm',
+    status: 'Waiting for bill' as const,
+    currentOrder: '#ORD-1238',
+  },
+]
+
 export default function TableLayoutPage() {
   const [tables, setTables] = useState<TableItem[]>([
     {
@@ -193,6 +242,8 @@ export default function TableLayoutPage() {
             onTableDelete={handleTableDelete}
             onAddTable={handleAddTable}
             areas={['Tầng 1', 'Tầng 2', 'Sân vườn']}
+            availableTables={mockAvailableTables}
+            tablesInLayout={tables}
           />
         </div>
       </div>

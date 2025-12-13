@@ -17,7 +17,7 @@ function StatCard({ title, value, subtext, icon, className }: StatCardProps) {
   return (
     <div
       className={cn(
-        'group rounded-2xl border border-slate-100 bg-white/80 p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md dark:border-slate-800 dark:bg-slate-900/80',
+        'rounded-2xl border border-slate-100 bg-white/80 p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900/80',
         className,
       )}
     >

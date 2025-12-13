@@ -1,62 +1,68 @@
-"use client"
+'use client'
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Textarea } from "@/components/ui/textarea"
-import { Circle, Trash2, Square, Users } from "lucide-react"
-import type { TableItem } from "@/app/admin/tables/layout/page"
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Textarea } from '@/components/ui/textarea'
+import { Circle, Trash2, Square, Users } from 'lucide-react'
+import type { TableItem } from '@/app/admin/tables/layout/page'
 
 interface FloorPlanSidePanelProps {
   selectedTable: TableItem | undefined
   onTableUpdate: (id: string, updates: Partial<TableItem>) => void
   onTableDelete: (id: string) => void
-  onAddTable: (table: Omit<TableItem, "id" | "position" | "area">) => void
+  onAddTable: (table: Omit<TableItem, 'id' | 'position' | 'area'>) => void
   areas: string[]
 }
 
 const tableTemplates = [
   {
-    type: "rectangle" as const,
-    name: "Hình chữ nhật 2 chỗ",
+    type: 'rectangle' as const,
+    name: 'Hình chữ nhật 2 chỗ',
     seats: 2,
     size: { width: 80, height: 80 },
     icon: Square,
   },
   {
-    type: "rectangle" as const,
-    name: "Hình chữ nhật 4 chỗ",
+    type: 'rectangle' as const,
+    name: 'Hình chữ nhật 4 chỗ',
     seats: 4,
     size: { width: 120, height: 80 },
     icon: Square,
   },
   {
-    type: "rectangle" as const,
-    name: "Hình chữ nhật 6 chỗ",
+    type: 'rectangle' as const,
+    name: 'Hình chữ nhật 6 chỗ',
     seats: 6,
     size: { width: 140, height: 80 },
     icon: Square,
   },
   {
-    type: "round" as const,
-    name: "Tròn 4 chỗ",
+    type: 'round' as const,
+    name: 'Tròn 4 chỗ',
     seats: 4,
     size: { width: 100, height: 100 },
     icon: Circle,
   },
   {
-    type: "round" as const,
-    name: "Tròn 6 chỗ",
+    type: 'round' as const,
+    name: 'Tròn 6 chỗ',
     seats: 6,
     size: { width: 120, height: 120 },
     icon: Circle,
   },
   {
-    type: "round" as const,
-    name: "Tròn 8 chỗ",
+    type: 'round' as const,
+    name: 'Tròn 8 chỗ',
     seats: 8,
     size: { width: 140, height: 140 },
     icon: Circle,
@@ -87,7 +93,9 @@ export function FloorPlanSidePanel({
           <div className="space-y-4">
             <div>
               <h3 className="mb-1 font-semibold text-slate-900 dark:text-white">Mục bàn</h3>
-              <p className="text-sm text-slate-500 dark:text-slate-400">Click để thêm bàn mới vào trung tâm canvas</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400">
+                Click để thêm bàn mới vào trung tâm canvas
+              </p>
             </div>
 
             <div className="grid gap-3">
@@ -99,7 +107,7 @@ export function FloorPlanSidePanel({
                       type: template.type,
                       name: `Bàn ${Date.now()}`,
                       seats: template.seats,
-                      status: "Available",
+                      status: 'Available',
                       rotation: 0,
                       size: template.size,
                       canBeMerged: true,
@@ -111,7 +119,9 @@ export function FloorPlanSidePanel({
                     <template.icon className="h-6 w-6 text-slate-600 dark:text-slate-400" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-slate-900 dark:text-white">{template.name}</p>
+                    <p className="text-sm font-medium text-slate-900 dark:text-white">
+                      {template.name}
+                    </p>
                     <p className="text-xs text-slate-500 dark:text-slate-400">
                       <Users className="mr-1 inline h-3 w-3" />
                       {template.seats} chỗ ngồi
@@ -128,8 +138,12 @@ export function FloorPlanSidePanel({
           {selectedTable ? (
             <div className="space-y-6">
               <div>
-                <h3 className="mb-1 font-semibold text-slate-900 dark:text-white">Thuộc tính bàn</h3>
-                <p className="text-sm text-slate-500 dark:text-slate-400">Chỉnh sửa thuộc tính bàn đã chọn</p>
+                <h3 className="mb-1 font-semibold text-slate-900 dark:text-white">
+                  Thuộc tính bàn
+                </h3>
+                <p className="text-sm text-slate-500 dark:text-slate-400">
+                  Chỉnh sửa thuộc tính bàn đã chọn
+                </p>
               </div>
 
               <div className="space-y-4">
@@ -173,7 +187,11 @@ export function FloorPlanSidePanel({
                     min="1"
                     max="20"
                     value={selectedTable.seats}
-                    onChange={(e) => onTableUpdate(selectedTable.id, { seats: Number.parseInt(e.target.value) || 1 })}
+                    onChange={(e) =>
+                      onTableUpdate(selectedTable.id, {
+                        seats: Number.parseInt(e.target.value) || 1,
+                      })
+                    }
                   />
                 </div>
 
@@ -182,7 +200,9 @@ export function FloorPlanSidePanel({
                   <Label htmlFor="table-status">Trạng thái</Label>
                   <Select
                     value={selectedTable.status}
-                    onValueChange={(value: any) => onTableUpdate(selectedTable.id, { status: value })}
+                    onValueChange={(value: any) =>
+                      onTableUpdate(selectedTable.id, { status: value })
+                    }
                   >
                     <SelectTrigger id="table-status">
                       <SelectValue />
@@ -202,7 +222,9 @@ export function FloorPlanSidePanel({
                   <Checkbox
                     id="can-merge"
                     checked={selectedTable.canBeMerged}
-                    onCheckedChange={(checked) => onTableUpdate(selectedTable.id, { canBeMerged: checked as boolean })}
+                    onCheckedChange={(checked) =>
+                      onTableUpdate(selectedTable.id, { canBeMerged: checked as boolean })
+                    }
                   />
                   <Label htmlFor="can-merge" className="text-sm font-normal">
                     Có thể gộp với bàn khác
@@ -214,7 +236,7 @@ export function FloorPlanSidePanel({
                   <Label htmlFor="table-notes">Ghi chú (Tùy chọn)</Label>
                   <Textarea
                     id="table-notes"
-                    value={selectedTable.notes || ""}
+                    value={selectedTable.notes || ''}
                     onChange={(e) => onTableUpdate(selectedTable.id, { notes: e.target.value })}
                     placeholder="Thêm ghi chú về bàn này..."
                     rows={3}
@@ -246,7 +268,8 @@ export function FloorPlanSidePanel({
               </div>
               <p className="mb-2 font-medium text-slate-900 dark:text-white">Chưa chọn bàn</p>
               <p className="max-w-xs text-sm text-slate-500 dark:text-slate-400">
-                Chọn một bàn trên sơ đồ để chỉnh sửa thuộc tính hoặc kéo một bàn mới từ tab "Thư viện"
+                Chọn một bàn trên sơ đồ để chỉnh sửa thuộc tính hoặc kéo một bàn mới từ tab "Thư
+                viện"
               </p>
             </div>
           )}
