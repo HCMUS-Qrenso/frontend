@@ -4,7 +4,8 @@ import { AdminLayout } from '@/components/admin/admin-layout'
 import { FloorPlanCanvas } from '@/components/admin/floor-plan-canvas'
 import { FloorPlanToolbar } from '@/components/admin/floor-plan-toolbar'
 import { FloorPlanSidePanel } from '@/components/admin/floor-plan-side-panel'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 
 export interface TableItem {
   id: string
@@ -20,59 +21,14 @@ export interface TableItem {
   notes?: string
 }
 
-// Mock data for tables from table list (should come from API/state management)
-const mockAvailableTables = [
-  {
-    id: '1',
-    number: '1',
-    seats: 4,
-    area: 'Tầng 1 - Khu cửa sổ',
-    status: 'Occupied' as const,
-    currentOrder: '#ORD-1234',
-  },
-  { id: '2', number: '2', seats: 2, area: 'Tầng 1 - Khu cửa sổ', status: 'Available' as const },
-  {
-    id: '3',
-    number: '3',
-    seats: 6,
-    area: 'Tầng 1 - Trung tâm',
-    status: 'Waiting for bill' as const,
-    currentOrder: '#ORD-1235',
-  },
-  { id: '4', number: '4', seats: 4, area: 'Tầng 1 - Trung tâm', status: 'Available' as const },
-  {
-    id: '5',
-    number: '5',
-    seats: 4,
-    area: 'Tầng 2 - VIP',
-    status: 'Occupied' as const,
-    currentOrder: '#ORD-1236',
-  },
-  { id: '6', number: '6', seats: 8, area: 'Tầng 2 - VIP', status: 'Available' as const },
-  { id: '7', number: '7', seats: 2, area: 'Tầng 2 - Khu ban công', status: 'Available' as const },
-  {
-    id: '8',
-    number: '8',
-    seats: 4,
-    area: 'Khu ngoài trời',
-    status: 'Occupied' as const,
-    currentOrder: '#ORD-1237',
-  },
-  { id: '9', number: '9', seats: 4, area: 'Khu ngoài trời', status: 'Needs cleaning' as const },
-  {
-    id: '10',
-    number: '10',
-    seats: 6,
-    area: 'Tầng 1 - Trung tâm',
-    status: 'Waiting for bill' as const,
-    currentOrder: '#ORD-1238',
-  },
-]
-
 export default function TableLayoutPage() {
+  const searchParams = useSearchParams()
+  const floorParam = searchParams.get('floor')
+  const tableIdParam = searchParams.get('tableId')
+
   const [tables, setTables] = useState<TableItem[]>([
     {
-      id: 't1',
+      id: '1',
       type: 'rectangle',
       name: 'Table 1',
       seats: 4,
@@ -84,7 +40,7 @@ export default function TableLayoutPage() {
       canBeMerged: true,
     },
     {
-      id: 't2',
+      id: '2',
       type: 'round',
       name: 'Table 2',
       seats: 6,
@@ -96,7 +52,7 @@ export default function TableLayoutPage() {
       canBeMerged: false,
     },
     {
-      id: 't3',
+      id: '3',
       type: 'rectangle',
       name: 'Table 3',
       seats: 2,
@@ -108,7 +64,7 @@ export default function TableLayoutPage() {
       canBeMerged: true,
     },
     {
-      id: 't4',
+      id: '4',
       type: 'rectangle',
       name: 'Table 4',
       seats: 4,
@@ -120,7 +76,7 @@ export default function TableLayoutPage() {
       canBeMerged: true,
     },
     {
-      id: 't5',
+      id: '5',
       type: 'round',
       name: 'Table 5',
       seats: 8,
@@ -134,11 +90,30 @@ export default function TableLayoutPage() {
   ])
 
   const [selectedTableId, setSelectedTableId] = useState<string | null>(null)
-  const [selectedArea, setSelectedArea] = useState('Tầng 1')
+  const [selectedArea, setSelectedArea] = useState(floorParam || 'Tầng 1')
   const [zoom, setZoom] = useState(1)
   const [showGrid, setShowGrid] = useState(true)
   const [history, setHistory] = useState<TableItem[][]>([tables])
   const [historyIndex, setHistoryIndex] = useState(0)
+
+  useEffect(() => {
+    if (floorParam) {
+      setSelectedArea(floorParam)
+    }
+
+    if (tableIdParam) {
+      // Find and select the table
+      const table = tables.find((t) => t.id === tableIdParam)
+      if (table) {
+        setSelectedTableId(tableIdParam)
+        console.log('[v0] Auto-focused on table:', tableIdParam, 'in floor:', floorParam)
+
+        // Optional: Auto-pan to the table position if it exists
+        // This would require implementing a pan feature in FloorPlanCanvas
+        // For now, just selecting it will highlight it in the properties panel
+      }
+    }
+  }, [floorParam, tableIdParam, tables])
 
   const selectedTable = tables.find((t) => t.id === selectedTableId)
 
@@ -191,8 +166,7 @@ export default function TableLayoutPage() {
 
   const handleSave = () => {
     console.log('[v0] Saving layout:', tables)
-    // TODO: Implement save to backend
-    alert('Đã lưu sơ đồ!')
+    alert('Layout saved!')
   }
 
   const handleReset = () => {
@@ -242,8 +216,6 @@ export default function TableLayoutPage() {
             onTableDelete={handleTableDelete}
             onAddTable={handleAddTable}
             areas={['Tầng 1', 'Tầng 2', 'Sân vườn']}
-            availableTables={mockAvailableTables}
-            tablesInLayout={tables}
           />
         </div>
       </div>

@@ -11,11 +11,21 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Search, Plus, LayoutGrid, QrCode, ChevronDown } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 export function TablesFilterToolbar() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedArea, setSelectedArea] = useState('Tất cả')
   const [selectedStatus, setSelectedStatus] = useState('Tất cả')
+
+  const handleAddTable = () => {
+    const params = new URLSearchParams(searchParams.toString())
+    params.set('modal', 'table')
+    params.set('mode', 'create')
+    router.push(`/admin/tables/list?${params.toString()}`)
+  }
 
   return (
     <div className="flex flex-col gap-3 rounded-2xl border border-slate-100 bg-white/80 p-4 shadow-sm md:flex-row md:items-center md:justify-between dark:border-slate-800 dark:bg-slate-900/80">
@@ -60,18 +70,12 @@ export function TablesFilterToolbar() {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-48">
             <DropdownMenuItem onClick={() => setSelectedStatus('Tất cả')}>Tất cả</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setSelectedStatus('Có sẵn')}>Có sẵn</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setSelectedStatus('Trống')}>Trống</DropdownMenuItem>
             <DropdownMenuItem onClick={() => setSelectedStatus('Đang sử dụng')}>
               Đang sử dụng
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setSelectedStatus('Chờ thanh toán')}>
-              Chờ thanh toán
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setSelectedStatus('Cần dọn dẹp')}>
-              Cần dọn dẹp
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setSelectedStatus('Vô hiệu')}>
-              Vô hiệu
+            <DropdownMenuItem onClick={() => setSelectedStatus('Bảo trì')}>
+              Bảo trì
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -99,7 +103,10 @@ export function TablesFilterToolbar() {
             <QrCode className="h-4 w-4" />
           </Button>
         </Link>
-        <Button className="h-10 gap-2 rounded-full bg-emerald-600 px-4 hover:bg-emerald-700">
+        <Button
+          onClick={handleAddTable}
+          className="h-10 gap-2 rounded-full bg-emerald-600 px-4 hover:bg-emerald-700"
+        >
           <Plus className="h-4 w-4" />
           <span className="hidden sm:inline">Thêm bàn</span>
         </Button>

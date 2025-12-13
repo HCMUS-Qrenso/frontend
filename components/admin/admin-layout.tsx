@@ -34,7 +34,7 @@ import {
   LayoutGrid,
 } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { usePathname } from 'next/navigation'
+import { usePathname, useSearchParams } from 'next/navigation'
 
 interface AdminLayoutProps {
   children: React.ReactNode
@@ -64,6 +64,10 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   const [isDark, setIsDark] = useState(false)
   const [openSubmenus, setOpenSubmenus] = useState<Set<string>>(new Set())
   const pathname = usePathname()
+  const searchParams = useSearchParams()
+
+  // Check if any modal is open
+  const isModalOpen = searchParams.get('modal') !== null || searchParams.get('delete') !== null
 
   const toggleTheme = () => {
     setIsDark(!isDark)
@@ -103,7 +107,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
       {/* Mobile sidebar overlay */}
-      {sidebarOpen && (
+      {sidebarOpen && !isModalOpen && (
         <div
           className="fixed inset-0 z-40 bg-black/50 lg:hidden"
           onClick={() => setSidebarOpen(false)}
@@ -115,6 +119,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
         className={cn(
           'fixed top-0 left-0 z-50 h-full w-64 border-r border-slate-200 bg-white transition-transform duration-300 lg:translate-x-0 dark:border-slate-800 dark:bg-slate-900',
           sidebarOpen ? 'translate-x-0' : '-translate-x-full',
+          isModalOpen && 'lg:hidden',
         )}
       >
         <div className="flex h-full flex-col">
