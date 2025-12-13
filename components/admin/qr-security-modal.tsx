@@ -47,7 +47,7 @@ export function QRSecurityModal({ onClose }: QRSecurityModalProps) {
               <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
                 Lưu ý bảo mật khi sử dụng QR menu
               </h3>
-              <p className="text-sm text-slate-500 dark:text-slate-400">Best practices & cảnh báo quan trọng</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400">Thực hành tốt nhất & cảnh báo quan trọng</p>
             </div>
           </div>
           <button
@@ -60,7 +60,7 @@ export function QRSecurityModal({ onClose }: QRSecurityModalProps) {
 
         {/* Best practices section */}
         <div className="space-y-3">
-          <h4 className="text-sm font-semibold text-slate-900 dark:text-white">Best practices cho QR menu</h4>
+          <h4 className="text-sm font-semibold text-slate-900 dark:text-white">Thực hành tốt nhất cho QR menu</h4>
           <div className="space-y-2.5">
             {bestPractices.map((tip, index) => (
               <div key={index} className="flex items-start gap-3 rounded-xl bg-slate-50 p-3 dark:bg-slate-800/50">

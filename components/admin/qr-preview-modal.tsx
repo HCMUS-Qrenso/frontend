@@ -26,7 +26,7 @@ export function QRPreviewModal({ table, onClose }: QRPreviewModalProps) {
         <div className="space-y-6">
           {/* Header */}
           <div className="space-y-1">
-            <h2 className="text-xl font-semibold text-slate-900 dark:text-white">QR Code Preview</h2>
+            <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Xem trước mã QR</h2>
             <p className="text-sm text-slate-500 dark:text-slate-400">
               Bàn {table.tableNumber} - {table.tableArea}
             </p>
@@ -50,7 +50,7 @@ export function QRPreviewModal({ table, onClose }: QRPreviewModalProps) {
           <div className="space-y-3 rounded-2xl bg-slate-50 p-4 dark:bg-slate-800/50">
             <div>
               <p className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
-                Table Info
+                Thông tin bàn
               </p>
               <p className="text-sm font-medium text-slate-900 dark:text-white">
                 Bàn {table.tableNumber} ({table.seats} ghế)
@@ -58,7 +58,7 @@ export function QRPreviewModal({ table, onClose }: QRPreviewModalProps) {
             </div>
             <div>
               <p className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
-                Target URL
+                URL đích đến
               </p>
               <div className="flex items-center gap-2">
                 <code className="flex-1 truncate text-xs text-slate-600 dark:text-slate-300">{table.qrLink}</code>
@@ -94,7 +94,7 @@ export function QRPreviewModal({ table, onClose }: QRPreviewModalProps) {
 
           <Button className="w-full gap-2 rounded-full bg-emerald-500 hover:bg-emerald-600">
             <Printer className="h-4 w-4" />
-            Print QR Code
+            In mã QR
           </Button>
         </div>
       </div>

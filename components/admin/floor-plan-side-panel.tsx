@@ -21,42 +21,42 @@ interface FloorPlanSidePanelProps {
 const tableTemplates = [
   {
     type: "rectangle" as const,
-    name: "Rectangle 2 seats",
+    name: "Hình chữ nhật 2 chỗ",
     seats: 2,
     size: { width: 80, height: 80 },
     icon: Square,
   },
   {
     type: "rectangle" as const,
-    name: "Rectangle 4 seats",
+    name: "Hình chữ nhật 4 chỗ",
     seats: 4,
     size: { width: 120, height: 80 },
     icon: Square,
   },
   {
     type: "rectangle" as const,
-    name: "Rectangle 6 seats",
+    name: "Hình chữ nhật 6 chỗ",
     seats: 6,
     size: { width: 140, height: 80 },
     icon: Square,
   },
   {
     type: "round" as const,
-    name: "Round 4 seats",
+    name: "Tròn 4 chỗ",
     seats: 4,
     size: { width: 100, height: 100 },
     icon: Circle,
   },
   {
     type: "round" as const,
-    name: "Round 6 seats",
+    name: "Tròn 6 chỗ",
     seats: 6,
     size: { width: 120, height: 120 },
     icon: Circle,
   },
   {
     type: "round" as const,
-    name: "Round 8 seats",
+    name: "Tròn 8 chỗ",
     seats: 8,
     size: { width: 140, height: 140 },
     icon: Circle,
@@ -75,10 +75,10 @@ export function FloorPlanSidePanel({
       <Tabs defaultValue="library" className="h-full">
         <TabsList className="w-full rounded-b-none border-b border-slate-100 bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900">
           <TabsTrigger value="library" className="flex-1">
-            Library
+            Thư viện
           </TabsTrigger>
           <TabsTrigger value="properties" className="flex-1">
-            Properties
+            Thuộc tính
           </TabsTrigger>
         </TabsList>
 
@@ -86,7 +86,7 @@ export function FloorPlanSidePanel({
         <TabsContent value="library" className="p-6">
           <div className="space-y-4">
             <div>
-              <h3 className="mb-1 font-semibold text-slate-900 dark:text-white">Table Items</h3>
+              <h3 className="mb-1 font-semibold text-slate-900 dark:text-white">Mục bàn</h3>
               <p className="text-sm text-slate-500 dark:text-slate-400">Click để thêm bàn mới vào trung tâm canvas</p>
             </div>
 
@@ -97,7 +97,7 @@ export function FloorPlanSidePanel({
                   onClick={() =>
                     onAddTable({
                       type: template.type,
-                      name: `Table ${Date.now()}`,
+                      name: `Bàn ${Date.now()}`,
                       seats: template.seats,
                       status: "Available",
                       rotation: 0,
@@ -114,7 +114,7 @@ export function FloorPlanSidePanel({
                     <p className="text-sm font-medium text-slate-900 dark:text-white">{template.name}</p>
                     <p className="text-xs text-slate-500 dark:text-slate-400">
                       <Users className="mr-1 inline h-3 w-3" />
-                      {template.seats} seats
+                      {template.seats} chỗ ngồi
                     </p>
                   </div>
                 </button>
@@ -128,25 +128,25 @@ export function FloorPlanSidePanel({
           {selectedTable ? (
             <div className="space-y-6">
               <div>
-                <h3 className="mb-1 font-semibold text-slate-900 dark:text-white">Table Properties</h3>
+                <h3 className="mb-1 font-semibold text-slate-900 dark:text-white">Thuộc tính bàn</h3>
                 <p className="text-sm text-slate-500 dark:text-slate-400">Chỉnh sửa thuộc tính bàn đã chọn</p>
               </div>
 
               <div className="space-y-4">
                 {/* Table Name */}
                 <div className="space-y-2">
-                  <Label htmlFor="table-name">Table Name / Number</Label>
+                  <Label htmlFor="table-name">Tên / Số bàn</Label>
                   <Input
                     id="table-name"
                     value={selectedTable.name}
                     onChange={(e) => onTableUpdate(selectedTable.id, { name: e.target.value })}
-                    placeholder="e.g., Table 5"
+                    placeholder="ví dụ: Bàn 5"
                   />
                 </div>
 
                 {/* Area */}
                 <div className="space-y-2">
-                  <Label htmlFor="table-area">Area / Zone</Label>
+                  <Label htmlFor="table-area">Khu vực</Label>
                   <Select
                     value={selectedTable.area}
                     onValueChange={(value) => onTableUpdate(selectedTable.id, { area: value })}
@@ -166,7 +166,7 @@ export function FloorPlanSidePanel({
 
                 {/* Capacity */}
                 <div className="space-y-2">
-                  <Label htmlFor="table-capacity">Capacity</Label>
+                  <Label htmlFor="table-capacity">Sức chứa</Label>
                   <Input
                     id="table-capacity"
                     type="number"
@@ -179,7 +179,7 @@ export function FloorPlanSidePanel({
 
                 {/* Status */}
                 <div className="space-y-2">
-                  <Label htmlFor="table-status">Status</Label>
+                  <Label htmlFor="table-status">Trạng thái</Label>
                   <Select
                     value={selectedTable.status}
                     onValueChange={(value: any) => onTableUpdate(selectedTable.id, { status: value })}
@@ -188,12 +188,12 @@ export function FloorPlanSidePanel({
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Available">Available</SelectItem>
-                      <SelectItem value="Disabled">Disabled</SelectItem>
+                      <SelectItem value="Available">Có sẵn</SelectItem>
+                      <SelectItem value="Disabled">Vô hiệu</SelectItem>
                     </SelectContent>
                   </Select>
                   <p className="text-xs text-slate-500 dark:text-slate-400">
-                    Real-time status (Occupied, Waiting) được cập nhật tự động
+                    Trạng thái thời gian thực (Đang sử dụng, Chờ) được cập nhật tự động
                   </p>
                 </div>
 
@@ -205,18 +205,18 @@ export function FloorPlanSidePanel({
                     onCheckedChange={(checked) => onTableUpdate(selectedTable.id, { canBeMerged: checked as boolean })}
                   />
                   <Label htmlFor="can-merge" className="text-sm font-normal">
-                    Can be merged with other tables
+                    Có thể gộp với bàn khác
                   </Label>
                 </div>
 
                 {/* Notes */}
                 <div className="space-y-2">
-                  <Label htmlFor="table-notes">Notes (Optional)</Label>
+                  <Label htmlFor="table-notes">Ghi chú (Tùy chọn)</Label>
                   <Textarea
                     id="table-notes"
                     value={selectedTable.notes || ""}
                     onChange={(e) => onTableUpdate(selectedTable.id, { notes: e.target.value })}
-                    placeholder="Add any notes about this table..."
+                    placeholder="Thêm ghi chú về bàn này..."
                     rows={3}
                   />
                 </div>
@@ -225,7 +225,7 @@ export function FloorPlanSidePanel({
               {/* Actions */}
               <div className="flex gap-2 border-t border-slate-100 pt-4 dark:border-slate-800">
                 <Button variant="outline" size="sm" className="flex-1 rounded-full bg-transparent">
-                  Update
+                  Cập nhật
                 </Button>
                 <Button
                   variant="destructive"
@@ -234,7 +234,7 @@ export function FloorPlanSidePanel({
                   onClick={() => onTableDelete(selectedTable.id)}
                 >
                   <Trash2 className="mr-2 h-4 w-4" />
-                  Delete
+                  Xóa
                 </Button>
               </div>
             </div>
@@ -244,9 +244,9 @@ export function FloorPlanSidePanel({
               <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-100 dark:bg-slate-800">
                 <Square className="h-8 w-8 text-slate-400" />
               </div>
-              <p className="mb-2 font-medium text-slate-900 dark:text-white">No table selected</p>
+              <p className="mb-2 font-medium text-slate-900 dark:text-white">Chưa chọn bàn</p>
               <p className="max-w-xs text-sm text-slate-500 dark:text-slate-400">
-                Chọn một bàn trên sơ đồ để chỉnh sửa thuộc tính hoặc kéo một bàn mới từ tab "Library"
+                Chọn một bàn trên sơ đồ để chỉnh sửa thuộc tính hoặc kéo một bàn mới từ tab "Thư viện"
               </p>
             </div>
           )}

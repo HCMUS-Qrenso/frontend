@@ -18,6 +18,12 @@ interface QRTableListProps {
 }
 
 function getStatusBadge(status: TableQR["status"]) {
+  const statusMap: Record<TableQR["status"], string> = {
+    Ready: "Sẵn sàng",
+    Missing: "Thiếu",
+    Outdated: "Lỗi thời",
+  }
+
   const styles = {
     Ready:
       "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20",
@@ -30,7 +36,7 @@ function getStatusBadge(status: TableQR["status"]) {
     <span
       className={cn("inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium", styles[status])}
     >
-      {status}
+      {statusMap[status]}
     </span>
   )
 }
@@ -55,15 +61,15 @@ export function QRTableList({ tables, selectedTables, onSelectTable, onSelectAll
           <div className="flex items-center gap-2">
             <Button size="sm" variant="outline" className="h-8 gap-2 rounded-full bg-white dark:bg-slate-900">
               <Download className="h-3.5 w-3.5" />
-              Download
+              Tải xuống
             </Button>
             <Button size="sm" variant="outline" className="h-8 gap-2 rounded-full bg-white dark:bg-slate-900">
               <Printer className="h-3.5 w-3.5" />
-              Print
+              In
             </Button>
             <Button size="sm" variant="outline" className="h-8 gap-2 rounded-full bg-white dark:bg-slate-900">
               <RefreshCw className="h-3.5 w-3.5" />
-              Regenerate
+              Tạo lại
             </Button>
           </div>
         </div>
@@ -78,26 +84,26 @@ export function QRTableList({ tables, selectedTables, onSelectTable, onSelectAll
                 <Checkbox
                   checked={selectedTables.length === tables.length}
                   onCheckedChange={onSelectAll}
-                  aria-label="Select all"
+                  aria-label="Chọn tất cả"
                 />
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
-                Table
+                Bàn
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
-                QR Preview
+                Xem trước QR
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
-                Link / Target
+                Liên kết / Đích đến
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
-                Status
+                Trạng thái
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
-                Updated At
+                Cập nhật lúc
               </th>
               <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
-                Actions
+                Thao tác
               </th>
             </tr>
           </thead>
@@ -141,7 +147,7 @@ export function QRTableList({ tables, selectedTables, onSelectTable, onSelectAll
                     </button>
                   ) : (
                     <div className="flex h-16 w-16 items-center justify-center rounded-lg border border-dashed border-slate-300 bg-slate-50 dark:border-slate-700 dark:bg-slate-800">
-                      <span className="text-xs text-slate-400">No QR</span>
+                      <span className="text-xs text-slate-400">Không có QR</span>
                     </div>
                   )}
                 </td>
@@ -186,9 +192,9 @@ export function QRTableList({ tables, selectedTables, onSelectTable, onSelectAll
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem>Download PNG</DropdownMenuItem>
-                        <DropdownMenuItem>Download SVG</DropdownMenuItem>
-                        <DropdownMenuItem>Download PDF</DropdownMenuItem>
+                        <DropdownMenuItem>Tải xuống PNG</DropdownMenuItem>
+                        <DropdownMenuItem>Tải xuống SVG</DropdownMenuItem>
+                        <DropdownMenuItem>Tải xuống PDF</DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                     <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full" disabled={!table.qrUrl}>
@@ -210,7 +216,7 @@ export function QRTableList({ tables, selectedTables, onSelectTable, onSelectAll
         <p className="text-sm text-slate-500 dark:text-slate-400">Hiển thị 1-10 trên {tables.length} bàn</p>
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" className="rounded-full bg-transparent" disabled>
-            Prev
+            Trước
           </Button>
           <Button
             variant="outline"
@@ -220,7 +226,7 @@ export function QRTableList({ tables, selectedTables, onSelectTable, onSelectAll
             1
           </Button>
           <Button variant="outline" size="sm" className="rounded-full bg-transparent">
-            Next
+            Sau
           </Button>
         </div>
       </div>

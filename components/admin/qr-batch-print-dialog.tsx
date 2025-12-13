@@ -34,7 +34,7 @@ export function QRBatchPrintDialog({ selectedCount, totalCount, onClose }: QRBat
         <div className="space-y-6">
           {/* Header */}
           <div className="space-y-1">
-            <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Batch Print QR Codes</h2>
+            <h2 className="text-xl font-semibold text-slate-900 dark:text-white">In hàng loạt mã QR</h2>
             <p className="text-sm text-slate-500 dark:text-slate-400">Tạo file PDF để in hàng loạt QR code cho bàn</p>
           </div>
 
@@ -45,19 +45,19 @@ export function QRBatchPrintDialog({ selectedCount, totalCount, onClose }: QRBat
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="all" id="scope-all" />
                 <Label htmlFor="scope-all" className="font-normal">
-                  All tables ({totalCount} bàn)
+                  Tất cả bàn ({totalCount} bàn)
                 </Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="area" id="scope-area" />
                 <Label htmlFor="scope-area" className="font-normal">
-                  Current area
+                  Khu vực hiện tại
                 </Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="selected" id="scope-selected" disabled={selectedCount === 0} />
                 <Label htmlFor="scope-selected" className="font-normal">
-                  Selected tables ({selectedCount} bàn)
+                  Bàn đã chọn ({selectedCount} bàn)
                 </Label>
               </div>
             </RadioGroup>
@@ -118,11 +118,11 @@ export function QRBatchPrintDialog({ selectedCount, totalCount, onClose }: QRBat
           {/* Actions */}
           <div className="flex gap-3">
             <Button variant="outline" className="flex-1 rounded-full bg-transparent" onClick={onClose}>
-              Cancel
+              Hủy
             </Button>
             <Button className="flex-1 gap-2 rounded-full bg-emerald-500 hover:bg-emerald-600">
               <FileText className="h-4 w-4" />
-              Generate PDF
+              Tạo PDF
             </Button>
           </div>
         </div>

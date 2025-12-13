@@ -14,8 +14,8 @@ interface QRManagerToolbarProps {
 
 export function QRManagerToolbar({ onGenerateAll, onPrintBatch, onSecurityInfo }: QRManagerToolbarProps) {
   const [showPreview, setShowPreview] = useState(true)
-  const [selectedArea, setSelectedArea] = useState("All")
-  const [selectedStatus, setSelectedStatus] = useState("All")
+  const [selectedArea, setSelectedArea] = useState("Tất cả")
+  const [selectedStatus, setSelectedStatus] = useState("Tất cả")
 
   return (
     <div className="flex flex-col gap-3 rounded-2xl border border-slate-100 bg-white/80 p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900/80 md:flex-row md:items-center md:justify-between">
@@ -39,7 +39,7 @@ export function QRManagerToolbar({ onGenerateAll, onPrintBatch, onSecurityInfo }
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start">
-            <DropdownMenuItem onClick={() => setSelectedArea("All")}>All Areas</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setSelectedArea("Tất cả")}>Tất cả khu vực</DropdownMenuItem>
             <DropdownMenuItem onClick={() => setSelectedArea("Tầng 1")}>Tầng 1</DropdownMenuItem>
             <DropdownMenuItem onClick={() => setSelectedArea("Tầng 2")}>Tầng 2</DropdownMenuItem>
             <DropdownMenuItem onClick={() => setSelectedArea("Khu ngoài trời")}>Khu ngoài trời</DropdownMenuItem>
@@ -55,11 +55,11 @@ export function QRManagerToolbar({ onGenerateAll, onPrintBatch, onSecurityInfo }
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start">
-            <DropdownMenuItem onClick={() => setSelectedStatus("All")}>All Status</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setSelectedStatus("Has QR")}>Has QR</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setSelectedStatus("Missing QR")}>Missing QR</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setSelectedStatus("Regenerated recently")}>
-              Regenerated recently
+            <DropdownMenuItem onClick={() => setSelectedStatus("Tất cả")}>Tất cả trạng thái</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setSelectedStatus("Có QR")}>Có QR</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setSelectedStatus("Thiếu QR")}>Thiếu QR</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setSelectedStatus("Tạo lại gần đây")}>
+              Tạo lại gần đây
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -87,11 +87,11 @@ export function QRManagerToolbar({ onGenerateAll, onPrintBatch, onSecurityInfo }
         </Button>
         <Button onClick={onGenerateAll} className="gap-2 rounded-full bg-emerald-500 hover:bg-emerald-600">
           <QrCode className="h-4 w-4" />
-          <span className="hidden sm:inline">Generate All</span>
+          <span className="hidden sm:inline">Tạo tất cả</span>
         </Button>
         <Button onClick={onPrintBatch} variant="outline" className="gap-2 rounded-full bg-transparent">
           <Printer className="h-4 w-4" />
-          <span className="hidden sm:inline">Print Batch</span>
+          <span className="hidden sm:inline">In hàng loạt</span>
         </Button>
       </div>
     </div>

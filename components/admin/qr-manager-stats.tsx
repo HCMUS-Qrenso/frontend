@@ -14,28 +14,28 @@ export function QRManagerStats({ tables }: QRManagerStatsProps) {
   const stats = [
     {
       icon: QrCode,
-      label: "Total Tables",
+      label: "Tổng số bàn",
       value: totalTables,
       color: "text-slate-600 dark:text-slate-400",
       bgColor: "bg-slate-50 dark:bg-slate-800",
     },
     {
       icon: CheckCircle2,
-      label: "Tables with QR",
+      label: "Bàn có QR",
       value: tablesWithQR,
       color: "text-emerald-600 dark:text-emerald-400",
       bgColor: "bg-emerald-50 dark:bg-emerald-500/10",
     },
     {
       icon: AlertCircle,
-      label: "Missing QR",
+      label: "Thiếu QR",
       value: missingQR,
       color: "text-rose-600 dark:text-rose-400",
       bgColor: "bg-rose-50 dark:bg-rose-500/10",
     },
     {
       icon: Clock,
-      label: "Last Regenerated",
+      label: "Lần tạo lại cuối",
       value: lastRegenerated,
       color: "text-indigo-600 dark:text-indigo-400",
       bgColor: "bg-indigo-50 dark:bg-indigo-500/10",

@@ -1,29 +1,34 @@
-"use client"
+'use client'
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Search, Plus, LayoutGrid, QrCode, ChevronDown } from "lucide-react"
-import Link from "next/link"
+import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { Search, Plus, LayoutGrid, QrCode, ChevronDown } from 'lucide-react'
+import Link from 'next/link'
 
 export function TablesFilterToolbar() {
-  const [searchQuery, setSearchQuery] = useState("")
-  const [selectedArea, setSelectedArea] = useState("All")
-  const [selectedStatus, setSelectedStatus] = useState("All")
+  const [searchQuery, setSearchQuery] = useState('')
+  const [selectedArea, setSelectedArea] = useState('Tất cả')
+  const [selectedStatus, setSelectedStatus] = useState('Tất cả')
 
   return (
-    <div className="flex flex-col gap-3 rounded-2xl border border-slate-100 bg-white/80 p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900/80 md:flex-row md:items-center md:justify-between">
+    <div className="flex flex-col gap-3 rounded-2xl border border-slate-100 bg-white/80 p-4 shadow-sm md:flex-row md:items-center md:justify-between dark:border-slate-800 dark:bg-slate-900/80">
       {/* Left - Filters */}
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
         {/* Search */}
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+          <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400" />
           <Input
             placeholder="Tìm theo số bàn, tên khu vực..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="h-10 w-full rounded-full border-slate-200 bg-slate-50 pl-9 pr-4 text-sm focus:bg-white dark:border-slate-700 dark:bg-slate-800 dark:focus:bg-slate-900 sm:w-64"
+            className="h-10 w-full rounded-full border-slate-200 bg-slate-50 pr-4 pl-9 text-sm focus:bg-white sm:w-64 dark:border-slate-700 dark:bg-slate-800 dark:focus:bg-slate-900"
           />
         </div>
 
@@ -36,10 +41,12 @@ export function TablesFilterToolbar() {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-48">
-            <DropdownMenuItem onClick={() => setSelectedArea("All")}>All</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setSelectedArea("Tầng 1")}>Tầng 1</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setSelectedArea("Tầng 2")}>Tầng 2</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setSelectedArea("Khu ngoài trời")}>Khu ngoài trời</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setSelectedArea('Tất cả')}>Tất cả</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setSelectedArea('Tầng 1')}>Tầng 1</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setSelectedArea('Tầng 2')}>Tầng 2</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setSelectedArea('Khu ngoài trời')}>
+              Khu ngoài trời
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
 
@@ -47,17 +54,25 @@ export function TablesFilterToolbar() {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="h-10 gap-2 rounded-full bg-transparent">
-              <span className="text-sm">Status: {selectedStatus}</span>
+              <span className="text-sm">Trạng thái: {selectedStatus}</span>
               <ChevronDown className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-48">
-            <DropdownMenuItem onClick={() => setSelectedStatus("All")}>All</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setSelectedStatus("Available")}>Available</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setSelectedStatus("Occupied")}>Occupied</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setSelectedStatus("Waiting for bill")}>Waiting for bill</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setSelectedStatus("Needs cleaning")}>Needs cleaning</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setSelectedStatus("Disabled")}>Disabled</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setSelectedStatus('Tất cả')}>Tất cả</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setSelectedStatus('Có sẵn')}>Có sẵn</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setSelectedStatus('Đang sử dụng')}>
+              Đang sử dụng
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setSelectedStatus('Chờ thanh toán')}>
+              Chờ thanh toán
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setSelectedStatus('Cần dọn dẹp')}>
+              Cần dọn dẹp
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setSelectedStatus('Vô hiệu')}>
+              Vô hiệu
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
@@ -65,18 +80,28 @@ export function TablesFilterToolbar() {
       {/* Right - Actions */}
       <div className="flex items-center gap-2">
         <Link href="/admin/tables/layout">
-          <Button variant="outline" size="icon" className="h-10 w-10 rounded-full bg-transparent" title="Layout view">
+          <Button
+            variant="outline"
+            size="icon"
+            className="h-10 w-10 rounded-full bg-transparent"
+            title="Xem sơ đồ"
+          >
             <LayoutGrid className="h-4 w-4" />
           </Button>
         </Link>
         <Link href="/admin/tables/qr">
-          <Button variant="outline" size="icon" className="h-10 w-10 rounded-full bg-transparent" title="QR manager">
+          <Button
+            variant="outline"
+            size="icon"
+            className="h-10 w-10 rounded-full bg-transparent"
+            title="Quản lý QR"
+          >
             <QrCode className="h-4 w-4" />
           </Button>
         </Link>
         <Button className="h-10 gap-2 rounded-full bg-emerald-600 px-4 hover:bg-emerald-700">
           <Plus className="h-4 w-4" />
-          <span className="hidden sm:inline">Add table</span>
+          <span className="hidden sm:inline">Thêm bàn</span>
         </Button>
       </div>
     </div>

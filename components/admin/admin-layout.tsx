@@ -1,18 +1,18 @@
-"use client"
+'use client'
 
-import type React from "react"
+import type React from 'react'
 
-import { useState } from "react"
-import Link from "next/link"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { useState } from 'react'
+import Link from 'next/link'
+import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from '@/components/ui/dropdown-menu'
 import {
   LayoutDashboard,
   ClipboardList,
@@ -31,31 +31,31 @@ import {
   User,
   Table,
   LayoutGrid,
-} from "lucide-react"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { usePathname } from "next/navigation"
+} from 'lucide-react'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { usePathname } from 'next/navigation'
 
 interface AdminLayoutProps {
   children: React.ReactNode
 }
 
 const menuItems = [
-  { icon: LayoutDashboard, label: "Dashboard", href: "/admin/dashboard" },
-  { icon: ClipboardList, label: "Orders", href: "/admin/orders" },
-  { icon: UtensilsCrossed, label: "Menu", href: "/admin/menu" },
+  { icon: LayoutDashboard, label: 'Tổng quan', href: '/admin/dashboard' },
+  { icon: ClipboardList, label: 'Đơn hàng', href: '/admin/orders' },
+  { icon: UtensilsCrossed, label: 'Thực đơn', href: '/admin/menu' },
   {
     icon: QrCode,
-    label: "Tables & QR",
-    href: "/admin/tables/list",
+    label: 'Bàn & QR',
+    href: '/admin/tables/list',
     subItems: [
-      { icon: Table, label: "Table List", href: "/admin/tables/list" },
-      { icon: LayoutGrid, label: "Layout", href: "/admin/tables/layout" },
-      { icon: QrCode, label: "QR Manager", href: "/admin/tables/qr" },
+      { icon: Table, label: 'Danh sách bàn', href: '/admin/tables/list' },
+      { icon: LayoutGrid, label: 'Sơ đồ', href: '/admin/tables/layout' },
+      { icon: QrCode, label: 'Quản lý QR', href: '/admin/tables/qr' },
     ],
   },
-  { icon: Users, label: "Staff", href: "/admin/staff" },
-  { icon: BarChart3, label: "Reports", href: "/admin/reports" },
-  { icon: Settings, label: "Settings", href: "/admin/settings" },
+  { icon: Users, label: 'Nhân viên', href: '/admin/staff' },
+  { icon: BarChart3, label: 'Báo cáo', href: '/admin/reports' },
+  { icon: Settings, label: 'Cài đặt', href: '/admin/settings' },
 ]
 
 export function AdminLayout({ children }: AdminLayoutProps) {
@@ -65,34 +65,42 @@ export function AdminLayout({ children }: AdminLayoutProps) {
 
   const toggleTheme = () => {
     setIsDark(!isDark)
-    document.documentElement.classList.toggle("dark")
+    document.documentElement.classList.toggle('dark')
   }
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
-        <div className="fixed inset-0 z-40 bg-black/50 lg:hidden" onClick={() => setSidebarOpen(false)} />
+        <div
+          className="fixed inset-0 z-40 bg-black/50 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
       )}
 
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed left-0 top-0 z-50 h-full w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 transition-transform duration-300 lg:translate-x-0",
-          sidebarOpen ? "translate-x-0" : "-translate-x-full",
+          'fixed top-0 left-0 z-50 h-full w-64 border-r border-slate-200 bg-white transition-transform duration-300 lg:translate-x-0 dark:border-slate-800 dark:bg-slate-900',
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full',
         )}
       >
         <div className="flex h-full flex-col">
           {/* Logo */}
-          <div className="flex items-center gap-3 border-b border-slate-200 dark:border-slate-800 px-6 py-5">
+          <div className="flex items-center gap-3 border-b border-slate-200 px-6 py-5 dark:border-slate-800">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500 text-white">
               <UtensilsCrossed className="h-5 w-5" />
             </div>
             <div>
               <h1 className="font-semibold text-slate-900 dark:text-white">Smart Restaurant</h1>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Admin Panel</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Bảng điều khiển quản trị</p>
             </div>
-            <Button variant="ghost" size="icon" className="ml-auto lg:hidden" onClick={() => setSidebarOpen(false)}>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="ml-auto lg:hidden"
+              onClick={() => setSidebarOpen(false)}
+            >
               <X className="h-5 w-5" />
             </Button>
           </div>
@@ -108,10 +116,10 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                   <Link
                     href={item.href}
                     className={cn(
-                      "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-colors",
+                      'flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-colors',
                       isActive
-                        ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400"
-                        : "text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800",
+                        ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400'
+                        : 'text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800',
                     )}
                   >
                     <item.icon className="h-5 w-5" />
@@ -119,7 +127,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                   </Link>
 
                   {hasSubItems && isActive && (
-                    <div className="ml-4 mt-1 space-y-1 border-l-2 border-emerald-200 pl-4 dark:border-emerald-500/20">
+                    <div className="mt-1 ml-4 space-y-1 border-l-2 border-emerald-200 pl-4 dark:border-emerald-500/20">
                       {item.subItems?.map((subItem) => {
                         const isSubActive = pathname === subItem.href
                         return (
@@ -127,10 +135,10 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                             key={subItem.href}
                             href={subItem.href}
                             className={cn(
-                              "flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium transition-colors",
+                              'flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium transition-colors',
                               isSubActive
-                                ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400"
-                                : "text-slate-500 hover:bg-slate-100 dark:text-slate-500 dark:hover:bg-slate-800",
+                                ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400'
+                                : 'text-slate-500 hover:bg-slate-100 dark:text-slate-500 dark:hover:bg-slate-800',
                             )}
                           >
                             <subItem.icon className="h-4 w-4" />
@@ -146,14 +154,16 @@ export function AdminLayout({ children }: AdminLayoutProps) {
           </nav>
 
           {/* Bottom */}
-          <div className="border-t border-slate-200 dark:border-slate-800 p-4">
-            <div className="flex items-center gap-3 rounded-xl bg-slate-50 dark:bg-slate-800 px-4 py-3">
+          <div className="border-t border-slate-200 p-4 dark:border-slate-800">
+            <div className="flex items-center gap-3 rounded-xl bg-slate-50 px-4 py-3 dark:bg-slate-800">
               <Avatar className="h-9 w-9">
                 <AvatarImage src="/restaurant-owner-avatar.png" />
                 <AvatarFallback>NT</AvatarFallback>
               </Avatar>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-slate-900 dark:text-white truncate">Nguyễn Thành</p>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium text-slate-900 dark:text-white">
+                  Nguyễn Thành
+                </p>
                 <p className="text-xs text-slate-500 dark:text-slate-400">Chủ nhà hàng</p>
               </div>
             </div>
@@ -164,14 +174,21 @@ export function AdminLayout({ children }: AdminLayoutProps) {
       {/* Main content */}
       <div className="lg:pl-64">
         {/* Top bar */}
-        <header className="sticky top-0 z-30 border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl">
+        <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/80 backdrop-blur-xl dark:border-slate-800 dark:bg-slate-900/80">
           <div className="flex items-center justify-between px-4 py-4 lg:px-8">
             <div className="flex items-center gap-4">
-              <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setSidebarOpen(true)}>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="lg:hidden"
+                onClick={() => setSidebarOpen(true)}
+              >
                 <Menu className="h-5 w-5" />
               </Button>
               <div>
-                <h2 className="text-xl font-semibold text-slate-900 dark:text-white lg:text-2xl">Dashboard</h2>
+                <h2 className="text-xl font-semibold text-slate-900 lg:text-2xl dark:text-white">
+                  Bảng điều khiển
+                </h2>
                 <p className="text-sm text-slate-500 dark:text-slate-400">Tổng quan hôm nay</p>
               </div>
             </div>
@@ -180,7 +197,10 @@ export function AdminLayout({ children }: AdminLayoutProps) {
               {/* Restaurant Selector */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="hidden gap-2 rounded-full md:flex bg-transparent">
+                  <Button
+                    variant="outline"
+                    className="hidden gap-2 rounded-full bg-transparent md:flex"
+                  >
                     <Store className="h-4 w-4" />
                     <span>Chi nhánh Quận 1</span>
                     <ChevronDown className="h-4 w-4" />

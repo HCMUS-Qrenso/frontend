@@ -35,6 +35,14 @@ const mockTables: Table[] = [
 ]
 
 function getStatusBadge(status: Table["status"]) {
+  const statusMap: Record<Table["status"], string> = {
+    Available: "Có sẵn",
+    Occupied: "Đang sử dụng",
+    "Waiting for bill": "Chờ thanh toán",
+    "Needs cleaning": "Cần dọn dẹp",
+    Disabled: "Vô hiệu",
+  }
+
   const styles = {
     Available:
       "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20",
@@ -52,7 +60,7 @@ function getStatusBadge(status: Table["status"]) {
     <span
       className={cn("inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium", styles[status])}
     >
-      {status}
+      {statusMap[status]}
     </span>
   )
 }
@@ -66,22 +74,22 @@ export function TablesListTable() {
           <thead>
             <tr className="border-b border-slate-100 bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900">
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
-                Table
+                Bàn
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
-                Area / Zone
+                Khu vực
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
-                Capacity
+                Sức chứa
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
-                Status
+                Trạng thái
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
-                Current Order
+                Đơn hàng hiện tại
               </th>
               <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
-                Actions
+                Thao tác
               </th>
             </tr>
           </thead>
@@ -96,8 +104,8 @@ export function TablesListTable() {
               >
                 <td className="px-6 py-4">
                   <div>
-                    <p className="text-sm font-medium text-slate-900 dark:text-white">Table #{table.number}</p>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">{table.seats} seats</p>
+                    <p className="text-sm font-medium text-slate-900 dark:text-white">Bàn #{table.number}</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">{table.seats} chỗ ngồi</p>
                   </div>
                 </td>
                 <td className="px-6 py-4">
@@ -128,15 +136,15 @@ export function TablesListTable() {
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem>
                           <Edit2 className="mr-2 h-4 w-4" />
-                          Edit
+                          Chỉnh sửa
                         </DropdownMenuItem>
                         <DropdownMenuItem>
                           <MapPin className="mr-2 h-4 w-4" />
-                          View on layout
+                          Xem trên sơ đồ
                         </DropdownMenuItem>
                         <DropdownMenuItem className="text-red-600">
                           <Trash2 className="mr-2 h-4 w-4" />
-                          Delete
+                          Xóa
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -153,7 +161,7 @@ export function TablesListTable() {
         <p className="text-sm text-slate-500 dark:text-slate-400">Hiển thị 1-10 trên 42 bàn</p>
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" className="rounded-full bg-transparent" disabled>
-            Prev
+            Trước
           </Button>
           <Button
             variant="outline"
@@ -169,7 +177,7 @@ export function TablesListTable() {
             3
           </Button>
           <Button variant="outline" size="sm" className="rounded-full bg-transparent">
-            Next
+            Sau
           </Button>
         </div>
       </div>

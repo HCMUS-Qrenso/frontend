@@ -40,7 +40,7 @@ export function FloorPlanToolbar({
       {/* Left: Title & Area selector */}
       <div className="flex items-center gap-4">
         <div>
-          <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Table Layout</h2>
+          <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Sơ đồ bàn</h2>
           <p className="text-sm text-slate-500 dark:text-slate-400">Sơ đồ mặt bằng & bố trí bàn</p>
         </div>
 
@@ -64,10 +64,10 @@ export function FloorPlanToolbar({
       {/* Right: Actions */}
       <div className="flex items-center gap-2">
         {/* Undo/Redo */}
-        <Button variant="ghost" size="icon" className="rounded-full" disabled={!canUndo} onClick={onUndo} title="Undo">
+        <Button variant="ghost" size="icon" className="rounded-full" disabled={!canUndo} onClick={onUndo} title="Hoàn tác">
           <Undo2 className="h-4 w-4" />
         </Button>
-        <Button variant="ghost" size="icon" className="rounded-full" disabled={!canRedo} onClick={onRedo} title="Redo">
+        <Button variant="ghost" size="icon" className="rounded-full" disabled={!canRedo} onClick={onRedo} title="Làm lại">
           <Redo2 className="h-4 w-4" />
         </Button>
 
@@ -102,7 +102,7 @@ export function FloorPlanToolbar({
           size="icon"
           className="rounded-full"
           onClick={() => onShowGridChange(!showGrid)}
-          title="Toggle grid"
+          title="Bật/tắt lưới"
         >
           <Grid3x3 className="h-4 w-4" />
         </Button>
@@ -112,11 +112,11 @@ export function FloorPlanToolbar({
         {/* Reset & Save */}
         <Button variant="ghost" size="sm" className="rounded-full text-red-600" onClick={onReset}>
           <RotateCcw className="mr-2 h-4 w-4" />
-          Reset
+          Đặt lại
         </Button>
         <Button size="sm" className="rounded-full" onClick={onSave}>
           <Save className="mr-2 h-4 w-4" />
-          Save changes
+          Lưu thay đổi
         </Button>
       </div>
     </div>
