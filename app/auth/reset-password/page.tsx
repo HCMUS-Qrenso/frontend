@@ -2,7 +2,7 @@
 
 import type React from 'react'
 
-import { useState, useEffect } from 'react'
+import { Suspense, useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { isAxiosError } from 'axios'
@@ -25,7 +25,7 @@ import type { ApiErrorResponse } from '@/types/auth'
 
 type PasswordStrength = 'weak' | 'medium' | 'strong'
 
-export default function ResetPasswordPage() {
+function ResetPasswordContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const token = searchParams.get('token')
@@ -406,5 +406,26 @@ export default function ResetPasswordPage() {
         </div>
       </div>
     </AuthContainer>
+  )
+}
+
+function LoadingFallback() {
+  return (
+    <AuthContainer>
+      <div className="mx-auto w-full max-w-sm text-center">
+        <div className="flex justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
+        </div>
+        <p className="mt-4 text-sm text-slate-500 dark:text-slate-400">Đang xác thực...</p>
+      </div>
+    </AuthContainer>
+  )
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <ResetPasswordContent />
+    </Suspense>
   )
 }

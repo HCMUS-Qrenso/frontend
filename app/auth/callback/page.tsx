@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { AlertCircle, Loader2 } from 'lucide-react'
 import { isAxiosError } from 'axios'
@@ -10,7 +10,7 @@ import { useAuthStore } from '@/store/auth-store'
 import { authApi } from '@/lib/api/auth'
 import type { ApiErrorResponse } from '@/types/auth'
 
-export default function AuthCallbackPage() {
+function AuthCallbackContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { setToken, setUser, clearAuth } = useAuthStore()
@@ -90,5 +90,31 @@ export default function AuthCallbackPage() {
         )}
       </div>
     </AuthContainer>
+  )
+}
+
+function LoadingFallback() {
+  return (
+    <AuthContainer>
+      <div className="mx-auto w-full max-w-sm space-y-6 py-10 text-center">
+        <Loader2 className="mx-auto h-10 w-10 animate-spin text-emerald-600 dark:text-emerald-400" />
+        <div className="space-y-2">
+          <h1 className="text-xl font-semibold text-slate-900 dark:text-slate-50">
+            Đang hoàn tất đăng nhập Google
+          </h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            Vui lòng đợi trong giây lát...
+          </p>
+        </div>
+      </div>
+    </AuthContainer>
+  )
+}
+
+export default function AuthCallbackPage() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <AuthCallbackContent />
+    </Suspense>
   )
 }

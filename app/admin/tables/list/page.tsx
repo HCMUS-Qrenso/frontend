@@ -1,5 +1,6 @@
 'use client'
 
+import { Suspense } from 'react'
 import { AdminLayout } from '@/components/admin/admin-layout'
 import { TablesOverviewStats } from '@/components/admin/tables-overview-stats'
 import { TablesFilterToolbar } from '@/components/admin/tables-filter-toolbar'
@@ -7,8 +8,9 @@ import { TablesListTable } from '@/components/admin/tables-list-table'
 import { TableUpsertDrawer } from '@/components/admin/table-upsert-drawer'
 import { TableDeleteDialog } from '@/components/admin/table-delete-dialog'
 import { useSearchParams } from 'next/navigation'
+import { Loader2 } from 'lucide-react'
 
-export default function TablesListPage() {
+function TablesListContent() {
   const searchParams = useSearchParams()
   const modalOpen = searchParams.get('modal') === 'table'
 
@@ -31,5 +33,23 @@ export default function TablesListPage() {
       {/* Delete Confirmation Dialog */}
       <TableDeleteDialog />
     </AdminLayout>
+  )
+}
+
+function LoadingFallback() {
+  return (
+    <AdminLayout>
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
+      </div>
+    </AdminLayout>
+  )
+}
+
+export default function TablesListPage() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <TablesListContent />
+    </Suspense>
   )
 }
