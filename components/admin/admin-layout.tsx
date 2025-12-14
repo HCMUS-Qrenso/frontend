@@ -21,8 +21,6 @@ import {
   Users,
   BarChart3,
   Settings,
-  Moon,
-  Sun,
   ChevronDown,
   ChevronRight,
   Menu,
@@ -34,7 +32,19 @@ import {
   LayoutGrid,
 } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { usePathname, useSearchParams } from 'next/navigation'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
+import { usePathname, useSearchParams, useRouter } from 'next/navigation'
+import { ThemeToggle } from '@/components/theme-toggle'
+import { useAuth } from '@/hooks/use-auth'
 
 interface AdminLayoutProps {
   children: React.ReactNode
@@ -61,17 +71,24 @@ const menuItems = [
 
 export function AdminLayout({ children }: AdminLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [isDark, setIsDark] = useState(false)
   const [openSubmenus, setOpenSubmenus] = useState<Set<string>>(new Set())
+  const [logoutDialogOpen, setLogoutDialogOpen] = useState(false)
   const pathname = usePathname()
   const searchParams = useSearchParams()
+  const router = useRouter()
+  const { logout, logoutPending } = useAuth()
 
   // Check if any modal is open
   const isModalOpen = searchParams.get('modal') !== null || searchParams.get('delete') !== null
 
-  const toggleTheme = () => {
-    setIsDark(!isDark)
-    document.documentElement.classList.toggle('dark')
+  const handleLogout = async () => {
+    try {
+      await logout()
+      setLogoutDialogOpen(false)
+      router.push('/auth/login')
+    } catch (error) {
+      console.error('Logout error:', error)
+    }
   }
 
   const toggleSubmenu = (itemLabel: string) => {
@@ -241,6 +258,18 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                 <p className="text-xs text-slate-500 dark:text-slate-400">Chủ nhà hàng</p>
               </div>
             </div>
+            <button
+              onClick={() => setLogoutDialogOpen(true)}
+              disabled={logoutPending}
+              className={cn(
+                'mt-3 flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-colors',
+                'text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10',
+                logoutPending && 'cursor-not-allowed opacity-50',
+              )}
+            >
+              <LogOut className="h-5 w-5" />
+              Đăng xuất
+            </button>
           </div>
         </div>
       </aside>
@@ -305,9 +334,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
               </DropdownMenu>
 
               {/* Theme Toggle */}
-              <Button variant="ghost" size="icon" className="rounded-full" onClick={toggleTheme}>
-                {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-              </Button>
+              <ThemeToggle />
 
               {/* User Menu */}
               <DropdownMenu>
@@ -329,7 +356,11 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                     Cài đặt
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem className="text-red-600">
+                  <DropdownMenuItem
+                    className="text-red-600"
+                    onClick={() => setLogoutDialogOpen(true)}
+                    disabled={logoutPending}
+                  >
                     <LogOut className="mr-2 h-4 w-4" />
                     Đăng xuất
                   </DropdownMenuItem>
@@ -342,6 +373,29 @@ export function AdminLayout({ children }: AdminLayoutProps) {
         {/* Page content */}
         <main className="p-4 lg:p-8">{children}</main>
       </div>
+
+      {/* Logout Confirmation Dialog */}
+      <AlertDialog open={logoutDialogOpen} onOpenChange={setLogoutDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Xác nhận đăng xuất</AlertDialogTitle>
+            <AlertDialogDescription>
+              Bạn có chắc chắn muốn đăng xuất khỏi hệ thống? Bạn sẽ cần đăng nhập lại để tiếp tục sử
+              dụng.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={logoutPending}>Hủy</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleLogout}
+              disabled={logoutPending}
+              className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
+            >
+              {logoutPending ? 'Đang đăng xuất...' : 'Đăng xuất'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

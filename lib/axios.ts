@@ -52,7 +52,26 @@ apiClient.interceptors.response.use(
   async (error: AxiosError) => {
     const originalConfig = error.config as (AxiosRequestConfig & { _retry?: boolean }) | undefined
 
-    if (error.response?.status === 401 && originalConfig && !originalConfig._retry) {
+    // Không refresh token cho các endpoint auth (login, signup, refresh, etc.)
+    const authEndpoints = [
+      '/auth/login',
+      '/auth/refresh',
+      '/auth/signup',
+
+      '/auth/forgot-password',
+      '/auth/reset-password',
+      '/auth/verify-email',
+    ]
+    const isAuthEndpoint =
+      originalConfig?.url &&
+      authEndpoints.some((endpoint) => originalConfig.url?.includes(endpoint))
+
+    if (
+      error.response?.status === 401 &&
+      originalConfig &&
+      !originalConfig._retry &&
+      !isAuthEndpoint
+    ) {
       originalConfig._retry = true
       try {
         const newToken = await refreshAccessToken()
