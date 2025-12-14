@@ -296,8 +296,8 @@ Create a new table.
       "width": 140,
       "height": 140
     },
-    "qr_code_url": "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://app.smartrestaurant.com/order?token=...",
-    "qr_code_link": "https://app.smartrestaurant.com/order?token=...",
+    "qr_code_url": "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://app.smartrestaurant.com/joes-diner/menu?table=...",
+    "ordering_url": "https://app.smartrestaurant.com/joes-diner/menu?table=...&token=...",
     "created_at": "2025-01-15T15:00:00Z",
     "updated_at": "2025-01-15T15:00:00Z"
   }
@@ -376,7 +376,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
     },
     "qr_code_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
     "qr_code_url": "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=...",
-    "qr_code_link": "https://app.smartrestaurant.com/order?token=...",
+    "ordering_url": "https://app.smartrestaurant.com/joes-diner/menu?table=...&token=...",
     "qr_code_generated_at": "2025-01-15T10:30:00Z",
     "current_order": null,
     "created_at": "2025-01-15T10:30:00Z",
@@ -409,11 +409,7 @@ SELECT
     'width', COALESCE((t.position::json->>'width')::int, 100),
     'height', COALESCE((t.position::json->>'height')::int, 100)
   ) as position,
-  CASE
-    WHEN t.qr_code_token IS NOT NULL
-    THEN CONCAT('https://app.smartrestaurant.com/order?token=', t.qr_code_token)
-    ELSE NULL
-  END as qr_code_link,
+  t.ordering_url,
   CASE
     WHEN t.status = 'occupied' THEN (
       SELECT json_build_object(
@@ -1052,8 +1048,8 @@ Content-Type: application/json
     "id": "550e8400-e29b-41d4-a716-446655440000",
     "table_number": "1",
     "qr_code_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5hbnRfaWQiOiI1NTBlODQwMC1lMjliLTQxZDQtYTcxNi00NDY2NTU0NDAwMDAiLCJ0YWJsZV9pZCI6IjU1MGU4NDAwLWUyOWItNDFkNC1hNzE2LTQ0NjY1NTQ0MDAwMCIsImlzc3VlZF9hdCI6IjIwMjUtMDEtMTVUMTg6MDA6MDBaIn0...",
-    "qr_code_url": "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://app.smartrestaurant.com/order?token=eyJhbGci...",
-    "qr_code_link": "https://app.smartrestaurant.com/order?token=eyJhbGci...",
+    "qr_code_url": "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://app.smartrestaurant.com/joes-diner/menu?table=...",
+    "ordering_url": "https://app.smartrestaurant.com/joes-diner/menu?table=...&token=eyJhbGci...",
     "qr_code_generated_at": "2025-01-15T18:00:00Z"
   }
 }
@@ -1217,7 +1213,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
     "table_number": "1",
     "qr_code_token": "eyJhbGci...",
     "qr_code_url": "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=...",
-    "qr_code_link": "https://app.smartrestaurant.com/order?token=...",
+    "ordering_url": "https://app.smartrestaurant.com/joes-diner/menu?table=...&token=...",
     "qr_code_generated_at": "2025-01-15T18:00:00Z",
     "status": "Ready"
   }
@@ -1253,8 +1249,8 @@ interface Table {
     notes?: string // Optional metadata
   } | null
   qr_code_token?: string // JWT token (unique)
-  qr_code_url?: string // QR code image URL
-  qr_code_link?: string // Generated order URL
+  qr_code_url?: string // External QR image URL (from api.qrserver.com)
+  ordering_url?: string // Actual ordering link embedded in QR code
   qr_code_generated_at?: string // ISO 8601 timestamp
   current_order?: {
     order_number: string

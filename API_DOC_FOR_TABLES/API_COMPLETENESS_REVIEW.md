@@ -137,8 +137,8 @@ This document verifies that all UI features have corresponding API endpoints.
 | `size.width, size.height` | `tables.position` (JSON)              | Stored in position JSON                           | ✅ Covered                         |
 | `canBeMerged`             | `tables.position` (JSON)              | Stored in position JSON metadata                  | ✅ Covered                         |
 | `notes`                   | `tables.position` (JSON)              | Stored in position JSON metadata                  | ✅ Covered                         |
-| `qr_code_url`             | `tables.qr_code_url`                  | Direct                                            | ✅ Covered                         |
-| `qr_code_link`            | Generated from `tables.qr_code_token` | Computed in API                                   | ✅ Covered                         |
+| `qr_code_url`             | `tables.qr_code_url`                  | External QR image URL (from api.qrserver.com)     | ✅ Covered                         |
+| `ordering_url`            | `tables.ordering_url`                 | Actual ordering link embedded in QR code          | ✅ Covered                         |
 
 **Status: ✅ All mappings documented**
 
