@@ -18,7 +18,7 @@ export function AuthContainer({ children }: AuthContainerProps) {
                 <UtensilsCrossed className="h-6 w-6 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-white">Smart Restaurant</h1>
+                <h1 className="text-2xl font-bold text-white">Qrenso</h1>
                 <p className="text-sm text-emerald-50">QR Menu & Dine-in Ordering</p>
               </div>
             </div>
@@ -50,8 +50,7 @@ export function AuthContainer({ children }: AuthContainerProps) {
           {/* Decorative Element */}
           <div className="mt-8 rounded-2xl bg-white/10 p-6 backdrop-blur-sm">
             <p className="text-sm text-emerald-50 italic">
-              "Smart Restaurant giúp chúng tôi tăng 40% hiệu suất phục vụ và giảm thiểu sai sót
-              trong order."
+              "Qrenso giúp chúng tôi tăng 40% hiệu suất phục vụ và giảm thiểu sai sót trong order."
             </p>
             <p className="mt-2 text-xs font-semibold text-white">Nhà hàng Phố Cổ - Hà Nội</p>
           </div>
