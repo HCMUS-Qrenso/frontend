@@ -2,7 +2,7 @@
 
 import type React from 'react'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { isAxiosError } from 'axios'
@@ -16,6 +16,9 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { useAuth } from '@/hooks/use-auth'
 import type { ApiErrorResponse } from '@/types/auth'
 
+const REMEMBER_ME_KEY = 'rememberMe'
+const REMEMBERED_EMAIL_KEY = 'rememberedEmail'
+
 export default function LoginPage() {
   const router = useRouter()
   const { login, loginPending } = useAuth()
@@ -27,6 +30,21 @@ export default function LoginPage() {
     email: '',
     password: '',
   })
+
+  // Load rememberMe và email từ localStorage khi component mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedRememberMe = localStorage.getItem(REMEMBER_ME_KEY) === 'true'
+      const savedEmail = localStorage.getItem(REMEMBERED_EMAIL_KEY)
+      
+      if (savedRememberMe) {
+        setRememberMe(true)
+      }
+      if (savedEmail) {
+        setFormData((prev) => ({ ...prev, email: savedEmail }))
+      }
+    }
+  }, [])
 
   const [fieldErrors, setFieldErrors] = useState({
     email: '',
@@ -69,7 +87,20 @@ export default function LoginPage() {
     }
 
     try {
-      await login(formData)
+      // Lưu rememberMe preference vào localStorage
+      if (typeof window !== 'undefined') {
+        if (rememberMe) {
+          localStorage.setItem(REMEMBER_ME_KEY, 'true')
+          // Lưu email nếu rememberMe = true
+          localStorage.setItem(REMEMBERED_EMAIL_KEY, formData.email)
+        } else {
+          localStorage.removeItem(REMEMBER_ME_KEY)
+          localStorage.removeItem(REMEMBERED_EMAIL_KEY)
+        }
+      }
+
+      // Truyền rememberMe vào login call
+      await login({ ...formData, rememberMe })
       router.push('/admin/dashboard')
     } catch (err) {
       const message = getErrorMessage(err)

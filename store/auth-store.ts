@@ -3,13 +3,14 @@ import { setAccessToken } from '@/lib/axios'
 import type { AuthResponse, User } from '@/types/auth'
 
 const ACCESS_TOKEN_KEY = 'accessToken'
+const SESSION_TOKEN_KEY = 'accessToken_session'
 
 interface AuthState {
   user: User | null
   accessToken: string | null
   isAuthenticated: boolean
   isHydrated: boolean
-  setAuth: (payload: AuthResponse) => void
+  setAuth: (payload: AuthResponse, rememberMe?: boolean) => void
   setUser: (user: User | null) => void
   setToken: (token: string | null) => void
   clearAuth: () => void
@@ -22,10 +23,18 @@ export const useAuthStore = create<AuthState>((set) => ({
   isAuthenticated: false,
   isHydrated: false,
 
-  setAuth: (payload) => {
+  setAuth: (payload, rememberMe = true) => {
     setAccessToken(payload.accessToken)
     if (typeof window !== 'undefined') {
-      localStorage.setItem(ACCESS_TOKEN_KEY, payload.accessToken)
+      if (rememberMe) {
+        // Lưu vào localStorage (persist qua browser restart)
+        localStorage.setItem(ACCESS_TOKEN_KEY, payload.accessToken)
+        sessionStorage.removeItem(SESSION_TOKEN_KEY)
+      } else {
+        // Lưu vào sessionStorage (chỉ tồn tại trong session hiện tại)
+        sessionStorage.setItem(SESSION_TOKEN_KEY, payload.accessToken)
+        localStorage.removeItem(ACCESS_TOKEN_KEY)
+      }
     }
     set({
       user: payload.user,
@@ -40,9 +49,21 @@ export const useAuthStore = create<AuthState>((set) => ({
     setAccessToken(token)
     if (typeof window !== 'undefined') {
       if (token) {
-        localStorage.setItem(ACCESS_TOKEN_KEY, token)
+        // Kiểm tra xem token đang ở đâu để giữ nguyên storage type
+        const localToken = localStorage.getItem(ACCESS_TOKEN_KEY)
+        const sessionToken = sessionStorage.getItem(SESSION_TOKEN_KEY)
+        
+        if (localToken) {
+          localStorage.setItem(ACCESS_TOKEN_KEY, token)
+        } else if (sessionToken) {
+          sessionStorage.setItem(SESSION_TOKEN_KEY, token)
+        } else {
+          // Mặc định lưu vào localStorage nếu không có token nào
+          localStorage.setItem(ACCESS_TOKEN_KEY, token)
+        }
       } else {
         localStorage.removeItem(ACCESS_TOKEN_KEY)
+        sessionStorage.removeItem(SESSION_TOKEN_KEY)
       }
     }
     set({ accessToken: token, isAuthenticated: !!token })
@@ -52,13 +73,18 @@ export const useAuthStore = create<AuthState>((set) => ({
     setAccessToken(null)
     if (typeof window !== 'undefined') {
       localStorage.removeItem(ACCESS_TOKEN_KEY)
+      sessionStorage.removeItem(SESSION_TOKEN_KEY)
     }
     set({ user: null, accessToken: null, isAuthenticated: false })
   },
 
   initAuth: () => {
     if (typeof window === 'undefined') return
-    const storedToken = localStorage.getItem(ACCESS_TOKEN_KEY)
+    // Ưu tiên localStorage (rememberMe = true), sau đó mới đến sessionStorage
+    const localToken = localStorage.getItem(ACCESS_TOKEN_KEY)
+    const sessionToken = sessionStorage.getItem(SESSION_TOKEN_KEY)
+    const storedToken = localToken || sessionToken
+    
     if (storedToken) {
       setAccessToken(storedToken)
       set({
