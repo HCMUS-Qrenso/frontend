@@ -136,7 +136,7 @@ export default function LoginPage() {
         {/* Header */}
         <div className="mb-8 space-y-2 text-center lg:text-left">
           <h1 className="text-2xl font-bold text-slate-900 lg:text-3xl dark:text-white">
-            Đăng nhập vào Smart Restaurant
+            Đăng nhập vào Qrenso
           </h1>
           <p className="text-sm text-slate-500 dark:text-slate-400">
             Tiếp tục quản lý menu, bàn, order và KDS của bạn
@@ -282,7 +282,7 @@ export default function LoginPage() {
             >
               Liên hệ chúng tôi
             </Link>{' '}
-            để đăng ký Smart Restaurant.
+            để đăng ký Qrenso.
           </p>
         </div>
       </div>

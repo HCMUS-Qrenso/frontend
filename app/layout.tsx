@@ -8,7 +8,7 @@ import './globals.css'
 const _inter = Inter({ subsets: ['latin', 'vietnamese'] })
 
 export const metadata: Metadata = {
-  title: 'Smart Restaurant - Admin Dashboard',
+  title: 'Qrenso - Admin Dashboard',
   description: 'Hệ thống quản lý nhà hàng thông minh với QR Menu & Dine-in Ordering',
   generator: 'v0.app',
   icons: {
