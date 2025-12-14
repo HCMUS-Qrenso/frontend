@@ -16,6 +16,10 @@ import {
 } from '@/components/ui/select'
 import { X, Loader2 } from 'lucide-react'
 import { Switch } from '@/components/ui/switch'
+import { useTableQuery, useCreateTableMutation, useUpdateTableMutation } from '@/hooks/use-tables-query'
+import { useFloorsQuery } from '@/hooks/use-tables-query'
+import { toast } from 'sonner'
+import type { TableStatus, TableShape, TablePosition } from '@/types/tables'
 
 interface TableUpsertDrawerProps {
   open: boolean
@@ -25,10 +29,11 @@ interface TableFormData {
   table_number: string
   capacity: string
   floor: string
-  shape: string
-  status: 'available' | 'occupied' | 'maintenance'
+  shape: TableShape
+  status: TableStatus
   is_active: boolean
   autoGenerateQR: boolean
+  position?: TablePosition
 }
 
 const initialFormData: TableFormData = {
@@ -83,23 +88,40 @@ export function TableUpsertDrawer({ open }: TableUpsertDrawerProps) {
   }, [open])
 
   // Load table data when editing
+  const { data: tableData, isLoading: isLoadingTable } = useTableQuery(
+    mode === 'edit' && tableId ? tableId : null,
+    mode === 'edit' && open,
+  )
+  const { data: floorsData } = useFloorsQuery()
+  const floors = floorsData?.data?.floors || []
+
   useEffect(() => {
-    if (mode === 'edit' && tableId && open) {
-      // Mock loading existing table data
-      // In production, fetch from API: const data = await fetch(`/api/tables/${tableId}`)
+    if (mode === 'edit' && tableData?.data && open) {
+      const table = tableData.data
+      // Parse position from JSON string
+      let position: TablePosition | undefined
+      if (table.position) {
+        try {
+          position = JSON.parse(table.position) as TablePosition
+        } catch {
+          // Invalid JSON, ignore
+        }
+      }
+
       setFormData({
-        table_number: tableId,
-        capacity: '4',
-        floor: 'Tầng 1',
-        shape: 'rectangle',
-        status: 'available',
-        is_active: true,
+        table_number: table.table_number,
+        capacity: table.capacity.toString(),
+        floor: table.floor || '',
+        shape: (table.shape as TableShape) || 'rectangle',
+        status: table.status,
+        is_active: table.is_active,
         autoGenerateQR: false,
+        position,
       })
     } else if (mode === 'create' && open) {
       setFormData(initialFormData)
     }
-  }, [mode, tableId, open])
+  }, [mode, tableData, open])
 
   const closeDrawer = () => {
     const params = new URLSearchParams(searchParams.toString())
@@ -131,6 +153,9 @@ export function TableUpsertDrawer({ open }: TableUpsertDrawerProps) {
     return Object.keys(newErrors).length === 0
   }
 
+  const createMutation = useCreateTableMutation()
+  const updateMutation = useUpdateTableMutation()
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
@@ -139,24 +164,71 @@ export function TableUpsertDrawer({ open }: TableUpsertDrawerProps) {
     setIsLoading(true)
 
     try {
-      // Mock API call
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      const payload = {
+        table_number: formData.table_number,
+        capacity: Number.parseInt(formData.capacity),
+        floor: formData.floor || undefined,
+        shape: formData.shape,
+        status: formData.status,
+        is_active: formData.is_active,
+        position: formData.position,
+        auto_generate_qr: formData.autoGenerateQR,
+      }
 
-      // In production:
-      // const endpoint = mode === "create" ? "/api/tables" : `/api/tables/${tableId}`
-      // const method = mode === "create" ? "POST" : "PUT"
-      // await fetch(endpoint, { method, body: JSON.stringify(formData) })
+      if (mode === 'create') {
+        await createMutation.mutateAsync(payload)
+        toast.success('Bàn đã được tạo thành công')
+      } else if (mode === 'edit' && tableId) {
+        await updateMutation.mutateAsync({
+          id: tableId,
+          payload: {
+            ...payload,
+            auto_generate_qr: undefined, // Remove this field for update
+          },
+        })
+        toast.success('Bàn đã được cập nhật thành công')
+      }
 
-      // Success feedback
-      console.log('[v0] Table saved:', formData)
-
-      // Close drawer and show success toast
+      // Close drawer
       closeDrawer()
-
-      // In production, trigger refresh of table list
-      // mutate('/api/tables')
-    } catch (error) {
-      console.error('[v0] Error saving table:', error)
+    } catch (error: any) {
+      console.error('Error saving table:', error)
+      
+      // Handle specific error cases
+      if (error?.response?.status === 409) {
+        // Conflict - table number already exists
+        const conflictMessage = Array.isArray(error?.response?.data?.message)
+          ? error.response.data.message.join(', ')
+          : error?.response?.data?.message || 'Số bàn đã tồn tại'
+        toast.error(conflictMessage)
+        // Set error on table_number field
+        setErrors({ table_number: 'Số bàn này đã tồn tại. Vui lòng chọn số khác.' })
+      } else if (error?.response?.status === 400) {
+        // Validation errors
+        const validationErrors = error?.response?.data?.message
+        if (Array.isArray(validationErrors)) {
+          validationErrors.forEach((msg: string) => {
+            // Try to map validation errors to form fields
+            if (msg.toLowerCase().includes('table_number') || msg.toLowerCase().includes('số bàn')) {
+              setErrors((prev) => ({ ...prev, table_number: msg }))
+            } else if (msg.toLowerCase().includes('capacity') || msg.toLowerCase().includes('sức chứa')) {
+              setErrors((prev) => ({ ...prev, capacity: msg }))
+            } else {
+              toast.error(msg)
+            }
+          })
+        } else {
+          toast.error(validationErrors || 'Dữ liệu không hợp lệ')
+        }
+      } else {
+        // Other errors
+        const errorMessage =
+          error?.response?.data?.message ||
+          (Array.isArray(error?.response?.data?.message)
+            ? error.response.data.message.join(', ')
+            : 'Có lỗi xảy ra khi lưu bàn')
+        toast.error(errorMessage)
+      }
     } finally {
       setIsLoading(false)
     }
@@ -207,6 +279,22 @@ export function TableUpsertDrawer({ open }: TableUpsertDrawerProps) {
   }, [open])
 
   if (!open) return null
+
+  if (mode === 'edit' && isLoadingTable) {
+    return (
+      <>
+        <div
+          className="fixed inset-0 z-60 bg-black/60 backdrop-blur-sm"
+          aria-hidden="true"
+        />
+        <div className="fixed top-1/2 left-1/2 z-70 flex max-h-[90vh] w-full max-w-xl -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-700 dark:bg-slate-900">
+          <div className="flex items-center justify-center p-12">
+            <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
+          </div>
+        </div>
+      </>
+    )
+  }
 
   return (
     <>
@@ -261,7 +349,13 @@ export function TableUpsertDrawer({ open }: TableUpsertDrawerProps) {
               <Input
                 id="table_number"
                 value={formData.table_number}
-                onChange={(e) => setFormData({ ...formData, table_number: e.target.value })}
+                onChange={(e) => {
+                  setFormData({ ...formData, table_number: e.target.value })
+                  // Clear error when user starts typing
+                  if (errors.table_number) {
+                    setErrors((prev) => ({ ...prev, table_number: undefined }))
+                  }
+                }}
                 placeholder="Ví dụ: 1, A1, VIP01"
                 className={errors.table_number ? 'border-red-500' : ''}
                 aria-invalid={!!errors.table_number}
@@ -282,14 +376,14 @@ export function TableUpsertDrawer({ open }: TableUpsertDrawerProps) {
                 onValueChange={(value) => setFormData({ ...formData, floor: value })}
               >
                 <SelectTrigger id="floor">
-                  <SelectValue />
+                  <SelectValue placeholder="Chọn tầng/khu vực" />
                 </SelectTrigger>
                 <SelectContent className="z-80">
-                  <SelectItem value="Tầng 1">Tầng 1</SelectItem>
-                  <SelectItem value="Tầng 2">Tầng 2</SelectItem>
-                  <SelectItem value="Tầng 3">Tầng 3</SelectItem>
-                  <SelectItem value="Khu ngoài trời">Khu ngoài trời</SelectItem>
-                  <SelectItem value="Khu VIP">Khu VIP</SelectItem>
+                  {floors.map((floor) => (
+                    <SelectItem key={floor} value={floor}>
+                      {floor}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -350,6 +444,7 @@ export function TableUpsertDrawer({ open }: TableUpsertDrawerProps) {
                 <SelectContent className="z-80">
                   <SelectItem value="available">Trống</SelectItem>
                   <SelectItem value="occupied">Đang sử dụng</SelectItem>
+                  <SelectItem value="waiting_for_payment">Chờ thanh toán</SelectItem>
                   <SelectItem value="maintenance">Bảo trì</SelectItem>
                 </SelectContent>
               </Select>

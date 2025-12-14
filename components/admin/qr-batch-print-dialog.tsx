@@ -2,10 +2,13 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { X, FileText } from "lucide-react"
+import { X, FileText, Loader2 } from "lucide-react"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { tablesApi } from "@/lib/api/tables"
+import { downloadBlob } from "@/lib/utils/download"
+import { toast } from "sonner"
 
 interface QRBatchPrintDialogProps {
   selectedCount: number
@@ -18,6 +21,22 @@ export function QRBatchPrintDialog({ selectedCount, totalCount, onClose }: QRBat
   const [layout, setLayout] = useState("4")
   const [showTableNumber, setShowTableNumber] = useState(true)
   const [showLogo, setShowLogo] = useState(true)
+  const [isDownloading, setIsDownloading] = useState(false)
+
+  const handleDownload = async () => {
+    setIsDownloading(true)
+    try {
+      const blob = await tablesApi.downloadAllQR()
+      downloadBlob(blob, "qr-codes.zip")
+      toast.success("Đã tải xuống tất cả QR codes")
+      onClose()
+    } catch (error: any) {
+      console.error("Error downloading QR batch:", error)
+      toast.error("Có lỗi xảy ra khi tải xuống QR codes")
+    } finally {
+      setIsDownloading(false)
+    }
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={onClose}>
@@ -120,9 +139,17 @@ export function QRBatchPrintDialog({ selectedCount, totalCount, onClose }: QRBat
             <Button variant="outline" className="flex-1 rounded-full bg-transparent" onClick={onClose}>
               Hủy
             </Button>
-            <Button className="flex-1 gap-2 rounded-full bg-emerald-500 hover:bg-emerald-600">
-              <FileText className="h-4 w-4" />
-              Tạo PDF
+            <Button
+              className="flex-1 gap-2 rounded-full bg-emerald-500 hover:bg-emerald-600"
+              onClick={handleDownload}
+              disabled={isDownloading}
+            >
+              {isDownloading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <FileText className="h-4 w-4" />
+              )}
+              {isDownloading ? "Đang tải..." : "Tải xuống ZIP"}
             </Button>
           </div>
         </div>

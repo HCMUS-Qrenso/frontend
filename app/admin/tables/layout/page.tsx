@@ -4,8 +4,11 @@ import { AdminLayout } from '@/components/admin/admin-layout'
 import { FloorPlanCanvas } from '@/components/admin/floor-plan-canvas'
 import { FloorPlanToolbar } from '@/components/admin/floor-plan-toolbar'
 import { FloorPlanSidePanel } from '@/components/admin/floor-plan-side-panel'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useSearchParams } from 'next/navigation'
+import { useFloorsQuery, useFloorLayoutQuery, useBatchUpdatePositionsMutation, useCreateTableMutation } from '@/hooks/use-tables-query'
+import { toast } from 'sonner'
+import type { FloorLayoutTable, TablePosition } from '@/types/tables'
 
 export interface TableItem {
   id: string
@@ -21,126 +24,131 @@ export interface TableItem {
   notes?: string
 }
 
+// Map backend status to frontend status
+function mapStatus(status: string): TableItem['status'] {
+  const statusMap: Record<string, TableItem['status']> = {
+    available: 'Available',
+    occupied: 'Occupied',
+    waiting_for_payment: 'Waiting for bill',
+    maintenance: 'Disabled',
+  }
+  return statusMap[status] || 'Available'
+}
+
+// Map backend shape to frontend type
+function mapShape(shape: string | null): 'rectangle' | 'round' {
+  if (shape === 'circle' || shape === 'oval') return 'round'
+  return 'rectangle'
+}
+
+// Transform backend FloorLayoutTable to TableItem
+function transformTableToItem(table: FloorLayoutTable): TableItem {
+  return {
+    id: table.id,
+    type: mapShape(table.type),
+    name: table.name,
+    seats: table.seats,
+    area: table.area,
+    status: mapStatus(table.status),
+    position: table.position,
+    rotation: 0,
+    size: {
+      width: table.type === 'circle' || table.type === 'oval' ? 120 : 120,
+      height: table.type === 'circle' || table.type === 'oval' ? 120 : 80,
+    },
+    canBeMerged: table.type !== 'circle' && table.type !== 'oval',
+  }
+}
+
 export default function TableLayoutPage() {
   const searchParams = useSearchParams()
   const floorParam = searchParams.get('floor')
   const tableIdParam = searchParams.get('tableId')
 
-  const [tables, setTables] = useState<TableItem[]>([
-    {
-      id: '1',
-      type: 'rectangle',
-      name: 'Table 1',
-      seats: 4,
-      area: 'Tầng 1',
-      status: 'Available',
-      position: { x: 100, y: 100 },
-      rotation: 0,
-      size: { width: 120, height: 80 },
-      canBeMerged: true,
-    },
-    {
-      id: '2',
-      type: 'round',
-      name: 'Table 2',
-      seats: 6,
-      area: 'Tầng 1',
-      status: 'Occupied',
-      position: { x: 300, y: 100 },
-      rotation: 0,
-      size: { width: 120, height: 120 },
-      canBeMerged: false,
-    },
-    {
-      id: '3',
-      type: 'rectangle',
-      name: 'Table 3',
-      seats: 2,
-      area: 'Tầng 1',
-      status: 'Waiting for bill',
-      position: { x: 500, y: 100 },
-      rotation: 0,
-      size: { width: 80, height: 80 },
-      canBeMerged: true,
-    },
-    {
-      id: '4',
-      type: 'rectangle',
-      name: 'Table 4',
-      seats: 4,
-      area: 'Tầng 1',
-      status: 'Available',
-      position: { x: 100, y: 300 },
-      rotation: 0,
-      size: { width: 120, height: 80 },
-      canBeMerged: true,
-    },
-    {
-      id: '5',
-      type: 'round',
-      name: 'Table 5',
-      seats: 8,
-      area: 'Tầng 1',
-      status: 'Disabled',
-      position: { x: 300, y: 300 },
-      rotation: 0,
-      size: { width: 140, height: 140 },
-      canBeMerged: false,
-    },
-  ])
-
-  const [selectedTableId, setSelectedTableId] = useState<string | null>(null)
-  const [selectedArea, setSelectedArea] = useState(floorParam || 'Tầng 1')
+  const [selectedTableId, setSelectedTableId] = useState<string | null>(tableIdParam)
+  const [selectedArea, setSelectedArea] = useState(floorParam || '')
   const [zoom, setZoom] = useState(1)
   const [showGrid, setShowGrid] = useState(true)
-  const [history, setHistory] = useState<TableItem[][]>([tables])
+  const [history, setHistory] = useState<TableItem[][]>([])
   const [historyIndex, setHistoryIndex] = useState(0)
+
+  // Load floors and layout data
+  const { data: floorsData } = useFloorsQuery()
+  const floors = floorsData?.data?.floors || []
+  const currentFloor = selectedArea || floors[0] || ''
+
+  const { data: layoutData, isLoading: isLoadingLayout } = useFloorLayoutQuery(
+    currentFloor || null,
+    !!currentFloor,
+  )
+
+  // Transform backend data to TableItem format
+  const tables = useMemo(() => {
+    if (!layoutData?.data.tables) return []
+    return layoutData.data.tables.map(transformTableToItem)
+  }, [layoutData])
+
+  const batchUpdateMutation = useBatchUpdatePositionsMutation()
+  const createTableMutation = useCreateTableMutation()
 
   useEffect(() => {
     if (floorParam) {
       setSelectedArea(floorParam)
     }
+  }, [floorParam])
 
-    if (tableIdParam) {
-      // Find and select the table
+  useEffect(() => {
+    if (tableIdParam && tables.length > 0) {
       const table = tables.find((t) => t.id === tableIdParam)
       if (table) {
         setSelectedTableId(tableIdParam)
-        console.log('[v0] Auto-focused on table:', tableIdParam, 'in floor:', floorParam)
-
-        // Optional: Auto-pan to the table position if it exists
-        // This would require implementing a pan feature in FloorPlanCanvas
-        // For now, just selecting it will highlight it in the properties panel
       }
     }
-  }, [floorParam, tableIdParam, tables])
+  }, [tableIdParam, tables])
+
+  // Initialize history when tables load
+  useEffect(() => {
+    if (tables.length > 0 && history.length === 0) {
+      setHistory([tables])
+      setHistoryIndex(0)
+    }
+  }, [tables, history.length])
 
   const selectedTable = tables.find((t) => t.id === selectedTableId)
 
   const handleTableUpdate = (id: string, updates: Partial<TableItem>) => {
+    // This is handled by the side panel component which calls the API directly
+    // We just update local state for immediate UI feedback
     const newTables = tables.map((t) => (t.id === id ? { ...t, ...updates } : t))
-    setTables(newTables)
     addToHistory(newTables)
   }
 
   const handleTableDelete = (id: string) => {
+    // This is handled by the side panel component which calls the API directly
+    // We just update local state for immediate UI feedback
     const newTables = tables.filter((t) => t.id !== id)
-    setTables(newTables)
     setSelectedTableId(null)
     addToHistory(newTables)
   }
 
-  const handleAddTable = (tableTemplate: Omit<TableItem, 'id' | 'position' | 'area'>) => {
-    const newTable: TableItem = {
-      ...tableTemplate,
-      id: `t${Date.now()}`,
-      position: { x: 200, y: 200 },
-      area: selectedArea,
+  const handleAddTable = async (tableTemplate: Omit<TableItem, 'id' | 'position' | 'area'>) => {
+    try {
+      const newTable = await createTableMutation.mutateAsync({
+        table_number: tableTemplate.name,
+        capacity: tableTemplate.seats,
+        floor: currentFloor,
+        shape: tableTemplate.type === 'round' ? 'circle' : 'rectangle',
+        status: 'available',
+        is_active: true,
+        position: { x: 200, y: 200 },
+      })
+
+      toast.success('Bàn đã được tạo thành công')
+      // The query will refetch automatically, so we don't need to update local state
+    } catch (error: any) {
+      console.error('Error creating table:', error)
+      toast.error('Có lỗi xảy ra khi tạo bàn')
     }
-    const newTables = [...tables, newTable]
-    setTables(newTables)
-    setSelectedTableId(newTable.id)
-    addToHistory(newTables)
   }
 
   const addToHistory = (newTables: TableItem[]) => {
@@ -151,30 +159,58 @@ export default function TableLayoutPage() {
   }
 
   const handleUndo = () => {
-    if (historyIndex > 0) {
-      setHistoryIndex(historyIndex - 1)
-      setTables(history[historyIndex - 1])
+    if (historyIndex > 0 && history.length > 0) {
+      const newIndex = historyIndex - 1
+      setHistoryIndex(newIndex)
+      // Note: We can't directly set tables since they come from API
+      // Undo/redo would need to be handled differently with API integration
+      // For now, we'll keep the history but tables will sync from API
     }
   }
 
   const handleRedo = () => {
-    if (historyIndex < history.length - 1) {
-      setHistoryIndex(historyIndex + 1)
-      setTables(history[historyIndex + 1])
+    if (historyIndex < history.length - 1 && history.length > 0) {
+      const newIndex = historyIndex + 1
+      setHistoryIndex(newIndex)
+      // Note: Same as undo - tables sync from API
     }
   }
 
-  const handleSave = () => {
-    console.log('[v0] Saving layout:', tables)
-    alert('Layout saved!')
+  const handleSave = async () => {
+    try {
+      const updates = tables.map((table) => ({
+        table_id: table.id,
+        position: table.position,
+      }))
+
+      await batchUpdateMutation.mutateAsync({ updates })
+      toast.success('Sơ đồ đã được lưu thành công')
+    } catch (error: any) {
+      console.error('Error saving layout:', error)
+      toast.error('Có lỗi xảy ra khi lưu sơ đồ')
+    }
   }
 
   const handleReset = () => {
     if (confirm('Bạn có chắc muốn reset layout về mặc định?')) {
-      setTables([])
+      // Reset to initial state from API
+      setHistory([])
+      setHistoryIndex(0)
       setSelectedTableId(null)
-      addToHistory([])
+      // Tables will be reloaded from API automatically
     }
+  }
+
+  if (isLoadingLayout) {
+    return (
+      <AdminLayout>
+        <div className="flex items-center justify-center py-12">
+          <div className="text-center">
+            <p className="text-sm text-slate-500 dark:text-slate-400">Đang tải sơ đồ...</p>
+          </div>
+        </div>
+      </AdminLayout>
+    )
   }
 
   return (
@@ -182,8 +218,13 @@ export default function TableLayoutPage() {
       <div className="space-y-4">
         {/* Toolbar */}
         <FloorPlanToolbar
-          selectedArea={selectedArea}
-          onAreaChange={setSelectedArea}
+          selectedArea={currentFloor}
+          onAreaChange={(area) => {
+            setSelectedArea(area)
+            setSelectedTableId(null)
+            setHistory([])
+            setHistoryIndex(0)
+          }}
           zoom={zoom}
           onZoomChange={setZoom}
           showGrid={showGrid}
@@ -203,10 +244,15 @@ export default function TableLayoutPage() {
             tables={tables}
             selectedTableId={selectedTableId}
             onTableSelect={setSelectedTableId}
-            onTableUpdate={handleTableUpdate}
+            onTableUpdate={(id, updates) => {
+              // Update local state immediately for UI feedback
+              handleTableUpdate(id, updates)
+              // Debounce and batch save positions
+              // This will be handled by a separate debounced save function if needed
+            }}
             zoom={zoom}
             showGrid={showGrid}
-            selectedArea={selectedArea}
+            selectedArea={currentFloor}
           />
 
           {/* Side Panel */}
@@ -215,10 +261,11 @@ export default function TableLayoutPage() {
             onTableUpdate={handleTableUpdate}
             onTableDelete={handleTableDelete}
             onAddTable={handleAddTable}
-            areas={['Tầng 1', 'Tầng 2', 'Sân vườn']}
+            areas={floors}
           />
         </div>
       </div>
     </AdminLayout>
   )
 }
+

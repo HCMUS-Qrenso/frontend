@@ -1,9 +1,13 @@
 "use client"
 
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { X, Download, Printer, ExternalLink } from "lucide-react"
+import { X, Download, Printer, ExternalLink, Loader2 } from "lucide-react"
 import Image from "next/image"
 import type { TableQR } from "./qr-manager-content"
+import { tablesApi } from "@/lib/api/tables"
+import { downloadBlob } from "@/lib/utils/download"
+import { toast } from "sonner"
 
 interface QRPreviewModalProps {
   table: TableQR
@@ -11,6 +15,25 @@ interface QRPreviewModalProps {
 }
 
 export function QRPreviewModal({ table, onClose }: QRPreviewModalProps) {
+  const [downloading, setDownloading] = useState<string | null>(null)
+
+  const handleDownload = async (format: "png" | "pdf") => {
+    if (!table.id) return
+
+    setDownloading(format)
+    try {
+      const blob = await tablesApi.downloadQR(table.id, format)
+      const filename = `table-${table.tableNumber}-qr.${format}`
+      downloadBlob(blob, filename)
+      toast.success(`Đã tải xuống ${format.toUpperCase()}`)
+    } catch (error: any) {
+      console.error("Error downloading QR:", error)
+      toast.error("Có lỗi xảy ra khi tải xuống QR")
+    } finally {
+      setDownloading(null)
+    }
+  }
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={onClose}>
       <div
@@ -77,17 +100,31 @@ export function QRPreviewModal({ table, onClose }: QRPreviewModalProps) {
           </div>
 
           {/* Actions */}
-          <div className="grid grid-cols-3 gap-2">
-            <Button variant="outline" className="gap-2 rounded-full bg-transparent">
-              <Download className="h-4 w-4" />
+          <div className="grid grid-cols-2 gap-2">
+            <Button
+              variant="outline"
+              className="gap-2 rounded-full bg-transparent"
+              onClick={() => handleDownload("png")}
+              disabled={!table.qrUrl || downloading !== null}
+            >
+              {downloading === "png" ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Download className="h-4 w-4" />
+              )}
               <span className="text-xs">PNG</span>
             </Button>
-            <Button variant="outline" className="gap-2 rounded-full bg-transparent">
-              <Download className="h-4 w-4" />
-              <span className="text-xs">SVG</span>
-            </Button>
-            <Button variant="outline" className="gap-2 rounded-full bg-transparent">
-              <Download className="h-4 w-4" />
+            <Button
+              variant="outline"
+              className="gap-2 rounded-full bg-transparent"
+              onClick={() => handleDownload("pdf")}
+              disabled={!table.qrUrl || downloading !== null}
+            >
+              {downloading === "pdf" ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Download className="h-4 w-4" />
+              )}
               <span className="text-xs">PDF</span>
             </Button>
           </div>

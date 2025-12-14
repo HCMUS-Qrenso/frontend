@@ -8,10 +8,14 @@ import Image from "next/image"
 import { useState } from "react"
 import type { TableQR } from "./qr-manager-content"
 import { Checkbox } from "@/components/ui/checkbox"
+import type { PaginationMeta } from "@/types/tables"
 
 interface QRTableListProps {
   tables: TableQR[]
   selectedTables: string[]
+  pagination?: PaginationMeta
+  currentPage: number
+  onPageChange: (page: number) => void
   onSelectTable: (id: string) => void
   onSelectAll: () => void
   onPreview: (table: TableQR) => void
@@ -41,7 +45,16 @@ function getStatusBadge(status: TableQR["status"]) {
   )
 }
 
-export function QRTableList({ tables, selectedTables, onSelectTable, onSelectAll, onPreview }: QRTableListProps) {
+export function QRTableList({ 
+  tables, 
+  selectedTables, 
+  pagination,
+  currentPage,
+  onPageChange,
+  onSelectTable, 
+  onSelectAll, 
+  onPreview 
+}: QRTableListProps) {
   const [copiedId, setCopiedId] = useState<string | null>(null)
 
   const copyToClipboard = (text: string, id: string) => {
@@ -212,24 +225,57 @@ export function QRTableList({ tables, selectedTables, onSelectTable, onSelectAll
       </div>
 
       {/* Pagination */}
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-slate-500 dark:text-slate-400">Hiển thị 1-10 trên {tables.length} bàn</p>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" className="rounded-full bg-transparent" disabled>
-            Trước
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-8 w-8 rounded-full bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10"
-          >
-            1
-          </Button>
-          <Button variant="outline" size="sm" className="rounded-full bg-transparent">
-            Sau
-          </Button>
+      {pagination && pagination.total_pages > 1 && (
+        <div className="flex items-center justify-between">
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            Hiển thị {(pagination.page - 1) * pagination.limit + 1}-
+            {Math.min(pagination.page * pagination.limit, pagination.total)} trên {pagination.total} bàn
+          </p>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="rounded-full bg-transparent"
+              disabled={pagination.page === 1}
+              onClick={() => onPageChange(pagination.page - 1)}
+            >
+              Trước
+            </Button>
+            {Array.from({ length: pagination.total_pages }, (_, i) => i + 1).map((pageNum) => (
+              <Button
+                key={pageNum}
+                variant="outline"
+                size="sm"
+                className={cn(
+                  "h-8 w-8 rounded-full",
+                  pageNum === pagination.page
+                    ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10"
+                    : "bg-transparent"
+                )}
+                onClick={() => onPageChange(pageNum)}
+              >
+                {pageNum}
+              </Button>
+            ))}
+            <Button
+              variant="outline"
+              size="sm"
+              className="rounded-full bg-transparent"
+              disabled={pagination.page === pagination.total_pages}
+              onClick={() => onPageChange(pagination.page + 1)}
+            >
+              Sau
+            </Button>
+          </div>
         </div>
-      </div>
+      )}
+      {pagination && pagination.total_pages <= 1 && (
+        <div className="flex items-center justify-between">
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            Hiển thị {pagination.total} bàn
+          </p>
+        </div>
+      )}
     </div>
   )
 }

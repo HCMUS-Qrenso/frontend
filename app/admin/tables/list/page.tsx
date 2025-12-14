@@ -6,7 +6,6 @@ import { TablesOverviewStats } from '@/components/admin/tables-overview-stats'
 import { TablesFilterToolbar } from '@/components/admin/tables-filter-toolbar'
 import { TablesListTable } from '@/components/admin/tables-list-table'
 import { TableUpsertDrawer } from '@/components/admin/table-upsert-drawer'
-import { TableDeleteDialog } from '@/components/admin/table-delete-dialog'
 import { useSearchParams } from 'next/navigation'
 import { Loader2 } from 'lucide-react'
 
@@ -29,9 +28,6 @@ function TablesListContent() {
 
       {/* Modal for Create/Edit */}
       <TableUpsertDrawer open={modalOpen} />
-
-      {/* Delete Confirmation Dialog */}
-      <TableDeleteDialog />
     </AdminLayout>
   )
 }

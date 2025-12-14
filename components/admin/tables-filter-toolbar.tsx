@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -12,13 +12,55 @@ import {
 import { Search, Plus, LayoutGrid, QrCode, ChevronDown } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { useFloorsQuery } from '@/hooks/use-tables-query'
 
 export function TablesFilterToolbar() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const [searchQuery, setSearchQuery] = useState('')
-  const [selectedArea, setSelectedArea] = useState('Tất cả')
-  const [selectedStatus, setSelectedStatus] = useState('Tất cả')
+  const { data: floorsData } = useFloorsQuery()
+  const floors = floorsData?.data?.floors || []
+
+  // Map backend status to UI labels
+  const statusMap: Record<string, string> = {
+    available: 'Trống',
+    occupied: 'Đang sử dụng',
+    waiting_for_payment: 'Chờ thanh toán',
+    maintenance: 'Bảo trì',
+  }
+
+  // Get filter values from URL params
+  const searchQuery = searchParams.get('search') || ''
+  const selectedArea = searchParams.get('floor') || 'Tất cả'
+  const selectedStatusKey = searchParams.get('status') || ''
+
+  // Map backend status key to frontend label for display
+  const selectedStatusLabel = selectedStatusKey
+    ? statusMap[selectedStatusKey] || selectedStatusKey
+    : 'Tất cả'
+
+  const [localSearchQuery, setLocalSearchQuery] = useState(searchQuery)
+
+  // Update URL params when filters change
+  const updateFilter = (key: string, value: string) => {
+    const params = new URLSearchParams(searchParams.toString())
+    if (value === 'Tất cả' || value === '') {
+      params.delete(key)
+    } else {
+      params.set(key, value)
+    }
+    params.set('page', '1') // Reset to first page when filtering
+    router.push(`/admin/tables/list?${params.toString()}`)
+  }
+
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      updateFilter('search', localSearchQuery)
+    }, 500)
+
+    return () => clearTimeout(timer)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [localSearchQuery])
 
   const handleAddTable = () => {
     const params = new URLSearchParams(searchParams.toString())
@@ -36,8 +78,8 @@ export function TablesFilterToolbar() {
           <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400" />
           <Input
             placeholder="Tìm theo số bàn, tên khu vực..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            value={localSearchQuery}
+            onChange={(e) => setLocalSearchQuery(e.target.value)}
             className="h-10 w-full rounded-full border-slate-200 bg-slate-50 pr-4 pl-9 text-sm focus:bg-white sm:w-64 dark:border-slate-700 dark:bg-slate-800 dark:focus:bg-slate-900"
           />
         </div>
@@ -51,12 +93,14 @@ export function TablesFilterToolbar() {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-48">
-            <DropdownMenuItem onClick={() => setSelectedArea('Tất cả')}>Tất cả</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setSelectedArea('Tầng 1')}>Tầng 1</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setSelectedArea('Tầng 2')}>Tầng 2</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setSelectedArea('Khu ngoài trời')}>
-              Khu ngoài trời
+            <DropdownMenuItem onClick={() => updateFilter('floor', 'Tất cả')}>
+              Tất cả
             </DropdownMenuItem>
+            {floors.map((floor) => (
+              <DropdownMenuItem key={floor} onClick={() => updateFilter('floor', floor)}>
+                {floor}
+              </DropdownMenuItem>
+            ))}
           </DropdownMenuContent>
         </DropdownMenu>
 
@@ -64,19 +108,19 @@ export function TablesFilterToolbar() {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="h-10 gap-2 rounded-full bg-transparent">
-              <span className="text-sm">Trạng thái: {selectedStatus}</span>
+              <span className="text-sm">Trạng thái: {selectedStatusLabel}</span>
               <ChevronDown className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-48">
-            <DropdownMenuItem onClick={() => setSelectedStatus('Tất cả')}>Tất cả</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setSelectedStatus('Trống')}>Trống</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setSelectedStatus('Đang sử dụng')}>
-              Đang sử dụng
+            <DropdownMenuItem onClick={() => updateFilter('status', 'Tất cả')}>
+              Tất cả
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setSelectedStatus('Bảo trì')}>
-              Bảo trì
-            </DropdownMenuItem>
+            {Object.entries(statusMap).map(([key, label]) => (
+              <DropdownMenuItem key={key} onClick={() => updateFilter('status', key)}>
+                {label}
+              </DropdownMenuItem>
+            ))}
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
