@@ -4,16 +4,19 @@ import type React from 'react'
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { isAxiosError } from 'axios'
 import { AuthContainer } from '@/components/auth/auth-container'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Loader2, UtensilsCrossed, CheckCircle2, AlertCircle } from 'lucide-react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import { useAuth } from '@/hooks/use-auth'
+import type { ApiErrorResponse } from '@/types/auth'
 
 export default function ForgotPasswordPage() {
+  const { forgotPassword, forgotPasswordPending } = useAuth()
   const [email, setEmail] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
   const [emailError, setEmailError] = useState('')
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [generalError, setGeneralError] = useState<string | null>(null)
@@ -39,20 +42,22 @@ export default function ForgotPasswordPage() {
       return
     }
 
-    setIsLoading(true)
+    try {
+      await forgotPassword({ email })
+      setIsSubmitted(true)
+    } catch (err) {
+      setGeneralError(getErrorMessage(err))
+    }
+  }
 
-    // Mock API call (replace with actual API)
-    setTimeout(() => {
-      // Simulate network error (5% chance for demo)
-      if (Math.random() < 0.05) {
-        setGeneralError('Có lỗi xảy ra, vui lòng thử lại sau.')
-        setIsLoading(false)
-      } else {
-        // Success - show success message regardless of email existence (security best practice)
-        setIsSubmitted(true)
-        setIsLoading(false)
+  const getErrorMessage = (err: unknown) => {
+    if (isAxiosError<ApiErrorResponse>(err)) {
+      const data = err.response?.data
+      if (data?.message) {
+        return Array.isArray(data.message) ? data.message.join(', ') : data.message
       }
-    }, 1500)
+    }
+    return 'Có lỗi xảy ra, vui lòng thử lại sau.'
   }
 
   // Success State
@@ -148,7 +153,7 @@ export default function ForgotPasswordPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="rounded-xl border-slate-200 bg-white px-4 py-2.5 text-sm shadow-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50 dark:focus:border-emerald-500 dark:focus:ring-emerald-500/20"
-              disabled={isLoading}
+              disabled={forgotPasswordPending}
             />
             {emailError && <p className="text-xs text-red-600 dark:text-red-400">{emailError}</p>}
           </div>
@@ -156,10 +161,10 @@ export default function ForgotPasswordPage() {
           {/* Submit Button */}
           <Button
             type="submit"
-            disabled={isLoading}
+            disabled={forgotPasswordPending}
             className="w-full rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60 dark:bg-emerald-500 dark:hover:bg-emerald-600"
           >
-            {isLoading ? (
+            {forgotPasswordPending ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Đang gửi...

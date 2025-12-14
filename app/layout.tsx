@@ -2,6 +2,7 @@ import type React from 'react'
 import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
+import { QueryProvider } from '@/providers/query-provider'
 import './globals.css'
 
 const _inter = Inter({ subsets: ['latin', 'vietnamese'] })
@@ -43,8 +44,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="vi">
-      <body className={`font-sans antialiased`}>
-        {children}
+      <body className={`font-sans antialiased ${_inter.className}`}>
+        <QueryProvider>{children}</QueryProvider>
         <Analytics />
       </body>
     </html>

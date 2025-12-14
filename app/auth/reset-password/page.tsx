@@ -5,6 +5,7 @@ import type React from 'react'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useSearchParams, useRouter } from 'next/navigation'
+import { isAxiosError } from 'axios'
 import { AuthContainer } from '@/components/auth/auth-container'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -19,6 +20,8 @@ import {
   AlertTriangle,
 } from 'lucide-react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import { useAuth } from '@/hooks/use-auth'
+import type { ApiErrorResponse } from '@/types/auth'
 
 type PasswordStrength = 'weak' | 'medium' | 'strong'
 
@@ -29,8 +32,8 @@ export default function ResetPasswordPage() {
 
   const [isValidatingToken, setIsValidatingToken] = useState(true)
   const [isTokenValid, setIsTokenValid] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
+  const { resetPassword, resetPasswordPending } = useAuth()
 
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
@@ -49,23 +52,13 @@ export default function ResetPasswordPage() {
 
   // Validate token on mount
   useEffect(() => {
-    const validateToken = async () => {
-      if (!token) {
-        setIsTokenValid(false)
-        setIsValidatingToken(false)
-        return
-      }
-
-      // Mock token validation (replace with actual API call)
-      setTimeout(() => {
-        // Simulate 20% invalid token rate for demo
-        const isValid = Math.random() > 0.2
-        setIsTokenValid(isValid)
-        setIsValidatingToken(false)
-      }, 1000)
+    if (!token) {
+      setIsTokenValid(false)
+      setIsValidatingToken(false)
+      return
     }
-
-    validateToken()
+    setIsTokenValid(true)
+    setIsValidatingToken(false)
   }, [token])
 
   // Calculate password strength
@@ -123,13 +116,23 @@ export default function ResetPasswordPage() {
       return
     }
 
-    setIsLoading(true)
-
-    // Mock API call (replace with actual API)
-    setTimeout(() => {
+    try {
+      await resetPassword({ token: token ?? '', newPassword: formData.password })
       setIsSuccess(true)
-      setIsLoading(false)
-    }, 1500)
+    } catch (err) {
+      const message = getErrorMessage(err)
+      setFieldErrors((prev) => ({ ...prev, password: message }))
+    }
+  }
+
+  const getErrorMessage = (err: unknown) => {
+    if (isAxiosError<ApiErrorResponse>(err)) {
+      const data = err.response?.data
+      if (data?.message) {
+        return Array.isArray(data.message) ? data.message.join(', ') : data.message
+      }
+    }
+    return 'Không thể đặt lại mật khẩu. Vui lòng thử lại.'
   }
 
   // Loading State
@@ -272,13 +275,13 @@ export default function ResetPasswordPage() {
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 className="rounded-xl border-slate-200 bg-white px-4 py-2.5 pr-10 text-sm shadow-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50 dark:focus:border-emerald-500 dark:focus:ring-emerald-500/20"
-                disabled={isLoading}
+                disabled={resetPasswordPending}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute top-1/2 right-3 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300"
-                disabled={isLoading}
+                disabled={resetPasswordPending}
               >
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
@@ -354,13 +357,13 @@ export default function ResetPasswordPage() {
                 value={formData.confirmPassword}
                 onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                 className="rounded-xl border-slate-200 bg-white px-4 py-2.5 pr-10 text-sm shadow-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50 dark:focus:border-emerald-500 dark:focus:ring-emerald-500/20"
-                disabled={isLoading}
+                disabled={resetPasswordPending}
               />
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 className="absolute top-1/2 right-3 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300"
-                disabled={isLoading}
+                disabled={resetPasswordPending}
               >
                 {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
@@ -375,10 +378,10 @@ export default function ResetPasswordPage() {
           {/* Submit Button */}
           <Button
             type="submit"
-            disabled={isLoading}
+            disabled={resetPasswordPending}
             className="w-full rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60 dark:bg-emerald-500 dark:hover:bg-emerald-600"
           >
-            {isLoading ? (
+            {resetPasswordPending ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Đang đặt lại...
