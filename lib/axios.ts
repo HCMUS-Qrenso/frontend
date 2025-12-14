@@ -57,7 +57,7 @@ apiClient.interceptors.response.use(
       '/auth/login',
       '/auth/refresh',
       '/auth/signup',
-
+      '/auth/logout',
       '/auth/forgot-password',
       '/auth/reset-password',
       '/auth/verify-email',

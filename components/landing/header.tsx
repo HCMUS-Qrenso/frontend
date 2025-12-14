@@ -1,6 +1,7 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
+import { ThemeToggle } from '@/components/theme-toggle'
 import { Menu, X } from 'lucide-react'
 import { useState } from 'react'
 import Link from 'next/link'
@@ -42,14 +43,14 @@ export function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-50 border-b border-slate-800/50 bg-slate-950/80 backdrop-blur-xl">
+    <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/80 backdrop-blur-xl dark:border-slate-800/50 dark:bg-slate-950/80">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600">
             <span className="text-lg font-bold text-white">Q</span>
           </div>
-          <span className="text-xl font-bold text-white">Qrenso</span>
+          <span className="text-xl font-bold text-slate-900 dark:text-white">Qrenso</span>
         </Link>
 
         {/* Desktop Nav */}
@@ -60,7 +61,7 @@ export function Header() {
                 key={item.href}
                 href={item.href}
                 onClick={(e) => handleSmoothScroll(e, item.href)}
-                className="text-sm text-slate-300 transition-colors hover:text-white"
+                className="text-sm text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-300 dark:hover:text-white"
               >
                 {item.label}
               </a>
@@ -68,7 +69,7 @@ export function Header() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="text-sm text-slate-300 transition-colors hover:text-white"
+                className="text-sm text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-300 dark:hover:text-white"
               >
                 {item.label}
               </Link>
@@ -78,7 +79,12 @@ export function Header() {
 
         {/* CTA */}
         <div className="hidden items-center gap-3 md:flex">
-          <Button variant="outline" className="border-slate-700 bg-transparent text-white" asChild>
+          <ThemeToggle />
+          <Button
+            variant="outline"
+            className="border-slate-300 bg-transparent text-slate-900 dark:border-slate-700 dark:text-white"
+            asChild
+          >
             <Link href="/auth/login">Đăng nhập</Link>
           </Button>
           <Button className="bg-emerald-600 text-white hover:bg-emerald-700" asChild>
@@ -89,16 +95,16 @@ export function Header() {
         {/* Mobile Menu Button */}
         <button className="md:hidden" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
           {mobileMenuOpen ? (
-            <X className="h-6 w-6 text-white" />
+            <X className="h-6 w-6 text-slate-900 dark:text-white" />
           ) : (
-            <Menu className="h-6 w-6 text-white" />
+            <Menu className="h-6 w-6 text-slate-900 dark:text-white" />
           )}
         </button>
       </div>
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="border-t border-slate-800 bg-slate-950 md:hidden">
+        <div className="border-t border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950 md:hidden">
           <nav className="container mx-auto flex flex-col gap-4 px-4 py-6">
             {navItems.map((item) =>
               item.href.startsWith('#') ? (
@@ -106,7 +112,7 @@ export function Header() {
                   key={item.href}
                   href={item.href}
                   onClick={(e) => handleSmoothScroll(e, item.href)}
-                  className="text-slate-300 hover:text-white"
+                  className="text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white"
                 >
                   {item.label}
                 </a>
@@ -114,17 +120,20 @@ export function Header() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="text-slate-300 hover:text-white"
+                  className="text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   {item.label}
                 </Link>
               ),
             )}
-            <div className="mt-4 flex flex-col gap-3">
+            <div className="mt-4 flex items-center gap-3">
+              <ThemeToggle />
+            </div>
+            <div className="flex flex-col gap-3">
               <Button
                 variant="outline"
-                className="border-slate-700 bg-transparent text-white hover:bg-slate-800"
+                className="border-slate-300 bg-transparent text-slate-900 hover:bg-slate-100 dark:border-slate-700 dark:text-white dark:hover:bg-slate-800"
                 asChild
               >
                 <Link href="/auth/login">Đăng nhập</Link>

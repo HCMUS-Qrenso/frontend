@@ -74,10 +74,12 @@ export default function ForgotPasswordPage() {
 
           {/* Header */}
           <div className="mb-6 space-y-2">
-            <h1 className="text-2xl font-bold text-white lg:text-3xl">Kiểm tra email của bạn</h1>
-            <p className="text-sm leading-relaxed text-white">
-              Nếu email <span className="font-medium text-white">{email}</span> tồn tại trong hệ
-              thống, chúng tôi đã gửi link đặt lại mật khẩu.
+            <h1 className="text-2xl font-bold text-slate-900 lg:text-3xl dark:text-white">
+              Kiểm tra email của bạn
+            </h1>
+            <p className="text-sm leading-relaxed text-slate-600 dark:text-white">
+              Nếu email <span className="font-medium text-slate-900 dark:text-white">{email}</span>{' '}
+              tồn tại trong hệ thống, chúng tôi đã gửi link đặt lại mật khẩu.
             </p>
             <p className="text-xs text-slate-500 dark:text-slate-400">
               Vui lòng kiểm tra hộp thư (bao gồm cả mục Spam/Quảng cáo).

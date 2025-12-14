@@ -25,13 +25,13 @@ const steps = [
 
 export function HowItWorks() {
   return (
-    <section id="how-it-works" className="border-b border-slate-800/50 bg-slate-950 py-20 md:py-32">
+    <section id="how-it-works" className="border-b border-slate-200 bg-white py-20 dark:border-slate-800/50 dark:bg-slate-950 md:py-32">
       <div className="container mx-auto px-4">
         <div className="mx-auto max-w-5xl">
           {/* Section Header */}
           <div className="mb-16 text-center">
-            <h2 className="text-3xl font-bold text-white md:text-4xl">Cách hoạt động đơn giản</h2>
-            <p className="mt-4 text-lg text-slate-400">4 bước để số hoá nhà hàng của bạn</p>
+            <h2 className="text-3xl font-bold text-slate-900 md:text-4xl dark:text-white">Cách hoạt động đơn giản</h2>
+            <p className="mt-4 text-lg text-slate-500 dark:text-slate-400">4 bước để số hoá nhà hàng của bạn</p>
           </div>
 
           {/* Steps */}
@@ -39,7 +39,7 @@ export function HowItWorks() {
             {steps.map((step, index) => (
               <div
                 key={index}
-                className="group relative flex gap-6 rounded-2xl border border-slate-800 bg-slate-900/50 p-6 transition-all hover:border-emerald-500/50"
+                className="group relative flex gap-6 rounded-2xl border border-slate-200 bg-slate-50 p-6 transition-all hover:border-emerald-500/50 dark:border-slate-800 dark:bg-slate-900/50"
               >
                 {/* Number */}
                 <div className="flex-shrink-0">
@@ -50,8 +50,8 @@ export function HowItWorks() {
 
                 {/* Content */}
                 <div className="flex-1">
-                  <h3 className="mb-2 text-xl font-semibold text-white">{step.title}</h3>
-                  <p className="text-slate-400">{step.description}</p>
+                  <h3 className="mb-2 text-xl font-semibold text-slate-900 dark:text-white">{step.title}</h3>
+                  <p className="text-slate-600 dark:text-slate-400">{step.description}</p>
                 </div>
 
                 {/* Check icon */}

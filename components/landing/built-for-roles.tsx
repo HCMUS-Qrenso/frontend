@@ -44,13 +44,13 @@ export function BuiltForRoles() {
   const currentRole = roles.find((r) => r.id === activeRole)!
 
   return (
-    <section className="border-b border-slate-800/50 bg-slate-900/50 py-20 md:py-32">
+    <section className="border-b border-slate-200 bg-slate-50 py-20 dark:border-slate-800/50 dark:bg-slate-900/50 md:py-32">
       <div className="container mx-auto px-4">
         <div className="mx-auto max-w-6xl">
           {/* Section Header */}
           <div className="mb-12 text-center">
-            <h2 className="text-3xl font-bold text-white md:text-4xl">Được thiết kế cho từng vai trò</h2>
-            <p className="mt-4 text-lg text-slate-400">Giải quyết đúng vấn đề của từng người trong nhà hàng</p>
+            <h2 className="text-3xl font-bold text-slate-900 md:text-4xl dark:text-white">Được thiết kế cho từng vai trò</h2>
+            <p className="mt-4 text-lg text-slate-500 dark:text-slate-400">Giải quyết đúng vấn đề của từng người trong nhà hàng</p>
           </div>
 
           {/* Role Tabs */}
@@ -63,16 +63,16 @@ export function BuiltForRoles() {
                   "flex flex-col items-center gap-3 rounded-2xl border p-6 transition-all",
                   activeRole === role.id
                     ? "border-emerald-500 bg-emerald-500/10"
-                    : "border-slate-800 bg-slate-900/50 hover:border-slate-700",
+                    : "border-slate-300 bg-white hover:border-slate-400 dark:border-slate-800 dark:bg-slate-900/50 dark:hover:border-slate-700",
                 )}
               >
-                <div className={cn("rounded-xl p-3", activeRole === role.id ? "bg-emerald-500/20" : "bg-slate-800")}>
+                <div className={cn("rounded-xl p-3", activeRole === role.id ? "bg-emerald-500/20" : "bg-slate-100 dark:bg-slate-800")}>
                   <role.icon
-                    className={cn("h-6 w-6", activeRole === role.id ? "text-emerald-400" : "text-slate-400")}
+                    className={cn("h-6 w-6", activeRole === role.id ? "text-emerald-400" : "text-slate-600 dark:text-slate-400")}
                   />
                 </div>
                 <span
-                  className={cn("text-sm font-medium", activeRole === role.id ? "text-emerald-400" : "text-slate-400")}
+                  className={cn("text-sm font-medium", activeRole === role.id ? "text-emerald-400" : "text-slate-600 dark:text-slate-400")}
                 >
                   {role.label}
                 </span>
@@ -83,13 +83,13 @@ export function BuiltForRoles() {
           {/* Pain Points & Solutions */}
           <div className="grid gap-8 md:grid-cols-2">
             {/* Pain Points */}
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-8">
-              <h3 className="mb-6 text-xl font-semibold text-white">Vấn đề thường gặp</h3>
+            <div className="rounded-2xl border border-slate-200 bg-white p-8 dark:border-slate-800 dark:bg-slate-900/50">
+              <h3 className="mb-6 text-xl font-semibold text-slate-900 dark:text-white">Vấn đề thường gặp</h3>
               <ul className="space-y-4">
                 {currentRole.painPoints.map((pain, index) => (
                   <li key={index} className="flex items-start gap-3">
                     <div className="mt-1 h-2 w-2 flex-shrink-0 rounded-full bg-red-500" />
-                    <span className="text-slate-300">{pain}</span>
+                    <span className="text-slate-600 dark:text-slate-300">{pain}</span>
                   </li>
                 ))}
               </ul>
@@ -97,12 +97,12 @@ export function BuiltForRoles() {
 
             {/* Solutions */}
             <div className="rounded-2xl border border-emerald-500/50 bg-emerald-500/5 p-8">
-              <h3 className="mb-6 text-xl font-semibold text-white">Qrenso giải quyết</h3>
+              <h3 className="mb-6 text-xl font-semibold text-slate-900 dark:text-white">Qrenso giải quyết</h3>
               <ul className="space-y-4">
                 {currentRole.solutions.map((solution, index) => (
                   <li key={index} className="flex items-start gap-3">
                     <div className="mt-1 h-2 w-2 flex-shrink-0 rounded-full bg-emerald-500" />
-                    <span className="text-slate-300">{solution}</span>
+                    <span className="text-slate-600 dark:text-slate-300">{solution}</span>
                   </li>
                 ))}
               </ul>
