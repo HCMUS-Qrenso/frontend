@@ -263,7 +263,7 @@ function ResetPasswordContent() {
           <div className="space-y-2">
             <Label
               htmlFor="password"
-              className="text-sm font-medium text-slate-700 dark:text-slate-300"
+              className="text-sm font-medium text-slate-700 dark:text-white"
             >
               Mật khẩu mới
             </Label>
@@ -345,7 +345,7 @@ function ResetPasswordContent() {
           <div className="space-y-2">
             <Label
               htmlFor="confirmPassword"
-              className="text-sm font-medium text-slate-700 dark:text-slate-300"
+              className="text-sm font-medium text-slate-700 dark:text-white"
             >
               Nhập lại mật khẩu
             </Label>

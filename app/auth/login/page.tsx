@@ -2,7 +2,7 @@
 
 import type React from 'react'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { isAxiosError } from 'axios'
@@ -16,11 +16,13 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { useAuth } from '@/hooks/use-auth'
 import type { ApiErrorResponse } from '@/types/auth'
 
+const REMEMBER_ME_KEY = 'rememberMe'
+const REMEMBERED_EMAIL_KEY = 'rememberedEmail'
+
 export default function LoginPage() {
   const router = useRouter()
   const { login, loginPending } = useAuth()
   const [showPassword, setShowPassword] = useState(false)
-  const [isGoogleLoading, setIsGoogleLoading] = useState(false)
   const [rememberMe, setRememberMe] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -28,6 +30,21 @@ export default function LoginPage() {
     email: '',
     password: '',
   })
+
+  // Load rememberMe và email từ localStorage khi component mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedRememberMe = localStorage.getItem(REMEMBER_ME_KEY) === 'true'
+      const savedEmail = localStorage.getItem(REMEMBERED_EMAIL_KEY)
+      
+      if (savedRememberMe) {
+        setRememberMe(true)
+      }
+      if (savedEmail) {
+        setFormData((prev) => ({ ...prev, email: savedEmail }))
+      }
+    }
+  }, [])
 
   const [fieldErrors, setFieldErrors] = useState({
     email: '',
@@ -70,47 +87,26 @@ export default function LoginPage() {
     }
 
     try {
-      await login(formData)
+      // Lưu rememberMe preference vào localStorage
+      if (typeof window !== 'undefined') {
+        if (rememberMe) {
+          localStorage.setItem(REMEMBER_ME_KEY, 'true')
+          // Lưu email nếu rememberMe = true
+          localStorage.setItem(REMEMBERED_EMAIL_KEY, formData.email)
+        } else {
+          localStorage.removeItem(REMEMBER_ME_KEY)
+          localStorage.removeItem(REMEMBERED_EMAIL_KEY)
+        }
+      }
+
+      // Truyền rememberMe vào login call
+      await login({ ...formData, rememberMe })
       router.push('/admin/dashboard')
     } catch (err) {
       const message = getErrorMessage(err)
       setError(message)
     }
   }
-
-  const handleGoogleLogin = () => {
-    setError(null)
-    setIsGoogleLoading(true)
-    window.location.href = 'http://localhost:3000/auth/google'
-  }
-
-  const GoogleIcon = () => (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 48 48"
-      className="h-4 w-4"
-      aria-hidden="true"
-      focusable="false"
-    >
-      <path
-        fill="#EA4335"
-        d="M24 9.5c3.54 0 5.93 1.54 7.29 2.83l5.32-5.2C33.64 3.6 29.28 2 24 2 14.91 2 7.14 7.59 4.13 15.12l6.9 5.36C12.57 13.3 17.74 9.5 24 9.5Z"
-      />
-      <path
-        fill="#4285F4"
-        d="M46.5 24.5c0-1.56-.14-3.02-.4-4.5H24v8.51h12.85c-.58 2.94-2.35 5.45-5.01 7.12l6.93 5.38C43.4 37.45 46.5 31.5 46.5 24.5Z"
-      />
-      <path
-        fill="#FBBC04"
-        d="M11.03 28.02a9.45 9.45 0 0 1-.52-2.95c0-1.03.19-2.04.5-2.96l-6.9-5.36A22.37 22.37 0 0 0 1.5 25.08c0 3.57.86 6.94 2.4 9.95l7.13-5.42Z"
-      />
-      <path
-        fill="#34A853"
-        d="M24 46c6.48 0 11.92-2.12 15.89-5.79l-6.93-5.38C30.58 36.65 27.58 37.5 24 37.5c-6.26 0-11.43-3.8-13.97-9.4l-7.13 5.42C7.14 40.41 14.91 46 24 46Z"
-      />
-      <path fill="none" d="M1.5 1.5h45v45h-45Z" />
-    </svg>
-  )
 
   const getErrorMessage = (err: unknown) => {
     if (isAxiosError<ApiErrorResponse>(err)) {
@@ -155,10 +151,7 @@ export default function LoginPage() {
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* Email Field */}
           <div className="space-y-2">
-            <Label
-              htmlFor="email"
-              className="text-sm font-medium text-slate-700 dark:text-slate-300"
-            >
+            <Label htmlFor="email" className="text-sm font-medium text-slate-700 dark:text-white">
               Email
             </Label>
             <Input
@@ -179,7 +172,7 @@ export default function LoginPage() {
           <div className="space-y-2">
             <Label
               htmlFor="password"
-              className="text-sm font-medium text-slate-700 dark:text-slate-300"
+              className="text-sm font-medium text-slate-700 dark:text-white"
             >
               Mật khẩu
             </Label>
@@ -226,7 +219,7 @@ export default function LoginPage() {
             </div>
             <Link
               href="/auth/forgot-password"
-              className="text-xs font-medium text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300"
+              className="text-xs font-medium text-emerald-600 hover:text-emerald-700 dark:text-white dark:hover:text-slate-200"
             >
               Quên mật khẩu?
             </Link>
@@ -248,24 +241,6 @@ export default function LoginPage() {
             )}
           </Button>
         </form>
-
-        <div className="mt-6 space-y-3">
-          <div className="flex items-center gap-3">
-            <div className="h-px flex-1 bg-slate-200 dark:bg-slate-800" />
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Hoặc</span>
-            <div className="h-px flex-1 bg-slate-200 dark:bg-slate-800" />
-          </div>
-          <Button
-            type="button"
-            variant="outline"
-            className="w-full rounded-xl border-slate-200 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700/80"
-            onClick={handleGoogleLogin}
-            disabled={loginPending || isGoogleLoading}
-          >
-            {isGoogleLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <GoogleIcon />}
-            {isGoogleLoading ? 'Đang chuyển hướng...' : 'Đăng nhập bằng Google'}
-          </Button>
-        </div>
 
         {/* Footer */}
         <div className="mt-8 space-y-4 border-t border-slate-200 pt-6 dark:border-slate-800">

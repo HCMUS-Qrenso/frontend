@@ -77,7 +77,7 @@ export default function ForgotPasswordPage() {
             <h1 className="text-2xl font-bold text-slate-900 lg:text-3xl dark:text-white">
               Kiểm tra email của bạn
             </h1>
-            <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+            <p className="text-sm leading-relaxed text-slate-600 dark:text-white">
               Nếu email <span className="font-medium text-slate-900 dark:text-white">{email}</span>{' '}
               tồn tại trong hệ thống, chúng tôi đã gửi link đặt lại mật khẩu.
             </p>
@@ -140,10 +140,7 @@ export default function ForgotPasswordPage() {
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* Email Field */}
           <div className="space-y-2">
-            <Label
-              htmlFor="email"
-              className="text-sm font-medium text-slate-700 dark:text-slate-300"
-            >
+            <Label htmlFor="email" className="text-sm font-medium text-slate-700 dark:text-white">
               Email
             </Label>
             <Input

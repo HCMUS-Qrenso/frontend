@@ -8,9 +8,9 @@ interface AuthContainerProps {
 export function AuthContainer({ children }: AuthContainerProps) {
   return (
     <div className="flex min-h-screen items-center justify-center px-4 py-8">
-      <div className="grid w-full max-w-6xl gap-0 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl lg:grid-cols-2 dark:border-slate-800 dark:bg-slate-900">
+      <div className="grid w-full max-w-6xl gap-0 overflow-hidden rounded-3xl border border-slate-200 bg-slate-100 shadow-2xl lg:grid-cols-2 dark:border-slate-800 dark:bg-slate-900">
         {/* Left Panel - Brand Info (Hidden on mobile) */}
-        <div className="hidden bg-gradient-to-br from-emerald-500 to-emerald-600 p-12 lg:flex lg:flex-col lg:justify-between dark:from-emerald-600 dark:to-emerald-700">
+        <div className="hidden bg-gradient-to-br from-emerald-600 to-emerald-700 p-12 lg:flex lg:flex-col lg:justify-between">
           {/* Logo & Brand */}
           <div>
             <div className="mb-8 flex items-center gap-3">

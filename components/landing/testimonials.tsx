@@ -31,19 +31,19 @@ const testimonials = [
 
 export function Testimonials() {
   return (
-    <section className="border-b border-slate-800/50 bg-slate-950 py-20 md:py-32">
+    <section className="border-b border-slate-200 bg-white py-20 dark:border-slate-800/50 dark:bg-slate-950 md:py-32">
       <div className="container mx-auto px-4">
         <div className="mx-auto max-w-6xl">
           {/* Section Header */}
           <div className="mb-16 text-center">
-            <h2 className="text-3xl font-bold text-white md:text-4xl">Khách hàng nói gì về Qrenso</h2>
-            <p className="mt-4 text-lg text-slate-400">Hàng trăm nhà hàng đã tin dùng và hài lòng</p>
+            <h2 className="text-3xl font-bold text-slate-900 md:text-4xl dark:text-white">Khách hàng nói gì về Qrenso</h2>
+            <p className="mt-4 text-lg text-slate-500 dark:text-slate-400">Hàng trăm nhà hàng đã tin dùng và hài lòng</p>
           </div>
 
           {/* Testimonials Grid */}
           <div className="grid gap-8 md:grid-cols-3">
             {testimonials.map((testimonial, index) => (
-              <div key={index} className="rounded-2xl border border-slate-800 bg-slate-900/50 p-6">
+              <div key={index} className="rounded-2xl border border-slate-200 bg-slate-50 p-6 dark:border-slate-800 dark:bg-slate-900/50">
                 {/* Rating */}
                 <div className="mb-4 flex gap-1">
                   {Array.from({ length: testimonial.rating }).map((_, i) => (
@@ -52,7 +52,7 @@ export function Testimonials() {
                 </div>
 
                 {/* Quote */}
-                <p className="mb-6 text-slate-300">{testimonial.quote}</p>
+                <p className="mb-6 text-slate-600 dark:text-slate-300">{testimonial.quote}</p>
 
                 {/* Author */}
                 <div className="flex items-center gap-4">
@@ -64,8 +64,8 @@ export function Testimonials() {
                     className="rounded-full"
                   />
                   <div>
-                    <div className="font-semibold text-white">{testimonial.name}</div>
-                    <div className="text-sm text-slate-400">
+                    <div className="font-semibold text-slate-900 dark:text-white">{testimonial.name}</div>
+                    <div className="text-sm text-slate-500 dark:text-slate-400">
                       {testimonial.role} - {testimonial.restaurant}
                     </div>
                   </div>

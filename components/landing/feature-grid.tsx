@@ -45,13 +45,13 @@ const features = [
 
 export function FeatureGrid() {
   return (
-    <section id="features" className="border-b border-slate-800/50 bg-slate-900/50 py-20 md:py-32">
+    <section id="features" className="border-b border-slate-200 bg-slate-50 py-20 dark:border-slate-800/50 dark:bg-slate-900/50 md:py-32">
       <div className="container mx-auto px-4">
         <div className="mx-auto max-w-6xl">
           {/* Section Header */}
           <div className="mb-16 text-center">
-            <h2 className="text-3xl font-bold text-white md:text-4xl">Tính năng hoàn chỉnh cho nhà hàng hiện đại</h2>
-            <p className="mt-4 text-lg text-slate-400">Từ đặt món đến thanh toán, từ bếp đến quản lý</p>
+            <h2 className="text-3xl font-bold text-slate-900 md:text-4xl dark:text-white">Tính năng hoàn chỉnh cho nhà hàng hiện đại</h2>
+            <p className="mt-4 text-lg text-slate-500 dark:text-slate-400">Từ đặt món đến thanh toán, từ bếp đến quản lý</p>
           </div>
 
           {/* Features Grid */}
@@ -59,13 +59,13 @@ export function FeatureGrid() {
             {features.map((feature, index) => (
               <div
                 key={index}
-                className="group rounded-2xl border border-slate-800 bg-slate-900/50 p-6 transition-all hover:border-emerald-500/50 hover:bg-slate-900"
+                className="group rounded-2xl border border-slate-200 bg-white p-6 transition-all hover:border-emerald-500/50 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900/50 dark:hover:bg-slate-900"
               >
                 <div className="mb-4 inline-flex rounded-xl bg-emerald-500/10 p-3">
                   <feature.icon className="h-6 w-6 text-emerald-400" />
                 </div>
-                <h3 className="mb-2 text-lg font-semibold text-white">{feature.title}</h3>
-                <p className="text-sm leading-relaxed text-slate-400">{feature.description}</p>
+                <h3 className="mb-2 text-lg font-semibold text-slate-900 dark:text-white">{feature.title}</h3>
+                <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400">{feature.description}</p>
               </div>
             ))}
           </div>

@@ -34,8 +34,9 @@ export const useLoginMutation = () => {
 
   return useMutation<AuthResponse, unknown, LoginCredentials>({
     mutationFn: (payload) => authApi.login(payload),
-    onSuccess: (data) => {
-      setAuth(data)
+    onSuccess: (data, variables) => {
+      // Truyền rememberMe vào setAuth (mặc định true nếu không có)
+      setAuth(data, variables.rememberMe ?? true)
       queryClient.setQueryData<User>(authQueryKeys.profile, data.user)
     },
   })
