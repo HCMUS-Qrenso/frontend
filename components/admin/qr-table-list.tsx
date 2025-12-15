@@ -1,13 +1,18 @@
-"use client"
+'use client'
 
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Eye, Download, Printer, RefreshCw, Copy, Check } from "lucide-react"
-import Image from "next/image"
-import { useState } from "react"
-import { Checkbox } from "@/components/ui/checkbox"
-import type { TableQR } from "@/types/tables"
+import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { Eye, Download, Printer, RefreshCw, Copy, Check } from 'lucide-react'
+import Image from 'next/image'
+import { useState } from 'react'
+import { Checkbox } from '@/components/ui/checkbox'
+import type { TableQR } from '@/types/tables'
 
 interface QRTableListProps {
   tables: TableQR[]
@@ -22,24 +27,28 @@ interface QRTableListProps {
   isLoading?: boolean
 }
 
-function getStatusBadge(status: TableQR["status"]) {
-  const statusMap: Record<TableQR["status"], string> = {
-    Ready: "Sẵn sàng",
-    Missing: "Thiếu",
-    Outdated: "Lỗi thời",
+function getStatusBadge(status: TableQR['status']) {
+  const statusMap: Record<TableQR['status'], string> = {
+    Ready: 'Sẵn sàng',
+    Missing: 'Thiếu',
+    Outdated: 'Lỗi thời',
   }
 
   const styles = {
     Ready:
-      "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20",
-    Missing: "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/20",
+      'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20',
+    Missing:
+      'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/20',
     Outdated:
-      "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20",
+      'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20',
   }
 
   return (
     <span
-      className={cn("inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium", styles[status])}
+      className={cn(
+        'inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium',
+        styles[status],
+      )}
     >
       {statusMap[status]}
     </span>
@@ -122,22 +131,22 @@ export function QRTableList({
                   aria-label="Chọn tất cả"
                 />
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
+              <th className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
                 Bàn
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
+              <th className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
                 Xem trước QR
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
+              <th className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
                 Liên kết / Đích đến
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
+              <th className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
                 Trạng thái
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
+              <th className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
                 Cập nhật lúc
               </th>
-              <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
+              <th className="px-6 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
                 Thao tác
               </th>
             </tr>
@@ -147,8 +156,8 @@ export function QRTableList({
               <tr
                 key={table.id}
                 className={cn(
-                  "border-b border-slate-100 transition-colors hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800",
-                  index === tables.length - 1 && "border-b-0",
+                  'border-b border-slate-100 transition-colors hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800',
+                  index === tables.length - 1 && 'border-b-0',
                 )}
               >
                 <td className="px-6 py-4">
@@ -160,7 +169,9 @@ export function QRTableList({
                 </td>
                 <td className="px-6 py-4">
                   <div>
-                    <p className="text-sm font-medium text-slate-900 dark:text-white">Bàn {table.tableNumber}</p>
+                    <p className="text-sm font-medium text-slate-900 dark:text-white">
+                      Bàn {table.tableNumber}
+                    </p>
                     <p className="text-xs text-slate-500 dark:text-slate-400">{table.tableArea}</p>
                   </div>
                 </td>
@@ -183,11 +194,11 @@ export function QRTableList({
                   ) : (
                     <div className="flex h-16 w-16 items-center justify-center rounded-lg border border-dashed border-slate-300 bg-slate-50 dark:border-slate-700 dark:bg-slate-800">
                       <Image
-                        src="/placeholder.svg"
-                        alt="QR placeholder"
+                        src="/placehoder.jpg"
+                        alt="QR sắp cập nhật"
                         width={40}
                         height={40}
-                        className="opacity-50"
+                        className="object-contain opacity-80"
                       />
                     </div>
                   )}
@@ -275,9 +286,7 @@ export function QRTableList({
       {/* Table count */}
       {tables.length > 0 && (
         <div className="flex items-center justify-between">
-          <p className="text-sm text-slate-500 dark:text-slate-400">
-            Hiển thị {tables.length} bàn
-          </p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">Hiển thị {tables.length} bàn</p>
         </div>
       )}
     </div>

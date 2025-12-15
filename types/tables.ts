@@ -18,7 +18,13 @@ export interface Table {
   /** @deprecated Use zone_id instead */
   floor: string | null
   zone_id: string | null
+  /** @deprecated Backend may also return nested `zone` object; prefer `zone.name` when available */
   zone_name?: string | null
+  /** Optional nested zone object from backend: { id, name } */
+  zone?: {
+    id: string
+    name: string
+  } | null
   shape: TableShape | null
   status: TableStatus
   qr_code_token: string | null
@@ -308,3 +314,239 @@ export interface TableQR {
   updatedAt: string
   seats: number
 }
+
+  name: string
+
+  seats: number
+
+  area: string // Zone name/area label
+
+  status: TableStatus
+
+  position: TablePosition
+
+}
+
+
+
+export interface ZoneLayoutResponse {
+
+  success: boolean
+
+  data: {
+
+    zone: string // Zone ID or name
+
+    zone_id?: string // Zone ID if available
+
+    tables: ZoneLayoutTable[]
+
+  }
+
+}
+
+
+
+// Keep FloorLayoutResponse for backward compatibility
+
+/** @deprecated Use ZoneLayoutResponse instead */
+
+export interface FloorLayoutResponse {
+
+  success: boolean
+
+  data: {
+
+    floor: string
+
+    tables: FloorLayoutTable[]
+
+  }
+
+}
+
+
+
+/** @deprecated Use ZoneLayoutTable instead */
+
+export type FloorLayoutTable = ZoneLayoutTable
+
+
+
+export interface ZonesResponse {
+
+  success: boolean
+
+  data: {
+
+    zones: Array<{
+
+      id: string
+
+      name: string
+
+    }>
+
+  }
+
+}
+
+
+
+// Keep FloorsResponse for backward compatibility
+
+/** @deprecated Use ZonesResponse instead */
+
+export interface FloorsResponse {
+
+  success: boolean
+
+  data: {
+
+    floors: string[]
+
+  }
+
+}
+
+
+
+// Batch Position Update
+
+export interface PositionUpdateItem {
+
+  table_id: string
+
+  position: TablePosition
+
+}
+
+
+
+export interface BatchPositionUpdatePayload {
+
+  updates: PositionUpdateItem[]
+
+}
+
+
+
+export interface BatchPositionUpdateResponse {
+
+  success: boolean
+
+  message: string
+
+  data: {
+
+    updated_count: number
+
+    tables: Array<{
+
+      id: string
+
+      position: TablePosition
+
+    }>
+
+  }
+
+}
+
+
+
+// QR Status Types
+export type QRStatus = 'ready' | 'missing' | 'outdated'
+
+// QR Code Info (single table)
+export interface QRCodeInfo {
+  id: string
+  table_id: string
+  table_number: string
+  qr_code_token: string
+  qr_code_url: string
+  ordering_url: string
+  qr_code_generated_at: string | null
+  status: QRStatus
+  zone_id?: string | null
+  zone_name?: string | null
+}
+
+// Single QR detail (API returns snake_case)
+export interface QRCodeDetailResponse {
+  success: boolean
+  message?: string
+  data: {
+    id: string
+    table_number: string
+    qr_code_token: string
+    qr_code_url: string | null
+    ordering_url: string | null
+    qr_code_generated_at: string | null
+    status: string
+    table_zone?: string | null
+    seats?: number | null
+  }
+}
+
+// QR Code List Query Parameters
+export interface QRCodeListQueryParams {
+  status?: QRStatus
+  zone_id?: string
+}
+
+// QR Code List Response (actual API returns camelCase)
+export interface QRCodeListResponse {
+  success: boolean
+  message?: string
+  data: {
+    tables: Array<{
+      id: string
+      tableNumber: string
+      tableZone: string
+      seats: number
+      qrUrl: string | null
+      orderingUrl: string | null
+      status: 'Missing' | 'Ready' | 'Outdated'
+      updatedAt: string | null
+    }>
+  }
+}
+
+// Batch Generate QR Payload
+export interface BatchGenerateQRPayload {
+  table_ids: string[]
+  force_regenerate?: boolean
+}
+
+export interface BatchGenerateQRResponse {
+  success: boolean
+  message: string
+  data: {
+    generated_count: number
+    qr_codes: QRCodeInfo[]
+  }
+}
+
+// TableQR interface for QR Manager page (UI)
+export interface TableQR {
+
+  id: string
+
+  tableNumber: string
+
+  tableArea: string
+
+  qrUrl: string
+
+  qrLink: string
+
+  status: 'Ready' | 'Missing' | 'Outdated'
+
+  updatedAt: string
+
+  seats: number
+
+}
+
+

@@ -12,7 +12,6 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Checkbox } from '@/components/ui/checkbox'
 import { Textarea } from '@/components/ui/textarea'
 import { Circle, Square, Users } from 'lucide-react'
 import type { TableItem } from '@/app/admin/tables/layout/page'
@@ -326,20 +325,6 @@ export function FloorPlanSidePanel({
                   <p className="text-xs text-slate-500 dark:text-slate-400">
                     Trạng thái thời gian thực (Đang sử dụng, Chờ) được cập nhật tự động
                   </p>
-                </div>
-
-                {/* Can be merged */}
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="can-merge"
-                    checked={selectedTable.canBeMerged}
-                    onCheckedChange={(checked) =>
-                      onTableUpdate(selectedTable.id, { canBeMerged: checked as boolean })
-                    }
-                  />
-                  <Label htmlFor="can-merge" className="text-sm font-normal">
-                    Có thể gộp với bàn khác
-                  </Label>
                 </div>
 
                 {/* Notes */}

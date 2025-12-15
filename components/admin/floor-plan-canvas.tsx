@@ -59,6 +59,14 @@ export function FloorPlanCanvas({
     (t) => t.area === selectedArea && t.position && t.position.x !== -1 && t.position.y !== -1,
   )
 
+  // Dynamic canvas height so grid always covers all tables (especially when zoomed)
+  const contentBottom =
+    filteredTables.length > 0
+      ? Math.max(...filteredTables.map((t) => t.position.y + t.size.height)) + 200
+      : 600
+  // Multiply by zoom so when zoomed in, the grid extends further down to cover scaled tables
+  const canvasHeight = Math.max(600, contentBottom * zoom)
+
   const handleDragStart = (event: DragStartEvent) => {
     const { active } = event
     // Select table when drag starts
@@ -142,44 +150,48 @@ export function FloorPlanCanvas({
           <div
             ref={canvasRef}
             className={cn(
-              'relative h-[600px] w-full overflow-auto rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800/50',
-              showGrid && 'bg-grid-pattern',
+              'relative w-full overflow-auto rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800/50',
             )}
             onClick={(e) => {
               if (e.target === e.currentTarget) {
                 onTableSelect(null)
               }
             }}
-            style={{
-              transform: `scale(${zoom})`,
-              transformOrigin: 'top left',
-              transition: 'transform 0.2s',
-            }}
+            style={{ height: canvasHeight }}
           >
-            {/* Grid background */}
+            {/* Grid background fills entire visible canvas and reacts to zoom */}
             {showGrid && (
               <div
                 className="pointer-events-none absolute inset-0"
                 style={{
                   backgroundImage:
                     'linear-gradient(to right, rgb(226 232 240 / 0.3) 1px, transparent 1px), linear-gradient(to bottom, rgb(226 232 240 / 0.3) 1px, transparent 1px)',
-                  backgroundSize: '20px 20px',
+                  // Scale spacing with zoom so grid density feels consistent
+                  backgroundSize: `${GRID_SIZE * zoom}px ${GRID_SIZE * zoom}px`,
                 }}
               />
             )}
-
-            {/* Tables */}
-            {filteredTables.map((table) => (
-              <DraggableTable
-                key={table.id}
-                table={table}
-                isSelected={table.id === selectedTableId}
-                onSelect={() => onTableSelect(table.id)}
-                onRotate={() => handleRotate(table.id, table.rotation)}
-                onRemove={() => onTableRemove(table.id)}
-                zoom={zoom}
-              />
-            ))}
+            <div
+              className="relative h-full w-full"
+              style={{
+                transform: `scale(${zoom})`,
+                transformOrigin: 'top left',
+                transition: 'transform 0.2s',
+              }}
+            >
+              {/* Tables */}
+              {filteredTables.map((table) => (
+                <DraggableTable
+                  key={table.id}
+                  table={table}
+                  isSelected={table.id === selectedTableId}
+                  onSelect={() => onTableSelect(table.id)}
+                  onRotate={() => handleRotate(table.id, table.rotation)}
+                  onRemove={() => onTableRemove(table.id)}
+                  zoom={zoom}
+                />
+              ))}
+            </div>
           </div>
         </DndContext>
       </div>

@@ -132,6 +132,21 @@ export function TableUpsertDrawer({ open }: TableUpsertDrawerProps) {
     }
   }, [mode, tableData, open])
 
+  // When creating a new table, default the zone to the first available zone
+  useEffect(() => {
+    if (!open) return
+    if (mode !== 'create') return
+    if (!zones || zones.length === 0) return
+
+    // Only set default if user hasn't chosen anything yet
+    if (!formData.zone_id) {
+      setFormData((prev) => ({
+        ...prev,
+        zone_id: zones[0].id,
+      }))
+    }
+  }, [open, mode, zones, formData.zone_id])
+
   const closeDrawer = () => {
     const params = new URLSearchParams(searchParams.toString())
     params.delete('modal')

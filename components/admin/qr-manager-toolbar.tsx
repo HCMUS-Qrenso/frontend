@@ -1,11 +1,16 @@
-"use client"
+'use client'
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Search, ChevronDown, QrCode, Eye, EyeOff, Shield, Download } from "lucide-react"
-import type { QRStatus } from "@/types/tables"
+import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { Search, ChevronDown, QrCode, Eye, EyeOff, Shield, Download } from 'lucide-react'
+import type { QRStatus } from '@/types/tables'
 
 interface QRManagerToolbarProps {
   zones: Array<{ id: string; name: string }>
@@ -31,7 +36,7 @@ export function QRManagerToolbar({
   isLoading = false,
 }: QRManagerToolbarProps) {
   const [showPreview, setShowPreview] = useState(true)
-  const [searchQuery, setSearchQuery] = useState("")
+  const [searchQuery, setSearchQuery] = useState('')
 
   const statusMap: Record<QRStatus, string> = {
     ready: 'Có QR',
@@ -46,12 +51,12 @@ export function QRManagerToolbar({
   const selectedStatusLabel = statusFilter ? statusMap[statusFilter] : 'Tất cả trạng thái'
 
   return (
-    <div className="flex flex-col gap-3 rounded-2xl border border-slate-100 bg-white/80 p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900/80 md:flex-row md:items-center md:justify-between">
+    <div className="flex flex-col gap-3 rounded-2xl border border-slate-100 bg-white/80 p-4 shadow-sm md:flex-row md:items-center md:justify-between dark:border-slate-800 dark:bg-slate-900/80">
       {/* Search & Filters */}
       <div className="flex flex-1 flex-col gap-2 sm:flex-row sm:items-center">
         {/* Search */}
         <div className="relative flex-1 sm:max-w-xs">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+          <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400" />
           <Input
             placeholder="Tìm theo số bàn, khu vực hoặc link QR..."
             className="rounded-full border-slate-200 bg-slate-50/50 pl-9 dark:border-slate-700 dark:bg-slate-800/50"
@@ -67,7 +72,9 @@ export function QRManagerToolbar({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start">
-            <DropdownMenuItem onClick={() => onZoneFilterChange(undefined)}>Tất cả khu vực</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onZoneFilterChange(undefined)}>
+              Tất cả khu vực
+            </DropdownMenuItem>
             {zones.map((zone) => (
               <DropdownMenuItem key={zone.id} onClick={() => onZoneFilterChange(zone.id)}>
                 {zone.name}
@@ -85,7 +92,9 @@ export function QRManagerToolbar({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start">
-            <DropdownMenuItem onClick={() => onStatusFilterChange(undefined)}>Tất cả trạng thái</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onStatusFilterChange(undefined)}>
+              Tất cả trạng thái
+            </DropdownMenuItem>
             {Object.entries(statusMap).map(([key, label]) => (
               <DropdownMenuItem key={key} onClick={() => onStatusFilterChange(key as QRStatus)}>
                 {label}
@@ -126,7 +135,6 @@ export function QRManagerToolbar({
           <DropdownMenuContent align="end">
             <DropdownMenuItem onClick={() => onDownloadAll('zip')}>Tải xuống ZIP</DropdownMenuItem>
             <DropdownMenuItem onClick={() => onDownloadAll('pdf')}>Tải xuống PDF</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onDownloadAll('png')}>Tải xuống PNG</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
         <Button

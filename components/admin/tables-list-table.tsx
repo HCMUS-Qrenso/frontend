@@ -269,7 +269,7 @@ export function TablesListTable({ isTrashView = false }: TablesListTableProps) {
                   </td>
                   <td className="px-6 py-4">
                     <p className="text-sm text-slate-700 dark:text-slate-300">
-                      {table.zone_name || table.floor || '—'}
+                      {table.zone?.name || '—'}
                     </p>
                   </td>
                   <td className="px-6 py-4">
