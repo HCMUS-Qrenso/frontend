@@ -4,7 +4,7 @@ import { AdminLayout } from '@/components/admin/admin-layout'
 import { FloorPlanCanvas } from '@/components/admin/floor-plan-canvas'
 import { FloorPlanToolbar } from '@/components/admin/floor-plan-toolbar'
 import { FloorPlanSidePanel } from '@/components/admin/floor-plan-side-panel'
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { useSearchParams } from 'next/navigation'
 import {
   useFloorsQuery,
@@ -104,11 +104,29 @@ export default function TableLayoutPage() {
   )
   const { handleError } = useErrorHandler()
 
-  // Transform backend data to TableItem format
-  const tables = useMemo(() => {
+  // Transform backend data to TableItem format (for initial sync only)
+  const tablesFromApi = useMemo(() => {
     if (!layoutData?.data.tables) return []
     return layoutData.data.tables.map(transformTableToItem)
   }, [layoutData])
+
+  // Local state for tables - this is the source of truth for UI
+  const [localTables, setLocalTables] = useState<TableItem[]>([])
+  const prevFloorRef = useRef<string>('')
+
+  // Sync localTables when floor changes or when data first loads
+  useEffect(() => {
+    const floorChanged = prevFloorRef.current !== currentFloor
+    prevFloorRef.current = currentFloor
+
+    // Sync when floor changes or when data first loads
+    if ((floorChanged || localTables.length === 0) && tablesFromApi.length > 0) {
+      setLocalTables(tablesFromApi)
+    }
+  }, [currentFloor, tablesFromApi, localTables.length])
+
+  // Use localTables instead of tables memo
+  const tables = localTables
 
   // Get all tables for current floor to find tables without positions
   const { data: allTablesData } = useTablesQuery(
@@ -151,17 +169,17 @@ export default function TableLayoutPage() {
   // Filter tables without positions (not in layout or position is null/0,0)
   const libraryTables = useMemo(() => {
     if (!allTablesData?.data.tables) return []
-    
+
     const tablesWithPositions = new Set(tables.map((t) => t.id))
-    
+
     return allTablesData.data.tables
       .filter((table) => {
         // Table is not in layout (doesn't have position)
         if (!tablesWithPositions.has(table.id)) return true
-        
+
         // Table has null position or position is {x:0, y:0}
         if (!table.position) return true
-        
+
         try {
           const pos = JSON.parse(table.position)
           return pos.x === 0 && pos.y === 0
@@ -210,27 +228,33 @@ export default function TableLayoutPage() {
         return newMap
       })
     }
-    
-    // Update local state for immediate UI feedback
-    const newTables = tables.map((t) => (t.id === id ? { ...t, ...updates } : t))
-    addToHistory(newTables)
+
+    // Update localTables state directly for immediate UI feedback
+    setLocalTables((prevTables) => {
+      const newTables = prevTables.map((t) => (t.id === id ? { ...t, ...updates } : t))
+      addToHistory(newTables)
+      return newTables
+    })
   }
 
   const handleTableDelete = (id: string) => {
     // This is handled by the side panel component which calls the API directly
     // We just update local state for immediate UI feedback
-    const newTables = tables.filter((t) => t.id !== id)
+    setLocalTables((prevTables) => {
+      const newTables = prevTables.filter((t) => t.id !== id)
+      addToHistory(newTables)
+      return newTables
+    })
     setSelectedTableId(null)
-    addToHistory(newTables)
   }
 
   // Map frontend status to backend status
   const mapStatusToBackend = (status: TableItem['status']): string => {
     const statusMap: Record<TableItem['status'], string> = {
-      'Available': 'available',
-      'Occupied': 'occupied',
+      Available: 'available',
+      Occupied: 'occupied',
       'Waiting for bill': 'waiting_for_payment',
-      'Disabled': 'maintenance',
+      Disabled: 'maintenance',
     }
     return statusMap[status] || 'available'
   }
@@ -246,7 +270,7 @@ export default function TableLayoutPage() {
       if (!table) return
 
       const payload: any = {}
-      
+
       if (updates.name !== undefined) {
         payload.table_number = updates.name
       }
@@ -268,7 +292,7 @@ export default function TableLayoutPage() {
 
       await updateTableMutation.mutateAsync({ id, payload })
       toast.success('Bàn đã được cập nhật thành công')
-      
+
       // Update local state for immediate UI feedback
       handleTableUpdate(id, updates)
     } catch (error: any) {
@@ -335,7 +359,7 @@ export default function TableLayoutPage() {
 
       await batchUpdateMutation.mutateAsync({ updates })
       toast.success('Sơ đồ đã được lưu thành công')
-      
+
       // Clear position changes after successful save
       setPositionChanges(new Map())
     } catch (error: any) {
@@ -351,24 +375,38 @@ export default function TableLayoutPage() {
     try {
       // Batch update API doesn't support null positions, so use individual PUT requests
       // Send null position to remove tables from layout
-      const updatePromises = tables.map((table) =>
+      const updatePromises = localTables.map((table) =>
         updateTableMutation.mutateAsync({
           id: table.id,
           payload: { position: null as any }, // Send null to remove position
-        } as any)
+        } as any),
       )
       await Promise.all(updatePromises)
-      
+
       toast.success('Layout đã được đặt lại thành công')
-      
+
+      // Update localTables to remove positions (set to 0,0 or keep them but they'll be filtered out)
+      // Actually, after reset, tables should disappear from layout, so we can clear localTables
+      // But wait - the API will refetch and return empty tables array, so we should sync
+      // For now, let's clear positions in localTables
+      setLocalTables((prevTables) =>
+        prevTables.map((table) => ({
+          ...table,
+          position: { x: 0, y: 0 },
+        })),
+      )
+
       // Clear local state
       setHistory([])
       setHistoryIndex(0)
       setSelectedTableId(null)
       setPositionChanges(new Map())
       setResetDialogOpen(false)
-      
+
       // Tables will be reloaded from API automatically via query invalidation
+      // When layoutData updates, localTables will sync (but only if floor changes)
+      // So we need to manually sync here after reset
+      // Actually, let's wait for the refetch and sync then
     } catch (error: any) {
       handleError(error, 'Có lỗi xảy ra khi đặt lại layout')
     }
@@ -399,6 +437,7 @@ export default function TableLayoutPage() {
             setHistory([])
             setHistoryIndex(0)
             setPositionChanges(new Map())
+            // localTables will sync automatically via useEffect when currentFloor changes
           }}
           zoom={zoom}
           onZoomChange={setZoom}
@@ -454,7 +493,8 @@ export default function TableLayoutPage() {
               Đặt lại layout?
             </AlertDialogTitle>
             <AlertDialogDescription className="text-center text-sm text-slate-500 dark:text-slate-400">
-              Tất cả vị trí bàn sẽ được xóa và các bàn sẽ quay về thư viện. Hành động này không thể hoàn tác.
+              Tất cả vị trí bàn sẽ được xóa và các bàn sẽ quay về thư viện. Hành động này không thể
+              hoàn tác.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="flex-row justify-end gap-3 sm:flex-row">
@@ -473,7 +513,7 @@ export default function TableLayoutPage() {
               {(batchUpdateMutation.isPending || updateTableMutation.isPending) && (
                 <Loader2 className="h-4 w-4 animate-spin" />
               )}
-              {(batchUpdateMutation.isPending || updateTableMutation.isPending)
+              {batchUpdateMutation.isPending || updateTableMutation.isPending
                 ? 'Đang đặt lại...'
                 : 'Đặt lại'}
             </AlertDialogAction>

@@ -1,6 +1,9 @@
 'use client'
 
 import { cn } from '@/lib/utils'
+import { useRef } from 'react'
+import { RotateCw } from 'lucide-react'
+import type { TableItem } from '@/app/admin/tables/layout/page'
 import {
   DndContext,
   type DragEndEvent,
@@ -10,9 +13,6 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core'
-import { CSS } from '@dnd-kit/utilities'
-import { RotateCw } from 'lucide-react'
-import type { TableItem } from '@/app/admin/tables/layout/page'
 
 interface FloorPlanCanvasProps {
   tables: TableItem[]
@@ -24,6 +24,8 @@ interface FloorPlanCanvasProps {
   selectedArea: string
 }
 
+const GRID_SIZE = 20
+
 export function FloorPlanCanvas({
   tables,
   selectedTableId,
@@ -33,38 +35,68 @@ export function FloorPlanCanvas({
   showGrid,
   selectedArea,
 }: FloorPlanCanvasProps) {
-  // Configure sensors for drag and drop
+  const canvasRef = useRef<HTMLDivElement>(null)
+
+  // Setup sensors with activation constraint to avoid conflict with click
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 8, // Require 8px of movement before activating drag
+        distance: 8, // Require 8px movement before drag
       },
+      // Ignore drag when clicking on rotate button
+      ignoreFrom: '.no-drag',
     }),
   )
-
-  const handleDragStart = (event: DragStartEvent) => {
-    // Optional: can add logic here if needed
-  }
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, delta } = event
-    const table = tables.find((t) => t.id === active.id)
-    if (table && delta) {
-      const gridSize = 20
-      // Calculate new position accounting for zoom
-      const newX = Math.round((table.position.x + delta.x / zoom) / gridSize) * gridSize
-      const newY = Math.round((table.position.y + delta.y / zoom) / gridSize) * gridSize
-      onTableUpdate(table.id, {
-        position: { x: Math.max(0, newX), y: Math.max(0, newY) },
-      })
-    }
-  }
 
   const handleRotate = (tableId: string, currentRotation: number) => {
     onTableUpdate(tableId, { rotation: (currentRotation + 90) % 360 })
   }
 
   const filteredTables = tables.filter((t) => t.area === selectedArea)
+
+  const handleDragStart = (event: DragStartEvent) => {
+    const { active } = event
+    // Select table when drag starts
+    onTableSelect(active.id as string)
+  }
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, delta } = event
+    const table = tables.find((t) => t.id === active.id)
+
+    if (table && delta) {
+      // Calculate new position with zoom adjustment
+      const dx = delta.x / zoom
+      const dy = delta.y / zoom
+
+      const newX = table.position.x + dx
+      const newY = table.position.y + dy
+
+      // Snap to grid
+      const snappedX = Math.round(newX / GRID_SIZE) * GRID_SIZE
+      const snappedY = Math.round(newY / GRID_SIZE) * GRID_SIZE
+
+      // Restrict bounds
+      const canvas = canvasRef.current
+      if (canvas && table) {
+        const canvasRect = canvas.getBoundingClientRect()
+        const maxX = canvasRect.width / zoom - table.size.width
+        const maxY = canvasRect.height / zoom - table.size.height
+
+        const finalX = Math.max(0, Math.min(snappedX, maxX))
+        const finalY = Math.max(0, Math.min(snappedY, maxY))
+
+        onTableUpdate(table.id, {
+          position: { x: finalX, y: finalY },
+        })
+      } else {
+        // Fallback if canvas ref is not available
+        onTableUpdate(table.id, {
+          position: { x: Math.max(0, snappedX), y: Math.max(0, snappedY) },
+        })
+      }
+    }
+  }
 
   return (
     <div className="rounded-2xl border border-slate-100 bg-white/80 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
@@ -102,6 +134,7 @@ export function FloorPlanCanvas({
       <div className="relative overflow-hidden p-6" style={{ minHeight: '600px' }}>
         <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
           <div
+            ref={canvasRef}
             className={cn(
               'relative h-[600px] w-full overflow-auto rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800/50',
               showGrid && 'bg-grid-pattern',
@@ -137,6 +170,7 @@ export function FloorPlanCanvas({
                 isSelected={table.id === selectedTableId}
                 onSelect={() => onTableSelect(table.id)}
                 onRotate={() => handleRotate(table.id, table.rotation)}
+                zoom={zoom}
               />
             ))}
           </div>
@@ -151,20 +185,17 @@ function DraggableTable({
   isSelected,
   onSelect,
   onRotate,
+  zoom,
 }: {
   table: TableItem
   isSelected: boolean
   onSelect: () => void
   onRotate: () => void
+  zoom: number
 }) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: table.id,
   })
-
-  const style = {
-    transform: CSS.Translate.toString(transform),
-    opacity: isDragging ? 0.5 : 1,
-  }
 
   const statusColors = {
     Available: 'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-500/10',
@@ -173,34 +204,46 @@ function DraggableTable({
     Disabled: 'border-slate-400 bg-slate-50/50 dark:bg-slate-500/10',
   }
 
+  // Adjust transform for zoom: dnd-kit's transform is in screen coordinates,
+  // but canvas is scaled, so we need to divide by zoom to get correct visual movement
+  const dragTransform = transform
+    ? `translate3d(${transform.x / zoom}px, ${transform.y / zoom}px, 0)`
+    : ''
+  const combinedTransform = dragTransform
+    ? `${dragTransform} rotate(${table.rotation}deg)`
+    : `rotate(${table.rotation}deg)`
+
   return (
     <div
       ref={setNodeRef}
       suppressHydrationWarning
       style={{
-        ...style,
         position: 'absolute',
         left: table.position.x,
         top: table.position.y,
         width: table.size.width,
         height: table.size.height,
-        transform: `${style.transform || ''} rotate(${table.rotation}deg)`,
+        transform: combinedTransform,
+        opacity: isDragging ? 0.5 : 1,
+        transition: isDragging ? 'none' : 'opacity 0.2s',
       }}
-      {...attributes}
       className={cn(
-        'border-2 transition-all',
+        'touch-none border-2 select-none',
         table.type === 'round' ? 'rounded-full' : 'rounded-lg',
         statusColors[table.status],
-        isSelected ? 'ring-2 ring-emerald-500 ring-offset-2' : 'hover:shadow-md',
+        isSelected
+          ? 'z-20 cursor-move ring-2 ring-emerald-500 ring-offset-2'
+          : 'z-10 cursor-grab hover:shadow-md',
       )}
+      {...listeners}
+      {...attributes}
     >
       <div
-        {...listeners}
         onClick={(e) => {
           e.stopPropagation()
           onSelect()
         }}
-        className="flex h-full cursor-move flex-col items-center justify-center p-2 text-center"
+        className="pointer-events-none flex h-full flex-col items-center justify-center p-2 text-center select-none"
       >
         <p className="text-xs font-semibold text-slate-900 dark:text-white">{table.name}</p>
         <p className="text-[10px] text-slate-600 dark:text-slate-400">{table.seats} chỗ ngồi</p>
@@ -217,7 +260,7 @@ function DraggableTable({
           onPointerDown={(e) => {
             e.stopPropagation()
           }}
-          className="absolute -top-2 -right-2 z-10 flex h-6 w-6 cursor-pointer items-center justify-center rounded-full border border-emerald-500 bg-white text-emerald-600 shadow-sm hover:bg-emerald-50 dark:bg-slate-800 dark:text-emerald-400"
+          className="no-drag absolute -top-2 -right-2 z-10 flex h-6 w-6 cursor-pointer items-center justify-center rounded-full border border-emerald-500 bg-white text-emerald-600 shadow-sm hover:bg-emerald-50 dark:bg-slate-800 dark:text-emerald-400"
           style={{ transform: `rotate(-${table.rotation}deg)` }}
         >
           <RotateCw className="h-3 w-3" />
