@@ -113,7 +113,7 @@ export function TablesListTable({ isTrashView = false }: TablesListTableProps) {
   const pagination = data?.data.pagination
   const deleteMutation = useDeleteTableMutation()
   const updateMutation = useUpdateTableMutation()
-  const { handleErrorWithStatus, getErrorMessage } = useErrorHandler()
+  const { handleErrorWithStatus } = useErrorHandler()
 
   const handleEdit = (tableId: string) => {
     const params = new URLSearchParams(searchParams.toString())
@@ -137,15 +137,14 @@ export function TablesListTable({ isTrashView = false }: TablesListTableProps) {
       setDeleteDialogOpen(false)
       setTableToDelete(null)
     } catch (error: any) {
-      console.error('Delete table error:', error)
-      console.error('Error status:', error?.response?.status)
-      console.error('Error message:', error?.response?.data?.message)
-
       // Handle specific error cases with custom message for 409
       const status = error?.response?.status
       if (status === 409) {
-        // Use message from backend or fallback to default
-        const message = getErrorMessage(error, 'Không thể xóa bàn đang có đơn hàng')
+        // Extract message directly from backend response
+        const backendMessage = error?.response?.data?.message
+        const message = Array.isArray(backendMessage)
+          ? backendMessage.join(', ')
+          : backendMessage || 'Không thể xóa bàn đang có đơn hàng'
         toast.error(message)
       } else {
         // Use default error handler for other errors
