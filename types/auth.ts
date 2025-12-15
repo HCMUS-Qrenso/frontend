@@ -6,6 +6,20 @@ export interface User {
   tenantId: string | null
 }
 
+export interface UserProfile {
+  id: string
+  email: string
+  fullName: string
+  phone?: string
+  role: string
+  emailVerified: boolean
+  status: string
+  avatarUrl: string | null
+  tenantId: string | null
+  createdAt: string
+  lastLoginAt: string | null
+}
+
 export interface AuthResponse {
   accessToken: string
   user: User

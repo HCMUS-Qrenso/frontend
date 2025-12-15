@@ -45,9 +45,31 @@ import {
 import { usePathname, useSearchParams, useRouter } from 'next/navigation'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { useAuth } from '@/hooks/use-auth'
+import { useUserProfileQuery } from '@/hooks/use-users-query'
 
 interface AdminLayoutProps {
   children: React.ReactNode
+}
+
+// Helper function to get initials from full name
+const getInitials = (fullName: string): string => {
+  const names = fullName.trim().split(/\s+/)
+  if (names.length === 0) return ''
+  if (names.length === 1) return names[0].charAt(0).toUpperCase()
+  return (names[0].charAt(0) + names[names.length - 1].charAt(0)).toUpperCase()
+}
+
+// Helper function to map role to Vietnamese label
+const getRoleLabel = (role: string): string => {
+  const roleMap: Record<string, string> = {
+    owner: 'Chủ nhà hàng',
+    admin: 'Quản trị viên',
+    manager: 'Quản lý',
+    waiter: 'Nhân viên phục vụ',
+    chef: 'Đầu bếp',
+    customer: 'Khách hàng',
+  }
+  return roleMap[role.toLowerCase()] || role
 }
 
 const menuItems = [
@@ -76,7 +98,9 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const router = useRouter()
-  const { logout, logoutPending } = useAuth()
+  const { logout, logoutPending, isAuthenticated, isHydrated } = useAuth()
+  const userProfileQuery = useUserProfileQuery(isAuthenticated && isHydrated)
+  const userProfile = userProfileQuery.data
 
   // Check if any modal is open
   const isModalOpen = searchParams.get('modal') !== null || searchParams.get('delete') !== null
@@ -248,14 +272,18 @@ export function AdminLayout({ children }: AdminLayoutProps) {
           <div className="border-t border-slate-200 p-4 dark:border-slate-800">
             <div className="flex items-center gap-3 rounded-xl bg-slate-50 px-4 py-3 dark:bg-slate-800">
               <Avatar className="h-9 w-9">
-                <AvatarImage src="/restaurant-owner-avatar.png" />
-                <AvatarFallback>NT</AvatarFallback>
+                <AvatarImage src={userProfile?.avatarUrl || undefined} />
+                <AvatarFallback>
+                  {userProfile ? getInitials(userProfile.fullName) : 'U'}
+                </AvatarFallback>
               </Avatar>
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-medium text-slate-900 dark:text-white">
-                  Nguyễn Thành
+                  {userProfile?.fullName || 'Người dùng'}
                 </p>
-                <p className="text-xs text-slate-500 dark:text-slate-400">Chủ nhà hàng</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  {userProfile ? getRoleLabel(userProfile.role) : 'Đang tải...'}
+                </p>
               </div>
             </div>
             <button
@@ -341,8 +369,10 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="icon" className="rounded-full">
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src="/diverse-user-avatars.png" />
-                      <AvatarFallback>NT</AvatarFallback>
+                      <AvatarImage src={userProfile?.avatarUrl || undefined} />
+                      <AvatarFallback>
+                        {userProfile ? getInitials(userProfile.fullName) : 'U'}
+                      </AvatarFallback>
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>

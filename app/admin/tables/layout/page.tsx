@@ -4,12 +4,33 @@ import { AdminLayout } from '@/components/admin/admin-layout'
 import { FloorPlanCanvas } from '@/components/admin/floor-plan-canvas'
 import { FloorPlanToolbar } from '@/components/admin/floor-plan-toolbar'
 import { FloorPlanSidePanel } from '@/components/admin/floor-plan-side-panel'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { useSearchParams } from 'next/navigation'
+import {
+  useZonesQuery,
+  useZoneLayoutQuery,
+  useBatchUpdatePositionsMutation,
+  useCreateTableMutation,
+  useUpdateTableMutation,
+} from '@/hooks/use-tables-query'
+import { toast } from 'sonner'
+import { useErrorHandler } from '@/hooks/use-error-handler'
+import type { ZoneLayoutTable, TablePosition } from '@/types/tables'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
+import { Loader2, AlertTriangle } from 'lucide-react'
 
 export interface TableItem {
   id: string
-  type: 'rectangle' | 'round'
+  type: 'rectangle' | 'circle' | 'oval'
   name: string
   seats: number
   area: string
@@ -21,126 +42,318 @@ export interface TableItem {
   notes?: string
 }
 
+// Map backend status to frontend status
+function mapStatus(status: string): TableItem['status'] {
+  const statusMap: Record<string, TableItem['status']> = {
+    available: 'Available',
+    occupied: 'Occupied',
+    waiting_for_payment: 'Waiting for bill',
+    maintenance: 'Disabled',
+  }
+  return statusMap[status] || 'Available'
+}
+
+// Map backend shape to frontend type
+function mapShape(shape: string | null): 'rectangle' | 'circle' | 'oval' {
+  if (shape === 'circle') return 'circle'
+  if (shape === 'oval') return 'oval'
+  return 'rectangle' // default
+}
+
+// Calculate table size based on type and number of seats
+function calculateTableSize(
+  type: 'rectangle' | 'circle' | 'oval',
+  seats: number,
+): { width: number; height: number } {
+  // Rectangle: width > height
+  if (type === 'rectangle') {
+    if (seats <= 2) return { width: 80, height: 80 }
+    if (seats <= 4) return { width: 120, height: 80 }
+    if (seats <= 6) return { width: 140, height: 80 }
+    if (seats <= 8) return { width: 160, height: 100 }
+    if (seats <= 10) return { width: 180, height: 100 }
+    // 11+ seats: base 200x120, add 20px width and 20px height per 2 seats
+    const extraSeats = seats - 10
+    const extraSize = Math.floor(extraSeats / 2) * 20
+    return { width: 200 + extraSize, height: 120 + extraSize }
+  }
+
+  // Circle: width === height
+  if (type === 'circle') {
+    if (seats <= 2) return { width: 80, height: 80 }
+    if (seats <= 4) return { width: 100, height: 100 }
+    if (seats <= 6) return { width: 120, height: 120 }
+    if (seats <= 8) return { width: 140, height: 140 }
+    if (seats <= 10) return { width: 160, height: 160 }
+    // 11+ seats: base 180x180, add 20px per 2 seats
+    const extraSeats = seats - 10
+    const extraSize = Math.floor(extraSeats / 2) * 20
+    return { width: 180 + extraSize, height: 180 + extraSize }
+  }
+
+  // Oval: width > height (similar to rectangle but rounded)
+  if (type === 'oval') {
+    if (seats <= 2) return { width: 90, height: 70 }
+    if (seats <= 4) return { width: 130, height: 90 }
+    if (seats <= 6) return { width: 150, height: 100 }
+    if (seats <= 8) return { width: 170, height: 120 }
+    if (seats <= 10) return { width: 190, height: 130 }
+    // 11+ seats: base 210x150, add 20px width and 10px height per 2 seats
+    const extraSeats = seats - 10
+    const extraWidth = Math.floor(extraSeats / 2) * 20
+    const extraHeight = Math.floor(extraSeats / 2) * 10
+    return { width: 210 + extraWidth, height: 150 + extraHeight }
+  }
+
+  // Fallback
+  return { width: 120, height: 80 }
+}
+
+// Transform backend ZoneLayoutTable to TableItem
+function transformTableToItem(
+  table: ZoneLayoutTable | (ZoneLayoutTable & { zone?: string }),
+): TableItem {
+  const tableType = mapShape(table.type)
+  return {
+    id: table.id,
+    type: tableType,
+    name: table.name,
+    seats: table.seats,
+    // Backend hiện trả field `zone` (zone name), còn type cũ là `area`
+    area: (table as any).zone ?? (table as any).area ?? '',
+    status: mapStatus(table.status),
+    position: table.position,
+    rotation: 0,
+    size: calculateTableSize(tableType, table.seats),
+    canBeMerged: tableType === 'rectangle',
+  }
+}
+
 export default function TableLayoutPage() {
   const searchParams = useSearchParams()
-  const floorParam = searchParams.get('floor')
+  const zoneParam = searchParams.get('zone')
   const tableIdParam = searchParams.get('tableId')
 
-  const [tables, setTables] = useState<TableItem[]>([
-    {
-      id: '1',
-      type: 'rectangle',
-      name: 'Table 1',
-      seats: 4,
-      area: 'Tầng 1',
-      status: 'Available',
-      position: { x: 100, y: 100 },
-      rotation: 0,
-      size: { width: 120, height: 80 },
-      canBeMerged: true,
-    },
-    {
-      id: '2',
-      type: 'round',
-      name: 'Table 2',
-      seats: 6,
-      area: 'Tầng 1',
-      status: 'Occupied',
-      position: { x: 300, y: 100 },
-      rotation: 0,
-      size: { width: 120, height: 120 },
-      canBeMerged: false,
-    },
-    {
-      id: '3',
-      type: 'rectangle',
-      name: 'Table 3',
-      seats: 2,
-      area: 'Tầng 1',
-      status: 'Waiting for bill',
-      position: { x: 500, y: 100 },
-      rotation: 0,
-      size: { width: 80, height: 80 },
-      canBeMerged: true,
-    },
-    {
-      id: '4',
-      type: 'rectangle',
-      name: 'Table 4',
-      seats: 4,
-      area: 'Tầng 1',
-      status: 'Available',
-      position: { x: 100, y: 300 },
-      rotation: 0,
-      size: { width: 120, height: 80 },
-      canBeMerged: true,
-    },
-    {
-      id: '5',
-      type: 'round',
-      name: 'Table 5',
-      seats: 8,
-      area: 'Tầng 1',
-      status: 'Disabled',
-      position: { x: 300, y: 300 },
-      rotation: 0,
-      size: { width: 140, height: 140 },
-      canBeMerged: false,
-    },
-  ])
-
-  const [selectedTableId, setSelectedTableId] = useState<string | null>(null)
-  const [selectedArea, setSelectedArea] = useState(floorParam || 'Tầng 1')
+  const [selectedTableId, setSelectedTableId] = useState<string | null>(tableIdParam)
+  const [selectedZone, setSelectedZone] = useState(zoneParam || '')
   const [zoom, setZoom] = useState(1)
   const [showGrid, setShowGrid] = useState(true)
-  const [history, setHistory] = useState<TableItem[][]>([tables])
+  const [history, setHistory] = useState<TableItem[][]>([])
   const [historyIndex, setHistoryIndex] = useState(0)
+  const [positionChanges, setPositionChanges] = useState<Map<string, TablePosition>>(new Map())
+  const [resetDialogOpen, setResetDialogOpen] = useState(false)
+
+  // Load zones and layout data
+  const { data: zonesData } = useZonesQuery()
+  const zones = zonesData?.data?.zones || []
+
+  // Derive current zone object, id and display name
+  const currentZoneObj =
+    zones.find((z) => z.id === selectedZone || z.name === selectedZone) || zones[0] || null
+  const currentZoneId = currentZoneObj?.id || ''
+  const currentZoneName = currentZoneObj?.name || currentZoneId
+
+  const { data: layoutData, isLoading: isLoadingLayout } = useZoneLayoutQuery(
+    currentZoneId || null,
+    !!currentZoneId,
+  )
+  const { handleError } = useErrorHandler()
+
+  // Transform backend data to TableItem format
+  const tablesFromApi = useMemo(() => {
+    if (!layoutData?.data.tables) return []
+    return layoutData.data.tables.map(transformTableToItem)
+  }, [layoutData])
+
+  // Local state for tables - this is the source of truth for UI
+  const [localTables, setLocalTables] = useState<TableItem[]>([])
+  const prevZoneRef = useRef<string>('')
+
+  // 1. Reset state when zone changes
+  useEffect(() => {
+    if (prevZoneRef.current !== currentZoneId && prevZoneRef.current !== '') {
+      // Zone đã thay đổi, reset local state
+      setLocalTables([])
+      setHistory([])
+      setHistoryIndex(0)
+      setPositionChanges(new Map())
+      setSelectedTableId(null)
+    }
+    prevZoneRef.current = currentZoneId
+  }, [currentZoneId])
+
+  // 2. Sync data from API when new data is available
+  useEffect(() => {
+    // Chỉ sync khi không đang loading và có dữ liệu (hoặc mảng rỗng)
+    if (!isLoadingLayout && layoutData?.data) {
+      const tables = layoutData.data.tables || []
+      const newTables = tables.map(transformTableToItem)
+      // Layout API đã filter theo zone_id nên có thể sync trực tiếp
+      setLocalTables(newTables)
+    }
+  }, [layoutData, isLoadingLayout])
+
+  // Use localTables instead of tables memo
+  const tables = localTables
+
+  // Filter tables without positions (not in layout or position is null/-1,-1)
+  const libraryTables = useMemo(() => {
+    return tables.filter((table) => {
+      const pos: any = (table as any).position
+      if (!pos) return true
+      return pos.x === -1 && pos.y === -1
+    })
+  }, [tables])
+
+  const batchUpdateMutation = useBatchUpdatePositionsMutation()
+  const createTableMutation = useCreateTableMutation()
+  const updateTableMutation = useUpdateTableMutation()
 
   useEffect(() => {
-    if (floorParam) {
-      setSelectedArea(floorParam)
+    if (zoneParam) {
+      setSelectedZone(zoneParam)
     }
+  }, [zoneParam])
 
-    if (tableIdParam) {
-      // Find and select the table
+  useEffect(() => {
+    if (tableIdParam && tables.length > 0) {
       const table = tables.find((t) => t.id === tableIdParam)
       if (table) {
         setSelectedTableId(tableIdParam)
-        console.log('[v0] Auto-focused on table:', tableIdParam, 'in floor:', floorParam)
-
-        // Optional: Auto-pan to the table position if it exists
-        // This would require implementing a pan feature in FloorPlanCanvas
-        // For now, just selecting it will highlight it in the properties panel
       }
     }
-  }, [floorParam, tableIdParam, tables])
+  }, [tableIdParam, tables])
+
+  // Initialize history when tables load
+  useEffect(() => {
+    if (tables.length > 0 && history.length === 0) {
+      setHistory([tables])
+      setHistoryIndex(0)
+    }
+  }, [tables, history.length])
 
   const selectedTable = tables.find((t) => t.id === selectedTableId)
 
   const handleTableUpdate = (id: string, updates: Partial<TableItem>) => {
-    const newTables = tables.map((t) => (t.id === id ? { ...t, ...updates } : t))
-    setTables(newTables)
-    addToHistory(newTables)
+    // Track position changes for batch save
+    if (updates.position) {
+      setPositionChanges((prev) => {
+        const newMap = new Map(prev)
+        newMap.set(id, updates.position!)
+        return newMap
+      })
+    }
+
+    // Update localTables state directly for immediate UI feedback
+    setLocalTables((prevTables) => {
+      const newTables = prevTables.map((t) => {
+        if (t.id === id) {
+          const updatedTable = { ...t, ...updates }
+          // Recalculate size if type or seats changed
+          if (updates.type !== undefined || updates.seats !== undefined) {
+            updatedTable.size = calculateTableSize(updatedTable.type, updatedTable.seats)
+          }
+          return updatedTable
+        }
+        return t
+      })
+      addToHistory(newTables)
+      return newTables
+    })
   }
 
   const handleTableDelete = (id: string) => {
-    const newTables = tables.filter((t) => t.id !== id)
-    setTables(newTables)
+    // This is handled by the side panel component which calls the API directly
+    // We just update local state for immediate UI feedback
+    setLocalTables((prevTables) => {
+      const newTables = prevTables.filter((t) => t.id !== id)
+      addToHistory(newTables)
+      return newTables
+    })
     setSelectedTableId(null)
-    addToHistory(newTables)
   }
 
-  const handleAddTable = (tableTemplate: Omit<TableItem, 'id' | 'position' | 'area'>) => {
-    const newTable: TableItem = {
-      ...tableTemplate,
-      id: `t${Date.now()}`,
-      position: { x: 200, y: 200 },
-      area: selectedArea,
+  const handleTableRemove = async (id: string) => {
+    // Move table back to library by setting position to -1,-1
+    await handleTableSave(id, { position: { x: -1, y: -1 } })
+    setSelectedTableId(null)
+  }
+
+  // Map frontend status to backend status
+  const mapStatusToBackend = (status: TableItem['status']): string => {
+    const statusMap: Record<TableItem['status'], string> = {
+      Available: 'available',
+      Occupied: 'occupied',
+      'Waiting for bill': 'waiting_for_payment',
+      Disabled: 'maintenance',
     }
-    const newTables = [...tables, newTable]
-    setTables(newTables)
-    setSelectedTableId(newTable.id)
-    addToHistory(newTables)
+    return statusMap[status] || 'available'
+  }
+
+  // Map frontend shape to backend shape
+  const mapShapeToBackend = (type: TableItem['type']): string => {
+    if (type === 'circle') return 'circle'
+    if (type === 'oval') return 'oval'
+    return 'rectangle'
+  }
+
+  const handleTableSave = async (id: string, updates: Partial<TableItem>) => {
+    try {
+      const table = tables.find((t) => t.id === id)
+      if (!table) return
+
+      const payload: any = {}
+
+      if (updates.name !== undefined) {
+        payload.table_number = updates.name
+      }
+      if (updates.seats !== undefined) {
+        payload.capacity = updates.seats
+      }
+      if (updates.area !== undefined) {
+        // Find zone by name/id
+        const zone = zones.find((z) => z.name === updates.area || z.id === updates.area)
+        if (zone) {
+          payload.zone_id = zone.id
+        }
+      }
+      if (updates.status !== undefined) {
+        payload.status = mapStatusToBackend(updates.status)
+      }
+      if (updates.type !== undefined) {
+        payload.shape = mapShapeToBackend(updates.type)
+      }
+      if (updates.position !== undefined) {
+        payload.position = updates.position
+      }
+
+      await updateTableMutation.mutateAsync({ id, payload })
+      toast.success('Bàn đã được cập nhật thành công')
+
+      // Update local state for immediate UI feedback
+      handleTableUpdate(id, updates)
+    } catch (error: any) {
+      handleError(error, 'Có lỗi xảy ra khi cập nhật bàn')
+    }
+  }
+
+  const handleAddTable = async (tableTemplate: Omit<TableItem, 'id' | 'position' | 'area'>) => {
+    try {
+      const newTable = await createTableMutation.mutateAsync({
+        table_number: tableTemplate.name,
+        capacity: tableTemplate.seats,
+        zone_id: currentZoneObj?.id || currentZoneId,
+        shape: mapShapeToBackend(tableTemplate.type) as 'circle' | 'rectangle' | 'oval',
+        status: 'available',
+        is_active: true,
+        position: { x: -1, y: -1 },
+      })
+
+      toast.success('Bàn đã được tạo thành công')
+      // The query will refetch automatically, so we don't need to update local state
+    } catch (error: any) {
+      handleError(error, 'Có lỗi xảy ra khi tạo bàn')
+    }
   }
 
   const addToHistory = (newTables: TableItem[]) => {
@@ -151,30 +364,99 @@ export default function TableLayoutPage() {
   }
 
   const handleUndo = () => {
-    if (historyIndex > 0) {
-      setHistoryIndex(historyIndex - 1)
-      setTables(history[historyIndex - 1])
+    if (historyIndex > 0 && history.length > 0) {
+      const newIndex = historyIndex - 1
+      setHistoryIndex(newIndex)
+      // Note: We can't directly set tables since they come from API
+      // Undo/redo would need to be handled differently with API integration
+      // For now, we'll keep the history but tables will sync from API
     }
   }
 
   const handleRedo = () => {
-    if (historyIndex < history.length - 1) {
-      setHistoryIndex(historyIndex + 1)
-      setTables(history[historyIndex + 1])
+    if (historyIndex < history.length - 1 && history.length > 0) {
+      const newIndex = historyIndex + 1
+      setHistoryIndex(newIndex)
+      // Note: Same as undo - tables sync from API
     }
   }
 
-  const handleSave = () => {
-    console.log('[v0] Saving layout:', tables)
-    alert('Layout saved!')
+  const handleSave = async () => {
+    try {
+      // Only send tables with position changes
+      if (positionChanges.size === 0) {
+        toast.info('Không có thay đổi nào để lưu')
+        return
+      }
+
+      const updates = Array.from(positionChanges.entries()).map(([tableId, position]) => ({
+        table_id: tableId,
+        position,
+      }))
+
+      await batchUpdateMutation.mutateAsync({ updates })
+      toast.success('Sơ đồ đã được lưu thành công')
+
+      // Clear position changes after successful save
+      setPositionChanges(new Map())
+    } catch (error: any) {
+      handleError(error, 'Có lỗi xảy ra khi lưu sơ đồ')
+    }
   }
 
   const handleReset = () => {
-    if (confirm('Bạn có chắc muốn reset layout về mặc định?')) {
-      setTables([])
+    setResetDialogOpen(true)
+  }
+
+  const handleConfirmReset = async () => {
+    try {
+      // Batch update API doesn't support null positions, so use individual PUT requests
+      // Send -1,-1 position to move tables back to library
+      const updatePromises = localTables.map((table) =>
+        updateTableMutation.mutateAsync({
+          id: table.id,
+          payload: { position: { x: -1, y: -1 } }, // Send -1,-1 to move to library
+        } as any),
+      )
+      await Promise.all(updatePromises)
+
+      toast.success('Layout đã được đặt lại thành công')
+
+      // Update localTables to remove positions (set to -1,-1 so they appear in library)
+      // After reset, tables should disappear from layout and appear in library
+      setLocalTables((prevTables) =>
+        prevTables.map((table) => ({
+          ...table,
+          position: { x: -1, y: -1 },
+        })),
+      )
+
+      // Clear local state
+      setHistory([])
+      setHistoryIndex(0)
       setSelectedTableId(null)
-      addToHistory([])
+      setPositionChanges(new Map())
+      setResetDialogOpen(false)
+
+      // Tables will be reloaded from API automatically via query invalidation
+      // When layoutData updates, localTables will sync (but only if floor changes)
+      // So we need to manually sync here after reset
+      // Actually, let's wait for the refetch and sync then
+    } catch (error: any) {
+      handleError(error, 'Có lỗi xảy ra khi đặt lại layout')
     }
+  }
+
+  if (isLoadingLayout) {
+    return (
+      <AdminLayout>
+        <div className="flex items-center justify-center py-12">
+          <div className="text-center">
+            <p className="text-sm text-slate-500 dark:text-slate-400">Đang tải sơ đồ...</p>
+          </div>
+        </div>
+      </AdminLayout>
+    )
   }
 
   return (
@@ -182,8 +464,19 @@ export default function TableLayoutPage() {
       <div className="space-y-4">
         {/* Toolbar */}
         <FloorPlanToolbar
-          selectedArea={selectedArea}
-          onAreaChange={setSelectedArea}
+          selectedArea={currentZoneName}
+          areas={zones.map((z) => z.name || z.id)}
+          onAreaChange={(area) => {
+            // Find zone by name or use as ID
+            const zone = zones.find((z) => z.name === area || z.id === area)
+            // Lưu id để gọi API, nhưng hiển thị tên trong dropdown
+            setSelectedZone(zone?.id || area)
+            setSelectedTableId(null)
+            setHistory([])
+            setHistoryIndex(0)
+            setPositionChanges(new Map())
+            // localTables will sync automatically via useEffect when currentZone changes
+          }}
           zoom={zoom}
           onZoomChange={setZoom}
           showGrid={showGrid}
@@ -203,22 +496,69 @@ export default function TableLayoutPage() {
             tables={tables}
             selectedTableId={selectedTableId}
             onTableSelect={setSelectedTableId}
-            onTableUpdate={handleTableUpdate}
+            onTableUpdate={(id, updates) => {
+              // Update local state immediately for UI feedback
+              handleTableUpdate(id, updates)
+              // Debounce and batch save positions
+              // This will be handled by a separate debounced save function if needed
+            }}
             zoom={zoom}
             showGrid={showGrid}
-            selectedArea={selectedArea}
+            selectedArea={currentZoneName}
+            onTableRemove={(id) => handleTableRemove(id)}
           />
 
           {/* Side Panel */}
           <FloorPlanSidePanel
             selectedTable={selectedTable}
             onTableUpdate={handleTableUpdate}
+            onTableSave={handleTableSave}
             onTableDelete={handleTableDelete}
             onAddTable={handleAddTable}
-            areas={['Tầng 1', 'Tầng 2', 'Sân vườn']}
+            areas={zones.map((z) => z.name || z.id)}
+            libraryTables={libraryTables}
           />
         </div>
       </div>
+
+      {/* Reset Confirmation Dialog */}
+      <AlertDialog open={resetDialogOpen} onOpenChange={setResetDialogOpen}>
+        <AlertDialogContent className="rounded-2xl">
+          <AlertDialogHeader>
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-50 dark:bg-red-500/10">
+              <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-400" />
+            </div>
+            <AlertDialogTitle className="text-center text-lg font-semibold text-slate-900 dark:text-white">
+              Đặt lại layout?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-center text-sm text-slate-500 dark:text-slate-400">
+              Tất cả vị trí bàn sẽ được xóa và các bàn sẽ quay về thư viện. Hành động này không thể
+              hoàn tác.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-row justify-end gap-3 sm:flex-row">
+            <AlertDialogCancel
+              disabled={batchUpdateMutation.isPending || updateTableMutation.isPending}
+              className="m-0 rounded-full"
+              onClick={() => setResetDialogOpen(false)}
+            >
+              Hủy
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmReset}
+              disabled={batchUpdateMutation.isPending || updateTableMutation.isPending}
+              className="m-0 gap-2 rounded-full bg-red-600 hover:bg-red-700"
+            >
+              {(batchUpdateMutation.isPending || updateTableMutation.isPending) && (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              )}
+              {batchUpdateMutation.isPending || updateTableMutation.isPending
+                ? 'Đang đặt lại...'
+                : 'Đặt lại'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AdminLayout>
   )
 }

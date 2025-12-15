@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -13,18 +14,21 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Textarea } from '@/components/ui/textarea'
-import { Circle, Trash2, Square, Users } from 'lucide-react'
+import { Circle, Square, Users } from 'lucide-react'
 import type { TableItem } from '@/app/admin/tables/layout/page'
 
 interface FloorPlanSidePanelProps {
   selectedTable: TableItem | undefined
   onTableUpdate: (id: string, updates: Partial<TableItem>) => void
+  onTableSave: (id: string, updates: Partial<TableItem>) => Promise<void>
   onTableDelete: (id: string) => void
   onAddTable: (table: Omit<TableItem, 'id' | 'position' | 'area'>) => void
   areas: string[]
+  libraryTables: TableItem[]
 }
 
 const tableTemplates = [
+  // Rectangle templates
   {
     type: 'rectangle' as const,
     name: 'Hình chữ nhật 2 chỗ',
@@ -47,24 +51,68 @@ const tableTemplates = [
     icon: Square,
   },
   {
-    type: 'round' as const,
+    type: 'rectangle' as const,
+    name: 'Hình chữ nhật 8 chỗ',
+    seats: 8,
+    size: { width: 160, height: 100 },
+    icon: Square,
+  },
+  // Circle templates
+  {
+    type: 'circle' as const,
+    name: 'Tròn 2 chỗ',
+    seats: 2,
+    size: { width: 80, height: 80 },
+    icon: Circle,
+  },
+  {
+    type: 'circle' as const,
     name: 'Tròn 4 chỗ',
     seats: 4,
     size: { width: 100, height: 100 },
     icon: Circle,
   },
   {
-    type: 'round' as const,
+    type: 'circle' as const,
     name: 'Tròn 6 chỗ',
     seats: 6,
     size: { width: 120, height: 120 },
     icon: Circle,
   },
   {
-    type: 'round' as const,
+    type: 'circle' as const,
     name: 'Tròn 8 chỗ',
     seats: 8,
     size: { width: 140, height: 140 },
+    icon: Circle,
+  },
+  // Oval templates
+  {
+    type: 'oval' as const,
+    name: 'Oval 2 chỗ',
+    seats: 2,
+    size: { width: 90, height: 70 },
+    icon: Circle,
+  },
+  {
+    type: 'oval' as const,
+    name: 'Oval 4 chỗ',
+    seats: 4,
+    size: { width: 130, height: 90 },
+    icon: Circle,
+  },
+  {
+    type: 'oval' as const,
+    name: 'Oval 6 chỗ',
+    seats: 6,
+    size: { width: 150, height: 100 },
+    icon: Circle,
+  },
+  {
+    type: 'oval' as const,
+    name: 'Oval 8 chỗ',
+    seats: 8,
+    size: { width: 170, height: 120 },
     icon: Circle,
   },
 ]
@@ -72,13 +120,45 @@ const tableTemplates = [
 export function FloorPlanSidePanel({
   selectedTable,
   onTableUpdate,
+  onTableSave,
   onTableDelete,
   onAddTable,
   areas,
+  libraryTables,
 }: FloorPlanSidePanelProps) {
+  const [isSaving, setIsSaving] = useState(false)
+  const [activeTab, setActiveTab] = useState<'library' | 'properties'>('library')
+  const nameInputRef = useRef<HTMLInputElement | null>(null)
+
+  // When a table is selected, switch to properties tab and focus the name input
+  useEffect(() => {
+    if (selectedTable) {
+      setActiveTab('properties')
+    }
+  }, [selectedTable])
+
+  useEffect(() => {
+    if (selectedTable && activeTab === 'properties') {
+      // Focus after tab becomes active
+      requestAnimationFrame(() => {
+        nameInputRef.current?.focus({ preventScroll: true })
+      })
+    }
+  }, [selectedTable, activeTab])
+
+  const handleSave = async () => {
+    if (!selectedTable) return
+
+    setIsSaving(true)
+    try {
+      await onTableSave(selectedTable.id, selectedTable)
+    } finally {
+      setIsSaving(false)
+    }
+  }
   return (
     <div className="rounded-2xl border border-slate-100 bg-white/80 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
-      <Tabs defaultValue="library" className="h-full">
+      <Tabs value={activeTab} onValueChange={(v: any) => setActiveTab(v)} className="h-full">
         <TabsList className="w-full rounded-b-none border-b border-slate-100 bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900">
           <TabsTrigger value="library" className="flex-1">
             Thư viện
@@ -94,41 +174,51 @@ export function FloorPlanSidePanel({
             <div>
               <h3 className="mb-1 font-semibold text-slate-900 dark:text-white">Mục bàn</h3>
               <p className="text-sm text-slate-500 dark:text-slate-400">
-                Click để thêm bàn mới vào trung tâm canvas
+                {libraryTables.length > 0
+                  ? 'Click để thêm bàn vào canvas'
+                  : 'Không có bàn nào trong thư viện'}
               </p>
             </div>
 
             <div className="grid gap-3">
-              {tableTemplates.map((template, index) => (
-                <button
-                  key={index}
-                  onClick={() =>
-                    onAddTable({
-                      type: template.type,
-                      name: `Bàn ${Date.now()}`,
-                      seats: template.seats,
-                      status: 'Available',
-                      rotation: 0,
-                      size: template.size,
-                      canBeMerged: true,
-                    })
-                  }
-                  className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 text-left transition-all hover:border-emerald-500 hover:bg-emerald-50 dark:border-slate-700 dark:bg-slate-800 dark:hover:border-emerald-500 dark:hover:bg-emerald-500/10"
-                >
-                  <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-700">
-                    <template.icon className="h-6 w-6 text-slate-600 dark:text-slate-400" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-slate-900 dark:text-white">
-                      {template.name}
-                    </p>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
-                      <Users className="mr-1 inline h-3 w-3" />
-                      {template.seats} chỗ ngồi
-                    </p>
-                  </div>
-                </button>
-              ))}
+              {libraryTables.length > 0 ? (
+                libraryTables.map((table) => {
+                  const Icon = table.type === 'rectangle' ? Square : Circle
+                  return (
+                    <button
+                      key={table.id}
+                      onClick={async () => {
+                        // Update table position to add it to canvas via API
+                        try {
+                          await onTableSave(table.id, {
+                            position: { x: 200, y: 200 },
+                          })
+                        } catch (error) {
+                          // Error handling is done in parent component
+                        }
+                      }}
+                      className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 text-left transition-all hover:border-emerald-500 hover:bg-emerald-50 dark:border-slate-700 dark:bg-slate-800 dark:hover:border-emerald-500 dark:hover:bg-emerald-500/10"
+                    >
+                      <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-700">
+                        <Icon className="h-6 w-6 text-slate-600 dark:text-slate-400" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-slate-900 dark:text-white">
+                          {table.name}
+                        </p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">
+                          <Users className="mr-1 inline h-3 w-3" />
+                          {table.seats} chỗ ngồi
+                        </p>
+                      </div>
+                    </button>
+                  )
+                })
+              ) : (
+                <div className="py-8 text-center text-sm text-slate-500 dark:text-slate-400">
+                  Tất cả bàn đã được đặt trên sơ đồ
+                </div>
+              )}
             </div>
           </div>
         </TabsContent>
@@ -152,6 +242,7 @@ export function FloorPlanSidePanel({
                   <Label htmlFor="table-name">Tên / Số bàn</Label>
                   <Input
                     id="table-name"
+                    ref={nameInputRef}
                     value={selectedTable.name}
                     onChange={(e) => onTableUpdate(selectedTable.id, { name: e.target.value })}
                     placeholder="ví dụ: Bàn 5"
@@ -174,6 +265,26 @@ export function FloorPlanSidePanel({
                           {area}
                         </SelectItem>
                       ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Shape */}
+                <div className="space-y-2">
+                  <Label htmlFor="table-shape">Hình dạng</Label>
+                  <Select
+                    value={selectedTable.type}
+                    onValueChange={(value: 'rectangle' | 'circle' | 'oval') =>
+                      onTableUpdate(selectedTable.id, { type: value })
+                    }
+                  >
+                    <SelectTrigger id="table-shape">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="rectangle">Hình chữ nhật</SelectItem>
+                      <SelectItem value="circle">Tròn</SelectItem>
+                      <SelectItem value="oval">Oval</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -246,17 +357,14 @@ export function FloorPlanSidePanel({
 
               {/* Actions */}
               <div className="flex gap-2 border-t border-slate-100 pt-4 dark:border-slate-800">
-                <Button variant="outline" size="sm" className="flex-1 rounded-full bg-transparent">
-                  Cập nhật
-                </Button>
                 <Button
-                  variant="destructive"
+                  variant="outline"
                   size="sm"
-                  className="rounded-full"
-                  onClick={() => onTableDelete(selectedTable.id)}
+                  className="flex-1 rounded-full bg-transparent"
+                  onClick={handleSave}
+                  disabled={isSaving}
                 >
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  Xóa
+                  {isSaving ? 'Đang lưu...' : 'Cập nhật'}
                 </Button>
               </div>
             </div>

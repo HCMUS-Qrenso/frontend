@@ -1,5 +1,5 @@
 import { QrCode, CheckCircle2, AlertCircle, Clock } from "lucide-react"
-import type { TableQR } from "./qr-manager-content"
+import type { TableQR } from "@/types/tables"
 
 interface QRManagerStatsProps {
   tables: TableQR[]
@@ -9,7 +9,28 @@ export function QRManagerStats({ tables }: QRManagerStatsProps) {
   const totalTables = tables.length
   const tablesWithQR = tables.filter((t) => t.status === "Ready").length
   const missingQR = tables.filter((t) => t.status === "Missing").length
-  const lastRegenerated = "15/01/2024 14:30"
+  
+  // Find the most recent updatedAt date
+  const lastRegenerated = tables
+    .filter((t) => t.updatedAt && t.updatedAt !== "—")
+    .map((t) => {
+      try {
+        return new Date(t.updatedAt).getTime()
+      } catch {
+        return 0
+      }
+    })
+    .sort((a, b) => b - a)[0]
+  
+  const lastRegeneratedFormatted = lastRegenerated
+    ? new Date(lastRegenerated).toLocaleDateString("vi-VN", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    : "—"
 
   const stats = [
     {
@@ -36,7 +57,7 @@ export function QRManagerStats({ tables }: QRManagerStatsProps) {
     {
       icon: Clock,
       label: "Lần tạo lại cuối",
-      value: lastRegenerated,
+      value: lastRegeneratedFormatted,
       color: "text-indigo-600 dark:text-indigo-400",
       bgColor: "bg-indigo-50 dark:bg-indigo-500/10",
       isDate: true,

@@ -1,155 +1,276 @@
-"use client"
+'use client'
 
-import { useState } from "react"
-import { QRManagerStats } from "./qr-manager-stats"
-import { QRManagerToolbar } from "./qr-manager-toolbar"
-import { QRTableList } from "./qr-table-list"
-import { QRPreviewModal } from "./qr-preview-modal"
-import { QRBatchPrintDialog } from "./qr-batch-print-dialog"
-import { QRSecurityModal } from "./qr-security-modal"
+import { useState, useMemo } from 'react'
+import { QRManagerStats } from './qr-manager-stats'
+import { QRManagerToolbar } from './qr-manager-toolbar'
+import { QRTableList } from './qr-table-list'
+import { QRPreviewModal } from './qr-preview-modal'
+import { QRBatchPrintDialog } from './qr-batch-print-dialog'
+import { QRSecurityModal } from './qr-security-modal'
+import {
+  useQRCodesQuery,
+  useBatchGenerateQRMutation,
+  useGenerateQRMutation,
+} from '@/hooks/use-tables-query'
+import { useZonesSimpleQuery } from '@/hooks/use-zones-query'
+import { tablesApi } from '@/lib/api/tables'
+import { downloadBlobWithHeaders } from '@/lib/utils/download'
+import { toast } from 'sonner'
+import { useErrorHandler } from '@/hooks/use-error-handler'
+import { Loader2 } from 'lucide-react'
+import type { QRStatus, TableQR } from '@/types/tables'
 
-export interface TableQR {
-  id: string
-  tableNumber: string
-  tableArea: string
-  qrUrl: string
-  qrLink: string
-  status: "Ready" | "Missing" | "Outdated"
-  updatedAt: string
-  seats: number
+// Helper function to map backend QR status to UI status
+// API returns title case: "Missing", "Ready", "Outdated"
+function mapQRStatus(status: string): TableQR['status'] {
+  const statusMap: Record<string, TableQR['status']> = {
+    Ready: 'Ready',
+    Missing: 'Missing',
+    Outdated: 'Outdated',
+    ready: 'Ready',
+    missing: 'Missing',
+    outdated: 'Outdated',
+  }
+  return statusMap[status] || 'Missing'
 }
 
-const mockTableQRs: TableQR[] = [
-  {
-    id: "1",
-    tableNumber: "1",
-    tableArea: "Tầng 1 - Khu cửa sổ",
-    qrUrl: "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://smart-restaurant.com/r/demo/t/1",
-    qrLink: "https://smart-restaurant.com/r/demo/t/1",
-    status: "Ready",
-    updatedAt: "2024-01-15 14:30",
-    seats: 4,
-  },
-  {
-    id: "2",
-    tableNumber: "2",
-    tableArea: "Tầng 1 - Khu cửa sổ",
-    qrUrl: "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://smart-restaurant.com/r/demo/t/2",
-    qrLink: "https://smart-restaurant.com/r/demo/t/2",
-    status: "Ready",
-    updatedAt: "2024-01-15 14:30",
-    seats: 2,
-  },
-  {
-    id: "3",
-    tableNumber: "3",
-    tableArea: "Tầng 1 - Trung tâm",
-    qrUrl: "",
-    qrLink: "https://smart-restaurant.com/r/demo/t/3",
-    status: "Missing",
-    updatedAt: "—",
-    seats: 6,
-  },
-  {
-    id: "4",
-    tableNumber: "4",
-    tableArea: "Tầng 1 - Trung tâm",
-    qrUrl: "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://smart-restaurant.com/r/demo/t/4",
-    qrLink: "https://smart-restaurant.com/r/demo/t/4",
-    status: "Ready",
-    updatedAt: "2024-01-15 14:30",
-    seats: 4,
-  },
-  {
-    id: "5",
-    tableNumber: "5",
-    tableArea: "Tầng 2 - VIP",
-    qrUrl: "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://smart-restaurant.com/r/demo/t/5",
-    qrLink: "https://smart-restaurant.com/r/demo/t/5",
-    status: "Ready",
-    updatedAt: "2024-01-10 09:15",
-    seats: 4,
-  },
-  {
-    id: "6",
-    tableNumber: "6",
-    tableArea: "Tầng 2 - VIP",
-    qrUrl: "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://smart-restaurant.com/r/demo/t/6",
-    qrLink: "https://smart-restaurant.com/r/demo/t/6",
-    status: "Outdated",
-    updatedAt: "2023-12-20 11:00",
-    seats: 8,
-  },
-  {
-    id: "7",
-    tableNumber: "7",
-    tableArea: "Tầng 2 - Khu ban công",
-    qrUrl: "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://smart-restaurant.com/r/demo/t/7",
-    qrLink: "https://smart-restaurant.com/r/demo/t/7",
-    status: "Ready",
-    updatedAt: "2024-01-15 14:30",
-    seats: 2,
-  },
-  {
-    id: "8",
-    tableNumber: "8",
-    tableArea: "Khu ngoài trời",
-    qrUrl: "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://smart-restaurant.com/r/demo/t/8",
-    qrLink: "https://smart-restaurant.com/r/demo/t/8",
-    status: "Ready",
-    updatedAt: "2024-01-15 14:30",
-    seats: 4,
-  },
-  {
-    id: "9",
-    tableNumber: "9",
-    tableArea: "Khu ngoài trời",
-    qrUrl: "",
-    qrLink: "https://smart-restaurant.com/r/demo/t/9",
-    status: "Missing",
-    updatedAt: "—",
-    seats: 4,
-  },
-  {
-    id: "10",
-    tableNumber: "10",
-    tableArea: "Tầng 1 - Trung tâm",
-    qrUrl: "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://smart-restaurant.com/r/demo/t/10",
-    qrLink: "https://smart-restaurant.com/r/demo/t/10",
-    status: "Ready",
-    updatedAt: "2024-01-15 14:30",
-    seats: 6,
-  },
-]
+// Helper function to format date
+function formatDate(dateString: string | null): string {
+  if (!dateString) return '—'
+  try {
+    const date = new Date(dateString)
+    return date.toLocaleDateString('vi-VN', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+  } catch {
+    return '—'
+  }
+}
+
+// Transform API response table item to TableQR
+// API returns camelCase: { id, tableNumber, tableZone, seats, qrUrl, orderingUrl, status, updatedAt }
+function transformQRToTableQR(qr: {
+  id: string
+  tableNumber: string
+  tableZone: string
+  seats: number
+  qrUrl: string | null
+  orderingUrl: string | null
+  status: 'Missing' | 'Ready' | 'Outdated'
+  updatedAt: string | null
+}): TableQR {
+  return {
+    id: qr.id,
+    tableNumber: qr.tableNumber,
+    tableArea: qr.tableZone || '—',
+    qrUrl: qr.qrUrl || '',
+    qrLink: qr.orderingUrl || '',
+    status: mapQRStatus(qr.status),
+    updatedAt: formatDate(qr.updatedAt),
+    seats: qr.seats || 0,
+  }
+}
+
+// Transform single QR detail (snake_case) to TableQR
+function transformSingleQRDetail(qr: {
+  id: string
+  table_number: string
+  table_zone?: string | null
+  seats?: number | null
+  qr_code_url: string | null
+  ordering_url: string | null
+  status: string
+  qr_code_generated_at: string | null
+}): TableQR {
+  return {
+    id: qr.id,
+    tableNumber: qr.table_number,
+    tableArea: qr.table_zone || '—',
+    qrUrl: qr.qr_code_url || '',
+    qrLink: qr.ordering_url || '',
+    status: mapQRStatus(qr.status),
+    updatedAt: formatDate(qr.qr_code_generated_at),
+    seats: qr.seats || 0,
+  }
+}
 
 export function QRManagerContent() {
   const [selectedQR, setSelectedQR] = useState<TableQR | null>(null)
   const [showBatchDialog, setShowBatchDialog] = useState(false)
   const [selectedTables, setSelectedTables] = useState<string[]>([])
   const [showSecurityModal, setShowSecurityModal] = useState(false)
+  const [statusFilter, setStatusFilter] = useState<QRStatus | undefined>(undefined)
+  const [zoneFilter, setZoneFilter] = useState<string | undefined>(undefined)
+  const [overrides, setOverrides] = useState<Record<string, TableQR>>({})
+
+  const { handleError } = useErrorHandler()
+  const { data: zonesData } = useZonesSimpleQuery()
+  const zones = Array.isArray(zonesData?.data)
+    ? zonesData.data
+    : (zonesData?.data as { zones?: Array<{ id: string; name: string }> } | undefined)?.zones || []
+
+  const { data: qrData, isLoading, error } = useQRCodesQuery(
+    {
+      status: statusFilter,
+      zone_id: zoneFilter,
+    },
+    true,
+  )
+
+  const batchGenerateMutation = useBatchGenerateQRMutation()
+  const generateMutation = useGenerateQRMutation()
+
+  const tableQRs = useMemo(() => {
+    if (!qrData?.data.tables) return []
+    const base = qrData.data.tables.map(transformQRToTableQR)
+    return base.map((t) => overrides[t.id] || t)
+  }, [qrData, overrides])
+
+  const refreshSingleQR = async (tableId: string) => {
+    try {
+      const detail = await tablesApi.getQRCode(tableId)
+      if (detail?.data) {
+        const mapped = transformSingleQRDetail(detail.data)
+        setOverrides((prev) => ({ ...prev, [tableId]: mapped }))
+      }
+    } catch (error) {
+      // Silent refresh errors; main generate already handled by mutation
+      console.error('Failed to refresh QR detail', error)
+    }
+  }
+
+  const handleGenerateAll = async () => {
+    if (tableQRs.length === 0) {
+      toast.info('Không có bàn nào để tạo QR')
+      return
+    }
+
+    try {
+      const allTableIds = tableQRs.map((t) => t.id)
+      await batchGenerateMutation.mutateAsync({
+        table_ids: allTableIds,
+        force_regenerate: false,
+      })
+      toast.success('Đã tạo QR cho tất cả bàn thành công')
+    } catch (error) {
+      handleError(error)
+    }
+  }
+
+  const handleBatchGenerate = async (forceRegenerate: boolean) => {
+    if (selectedTables.length === 0) {
+      toast.info('Vui lòng chọn ít nhất một bàn')
+      return
+    }
+
+    try {
+      await batchGenerateMutation.mutateAsync({
+        table_ids: selectedTables,
+        force_regenerate: forceRegenerate,
+      })
+      toast.success(`Đã tạo QR cho ${selectedTables.length} bàn thành công`)
+      setSelectedTables([])
+      setShowBatchDialog(false)
+    } catch (error) {
+      handleError(error)
+    }
+  }
+
+  const handleDownloadAll = async (format: 'png' | 'pdf' | 'zip' = 'zip') => {
+    try {
+      const blob = await tablesApi.downloadAllQR(format)
+      const extension = format === 'zip' ? 'zip' : format === 'pdf' ? 'pdf' : 'png'
+      downloadBlobWithHeaders(blob, {}, `qr-codes-all.${extension}`)
+      toast.success('Đã tải xuống tất cả QR codes')
+    } catch (error) {
+      handleError(error)
+    }
+  }
+
+  const handleDownloadQR = async (tableId: string, format: 'png' | 'pdf' = 'png') => {
+    try {
+      const blob = await tablesApi.downloadQR(tableId, format)
+      const table = tableQRs.find((t) => t.id === tableId)
+      const filename = `qr-table-${table?.tableNumber || tableId}.${format}`
+      downloadBlobWithHeaders(blob, {}, filename)
+      toast.success('Đã tải xuống QR code')
+    } catch (error) {
+      handleError(error)
+    }
+  }
+
+  const handleGenerateQR = async (tableId: string, forceRegenerate = false) => {
+    try {
+      await generateMutation.mutateAsync({ tableId, forceRegenerate })
+      toast.success(forceRegenerate ? 'Đã tạo lại QR code thành công' : 'Đã tạo QR code thành công')
+      await refreshSingleQR(tableId)
+    } catch (error) {
+      handleError(error)
+    }
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="rounded-2xl border border-red-200 bg-red-50 p-6 dark:border-red-800 dark:bg-red-500/10">
+        <p className="text-sm text-red-600 dark:text-red-400">
+          Có lỗi xảy ra khi tải danh sách QR. Vui lòng thử lại.
+        </p>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">
       {/* Stats */}
-      <QRManagerStats tables={mockTableQRs} />
+      <QRManagerStats tables={tableQRs} />
 
       {/* Main content grid */}
       <div className="space-y-4">
         <QRManagerToolbar
-          onGenerateAll={() => {}}
-          onPrintBatch={() => setShowBatchDialog(true)}
+          zones={zones}
+          statusFilter={statusFilter}
+          zoneFilter={zoneFilter}
+          onStatusFilterChange={setStatusFilter}
+          onZoneFilterChange={setZoneFilter}
+          onGenerateAll={handleGenerateAll}
+          onDownloadAll={handleDownloadAll}
           onSecurityInfo={() => setShowSecurityModal(true)}
+          isLoading={batchGenerateMutation.isPending}
         />
         <QRTableList
-          tables={mockTableQRs}
+          tables={tableQRs}
           selectedTables={selectedTables}
           onSelectTable={(id) => {
-            setSelectedTables((prev) => (prev.includes(id) ? prev.filter((t) => t !== id) : [...prev, id]))
+            setSelectedTables((prev) =>
+              prev.includes(id) ? prev.filter((t) => t !== id) : [...prev, id],
+            )
           }}
           onSelectAll={() => {
-            setSelectedTables(selectedTables.length === mockTableQRs.length ? [] : mockTableQRs.map((t) => t.id))
+            setSelectedTables(
+              selectedTables.length === tableQRs.length ? [] : tableQRs.map((t) => t.id),
+            )
           }}
           onPreview={(table) => setSelectedQR(table)}
+          onDownload={(tableId, format) => handleDownloadQR(tableId, format)}
+          onGenerate={(tableId, forceRegenerate) => handleGenerateQR(tableId, forceRegenerate)}
+          onBatchGenerate={(forceRegenerate) => handleBatchGenerate(forceRegenerate)}
+          onBatchDownload={(format) => {
+            // For batch download, we'll download individual QRs
+            Promise.all(selectedTables.map((id) => handleDownloadQR(id, format)))
+          }}
+          isLoading={generateMutation.isPending || batchGenerateMutation.isPending}
         />
       </div>
 
@@ -158,8 +279,10 @@ export function QRManagerContent() {
       {showBatchDialog && (
         <QRBatchPrintDialog
           selectedCount={selectedTables.length}
-          totalCount={mockTableQRs.length}
+          totalCount={tableQRs.length}
           onClose={() => setShowBatchDialog(false)}
+          onGenerate={(forceRegenerate) => handleBatchGenerate(forceRegenerate)}
+          isLoading={batchGenerateMutation.isPending}
         />
       )}
       {showSecurityModal && <QRSecurityModal onClose={() => setShowSecurityModal(false)} />}
