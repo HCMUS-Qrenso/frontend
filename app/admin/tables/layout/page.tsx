@@ -11,10 +11,23 @@ import {
   useFloorLayoutQuery,
   useBatchUpdatePositionsMutation,
   useCreateTableMutation,
+  useUpdateTableMutation,
+  useTablesQuery,
 } from '@/hooks/use-tables-query'
 import { toast } from 'sonner'
 import { useErrorHandler } from '@/hooks/use-error-handler'
 import type { FloorLayoutTable, TablePosition } from '@/types/tables'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
+import { Loader2, AlertTriangle } from 'lucide-react'
 
 export interface TableItem {
   id: string
@@ -77,6 +90,8 @@ export default function TableLayoutPage() {
   const [showGrid, setShowGrid] = useState(true)
   const [history, setHistory] = useState<TableItem[][]>([])
   const [historyIndex, setHistoryIndex] = useState(0)
+  const [positionChanges, setPositionChanges] = useState<Map<string, TablePosition>>(new Map())
+  const [resetDialogOpen, setResetDialogOpen] = useState(false)
 
   // Load floors and layout data
   const { data: floorsData } = useFloorsQuery()
@@ -95,8 +110,71 @@ export default function TableLayoutPage() {
     return layoutData.data.tables.map(transformTableToItem)
   }, [layoutData])
 
+  // Get all tables for current floor to find tables without positions
+  const { data: allTablesData } = useTablesQuery(
+    {
+      floor: currentFloor || undefined,
+      is_active: true,
+    },
+    !!currentFloor,
+  )
+
+  // Transform Table to TableItem for library (tables without positions)
+  const transformTableToLibraryItem = (table: any): TableItem => {
+    let position = { x: 0, y: 0 }
+    if (table.position) {
+      try {
+        const parsed = JSON.parse(table.position)
+        position = parsed
+      } catch {
+        position = { x: 0, y: 0 }
+      }
+    }
+
+    return {
+      id: table.id,
+      type: mapShape(table.shape),
+      name: table.table_number,
+      seats: table.capacity,
+      area: table.floor || currentFloor,
+      status: mapStatus(table.status),
+      position,
+      rotation: 0,
+      size: {
+        width: table.shape === 'circle' || table.shape === 'oval' ? 120 : 120,
+        height: table.shape === 'circle' || table.shape === 'oval' ? 120 : 80,
+      },
+      canBeMerged: table.shape !== 'circle' && table.shape !== 'oval',
+    }
+  }
+
+  // Filter tables without positions (not in layout or position is null/0,0)
+  const libraryTables = useMemo(() => {
+    if (!allTablesData?.data.tables) return []
+    
+    const tablesWithPositions = new Set(tables.map((t) => t.id))
+    
+    return allTablesData.data.tables
+      .filter((table) => {
+        // Table is not in layout (doesn't have position)
+        if (!tablesWithPositions.has(table.id)) return true
+        
+        // Table has null position or position is {x:0, y:0}
+        if (!table.position) return true
+        
+        try {
+          const pos = JSON.parse(table.position)
+          return pos.x === 0 && pos.y === 0
+        } catch {
+          return true
+        }
+      })
+      .map(transformTableToLibraryItem)
+  }, [allTablesData, tables, currentFloor])
+
   const batchUpdateMutation = useBatchUpdatePositionsMutation()
   const createTableMutation = useCreateTableMutation()
+  const updateTableMutation = useUpdateTableMutation()
 
   useEffect(() => {
     if (floorParam) {
@@ -124,8 +202,16 @@ export default function TableLayoutPage() {
   const selectedTable = tables.find((t) => t.id === selectedTableId)
 
   const handleTableUpdate = (id: string, updates: Partial<TableItem>) => {
-    // This is handled by the side panel component which calls the API directly
-    // We just update local state for immediate UI feedback
+    // Track position changes for batch save
+    if (updates.position) {
+      setPositionChanges((prev) => {
+        const newMap = new Map(prev)
+        newMap.set(id, updates.position!)
+        return newMap
+      })
+    }
+    
+    // Update local state for immediate UI feedback
     const newTables = tables.map((t) => (t.id === id ? { ...t, ...updates } : t))
     addToHistory(newTables)
   }
@@ -136,6 +222,58 @@ export default function TableLayoutPage() {
     const newTables = tables.filter((t) => t.id !== id)
     setSelectedTableId(null)
     addToHistory(newTables)
+  }
+
+  // Map frontend status to backend status
+  const mapStatusToBackend = (status: TableItem['status']): string => {
+    const statusMap: Record<TableItem['status'], string> = {
+      'Available': 'available',
+      'Occupied': 'occupied',
+      'Waiting for bill': 'waiting_for_payment',
+      'Disabled': 'maintenance',
+    }
+    return statusMap[status] || 'available'
+  }
+
+  // Map frontend shape to backend shape
+  const mapShapeToBackend = (type: TableItem['type']): string => {
+    return type === 'round' ? 'circle' : 'rectangle'
+  }
+
+  const handleTableSave = async (id: string, updates: Partial<TableItem>) => {
+    try {
+      const table = tables.find((t) => t.id === id)
+      if (!table) return
+
+      const payload: any = {}
+      
+      if (updates.name !== undefined) {
+        payload.table_number = updates.name
+      }
+      if (updates.seats !== undefined) {
+        payload.capacity = updates.seats
+      }
+      if (updates.area !== undefined) {
+        payload.floor = updates.area
+      }
+      if (updates.status !== undefined) {
+        payload.status = mapStatusToBackend(updates.status)
+      }
+      if (updates.type !== undefined) {
+        payload.shape = mapShapeToBackend(updates.type)
+      }
+      if (updates.position !== undefined) {
+        payload.position = updates.position
+      }
+
+      await updateTableMutation.mutateAsync({ id, payload })
+      toast.success('Bàn đã được cập nhật thành công')
+      
+      // Update local state for immediate UI feedback
+      handleTableUpdate(id, updates)
+    } catch (error: any) {
+      handleError(error, 'Có lỗi xảy ra khi cập nhật bàn')
+    }
   }
 
   const handleAddTable = async (tableTemplate: Omit<TableItem, 'id' | 'position' | 'area'>) => {
@@ -184,25 +322,55 @@ export default function TableLayoutPage() {
 
   const handleSave = async () => {
     try {
-      const updates = tables.map((table) => ({
-        table_id: table.id,
-        position: table.position,
+      // Only send tables with position changes
+      if (positionChanges.size === 0) {
+        toast.info('Không có thay đổi nào để lưu')
+        return
+      }
+
+      const updates = Array.from(positionChanges.entries()).map(([tableId, position]) => ({
+        table_id: tableId,
+        position,
       }))
 
       await batchUpdateMutation.mutateAsync({ updates })
       toast.success('Sơ đồ đã được lưu thành công')
+      
+      // Clear position changes after successful save
+      setPositionChanges(new Map())
     } catch (error: any) {
       handleError(error, 'Có lỗi xảy ra khi lưu sơ đồ')
     }
   }
 
   const handleReset = () => {
-    if (confirm('Bạn có chắc muốn reset layout về mặc định?')) {
-      // Reset to initial state from API
+    setResetDialogOpen(true)
+  }
+
+  const handleConfirmReset = async () => {
+    try {
+      // Batch update API doesn't support null positions, so use individual PUT requests
+      // Send null position to remove tables from layout
+      const updatePromises = tables.map((table) =>
+        updateTableMutation.mutateAsync({
+          id: table.id,
+          payload: { position: null as any }, // Send null to remove position
+        } as any)
+      )
+      await Promise.all(updatePromises)
+      
+      toast.success('Layout đã được đặt lại thành công')
+      
+      // Clear local state
       setHistory([])
       setHistoryIndex(0)
       setSelectedTableId(null)
-      // Tables will be reloaded from API automatically
+      setPositionChanges(new Map())
+      setResetDialogOpen(false)
+      
+      // Tables will be reloaded from API automatically via query invalidation
+    } catch (error: any) {
+      handleError(error, 'Có lỗi xảy ra khi đặt lại layout')
     }
   }
 
@@ -224,11 +392,13 @@ export default function TableLayoutPage() {
         {/* Toolbar */}
         <FloorPlanToolbar
           selectedArea={currentFloor}
+          areas={floors}
           onAreaChange={(area) => {
             setSelectedArea(area)
             setSelectedTableId(null)
             setHistory([])
             setHistoryIndex(0)
+            setPositionChanges(new Map())
           }}
           zoom={zoom}
           onZoomChange={setZoom}
@@ -264,12 +434,52 @@ export default function TableLayoutPage() {
           <FloorPlanSidePanel
             selectedTable={selectedTable}
             onTableUpdate={handleTableUpdate}
+            onTableSave={handleTableSave}
             onTableDelete={handleTableDelete}
             onAddTable={handleAddTable}
             areas={floors}
+            libraryTables={libraryTables}
           />
         </div>
       </div>
+
+      {/* Reset Confirmation Dialog */}
+      <AlertDialog open={resetDialogOpen} onOpenChange={setResetDialogOpen}>
+        <AlertDialogContent className="rounded-2xl">
+          <AlertDialogHeader>
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-50 dark:bg-red-500/10">
+              <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-400" />
+            </div>
+            <AlertDialogTitle className="text-center text-lg font-semibold text-slate-900 dark:text-white">
+              Đặt lại layout?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-center text-sm text-slate-500 dark:text-slate-400">
+              Tất cả vị trí bàn sẽ được xóa và các bàn sẽ quay về thư viện. Hành động này không thể hoàn tác.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-row justify-end gap-3 sm:flex-row">
+            <AlertDialogCancel
+              disabled={batchUpdateMutation.isPending || updateTableMutation.isPending}
+              className="m-0 rounded-full"
+              onClick={() => setResetDialogOpen(false)}
+            >
+              Hủy
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmReset}
+              disabled={batchUpdateMutation.isPending || updateTableMutation.isPending}
+              className="m-0 gap-2 rounded-full bg-red-600 hover:bg-red-700"
+            >
+              {(batchUpdateMutation.isPending || updateTableMutation.isPending) && (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              )}
+              {(batchUpdateMutation.isPending || updateTableMutation.isPending)
+                ? 'Đang đặt lại...'
+                : 'Đặt lại'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AdminLayout>
   )
 }

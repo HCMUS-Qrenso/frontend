@@ -6,6 +6,7 @@ import { ChevronDown, Grid3x3, Minus, Plus, RotateCcw, Save, Undo2, Redo2 } from
 
 interface FloorPlanToolbarProps {
   selectedArea: string
+  areas: string[]
   onAreaChange: (area: string) => void
   zoom: number
   onZoomChange: (zoom: number) => void
@@ -21,6 +22,7 @@ interface FloorPlanToolbarProps {
 
 export function FloorPlanToolbar({
   selectedArea,
+  areas,
   onAreaChange,
   zoom,
   onZoomChange,
@@ -33,7 +35,6 @@ export function FloorPlanToolbar({
   onSave,
   onReset,
 }: FloorPlanToolbarProps) {
-  const areas = ["Tầng 1", "Tầng 2", "Sân vườn"]
 
   return (
     <div className="flex items-center justify-between rounded-2xl border border-slate-100 bg-white/80 px-6 py-4 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">

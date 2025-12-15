@@ -1,7 +1,15 @@
 'use client'
 
 import { cn } from '@/lib/utils'
-import { DndContext, type DragEndEvent, useDraggable } from '@dnd-kit/core'
+import {
+  DndContext,
+  type DragEndEvent,
+  type DragStartEvent,
+  useDraggable,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core'
 import { CSS } from '@dnd-kit/utilities'
 import { RotateCw } from 'lucide-react'
 import type { TableItem } from '@/app/admin/tables/layout/page'
@@ -25,11 +33,25 @@ export function FloorPlanCanvas({
   showGrid,
   selectedArea,
 }: FloorPlanCanvasProps) {
+  // Configure sensors for drag and drop
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8, // Require 8px of movement before activating drag
+      },
+    }),
+  )
+
+  const handleDragStart = (event: DragStartEvent) => {
+    // Optional: can add logic here if needed
+  }
+
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, delta } = event
     const table = tables.find((t) => t.id === active.id)
-    if (table) {
+    if (table && delta) {
       const gridSize = 20
+      // Calculate new position accounting for zoom
       const newX = Math.round((table.position.x + delta.x / zoom) / gridSize) * gridSize
       const newY = Math.round((table.position.y + delta.y / zoom) / gridSize) * gridSize
       onTableUpdate(table.id, {
@@ -78,7 +100,7 @@ export function FloorPlanCanvas({
 
       {/* Canvas */}
       <div className="relative overflow-hidden p-6" style={{ minHeight: '600px' }}>
-        <DndContext onDragEnd={handleDragEnd}>
+        <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
           <div
             className={cn(
               'relative h-[600px] w-full overflow-auto rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800/50',
@@ -164,20 +186,22 @@ function DraggableTable({
         height: table.size.height,
         transform: `${style.transform || ''} rotate(${table.rotation}deg)`,
       }}
-      {...listeners}
       {...attributes}
-      onClick={(e) => {
-        e.stopPropagation()
-        onSelect()
-      }}
       className={cn(
-        'cursor-move border-2 transition-all',
+        'border-2 transition-all',
         table.type === 'round' ? 'rounded-full' : 'rounded-lg',
         statusColors[table.status],
         isSelected ? 'ring-2 ring-emerald-500 ring-offset-2' : 'hover:shadow-md',
       )}
     >
-      <div className="flex h-full flex-col items-center justify-center p-2 text-center">
+      <div
+        {...listeners}
+        onClick={(e) => {
+          e.stopPropagation()
+          onSelect()
+        }}
+        className="flex h-full cursor-move flex-col items-center justify-center p-2 text-center"
+      >
         <p className="text-xs font-semibold text-slate-900 dark:text-white">{table.name}</p>
         <p className="text-[10px] text-slate-600 dark:text-slate-400">{table.seats} chỗ ngồi</p>
       </div>
@@ -187,9 +211,13 @@ function DraggableTable({
         <button
           onClick={(e) => {
             e.stopPropagation()
+            e.preventDefault()
             onRotate()
           }}
-          className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full border border-emerald-500 bg-white text-emerald-600 shadow-sm hover:bg-emerald-50 dark:bg-slate-800 dark:text-emerald-400"
+          onPointerDown={(e) => {
+            e.stopPropagation()
+          }}
+          className="absolute -top-2 -right-2 z-10 flex h-6 w-6 cursor-pointer items-center justify-center rounded-full border border-emerald-500 bg-white text-emerald-600 shadow-sm hover:bg-emerald-50 dark:bg-slate-800 dark:text-emerald-400"
           style={{ transform: `rotate(-${table.rotation}deg)` }}
         >
           <RotateCw className="h-3 w-3" />

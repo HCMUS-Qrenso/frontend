@@ -196,13 +196,6 @@ export function TablesListTable({ isTrashView = false }: TablesListTableProps) {
     }
   }
 
-  const handleDeletePermanently = async (table: Table) => {
-    // TODO: Implement permanent delete API when available
-    // For now, just show a message
-    toast.info('Chức năng xóa vĩnh viễn sẽ được triển khai khi API sẵn sàng')
-    console.log('Permanent delete requested for table:', table.id)
-  }
-
   const handlePageChange = (newPage: number) => {
     const params = new URLSearchParams(searchParams.toString())
     params.set('page', newPage.toString())
@@ -303,29 +296,16 @@ export function TablesListTable({ isTrashView = false }: TablesListTableProps) {
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-end gap-2">
                       {isTrashView ? (
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
-                              <MoreVertical className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem
-                              onClick={() => handleRestore(table)}
-                              disabled={updateMutation.isPending}
-                            >
-                              <RotateCcw className="mr-2 h-4 w-4" />
-                              {updateMutation.isPending ? 'Đang khôi phục...' : 'Khôi phục'}
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              className="text-red-600"
-                              onClick={() => handleDeletePermanently(table)}
-                            >
-                              <Trash2 className="mr-2 h-4 w-4" />
-                              Xóa vĩnh viễn
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 rounded-full"
+                          onClick={() => handleRestore(table)}
+                          disabled={updateMutation.isPending}
+                          title="Khôi phục bàn"
+                        >
+                          <RotateCcw className="h-4 w-4" />
+                        </Button>
                       ) : (
                         <>
                           <Button
