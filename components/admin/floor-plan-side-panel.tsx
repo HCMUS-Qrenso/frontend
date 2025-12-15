@@ -28,6 +28,7 @@ interface FloorPlanSidePanelProps {
 }
 
 const tableTemplates = [
+  // Rectangle templates
   {
     type: 'rectangle' as const,
     name: 'Hình chữ nhật 2 chỗ',
@@ -50,24 +51,68 @@ const tableTemplates = [
     icon: Square,
   },
   {
-    type: 'round' as const,
+    type: 'rectangle' as const,
+    name: 'Hình chữ nhật 8 chỗ',
+    seats: 8,
+    size: { width: 160, height: 100 },
+    icon: Square,
+  },
+  // Circle templates
+  {
+    type: 'circle' as const,
+    name: 'Tròn 2 chỗ',
+    seats: 2,
+    size: { width: 80, height: 80 },
+    icon: Circle,
+  },
+  {
+    type: 'circle' as const,
     name: 'Tròn 4 chỗ',
     seats: 4,
     size: { width: 100, height: 100 },
     icon: Circle,
   },
   {
-    type: 'round' as const,
+    type: 'circle' as const,
     name: 'Tròn 6 chỗ',
     seats: 6,
     size: { width: 120, height: 120 },
     icon: Circle,
   },
   {
-    type: 'round' as const,
+    type: 'circle' as const,
     name: 'Tròn 8 chỗ',
     seats: 8,
     size: { width: 140, height: 140 },
+    icon: Circle,
+  },
+  // Oval templates
+  {
+    type: 'oval' as const,
+    name: 'Oval 2 chỗ',
+    seats: 2,
+    size: { width: 90, height: 70 },
+    icon: Circle,
+  },
+  {
+    type: 'oval' as const,
+    name: 'Oval 4 chỗ',
+    seats: 4,
+    size: { width: 130, height: 90 },
+    icon: Circle,
+  },
+  {
+    type: 'oval' as const,
+    name: 'Oval 6 chỗ',
+    seats: 6,
+    size: { width: 150, height: 100 },
+    icon: Circle,
+  },
+  {
+    type: 'oval' as const,
+    name: 'Oval 8 chỗ',
+    seats: 8,
+    size: { width: 170, height: 120 },
     icon: Circle,
   },
 ]
@@ -138,7 +183,7 @@ export function FloorPlanSidePanel({
             <div className="grid gap-3">
               {libraryTables.length > 0 ? (
                 libraryTables.map((table) => {
-                  const Icon = table.type === 'round' ? Circle : Square
+                  const Icon = table.type === 'rectangle' ? Square : Circle
                   return (
                     <button
                       key={table.id}
@@ -220,6 +265,26 @@ export function FloorPlanSidePanel({
                           {area}
                         </SelectItem>
                       ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Shape */}
+                <div className="space-y-2">
+                  <Label htmlFor="table-shape">Hình dạng</Label>
+                  <Select
+                    value={selectedTable.type}
+                    onValueChange={(value: 'rectangle' | 'circle' | 'oval') =>
+                      onTableUpdate(selectedTable.id, { type: value })
+                    }
+                  >
+                    <SelectTrigger id="table-shape">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="rectangle">Hình chữ nhật</SelectItem>
+                      <SelectItem value="circle">Tròn</SelectItem>
+                      <SelectItem value="oval">Oval</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

@@ -54,11 +54,7 @@ export function FloorPlanCanvas({
 
   // Filter tables by area and exclude tables with position -1,-1 (unplaced tables)
   const filteredTables = tables.filter(
-    (t) =>
-      t.area === selectedArea &&
-      t.position &&
-      t.position.x !== -1 &&
-      t.position.y !== -1,
+    (t) => t.area === selectedArea && t.position && t.position.x !== -1 && t.position.y !== -1,
   )
 
   const handleDragStart = (event: DragStartEvent) => {
@@ -241,7 +237,7 @@ function DraggableTable({
       }}
       className={cn(
         'touch-none border-2 select-none',
-        table.type === 'round' ? 'rounded-full' : 'rounded-lg',
+        table.type === 'circle' || table.type === 'oval' ? 'rounded-full' : 'rounded-lg',
         statusColors[table.status],
         isSelected
           ? 'z-20 cursor-move ring-2 ring-emerald-500 ring-offset-2'
