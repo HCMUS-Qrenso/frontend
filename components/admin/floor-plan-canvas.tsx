@@ -52,7 +52,14 @@ export function FloorPlanCanvas({
     onTableUpdate(tableId, { rotation: (currentRotation + 90) % 360 })
   }
 
-  const filteredTables = tables.filter((t) => t.area === selectedArea)
+  // Filter tables by area and exclude tables with position -1,-1 (unplaced tables)
+  const filteredTables = tables.filter(
+    (t) =>
+      t.area === selectedArea &&
+      t.position &&
+      t.position.x !== -1 &&
+      t.position.y !== -1,
+  )
 
   const handleDragStart = (event: DragStartEvent) => {
     const { active } = event
@@ -64,7 +71,8 @@ export function FloorPlanCanvas({
     const { active, delta } = event
     const table = tables.find((t) => t.id === active.id)
 
-    if (table && delta) {
+    // Only process tables with valid positions (not -1,-1)
+    if (table && delta && table.position && table.position.x !== -1 && table.position.y !== -1) {
       // Calculate new position with zoom adjustment
       const dx = delta.x / zoom
       const dy = delta.y / zoom
@@ -217,6 +225,10 @@ function DraggableTable({
     <div
       ref={setNodeRef}
       suppressHydrationWarning
+      onClick={(e) => {
+        e.stopPropagation()
+        onSelect()
+      }}
       style={{
         position: 'absolute',
         left: table.position.x,

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -82,6 +82,24 @@ export function FloorPlanSidePanel({
   libraryTables,
 }: FloorPlanSidePanelProps) {
   const [isSaving, setIsSaving] = useState(false)
+  const [activeTab, setActiveTab] = useState<'library' | 'properties'>('library')
+  const nameInputRef = useRef<HTMLInputElement | null>(null)
+
+  // When a table is selected, switch to properties tab and focus the name input
+  useEffect(() => {
+    if (selectedTable) {
+      setActiveTab('properties')
+    }
+  }, [selectedTable])
+
+  useEffect(() => {
+    if (selectedTable && activeTab === 'properties') {
+      // Focus after tab becomes active
+      requestAnimationFrame(() => {
+        nameInputRef.current?.focus({ preventScroll: true })
+      })
+    }
+  }, [selectedTable, activeTab])
 
   const handleSave = async () => {
     if (!selectedTable) return
@@ -95,7 +113,7 @@ export function FloorPlanSidePanel({
   }
   return (
     <div className="rounded-2xl border border-slate-100 bg-white/80 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
-      <Tabs defaultValue="library" className="h-full">
+      <Tabs value={activeTab} onValueChange={(v: any) => setActiveTab(v)} className="h-full">
         <TabsList className="w-full rounded-b-none border-b border-slate-100 bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900">
           <TabsTrigger value="library" className="flex-1">
             Thư viện
@@ -179,6 +197,7 @@ export function FloorPlanSidePanel({
                   <Label htmlFor="table-name">Tên / Số bàn</Label>
                   <Input
                     id="table-name"
+                    ref={nameInputRef}
                     value={selectedTable.name}
                     onChange={(e) => onTableUpdate(selectedTable.id, { name: e.target.value })}
                     placeholder="ví dụ: Bàn 5"

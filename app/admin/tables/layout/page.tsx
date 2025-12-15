@@ -12,7 +12,6 @@ import {
   useBatchUpdatePositionsMutation,
   useCreateTableMutation,
   useUpdateTableMutation,
-  useTablesQuery,
 } from '@/hooks/use-tables-query'
 import { toast } from 'sonner'
 import { useErrorHandler } from '@/hooks/use-error-handler'
@@ -104,7 +103,7 @@ export default function TableLayoutPage() {
   )
   const { handleError } = useErrorHandler()
 
-  // Transform backend data to TableItem format (for initial sync only)
+  // Transform backend data to TableItem format
   const tablesFromApi = useMemo(() => {
     if (!layoutData?.data.tables) return []
     return layoutData.data.tables.map(transformTableToItem)
@@ -114,81 +113,45 @@ export default function TableLayoutPage() {
   const [localTables, setLocalTables] = useState<TableItem[]>([])
   const prevFloorRef = useRef<string>('')
 
-  // Sync localTables when floor changes or when data first loads
+  // 1. Reset state when floor changes
   useEffect(() => {
-    const floorChanged = prevFloorRef.current !== currentFloor
-    prevFloorRef.current = currentFloor
-
-    // Sync when floor changes or when data first loads
-    if ((floorChanged || localTables.length === 0) && tablesFromApi.length > 0) {
-      setLocalTables(tablesFromApi)
+    if (prevFloorRef.current !== currentFloor && prevFloorRef.current !== '') {
+      // Floor đã thay đổi, reset local state
+      setLocalTables([])
+      setHistory([])
+      setHistoryIndex(0)
+      setPositionChanges(new Map())
+      setSelectedTableId(null)
     }
-  }, [currentFloor, tablesFromApi, localTables.length])
+    prevFloorRef.current = currentFloor
+  }, [currentFloor])
+
+  // 2. Sync data from API when new data is available
+  useEffect(() => {
+    // Chỉ sync khi không đang loading và có dữ liệu (hoặc mảng rỗng)
+    if (!isLoadingLayout && layoutData?.data) {
+      const tables = layoutData.data.tables || []
+      const newTables = tables.map(transformTableToItem)
+      // Đảm bảo dữ liệu match với currentFloor (hoặc không có bàn nào)
+      const allMatchFloor =
+        newTables.length === 0 || newTables.every((t) => t.area === currentFloor)
+      if (allMatchFloor) {
+        setLocalTables(newTables)
+      }
+    }
+  }, [layoutData, isLoadingLayout, currentFloor])
 
   // Use localTables instead of tables memo
   const tables = localTables
 
-  // Get all tables for current floor to find tables without positions
-  const { data: allTablesData } = useTablesQuery(
-    {
-      floor: currentFloor || undefined,
-      is_active: true,
-    },
-    !!currentFloor,
-  )
-
-  // Transform Table to TableItem for library (tables without positions)
-  const transformTableToLibraryItem = (table: any): TableItem => {
-    let position = { x: 0, y: 0 }
-    if (table.position) {
-      try {
-        const parsed = JSON.parse(table.position)
-        position = parsed
-      } catch {
-        position = { x: 0, y: 0 }
-      }
-    }
-
-    return {
-      id: table.id,
-      type: mapShape(table.shape),
-      name: table.table_number,
-      seats: table.capacity,
-      area: table.floor || currentFloor,
-      status: mapStatus(table.status),
-      position,
-      rotation: 0,
-      size: {
-        width: table.shape === 'circle' || table.shape === 'oval' ? 120 : 120,
-        height: table.shape === 'circle' || table.shape === 'oval' ? 120 : 80,
-      },
-      canBeMerged: table.shape !== 'circle' && table.shape !== 'oval',
-    }
-  }
-
-  // Filter tables without positions (not in layout or position is null/0,0)
+  // Filter tables without positions (not in layout or position is null/-1,-1)
   const libraryTables = useMemo(() => {
-    if (!allTablesData?.data.tables) return []
-
-    const tablesWithPositions = new Set(tables.map((t) => t.id))
-
-    return allTablesData.data.tables
-      .filter((table) => {
-        // Table is not in layout (doesn't have position)
-        if (!tablesWithPositions.has(table.id)) return true
-
-        // Table has null position or position is {x:0, y:0}
-        if (!table.position) return true
-
-        try {
-          const pos = JSON.parse(table.position)
-          return pos.x === 0 && pos.y === 0
-        } catch {
-          return true
-        }
-      })
-      .map(transformTableToLibraryItem)
-  }, [allTablesData, tables, currentFloor])
+    return tables.filter((table) => {
+      const pos: any = (table as any).position
+      if (!pos) return true
+      return pos.x === -1 && pos.y === -1
+    })
+  }, [tables])
 
   const batchUpdateMutation = useBatchUpdatePositionsMutation()
   const createTableMutation = useCreateTableMutation()
@@ -309,7 +272,7 @@ export default function TableLayoutPage() {
         shape: tableTemplate.type === 'round' ? 'circle' : 'rectangle',
         status: 'available',
         is_active: true,
-        position: { x: 200, y: 200 },
+        position: { x: -1, y: -1 },
       })
 
       toast.success('Bàn đã được tạo thành công')
@@ -374,25 +337,23 @@ export default function TableLayoutPage() {
   const handleConfirmReset = async () => {
     try {
       // Batch update API doesn't support null positions, so use individual PUT requests
-      // Send null position to remove tables from layout
+      // Send -1,-1 position to move tables back to library
       const updatePromises = localTables.map((table) =>
         updateTableMutation.mutateAsync({
           id: table.id,
-          payload: { position: null as any }, // Send null to remove position
+          payload: { position: { x: -1, y: -1 } }, // Send -1,-1 to move to library
         } as any),
       )
       await Promise.all(updatePromises)
 
       toast.success('Layout đã được đặt lại thành công')
 
-      // Update localTables to remove positions (set to 0,0 or keep them but they'll be filtered out)
-      // Actually, after reset, tables should disappear from layout, so we can clear localTables
-      // But wait - the API will refetch and return empty tables array, so we should sync
-      // For now, let's clear positions in localTables
+      // Update localTables to remove positions (set to -1,-1 so they appear in library)
+      // After reset, tables should disappear from layout and appear in library
       setLocalTables((prevTables) =>
         prevTables.map((table) => ({
           ...table,
-          position: { x: 0, y: 0 },
+          position: { x: -1, y: -1 },
         })),
       )
 

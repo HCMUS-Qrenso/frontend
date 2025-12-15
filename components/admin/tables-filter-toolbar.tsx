@@ -68,6 +68,8 @@ export function TablesFilterToolbar({ isTrashView = false }: TablesFilterToolbar
 
   const handleAddTable = () => {
     const params = new URLSearchParams(searchParams.toString())
+    // Remove id param if exists (for edit mode)
+    params.delete('id')
     params.set('modal', 'table')
     params.set('mode', 'create')
     router.push(`/admin/tables/list?${params.toString()}`)
