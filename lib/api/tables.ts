@@ -115,6 +115,12 @@ export const tablesApi = {
     return data
   },
 
+  // Deprecated floor layout API kept only for type compatibility
+  /** @deprecated Use getZoneLayout instead */
+  getFloorLayout: async (_floor: string): Promise<FloorLayoutResponse> => {
+    throw new Error('getFloorLayout is deprecated. Use getZoneLayout instead.')
+  },
+
 
   getZones: async (): Promise<ZonesResponse> => {
     const { data } = await apiClient.get<ZonesResponse>('/tables/zones')

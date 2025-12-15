@@ -35,7 +35,8 @@ export const tablesQueryKeys = {
   floors: () => [...tablesQueryKeys.all, 'floors'] as const, // Deprecated
   qr: {
     all: () => [...tablesQueryKeys.all, 'qr'] as const,
-    list: (params?: QRCodeListQueryParams) => [...tablesQueryKeys.qr.all(), 'list', params] as const,
+    list: (params?: QRCodeListQueryParams) =>
+      [...tablesQueryKeys.qr.all(), 'list', params] as const,
     detail: (id: string) => [...tablesQueryKeys.qr.all(), 'detail', id] as const,
   },
 }
@@ -156,7 +157,7 @@ export const useDeleteTableMutation = () => {
 
 // QR Code Query Hooks
 export const useQRCodeQuery = (tableId: string | null, enabled = true) => {
-  return useQuery<QRCodeInfoResponse>({
+  return useQuery<QRCodeDetailResponse>({
     queryKey: tablesQueryKeys.qr.detail(tableId!),
     queryFn: () => tablesApi.getQRCode(tableId!),
     enabled: enabled && !!tableId,

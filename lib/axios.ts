@@ -1,4 +1,9 @@
-import axios, { AxiosError, type AxiosInstance, type AxiosRequestConfig } from 'axios'
+import axios, {
+  AxiosError,
+  type AxiosInstance,
+  type AxiosRequestConfig,
+  type AxiosRequestHeaders,
+} from 'axios'
 
 const baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
 
@@ -27,7 +32,7 @@ const apiClient: AxiosInstance = axios.create({
 apiClient.interceptors.request.use((config) => {
   // Đảm bảo headers tồn tại
   if (!config.headers) {
-    config.headers = {}
+    config.headers = {} as AxiosRequestHeaders
   }
 
   // Gắn Authorization nếu chưa có
