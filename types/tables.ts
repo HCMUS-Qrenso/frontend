@@ -224,7 +224,80 @@ export interface BatchPositionUpdateResponse {
   }
 }
 
-// TableQR interface for QR Manager page
+// QR Status Types
+export type QRStatus = 'ready' | 'missing' | 'outdated'
+
+// QR Code Info (single table)
+export interface QRCodeInfo {
+  id: string
+  table_id: string
+  table_number: string
+  qr_code_token: string
+  qr_code_url: string
+  ordering_url: string
+  qr_code_generated_at: string | null
+  status: QRStatus
+  zone_id?: string | null
+  zone_name?: string | null
+}
+
+// Single QR detail (API returns snake_case)
+export interface QRCodeDetailResponse {
+  success: boolean
+  message?: string
+  data: {
+    id: string
+    table_number: string
+    qr_code_token: string
+    qr_code_url: string | null
+    ordering_url: string | null
+    qr_code_generated_at: string | null
+    status: string
+    table_zone?: string | null
+    seats?: number | null
+  }
+}
+
+// QR Code List Query Parameters
+export interface QRCodeListQueryParams {
+  status?: QRStatus
+  zone_id?: string
+}
+
+// QR Code List Response (actual API returns camelCase)
+export interface QRCodeListResponse {
+  success: boolean
+  message?: string
+  data: {
+    tables: Array<{
+      id: string
+      tableNumber: string
+      tableZone: string
+      seats: number
+      qrUrl: string | null
+      orderingUrl: string | null
+      status: 'Missing' | 'Ready' | 'Outdated'
+      updatedAt: string | null
+    }>
+  }
+}
+
+// Batch Generate QR Payload
+export interface BatchGenerateQRPayload {
+  table_ids: string[]
+  force_regenerate?: boolean
+}
+
+export interface BatchGenerateQRResponse {
+  success: boolean
+  message: string
+  data: {
+    generated_count: number
+    qr_codes: QRCodeInfo[]
+  }
+}
+
+// TableQR interface for QR Manager page (UI)
 export interface TableQR {
   id: string
   tableNumber: string

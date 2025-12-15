@@ -15,12 +15,16 @@ interface QRBatchPrintDialogProps {
   selectedCount: number
   totalCount: number
   onClose: () => void
+  onGenerate?: (forceRegenerate: boolean) => void
+  isLoading?: boolean
 }
 
 export function QRBatchPrintDialog({
   selectedCount,
   totalCount,
   onClose,
+  onGenerate,
+  isLoading = false,
 }: QRBatchPrintDialogProps) {
   const [scope, setScope] = useState<'all' | 'area' | 'selected'>('all')
   const [layout, setLayout] = useState('4')
@@ -161,13 +165,29 @@ export function QRBatchPrintDialog({
               variant="outline"
               className="flex-1 rounded-full bg-transparent"
               onClick={onClose}
+              disabled={isLoading}
             >
               Hủy
             </Button>
+            {onGenerate && (
+              <Button
+                variant="outline"
+                className="flex-1 gap-2 rounded-full bg-transparent"
+                onClick={() => onGenerate(false)}
+                disabled={isLoading || selectedCount === 0}
+              >
+                {isLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <FileText className="h-4 w-4" />
+                )}
+                Tạo QR
+              </Button>
+            )}
             <Button
               className="flex-1 gap-2 rounded-full bg-emerald-500 hover:bg-emerald-600"
               onClick={handleDownload}
-              disabled={isDownloading}
+              disabled={isDownloading || isLoading}
             >
               {isDownloading ? (
                 <Loader2 className="h-4 w-4 animate-spin" />

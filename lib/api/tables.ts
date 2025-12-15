@@ -16,6 +16,11 @@ import type {
   FloorsResponse,
   BatchPositionUpdatePayload,
   BatchPositionUpdateResponse,
+  QRCodeDetailResponse,
+  QRCodeListQueryParams,
+  QRCodeListResponse,
+  BatchGenerateQRPayload,
+  BatchGenerateQRResponse,
 } from '@/types/tables'
 import type { MessageResponse } from '@/types/auth'
 
@@ -54,6 +59,16 @@ export const tablesApi = {
   },
 
   // QR Code Management
+  getQRCode: async (tableId: string): Promise<QRCodeDetailResponse> => {
+    const { data } = await apiClient.get<QRCodeDetailResponse>(`/tables/${tableId}/qr`)
+    return data
+  },
+
+  getQRCodes: async (params?: QRCodeListQueryParams): Promise<QRCodeListResponse> => {
+    const { data } = await apiClient.get<QRCodeListResponse>('/tables/qr', { params })
+    return data
+  },
+
   generateQR: async (tableId: string, forceRegenerate = false): Promise<QRGenerationResponse> => {
     const { data } = await apiClient.post<QRGenerationResponse>(`/tables/${tableId}/qr/generate`, {
       force_regenerate: forceRegenerate,
@@ -61,7 +76,12 @@ export const tablesApi = {
     return data
   },
 
-  downloadQR: async (tableId: string, format: 'png' | 'pdf'): Promise<Blob> => {
+  batchGenerateQR: async (payload: BatchGenerateQRPayload): Promise<BatchGenerateQRResponse> => {
+    const { data } = await apiClient.post<BatchGenerateQRResponse>('/tables/qr/batch-generate', payload)
+    return data
+  },
+
+  downloadQR: async (tableId: string, format: 'png' | 'pdf' | 'zip' = 'png'): Promise<Blob> => {
     const response = await apiClient.get(`/tables/${tableId}/qr/download`, {
       params: { format },
       responseType: 'blob',
@@ -69,8 +89,9 @@ export const tablesApi = {
     return response.data
   },
 
-  downloadAllQR: async (): Promise<Blob> => {
+  downloadAllQR: async (format: 'png' | 'pdf' | 'zip' = 'zip'): Promise<Blob> => {
     const response = await apiClient.get('/tables/qr/download-all', {
+      params: { format },
       responseType: 'blob',
     })
     return response.data

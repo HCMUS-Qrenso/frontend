@@ -6,19 +6,20 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Eye, Download, Printer, RefreshCw, Copy, Check } from "lucide-react"
 import Image from "next/image"
 import { useState } from "react"
-import type { TableQR } from "./qr-manager-content"
 import { Checkbox } from "@/components/ui/checkbox"
-import type { PaginationMeta } from "@/types/tables"
+import type { TableQR } from "@/types/tables"
 
 interface QRTableListProps {
   tables: TableQR[]
   selectedTables: string[]
-  pagination?: PaginationMeta
-  currentPage: number
-  onPageChange: (page: number) => void
   onSelectTable: (id: string) => void
   onSelectAll: () => void
   onPreview: (table: TableQR) => void
+  onDownload?: (tableId: string, format: 'png' | 'pdf') => void
+  onGenerate?: (tableId: string, forceRegenerate: boolean) => void
+  onBatchGenerate?: (forceRegenerate: boolean) => void
+  onBatchDownload?: (format: 'png' | 'pdf') => void
+  isLoading?: boolean
 }
 
 function getStatusBadge(status: TableQR["status"]) {
@@ -45,15 +46,17 @@ function getStatusBadge(status: TableQR["status"]) {
   )
 }
 
-export function QRTableList({ 
-  tables, 
-  selectedTables, 
-  pagination,
-  currentPage,
-  onPageChange,
-  onSelectTable, 
-  onSelectAll, 
-  onPreview 
+export function QRTableList({
+  tables,
+  selectedTables,
+  onSelectTable,
+  onSelectAll,
+  onPreview,
+  onDownload,
+  onGenerate,
+  onBatchGenerate,
+  onBatchDownload,
+  isLoading = false,
 }: QRTableListProps) {
   const [copiedId, setCopiedId] = useState<string | null>(null)
 
@@ -72,18 +75,37 @@ export function QRTableList({
             {selectedTables.length} bàn đã chọn
           </span>
           <div className="flex items-center gap-2">
-            <Button size="sm" variant="outline" className="h-8 gap-2 rounded-full bg-white dark:bg-slate-900">
-              <Download className="h-3.5 w-3.5" />
-              Tải xuống
-            </Button>
-            <Button size="sm" variant="outline" className="h-8 gap-2 rounded-full bg-white dark:bg-slate-900">
-              <Printer className="h-3.5 w-3.5" />
-              In
-            </Button>
-            <Button size="sm" variant="outline" className="h-8 gap-2 rounded-full bg-white dark:bg-slate-900">
-              <RefreshCw className="h-3.5 w-3.5" />
-              Tạo lại
-            </Button>
+            {onBatchDownload && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-8 gap-2 rounded-full bg-white dark:bg-slate-900"
+                    disabled={isLoading}
+                  >
+                    <Download className="h-3.5 w-3.5" />
+                    Tải xuống
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => onBatchDownload('png')}>PNG</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => onBatchDownload('pdf')}>PDF</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+            {onBatchGenerate && (
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-8 gap-2 rounded-full bg-white dark:bg-slate-900"
+                onClick={() => onBatchGenerate(false)}
+                disabled={isLoading}
+              >
+                <RefreshCw className="h-3.5 w-3.5" />
+                Tạo lại
+              </Button>
+            )}
           </div>
         </div>
       )}
@@ -149,7 +171,7 @@ export function QRTableList({
                       className="group relative h-16 w-16 overflow-hidden rounded-lg border border-slate-200 transition-all hover:scale-105 hover:border-emerald-500 dark:border-slate-700"
                     >
                       <Image
-                        src={table.qrUrl || "/placeholder.svg"}
+                        src={table.qrUrl}
                         alt={`QR for table ${table.tableNumber}`}
                         fill
                         className="object-cover"
@@ -160,28 +182,38 @@ export function QRTableList({
                     </button>
                   ) : (
                     <div className="flex h-16 w-16 items-center justify-center rounded-lg border border-dashed border-slate-300 bg-slate-50 dark:border-slate-700 dark:bg-slate-800">
-                      <span className="text-xs text-slate-400">Không có QR</span>
+                      <Image
+                        src="/placeholder.svg"
+                        alt="QR placeholder"
+                        width={40}
+                        height={40}
+                        className="opacity-50"
+                      />
                     </div>
                   )}
                 </td>
                 <td className="px-6 py-4">
-                  <div className="flex items-center gap-2">
-                    <code className="max-w-[200px] truncate text-xs text-slate-600 dark:text-slate-400">
-                      {table.qrLink}
-                    </code>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-6 w-6 rounded-md"
-                      onClick={() => copyToClipboard(table.qrLink, table.id)}
-                    >
-                      {copiedId === table.id ? (
-                        <Check className="h-3 w-3 text-emerald-600" />
-                      ) : (
-                        <Copy className="h-3 w-3" />
-                      )}
-                    </Button>
-                  </div>
+                  {table.qrLink ? (
+                    <div className="flex items-center gap-2">
+                      <code className="max-w-[200px] truncate text-xs text-slate-600 dark:text-slate-400">
+                        {table.qrLink}
+                      </code>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6 rounded-md"
+                        onClick={() => copyToClipboard(table.qrLink, table.id)}
+                      >
+                        {copiedId === table.id ? (
+                          <Check className="h-3 w-3 text-emerald-600" />
+                        ) : (
+                          <Copy className="h-3 w-3" />
+                        )}
+                      </Button>
+                    </div>
+                  ) : (
+                    <span className="text-xs text-slate-400 dark:text-slate-500">—</span>
+                  )}
                 </td>
                 <td className="px-6 py-4">{getStatusBadge(table.status)}</td>
                 <td className="px-6 py-4">
@@ -198,24 +230,40 @@ export function QRTableList({
                     >
                       <Eye className="h-4 w-4" />
                     </Button>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full" disabled={!table.qrUrl}>
-                          <Download className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem>Tải xuống PNG</DropdownMenuItem>
-                        <DropdownMenuItem>Tải xuống SVG</DropdownMenuItem>
-                        <DropdownMenuItem>Tải xuống PDF</DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full" disabled={!table.qrUrl}>
-                      <Printer className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
-                      <RefreshCw className="h-4 w-4" />
-                    </Button>
+                    {onDownload && (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 rounded-full"
+                            disabled={!table.qrUrl || isLoading}
+                          >
+                            <Download className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => onDownload(table.id, 'png')}>
+                            Tải xuống PNG
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => onDownload(table.id, 'pdf')}>
+                            Tải xuống PDF
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    )}
+                    {onGenerate && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 rounded-full"
+                        onClick={() => onGenerate(table.id, !!table.qrUrl)}
+                        disabled={isLoading}
+                        title={table.qrUrl ? 'Tạo lại QR' : 'Tạo QR'}
+                      >
+                        <RefreshCw className="h-4 w-4" />
+                      </Button>
+                    )}
                   </div>
                 </td>
               </tr>
@@ -224,55 +272,11 @@ export function QRTableList({
         </table>
       </div>
 
-      {/* Pagination */}
-      {pagination && pagination.total_pages > 1 && (
+      {/* Table count */}
+      {tables.length > 0 && (
         <div className="flex items-center justify-between">
           <p className="text-sm text-slate-500 dark:text-slate-400">
-            Hiển thị {(pagination.page - 1) * pagination.limit + 1}-
-            {Math.min(pagination.page * pagination.limit, pagination.total)} trên {pagination.total} bàn
-          </p>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              className="rounded-full bg-transparent"
-              disabled={pagination.page === 1}
-              onClick={() => onPageChange(pagination.page - 1)}
-            >
-              Trước
-            </Button>
-            {Array.from({ length: pagination.total_pages }, (_, i) => i + 1).map((pageNum) => (
-              <Button
-                key={pageNum}
-                variant="outline"
-                size="sm"
-                className={cn(
-                  "h-8 w-8 rounded-full",
-                  pageNum === pagination.page
-                    ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10"
-                    : "bg-transparent"
-                )}
-                onClick={() => onPageChange(pageNum)}
-              >
-                {pageNum}
-              </Button>
-            ))}
-            <Button
-              variant="outline"
-              size="sm"
-              className="rounded-full bg-transparent"
-              disabled={pagination.page === pagination.total_pages}
-              onClick={() => onPageChange(pagination.page + 1)}
-            >
-              Sau
-            </Button>
-          </div>
-        </div>
-      )}
-      {pagination && pagination.total_pages <= 1 && (
-        <div className="flex items-center justify-between">
-          <p className="text-sm text-slate-500 dark:text-slate-400">
-            Hiển thị {pagination.total} bàn
+            Hiển thị {tables.length} bàn
           </p>
         </div>
       )}

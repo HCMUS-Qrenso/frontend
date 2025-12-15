@@ -15,6 +15,11 @@ import type {
   FloorLayoutResponse,
   FloorsResponse,
   BatchPositionUpdateResponse,
+  QRCodeDetailResponse,
+  QRCodeListQueryParams,
+  QRCodeListResponse,
+  BatchGenerateQRPayload,
+  BatchGenerateQRResponse,
 } from '@/types/tables'
 import type { MessageResponse } from '@/types/auth'
 
@@ -28,6 +33,11 @@ export const tablesQueryKeys = {
   layout: (zone: string) => [...tablesQueryKeys.all, 'layout', zone] as const,
   zones: () => [...tablesQueryKeys.all, 'zones'] as const,
   floors: () => [...tablesQueryKeys.all, 'floors'] as const, // Deprecated
+  qr: {
+    all: () => [...tablesQueryKeys.all, 'qr'] as const,
+    list: (params?: QRCodeListQueryParams) => [...tablesQueryKeys.qr.all(), 'list', params] as const,
+    detail: (id: string) => [...tablesQueryKeys.qr.all(), 'detail', id] as const,
+  },
 }
 
 // Query Hooks
@@ -144,6 +154,26 @@ export const useDeleteTableMutation = () => {
   })
 }
 
+// QR Code Query Hooks
+export const useQRCodeQuery = (tableId: string | null, enabled = true) => {
+  return useQuery<QRCodeInfoResponse>({
+    queryKey: tablesQueryKeys.qr.detail(tableId!),
+    queryFn: () => tablesApi.getQRCode(tableId!),
+    enabled: enabled && !!tableId,
+    staleTime: 30 * 1000,
+  })
+}
+
+export const useQRCodesQuery = (params?: QRCodeListQueryParams, enabled = true) => {
+  return useQuery<QRCodeListResponse>({
+    queryKey: tablesQueryKeys.qr.list(params),
+    queryFn: () => tablesApi.getQRCodes(params),
+    enabled,
+    staleTime: 30 * 1000,
+  })
+}
+
+// QR Code Mutation Hooks
 export const useGenerateQRMutation = () => {
   const queryClient = useQueryClient()
 
@@ -153,11 +183,28 @@ export const useGenerateQRMutation = () => {
       onSuccess: (data, variables) => {
         // Update the specific table in cache
         queryClient.invalidateQueries({ queryKey: tablesQueryKeys.detail(variables.tableId) })
+        // Invalidate QR queries
+        queryClient.invalidateQueries({ queryKey: tablesQueryKeys.qr.detail(variables.tableId) })
+        queryClient.invalidateQueries({ queryKey: tablesQueryKeys.qr.list() })
         // Invalidate list queries to update QR status
         queryClient.invalidateQueries({ queryKey: tablesQueryKeys.lists() })
       },
     },
   )
+}
+
+export const useBatchGenerateQRMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation<BatchGenerateQRResponse, unknown, BatchGenerateQRPayload>({
+    mutationFn: (payload) => tablesApi.batchGenerateQR(payload),
+    onSuccess: () => {
+      // Invalidate all QR queries
+      queryClient.invalidateQueries({ queryKey: tablesQueryKeys.qr.all() })
+      // Invalidate table list queries
+      queryClient.invalidateQueries({ queryKey: tablesQueryKeys.lists() })
+    },
+  })
 }
 
 export const useBatchUpdatePositionsMutation = () => {

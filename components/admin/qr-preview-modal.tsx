@@ -2,9 +2,9 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { X, Download, Printer, ExternalLink, Loader2 } from 'lucide-react'
+import { X, Download, ExternalLink, Loader2 } from 'lucide-react'
 import Image from 'next/image'
-import type { TableQR } from './qr-manager-content'
+import type { TableQR } from '@/types/tables'
 import { tablesApi } from '@/lib/api/tables'
 import { downloadBlob } from '@/lib/utils/download'
 import { toast } from 'sonner'
@@ -70,12 +70,24 @@ export function QRPreviewModal({ table, onClose }: QRPreviewModalProps) {
           <div className="flex justify-center">
             <div className="rounded-2xl border-4 border-slate-100 bg-white p-6 dark:border-slate-800 dark:bg-slate-950">
               <div className="relative h-64 w-64">
-                <Image
-                  src={table.qrUrl || '/placeholder.svg'}
-                  alt={`QR code for table ${table.tableNumber}`}
-                  fill
-                  className="object-contain"
-                />
+                {table.qrUrl ? (
+                  <Image
+                    src={table.qrUrl}
+                    alt={`QR code for table ${table.tableNumber}`}
+                    fill
+                    className="object-contain"
+                  />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center">
+                    <Image
+                      src="/placeholder.svg"
+                      alt="QR placeholder"
+                      width={120}
+                      height={120}
+                      className="opacity-50"
+                    />
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -115,8 +127,7 @@ export function QRPreviewModal({ table, onClose }: QRPreviewModalProps) {
           {/* Actions */}
           <div className="grid grid-cols-2 gap-2">
             <Button
-              variant="outline"
-              className="gap-2 rounded-full bg-transparent"
+              className="gap-2 rounded-full bg-emerald-500 text-white hover:bg-emerald-600"
               onClick={() => handleDownload('png')}
               disabled={!table.qrUrl || downloading !== null}
             >
@@ -128,8 +139,7 @@ export function QRPreviewModal({ table, onClose }: QRPreviewModalProps) {
               <span className="text-xs">PNG</span>
             </Button>
             <Button
-              variant="outline"
-              className="gap-2 rounded-full bg-transparent"
+              className="gap-2 rounded-full bg-indigo-500 text-white hover:bg-indigo-600"
               onClick={() => handleDownload('pdf')}
               disabled={!table.qrUrl || downloading !== null}
             >
@@ -142,10 +152,6 @@ export function QRPreviewModal({ table, onClose }: QRPreviewModalProps) {
             </Button>
           </div>
 
-          <Button className="w-full gap-2 rounded-full bg-emerald-500 hover:bg-emerald-600">
-            <Printer className="h-4 w-4" />
-            In mã QR
-          </Button>
         </div>
       </div>
     </div>
