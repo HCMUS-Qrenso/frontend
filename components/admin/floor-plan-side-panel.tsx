@@ -14,7 +14,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Textarea } from '@/components/ui/textarea'
-import { Circle, Trash2, Square, Users } from 'lucide-react'
+import { Circle, Square, Users } from 'lucide-react'
 import type { TableItem } from '@/app/admin/tables/layout/page'
 
 interface FloorPlanSidePanelProps {
@@ -365,15 +365,6 @@ export function FloorPlanSidePanel({
                   disabled={isSaving}
                 >
                   {isSaving ? 'Đang lưu...' : 'Cập nhật'}
-                </Button>
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  className="rounded-full"
-                  onClick={() => onTableDelete(selectedTable.id)}
-                >
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  Xóa
                 </Button>
               </div>
             </div>

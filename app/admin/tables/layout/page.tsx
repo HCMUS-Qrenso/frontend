@@ -269,6 +269,12 @@ export default function TableLayoutPage() {
     setSelectedTableId(null)
   }
 
+  const handleTableRemove = async (id: string) => {
+    // Move table back to library by setting position to -1,-1
+    await handleTableSave(id, { position: { x: -1, y: -1 } })
+    setSelectedTableId(null)
+  }
+
   // Map frontend status to backend status
   const mapStatusToBackend = (status: TableItem['status']): string => {
     const statusMap: Record<TableItem['status'], string> = {
@@ -488,6 +494,7 @@ export default function TableLayoutPage() {
             zoom={zoom}
             showGrid={showGrid}
             selectedArea={currentFloor}
+          onTableRemove={(id) => handleTableRemove(id)}
           />
 
           {/* Side Panel */}

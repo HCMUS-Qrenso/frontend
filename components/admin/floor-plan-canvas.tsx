@@ -19,6 +19,7 @@ interface FloorPlanCanvasProps {
   selectedTableId: string | null
   onTableSelect: (id: string | null) => void
   onTableUpdate: (id: string, updates: Partial<TableItem>) => void
+  onTableRemove: (id: string) => void
   zoom: number
   showGrid: boolean
   selectedArea: string
@@ -31,6 +32,7 @@ export function FloorPlanCanvas({
   selectedTableId,
   onTableSelect,
   onTableUpdate,
+  onTableRemove,
   zoom,
   showGrid,
   selectedArea,
@@ -174,6 +176,7 @@ export function FloorPlanCanvas({
                 isSelected={table.id === selectedTableId}
                 onSelect={() => onTableSelect(table.id)}
                 onRotate={() => handleRotate(table.id, table.rotation)}
+                onRemove={() => onTableRemove(table.id)}
                 zoom={zoom}
               />
             ))}
@@ -189,12 +192,14 @@ function DraggableTable({
   isSelected,
   onSelect,
   onRotate,
+  onRemove,
   zoom,
 }: {
   table: TableItem
   isSelected: boolean
   onSelect: () => void
   onRotate: () => void
+  onRemove: () => void
   zoom: number
 }) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
@@ -256,6 +261,23 @@ function DraggableTable({
         <p className="text-xs font-semibold text-slate-900 dark:text-white">{table.name}</p>
         <p className="text-[10px] text-slate-600 dark:text-slate-400">{table.seats} chỗ ngồi</p>
       </div>
+
+      {/* Remove handle */}
+      {isSelected && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation()
+            e.preventDefault()
+            onRemove()
+          }}
+          onPointerDown={(e) => {
+            e.stopPropagation()
+          }}
+          className="no-drag absolute -top-2 -left-2 z-10 flex h-6 w-6 items-center justify-center rounded-full border border-red-500 bg-white text-red-600 shadow-sm hover:bg-red-50 dark:bg-slate-800 dark:text-red-400"
+        >
+          ×
+        </button>
+      )}
 
       {/* Rotate handle */}
       {isSelected && (
