@@ -7,15 +7,15 @@ import { FloorPlanSidePanel } from '@/components/admin/floor-plan-side-panel'
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { useSearchParams } from 'next/navigation'
 import {
-  useFloorsQuery,
-  useFloorLayoutQuery,
+  useZonesQuery,
+  useZoneLayoutQuery,
   useBatchUpdatePositionsMutation,
   useCreateTableMutation,
   useUpdateTableMutation,
 } from '@/hooks/use-tables-query'
 import { toast } from 'sonner'
 import { useErrorHandler } from '@/hooks/use-error-handler'
-import type { FloorLayoutTable, TablePosition } from '@/types/tables'
+import type { ZoneLayoutTable, TablePosition } from '@/types/tables'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -109,15 +109,18 @@ function calculateTableSize(
   return { width: 120, height: 80 }
 }
 
-// Transform backend FloorLayoutTable to TableItem
-function transformTableToItem(table: FloorLayoutTable): TableItem {
+// Transform backend ZoneLayoutTable to TableItem
+function transformTableToItem(
+  table: ZoneLayoutTable | (ZoneLayoutTable & { zone?: string }),
+): TableItem {
   const tableType = mapShape(table.type)
   return {
     id: table.id,
     type: tableType,
     name: table.name,
     seats: table.seats,
-    area: table.area,
+    // Backend hiện trả field `zone` (zone name), còn type cũ là `area`
+    area: (table as any).zone ?? (table as any).area ?? '',
     status: mapStatus(table.status),
     position: table.position,
     rotation: 0,
@@ -128,11 +131,11 @@ function transformTableToItem(table: FloorLayoutTable): TableItem {
 
 export default function TableLayoutPage() {
   const searchParams = useSearchParams()
-  const floorParam = searchParams.get('floor')
+  const zoneParam = searchParams.get('zone')
   const tableIdParam = searchParams.get('tableId')
 
   const [selectedTableId, setSelectedTableId] = useState<string | null>(tableIdParam)
-  const [selectedArea, setSelectedArea] = useState(floorParam || '')
+  const [selectedZone, setSelectedZone] = useState(zoneParam || '')
   const [zoom, setZoom] = useState(1)
   const [showGrid, setShowGrid] = useState(true)
   const [history, setHistory] = useState<TableItem[][]>([])
@@ -140,14 +143,19 @@ export default function TableLayoutPage() {
   const [positionChanges, setPositionChanges] = useState<Map<string, TablePosition>>(new Map())
   const [resetDialogOpen, setResetDialogOpen] = useState(false)
 
-  // Load floors and layout data
-  const { data: floorsData } = useFloorsQuery()
-  const floors = floorsData?.data?.floors || []
-  const currentFloor = selectedArea || floors[0] || ''
+  // Load zones and layout data
+  const { data: zonesData } = useZonesQuery()
+  const zones = zonesData?.data?.zones || []
 
-  const { data: layoutData, isLoading: isLoadingLayout } = useFloorLayoutQuery(
-    currentFloor || null,
-    !!currentFloor,
+  // Derive current zone object, id and display name
+  const currentZoneObj =
+    zones.find((z) => z.id === selectedZone || z.name === selectedZone) || zones[0] || null
+  const currentZoneId = currentZoneObj?.id || ''
+  const currentZoneName = currentZoneObj?.name || currentZoneId
+
+  const { data: layoutData, isLoading: isLoadingLayout } = useZoneLayoutQuery(
+    currentZoneId || null,
+    !!currentZoneId,
   )
   const { handleError } = useErrorHandler()
 
@@ -159,20 +167,20 @@ export default function TableLayoutPage() {
 
   // Local state for tables - this is the source of truth for UI
   const [localTables, setLocalTables] = useState<TableItem[]>([])
-  const prevFloorRef = useRef<string>('')
+  const prevZoneRef = useRef<string>('')
 
-  // 1. Reset state when floor changes
+  // 1. Reset state when zone changes
   useEffect(() => {
-    if (prevFloorRef.current !== currentFloor && prevFloorRef.current !== '') {
-      // Floor đã thay đổi, reset local state
+    if (prevZoneRef.current !== currentZoneId && prevZoneRef.current !== '') {
+      // Zone đã thay đổi, reset local state
       setLocalTables([])
       setHistory([])
       setHistoryIndex(0)
       setPositionChanges(new Map())
       setSelectedTableId(null)
     }
-    prevFloorRef.current = currentFloor
-  }, [currentFloor])
+    prevZoneRef.current = currentZoneId
+  }, [currentZoneId])
 
   // 2. Sync data from API when new data is available
   useEffect(() => {
@@ -180,14 +188,10 @@ export default function TableLayoutPage() {
     if (!isLoadingLayout && layoutData?.data) {
       const tables = layoutData.data.tables || []
       const newTables = tables.map(transformTableToItem)
-      // Đảm bảo dữ liệu match với currentFloor (hoặc không có bàn nào)
-      const allMatchFloor =
-        newTables.length === 0 || newTables.every((t) => t.area === currentFloor)
-      if (allMatchFloor) {
-        setLocalTables(newTables)
-      }
+      // Layout API đã filter theo zone_id nên có thể sync trực tiếp
+      setLocalTables(newTables)
     }
-  }, [layoutData, isLoadingLayout, currentFloor])
+  }, [layoutData, isLoadingLayout])
 
   // Use localTables instead of tables memo
   const tables = localTables
@@ -206,10 +210,10 @@ export default function TableLayoutPage() {
   const updateTableMutation = useUpdateTableMutation()
 
   useEffect(() => {
-    if (floorParam) {
-      setSelectedArea(floorParam)
+    if (zoneParam) {
+      setSelectedZone(zoneParam)
     }
-  }, [floorParam])
+  }, [zoneParam])
 
   useEffect(() => {
     if (tableIdParam && tables.length > 0) {
@@ -307,7 +311,11 @@ export default function TableLayoutPage() {
         payload.capacity = updates.seats
       }
       if (updates.area !== undefined) {
-        payload.floor = updates.area
+        // Find zone by name/id
+        const zone = zones.find((z) => z.name === updates.area || z.id === updates.area)
+        if (zone) {
+          payload.zone_id = zone.id
+        }
       }
       if (updates.status !== undefined) {
         payload.status = mapStatusToBackend(updates.status)
@@ -334,7 +342,7 @@ export default function TableLayoutPage() {
       const newTable = await createTableMutation.mutateAsync({
         table_number: tableTemplate.name,
         capacity: tableTemplate.seats,
-        floor: currentFloor,
+        zone_id: currentZoneObj?.id || currentZoneId,
         shape: mapShapeToBackend(tableTemplate.type) as 'circle' | 'rectangle' | 'oval',
         status: 'available',
         is_active: true,
@@ -456,15 +464,18 @@ export default function TableLayoutPage() {
       <div className="space-y-4">
         {/* Toolbar */}
         <FloorPlanToolbar
-          selectedArea={currentFloor}
-          areas={floors}
+          selectedArea={currentZoneName}
+          areas={zones.map((z) => z.name || z.id)}
           onAreaChange={(area) => {
-            setSelectedArea(area)
+            // Find zone by name or use as ID
+            const zone = zones.find((z) => z.name === area || z.id === area)
+            // Lưu id để gọi API, nhưng hiển thị tên trong dropdown
+            setSelectedZone(zone?.id || area)
             setSelectedTableId(null)
             setHistory([])
             setHistoryIndex(0)
             setPositionChanges(new Map())
-            // localTables will sync automatically via useEffect when currentFloor changes
+            // localTables will sync automatically via useEffect when currentZone changes
           }}
           zoom={zoom}
           onZoomChange={setZoom}
@@ -493,8 +504,8 @@ export default function TableLayoutPage() {
             }}
             zoom={zoom}
             showGrid={showGrid}
-            selectedArea={currentFloor}
-          onTableRemove={(id) => handleTableRemove(id)}
+            selectedArea={currentZoneName}
+            onTableRemove={(id) => handleTableRemove(id)}
           />
 
           {/* Side Panel */}
@@ -504,7 +515,7 @@ export default function TableLayoutPage() {
             onTableSave={handleTableSave}
             onTableDelete={handleTableDelete}
             onAddTable={handleAddTable}
-            areas={floors}
+            areas={zones.map((z) => z.name || z.id)}
             libraryTables={libraryTables}
           />
         </div>

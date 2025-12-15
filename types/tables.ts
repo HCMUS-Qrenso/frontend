@@ -15,7 +15,10 @@ export interface Table {
   table_number: string
   capacity: number
   position: string | null // JSON string from backend: "{\"x\":100,\"y\":200}"
+  /** @deprecated Use zone_id instead */
   floor: string | null
+  zone_id: string | null
+  zone_name?: string | null
   shape: TableShape | null
   status: TableStatus
   qr_code_token: string | null
@@ -77,6 +80,8 @@ export interface TableResponse {
 export interface CreateTablePayload {
   table_number: string
   capacity: number
+  zone_id?: string
+  /** @deprecated Use zone_id instead */
   floor?: string
   shape?: TableShape
   status?: TableStatus
@@ -89,6 +94,8 @@ export interface CreateTablePayload {
 export interface UpdateTablePayload {
   table_number?: string
   capacity?: number
+  zone_id?: string
+  /** @deprecated Use zone_id instead */
   floor?: string
   shape?: TableShape
   status?: TableStatus
@@ -101,6 +108,8 @@ export interface TableQueryParams {
   page?: number
   limit?: number
   search?: string
+  zone_id?: string
+  /** @deprecated Use zone_id instead */
   floor?: string
   status?: TableStatus
   is_active?: boolean
@@ -130,7 +139,9 @@ export interface QRTokenVerificationResponse {
   table?: {
     id: string
     tableNumber: string
-    floor: string
+    zone_id?: string
+    /** @deprecated Use zone_id instead */
+    floor?: string
     capacity: number
     status: TableStatus
   }
@@ -138,18 +149,29 @@ export interface QRTokenVerificationResponse {
   message?: string
 }
 
-// Floor Layout Types
-export interface FloorLayoutTable {
+// Zone Layout Types (renamed from Floor Layout)
+export interface ZoneLayoutTable {
   id: string
   table_number: string
   type: TableShape
   name: string
   seats: number
-  area: string
+  area: string // Zone name/area label
   status: TableStatus
   position: TablePosition
 }
 
+export interface ZoneLayoutResponse {
+  success: boolean
+  data: {
+    zone: string // Zone ID or name
+    zone_id?: string // Zone ID if available
+    tables: ZoneLayoutTable[]
+  }
+}
+
+// Keep FloorLayoutResponse for backward compatibility
+/** @deprecated Use ZoneLayoutResponse instead */
 export interface FloorLayoutResponse {
   success: boolean
   data: {
@@ -158,6 +180,21 @@ export interface FloorLayoutResponse {
   }
 }
 
+/** @deprecated Use ZoneLayoutTable instead */
+export type FloorLayoutTable = ZoneLayoutTable
+
+export interface ZonesResponse {
+  success: boolean
+  data: {
+    zones: Array<{
+      id: string
+      name: string
+    }>
+  }
+}
+
+// Keep FloorsResponse for backward compatibility
+/** @deprecated Use ZonesResponse instead */
 export interface FloorsResponse {
   success: boolean
   data: {
@@ -198,4 +235,3 @@ export interface TableQR {
   updatedAt: string
   seats: number
 }
-

@@ -65,7 +65,7 @@ function transformTableToQR(table: Table): TableQR {
   return {
     id: table.id,
     tableNumber: table.table_number,
-    tableArea: table.floor || '—',
+    tableArea: table.zone_name || table.floor || '—',
     qrUrl: table.qr_code_url || '',
     qrLink: table.ordering_url || '',
     status: calculateQRStatus(table),

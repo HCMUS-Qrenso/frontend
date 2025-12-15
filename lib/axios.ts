@@ -3,10 +3,15 @@ import axios, { AxiosError, type AxiosInstance, type AxiosRequestConfig } from '
 const baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
 
 let accessToken: string | null = null
+let tenantId: string | null = null
 let refreshPromise: Promise<string | null> | null = null
 
 export const setAccessToken = (token: string | null) => {
   accessToken = token
+}
+
+export const setTenantId = (tenant: string | null) => {
+  tenantId = tenant
 }
 
 const rawClient: AxiosInstance = axios.create({
@@ -20,9 +25,21 @@ const apiClient: AxiosInstance = axios.create({
 })
 
 apiClient.interceptors.request.use((config) => {
+  // Đảm bảo headers tồn tại
+  if (!config.headers) {
+    config.headers = {}
+  }
+
+  // Gắn Authorization nếu chưa có
   if (accessToken && !config.headers.Authorization) {
     config.headers.Authorization = `Bearer ${accessToken}`
   }
+
+  // Gắn x-tenant-id nếu đã có tenantId và request chưa override
+  if (tenantId && !('x-tenant-id' in config.headers)) {
+    ;(config.headers as Record<string, string>)['x-tenant-id'] = tenantId
+  }
+
   return config
 })
 

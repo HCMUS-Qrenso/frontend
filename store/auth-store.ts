@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { setAccessToken } from '@/lib/axios'
+import { setAccessToken, setTenantId } from '@/lib/axios'
 import type { AuthResponse, User } from '@/types/auth'
 
 const ACCESS_TOKEN_KEY = 'accessToken'
@@ -25,6 +25,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   setAuth: (payload, rememberMe = true) => {
     setAccessToken(payload.accessToken)
+    setTenantId(payload.user.tenantId)
     if (typeof window !== 'undefined') {
       if (rememberMe) {
         // Lưu vào localStorage (persist qua browser restart)
@@ -43,7 +44,10 @@ export const useAuthStore = create<AuthState>((set) => ({
     })
   },
 
-  setUser: (user) => set({ user }),
+  setUser: (user) => {
+    setTenantId(user?.tenantId ?? null)
+    set({ user })
+  },
 
   setToken: (token) => {
     setAccessToken(token)
@@ -52,7 +56,7 @@ export const useAuthStore = create<AuthState>((set) => ({
         // Kiểm tra xem token đang ở đâu để giữ nguyên storage type
         const localToken = localStorage.getItem(ACCESS_TOKEN_KEY)
         const sessionToken = sessionStorage.getItem(SESSION_TOKEN_KEY)
-        
+
         if (localToken) {
           localStorage.setItem(ACCESS_TOKEN_KEY, token)
         } else if (sessionToken) {
@@ -71,6 +75,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   clearAuth: () => {
     setAccessToken(null)
+    setTenantId(null)
     if (typeof window !== 'undefined') {
       localStorage.removeItem(ACCESS_TOKEN_KEY)
       sessionStorage.removeItem(SESSION_TOKEN_KEY)
@@ -84,7 +89,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     const localToken = localStorage.getItem(ACCESS_TOKEN_KEY)
     const sessionToken = sessionStorage.getItem(SESSION_TOKEN_KEY)
     const storedToken = localToken || sessionToken
-    
+
     if (storedToken) {
       setAccessToken(storedToken)
       set({

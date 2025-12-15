@@ -10,11 +10,13 @@ import type {
   TableStatsResponse,
   TableResponse,
   QRGenerationResponse,
+  ZoneLayoutResponse,
+  ZonesResponse,
   FloorLayoutResponse,
   FloorsResponse,
   BatchPositionUpdateResponse,
-  MessageResponse,
 } from '@/types/tables'
+import type { MessageResponse } from '@/types/auth'
 
 // Query Keys
 export const tablesQueryKeys = {
@@ -23,8 +25,9 @@ export const tablesQueryKeys = {
   list: (params?: TableQueryParams) => [...tablesQueryKeys.lists(), params] as const,
   detail: (id: string) => [...tablesQueryKeys.all, 'detail', id] as const,
   stats: () => [...tablesQueryKeys.all, 'stats'] as const,
-  layout: (floor: string) => [...tablesQueryKeys.all, 'layout', floor] as const,
-  floors: () => [...tablesQueryKeys.all, 'floors'] as const,
+  layout: (zone: string) => [...tablesQueryKeys.all, 'layout', zone] as const,
+  zones: () => [...tablesQueryKeys.all, 'zones'] as const,
+  floors: () => [...tablesQueryKeys.all, 'floors'] as const, // Deprecated
 }
 
 // Query Hooks
@@ -55,6 +58,26 @@ export const useTableStatsQuery = (enabled = true) => {
   })
 }
 
+export const useZoneLayoutQuery = (zone: string | null, enabled = true) => {
+  return useQuery<ZoneLayoutResponse>({
+    queryKey: tablesQueryKeys.layout(zone!),
+    queryFn: () => tablesApi.getZoneLayout(zone!),
+    enabled: enabled && !!zone,
+    staleTime: 30 * 1000,
+  })
+}
+
+export const useZonesQuery = (enabled = true) => {
+  return useQuery<ZonesResponse>({
+    queryKey: tablesQueryKeys.zones(),
+    queryFn: () => tablesApi.getZones(),
+    enabled,
+    staleTime: 5 * 60 * 1000, // 5 minutes - zones don't change often
+  })
+}
+
+// Keep deprecated hooks for backward compatibility
+/** @deprecated Use useZoneLayoutQuery instead */
 export const useFloorLayoutQuery = (floor: string | null, enabled = true) => {
   return useQuery<FloorLayoutResponse>({
     queryKey: tablesQueryKeys.layout(floor!),
@@ -64,6 +87,7 @@ export const useFloorLayoutQuery = (floor: string | null, enabled = true) => {
   })
 }
 
+/** @deprecated Use useZonesQuery instead */
 export const useFloorsQuery = (enabled = true) => {
   return useQuery<FloorsResponse>({
     queryKey: tablesQueryKeys.floors(),
@@ -83,7 +107,8 @@ export const useCreateTableMutation = () => {
       // Invalidate list and stats queries
       queryClient.invalidateQueries({ queryKey: tablesQueryKeys.lists() })
       queryClient.invalidateQueries({ queryKey: tablesQueryKeys.stats() })
-      queryClient.invalidateQueries({ queryKey: tablesQueryKeys.floors() })
+      queryClient.invalidateQueries({ queryKey: tablesQueryKeys.zones() })
+      queryClient.invalidateQueries({ queryKey: tablesQueryKeys.floors() }) // Deprecated
     },
   })
 }
@@ -122,20 +147,17 @@ export const useDeleteTableMutation = () => {
 export const useGenerateQRMutation = () => {
   const queryClient = useQueryClient()
 
-  return useMutation<
-    QRGenerationResponse,
-    unknown,
-    { tableId: string; forceRegenerate?: boolean }
-  >({
-    mutationFn: ({ tableId, forceRegenerate }) =>
-      tablesApi.generateQR(tableId, forceRegenerate),
-    onSuccess: (data, variables) => {
-      // Update the specific table in cache
-      queryClient.invalidateQueries({ queryKey: tablesQueryKeys.detail(variables.tableId) })
-      // Invalidate list queries to update QR status
-      queryClient.invalidateQueries({ queryKey: tablesQueryKeys.lists() })
+  return useMutation<QRGenerationResponse, unknown, { tableId: string; forceRegenerate?: boolean }>(
+    {
+      mutationFn: ({ tableId, forceRegenerate }) => tablesApi.generateQR(tableId, forceRegenerate),
+      onSuccess: (data, variables) => {
+        // Update the specific table in cache
+        queryClient.invalidateQueries({ queryKey: tablesQueryKeys.detail(variables.tableId) })
+        // Invalidate list queries to update QR status
+        queryClient.invalidateQueries({ queryKey: tablesQueryKeys.lists() })
+      },
     },
-  })
+  )
 }
 
 export const useBatchUpdatePositionsMutation = () => {
@@ -149,4 +171,3 @@ export const useBatchUpdatePositionsMutation = () => {
     },
   })
 }
-

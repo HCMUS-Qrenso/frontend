@@ -10,6 +10,8 @@ import type {
   QRGenerationResponse,
   QRTokenVerificationRequest,
   QRTokenVerificationResponse,
+  ZoneLayoutResponse,
+  ZonesResponse,
   FloorLayoutResponse,
   FloorsResponse,
   BatchPositionUpdatePayload,
@@ -84,14 +86,22 @@ export const tablesApi = {
     return data
   },
 
-  // Floor Layout
-  getFloorLayout: async (floor: string): Promise<FloorLayoutResponse> => {
-    const { data } = await apiClient.get<FloorLayoutResponse>('/tables/layout', {
-      params: { floor },
+  // Zone Layout
+  getZoneLayout: async (zoneId: string): Promise<ZoneLayoutResponse> => {
+    const { data } = await apiClient.get<ZoneLayoutResponse>('/tables/layout', {
+      params: { zone_id: zoneId },
     })
     return data
   },
 
+
+  getZones: async (): Promise<ZonesResponse> => {
+    const { data } = await apiClient.get<ZonesResponse>('/tables/zones')
+    return data
+  },
+
+  // Keep getFloors for backward compatibility
+  /** @deprecated Use getZones instead */
   getFloors: async (): Promise<FloorsResponse> => {
     const { data } = await apiClient.get<FloorsResponse>('/tables/floors')
     return data

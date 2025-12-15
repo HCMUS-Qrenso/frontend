@@ -21,7 +21,8 @@ import {
   useCreateTableMutation,
   useUpdateTableMutation,
 } from '@/hooks/use-tables-query'
-import { useFloorsQuery } from '@/hooks/use-tables-query'
+import { useZonesSimpleQuery } from '@/hooks/use-zones-query'
+import type { SimpleZone } from '@/types/zones'
 import { toast } from 'sonner'
 import type { TableStatus, TableShape, TablePosition } from '@/types/tables'
 import { useErrorHandler } from '@/hooks/use-error-handler'
@@ -33,7 +34,7 @@ interface TableUpsertDrawerProps {
 interface TableFormData {
   table_number: string
   capacity: string
-  floor: string
+  zone_id: string
   shape: TableShape
   status: TableStatus
   is_active: boolean
@@ -44,7 +45,7 @@ interface TableFormData {
 const initialFormData: TableFormData = {
   table_number: '',
   capacity: '4',
-  floor: 'Tầng 1',
+  zone_id: '',
   shape: 'circle',
   status: 'available',
   is_active: true,
@@ -98,8 +99,10 @@ export function TableUpsertDrawer({ open }: TableUpsertDrawerProps) {
     mode === 'edit' && tableId ? tableId : null,
     mode === 'edit' && open,
   )
-  const { data: floorsData } = useFloorsQuery()
-  const floors = floorsData?.data?.floors || []
+  const { data: zonesData } = useZonesSimpleQuery()
+  const zones: SimpleZone[] = Array.isArray(zonesData?.data)
+    ? (zonesData?.data as SimpleZone[])
+    : (zonesData?.data as { zones?: SimpleZone[] } | undefined)?.zones || []
 
   useEffect(() => {
     if (mode === 'edit' && tableData?.data && open) {
@@ -117,7 +120,7 @@ export function TableUpsertDrawer({ open }: TableUpsertDrawerProps) {
       setFormData({
         table_number: table.table_number,
         capacity: table.capacity.toString(),
-        floor: table.floor || '',
+        zone_id: table.zone_id || '',
         shape: (table.shape as TableShape) || 'rectangle',
         status: table.status,
         is_active: table.is_active,
@@ -174,7 +177,7 @@ export function TableUpsertDrawer({ open }: TableUpsertDrawerProps) {
       const payload = {
         table_number: formData.table_number,
         capacity: Number.parseInt(formData.capacity),
-        floor: formData.floor || undefined,
+        zone_id: formData.zone_id || undefined,
         shape: formData.shape,
         status: formData.status,
         is_active: formData.is_active,
@@ -372,20 +375,20 @@ export function TableUpsertDrawer({ open }: TableUpsertDrawerProps) {
               )}
             </div>
 
-            {/* Floor / Area */}
+            {/* Zone / Area */}
             <div className="space-y-2">
-              <Label htmlFor="floor">Khu vực / Tầng</Label>
+              <Label htmlFor="zone_id">Khu vực / Tầng</Label>
               <Select
-                value={formData.floor}
-                onValueChange={(value) => setFormData({ ...formData, floor: value })}
+                value={formData.zone_id}
+                onValueChange={(value) => setFormData({ ...formData, zone_id: value })}
               >
-                <SelectTrigger id="floor">
-                  <SelectValue placeholder="Chọn tầng/khu vực" />
+                <SelectTrigger id="zone_id">
+                  <SelectValue placeholder="Chọn khu vực" />
                 </SelectTrigger>
                 <SelectContent className="z-80">
-                  {floors.map((floor) => (
-                    <SelectItem key={floor} value={floor}>
-                      {floor}
+                  {zones.map((zone: SimpleZone) => (
+                    <SelectItem key={zone.id} value={zone.id}>
+                      {zone.name}
                     </SelectItem>
                   ))}
                 </SelectContent>

@@ -92,7 +92,7 @@ export function TablesListTable({ isTrashView = false }: TablesListTableProps) {
   const page = Number.parseInt(searchParams.get('page') || '1')
   const limit = Number.parseInt(searchParams.get('limit') || '10')
   const search = searchParams.get('search') || undefined
-  const floor = searchParams.get('floor') || undefined
+  const zone_id = searchParams.get('zone_id') || undefined
   const status = (searchParams.get('status') as TableStatus | null) || undefined
 
   // Set is_active filter based on trash view
@@ -104,7 +104,7 @@ export function TablesListTable({ isTrashView = false }: TablesListTableProps) {
     page,
     limit,
     search,
-    floor,
+    zone_id,
     status,
     is_active: isActive,
   })
@@ -157,13 +157,13 @@ export function TablesListTable({ isTrashView = false }: TablesListTableProps) {
   // Format table info for display
   const getTableDisplayInfo = (table: Table | null): string => {
     if (!table) return ''
-    const floor = table.floor || 'Chưa xác định'
-    return `${floor} - Bàn #${table.table_number} - ${table.capacity} ghế`
+    const zoneName = table.zone_name || table.floor || 'Chưa xác định'
+    return `${zoneName} - Bàn #${table.table_number} - ${table.capacity} ghế`
   }
 
   const handleViewOnLayout = (table: Table) => {
-    const floorParam = table.floor || 'Tất cả'
-    router.push(`/admin/tables/layout?floor=${encodeURIComponent(floorParam)}&tableId=${table.id}`)
+    const zoneParam = table.zone_id || table.zone_name || table.floor || 'Tất cả'
+    router.push(`/admin/tables/layout?zone=${encodeURIComponent(zoneParam)}&tableId=${table.id}`)
   }
 
   const handleRestore = async (table: Table) => {
@@ -183,7 +183,7 @@ export function TablesListTable({ isTrashView = false }: TablesListTableProps) {
         payload: {
           table_number: table.table_number,
           capacity: table.capacity,
-          floor: table.floor || undefined,
+          zone_id: table.zone_id || undefined,
           shape: table.shape || undefined,
           status: table.status,
           is_active: true,
@@ -277,7 +277,7 @@ export function TablesListTable({ isTrashView = false }: TablesListTableProps) {
                   </td>
                   <td className="px-6 py-4">
                     <p className="text-sm text-slate-700 dark:text-slate-300">
-                      {table.floor || '—'}
+                      {table.zone_name || table.floor || '—'}
                     </p>
                   </td>
                   <td className="px-6 py-4">

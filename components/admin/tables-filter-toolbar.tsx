@@ -12,7 +12,8 @@ import {
 import { Search, Plus, LayoutGrid, QrCode, ChevronDown } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useFloorsQuery } from '@/hooks/use-tables-query'
+import { useZonesSimpleQuery } from '@/hooks/use-zones-query'
+import type { SimpleZone } from '@/types/zones'
 
 interface TablesFilterToolbarProps {
   isTrashView?: boolean
@@ -21,8 +22,10 @@ interface TablesFilterToolbarProps {
 export function TablesFilterToolbar({ isTrashView = false }: TablesFilterToolbarProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const { data: floorsData } = useFloorsQuery()
-  const floors = floorsData?.data?.floors || []
+  const { data: zonesData } = useZonesSimpleQuery()
+  const zones: SimpleZone[] = Array.isArray(zonesData?.data)
+    ? (zonesData?.data as SimpleZone[])
+    : (zonesData?.data as { zones?: SimpleZone[] } | undefined)?.zones || []
 
   // Map backend status to UI labels
   const statusMap: Record<string, string> = {
@@ -34,13 +37,19 @@ export function TablesFilterToolbar({ isTrashView = false }: TablesFilterToolbar
 
   // Get filter values from URL params
   const searchQuery = searchParams.get('search') || ''
-  const selectedArea = searchParams.get('floor') || 'Tất cả'
+  const selectedZoneId = searchParams.get('zone_id') || 'Tất cả'
   const selectedStatusKey = searchParams.get('status') || ''
 
   // Map backend status key to frontend label for display
   const selectedStatusLabel = selectedStatusKey
     ? statusMap[selectedStatusKey] || selectedStatusKey
     : 'Tất cả'
+
+  // Get selected zone name for display
+  const selectedZoneName =
+    selectedZoneId === 'Tất cả'
+      ? 'Tất cả'
+      : zones.find((z: SimpleZone) => z.id === selectedZoneId)?.name || 'Tất cả'
 
   const [localSearchQuery, setLocalSearchQuery] = useState(searchQuery)
 
@@ -90,21 +99,21 @@ export function TablesFilterToolbar({ isTrashView = false }: TablesFilterToolbar
           />
         </div>
 
-        {/* Area Filter */}
+        {/* Zone Filter */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="h-10 gap-2 rounded-full bg-transparent">
-              <span className="text-sm">Khu vực: {selectedArea}</span>
+              <span className="text-sm">Khu vực: {selectedZoneName}</span>
               <ChevronDown className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-48">
-            <DropdownMenuItem onClick={() => updateFilter('floor', 'Tất cả')}>
+            <DropdownMenuItem onClick={() => updateFilter('zone_id', 'Tất cả')}>
               Tất cả
             </DropdownMenuItem>
-            {floors.map((floor) => (
-              <DropdownMenuItem key={floor} onClick={() => updateFilter('floor', floor)}>
-                {floor}
+            {zones.map((zone: SimpleZone) => (
+              <DropdownMenuItem key={zone.id} onClick={() => updateFilter('zone_id', zone.id)}>
+                {zone.name}
               </DropdownMenuItem>
             ))}
           </DropdownMenuContent>
