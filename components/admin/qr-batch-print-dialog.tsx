@@ -1,14 +1,15 @@
-"use client"
+'use client'
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { X, FileText, Loader2 } from "lucide-react"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Label } from "@/components/ui/label"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { tablesApi } from "@/lib/api/tables"
-import { downloadBlob } from "@/lib/utils/download"
-import { toast } from "sonner"
+import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { X, FileText, Loader2 } from 'lucide-react'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Label } from '@/components/ui/label'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { tablesApi } from '@/lib/api/tables'
+import { downloadBlob } from '@/lib/utils/download'
+import { toast } from 'sonner'
+import { useErrorHandler } from '@/hooks/use-error-handler'
 
 interface QRBatchPrintDialogProps {
   selectedCount: number
@@ -16,36 +17,48 @@ interface QRBatchPrintDialogProps {
   onClose: () => void
 }
 
-export function QRBatchPrintDialog({ selectedCount, totalCount, onClose }: QRBatchPrintDialogProps) {
-  const [scope, setScope] = useState<"all" | "area" | "selected">("all")
-  const [layout, setLayout] = useState("4")
+export function QRBatchPrintDialog({
+  selectedCount,
+  totalCount,
+  onClose,
+}: QRBatchPrintDialogProps) {
+  const [scope, setScope] = useState<'all' | 'area' | 'selected'>('all')
+  const [layout, setLayout] = useState('4')
   const [showTableNumber, setShowTableNumber] = useState(true)
   const [showLogo, setShowLogo] = useState(true)
   const [isDownloading, setIsDownloading] = useState(false)
+  const { handleError } = useErrorHandler()
 
   const handleDownload = async () => {
     setIsDownloading(true)
     try {
       const blob = await tablesApi.downloadAllQR()
-      downloadBlob(blob, "qr-codes.zip")
-      toast.success("Đã tải xuống tất cả QR codes")
+      downloadBlob(blob, 'qr-codes.zip')
+      toast.success('Đã tải xuống tất cả QR codes')
       onClose()
     } catch (error: any) {
-      console.error("Error downloading QR batch:", error)
-      toast.error("Có lỗi xảy ra khi tải xuống QR codes")
+      handleError(error, 'Có lỗi xảy ra khi tải xuống QR codes')
     } finally {
       setIsDownloading(false)
     }
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={onClose}>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      onClick={onClose}
+    >
       <div
         className="relative w-full max-w-lg rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl dark:border-slate-800 dark:bg-slate-900"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close button */}
-        <Button variant="ghost" size="icon" className="absolute right-4 top-4 rounded-full" onClick={onClose}>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="absolute top-4 right-4 rounded-full"
+          onClick={onClose}
+        >
           <X className="h-5 w-5" />
         </Button>
 
@@ -53,8 +66,12 @@ export function QRBatchPrintDialog({ selectedCount, totalCount, onClose }: QRBat
         <div className="space-y-6">
           {/* Header */}
           <div className="space-y-1">
-            <h2 className="text-xl font-semibold text-slate-900 dark:text-white">In hàng loạt mã QR</h2>
-            <p className="text-sm text-slate-500 dark:text-slate-400">Tạo file PDF để in hàng loạt QR code cho bàn</p>
+            <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
+              In hàng loạt mã QR
+            </h2>
+            <p className="text-sm text-slate-500 dark:text-slate-400">
+              Tạo file PDF để in hàng loạt QR code cho bàn
+            </p>
           </div>
 
           {/* Scope Selection */}
@@ -74,7 +91,11 @@ export function QRBatchPrintDialog({ selectedCount, totalCount, onClose }: QRBat
                 </Label>
               </div>
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="selected" id="scope-selected" disabled={selectedCount === 0} />
+                <RadioGroupItem
+                  value="selected"
+                  id="scope-selected"
+                  disabled={selectedCount === 0}
+                />
                 <Label htmlFor="scope-selected" className="font-normal">
                   Bàn đã chọn ({selectedCount} bàn)
                 </Label>
@@ -136,7 +157,11 @@ export function QRBatchPrintDialog({ selectedCount, totalCount, onClose }: QRBat
 
           {/* Actions */}
           <div className="flex gap-3">
-            <Button variant="outline" className="flex-1 rounded-full bg-transparent" onClick={onClose}>
+            <Button
+              variant="outline"
+              className="flex-1 rounded-full bg-transparent"
+              onClick={onClose}
+            >
               Hủy
             </Button>
             <Button
@@ -149,7 +174,7 @@ export function QRBatchPrintDialog({ selectedCount, totalCount, onClose }: QRBat
               ) : (
                 <FileText className="h-4 w-4" />
               )}
-              {isDownloading ? "Đang tải..." : "Tải xuống ZIP"}
+              {isDownloading ? 'Đang tải...' : 'Tải xuống ZIP'}
             </Button>
           </div>
         </div>

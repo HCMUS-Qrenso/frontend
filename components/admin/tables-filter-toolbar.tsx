@@ -14,7 +14,11 @@ import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useFloorsQuery } from '@/hooks/use-tables-query'
 
-export function TablesFilterToolbar() {
+interface TablesFilterToolbarProps {
+  isTrashView?: boolean
+}
+
+export function TablesFilterToolbar({ isTrashView = false }: TablesFilterToolbarProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { data: floorsData } = useFloorsQuery()
@@ -127,33 +131,37 @@ export function TablesFilterToolbar() {
 
       {/* Right - Actions */}
       <div className="flex items-center gap-2">
-        <Link href="/admin/tables/layout">
-          <Button
-            variant="outline"
-            size="icon"
-            className="h-10 w-10 rounded-full bg-transparent"
-            title="Xem sơ đồ"
-          >
-            <LayoutGrid className="h-4 w-4" />
-          </Button>
-        </Link>
-        <Link href="/admin/tables/qr">
-          <Button
-            variant="outline"
-            size="icon"
-            className="h-10 w-10 rounded-full bg-transparent"
-            title="Quản lý QR"
-          >
-            <QrCode className="h-4 w-4" />
-          </Button>
-        </Link>
-        <Button
-          onClick={handleAddTable}
-          className="h-10 gap-2 rounded-full bg-emerald-600 px-4 hover:bg-emerald-700"
-        >
-          <Plus className="h-4 w-4" />
-          <span className="hidden sm:inline">Thêm bàn</span>
-        </Button>
+        {!isTrashView && (
+          <>
+            <Link href="/admin/tables/layout">
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-10 w-10 rounded-full bg-transparent"
+                title="Xem sơ đồ"
+              >
+                <LayoutGrid className="h-4 w-4" />
+              </Button>
+            </Link>
+            <Link href="/admin/tables/qr">
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-10 w-10 rounded-full bg-transparent"
+                title="Quản lý QR"
+              >
+                <QrCode className="h-4 w-4" />
+              </Button>
+            </Link>
+            <Button
+              onClick={handleAddTable}
+              className="h-10 gap-2 rounded-full bg-emerald-600 px-4 hover:bg-emerald-700"
+            >
+              <Plus className="h-4 w-4" />
+              <span className="hidden sm:inline">Thêm bàn</span>
+            </Button>
+          </>
+        )}
       </div>
     </div>
   )

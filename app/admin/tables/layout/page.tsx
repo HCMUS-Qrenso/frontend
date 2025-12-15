@@ -6,8 +6,14 @@ import { FloorPlanToolbar } from '@/components/admin/floor-plan-toolbar'
 import { FloorPlanSidePanel } from '@/components/admin/floor-plan-side-panel'
 import { useState, useEffect, useMemo } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { useFloorsQuery, useFloorLayoutQuery, useBatchUpdatePositionsMutation, useCreateTableMutation } from '@/hooks/use-tables-query'
+import {
+  useFloorsQuery,
+  useFloorLayoutQuery,
+  useBatchUpdatePositionsMutation,
+  useCreateTableMutation,
+} from '@/hooks/use-tables-query'
 import { toast } from 'sonner'
+import { useErrorHandler } from '@/hooks/use-error-handler'
 import type { FloorLayoutTable, TablePosition } from '@/types/tables'
 
 export interface TableItem {
@@ -81,6 +87,7 @@ export default function TableLayoutPage() {
     currentFloor || null,
     !!currentFloor,
   )
+  const { handleError } = useErrorHandler()
 
   // Transform backend data to TableItem format
   const tables = useMemo(() => {
@@ -146,8 +153,7 @@ export default function TableLayoutPage() {
       toast.success('Bàn đã được tạo thành công')
       // The query will refetch automatically, so we don't need to update local state
     } catch (error: any) {
-      console.error('Error creating table:', error)
-      toast.error('Có lỗi xảy ra khi tạo bàn')
+      handleError(error, 'Có lỗi xảy ra khi tạo bàn')
     }
   }
 
@@ -186,8 +192,7 @@ export default function TableLayoutPage() {
       await batchUpdateMutation.mutateAsync({ updates })
       toast.success('Sơ đồ đã được lưu thành công')
     } catch (error: any) {
-      console.error('Error saving layout:', error)
-      toast.error('Có lỗi xảy ra khi lưu sơ đồ')
+      handleError(error, 'Có lỗi xảy ra khi lưu sơ đồ')
     }
   }
 
@@ -268,4 +273,3 @@ export default function TableLayoutPage() {
     </AdminLayout>
   )
 }
-

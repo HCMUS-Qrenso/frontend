@@ -19,11 +19,24 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import { Edit2, MoreVertical, MapPin, Trash2, Loader2, AlertTriangle } from 'lucide-react'
+import {
+  Edit2,
+  MoreVertical,
+  MapPin,
+  Trash2,
+  Loader2,
+  AlertTriangle,
+  RotateCcw,
+} from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useTablesQuery, useDeleteTableMutation } from '@/hooks/use-tables-query'
+import {
+  useTablesQuery,
+  useDeleteTableMutation,
+  useUpdateTableMutation,
+} from '@/hooks/use-tables-query'
 import { toast } from 'sonner'
-import type { Table, TableStatus } from '@/types/tables'
+import type { Table, TableStatus, TablePosition } from '@/types/tables'
+import { useErrorHandler } from '@/hooks/use-error-handler'
 
 function getStatusBadge(status: TableStatus) {
   const config = {
@@ -63,7 +76,11 @@ function getStatusBadge(status: TableStatus) {
   )
 }
 
-export function TablesListTable() {
+interface TablesListTableProps {
+  isTrashView?: boolean
+}
+
+export function TablesListTable({ isTrashView = false }: TablesListTableProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
 
@@ -77,12 +94,11 @@ export function TablesListTable() {
   const search = searchParams.get('search') || undefined
   const floor = searchParams.get('floor') || undefined
   const status = (searchParams.get('status') as TableStatus | null) || undefined
-  const isActive =
-    searchParams.get('is_active') === 'true'
-      ? true
-      : searchParams.get('is_active') === 'false'
-        ? false
-        : undefined
+
+  // Set is_active filter based on trash view
+  // If trash view: show inactive tables (is_active = false)
+  // If active view: show active tables (is_active = true)
+  const isActive = isTrashView ? false : true
 
   const { data, isLoading, error } = useTablesQuery({
     page,
@@ -96,6 +112,8 @@ export function TablesListTable() {
   const tables = data?.data.tables || []
   const pagination = data?.data.pagination
   const deleteMutation = useDeleteTableMutation()
+  const updateMutation = useUpdateTableMutation()
+  const { handleErrorWithStatus, getErrorMessage } = useErrorHandler()
 
   const handleEdit = (tableId: string) => {
     const params = new URLSearchParams(searchParams.toString())
@@ -119,18 +137,19 @@ export function TablesListTable() {
       setDeleteDialogOpen(false)
       setTableToDelete(null)
     } catch (error: any) {
-      console.error('Error deleting table:', error)
-      const errorMessage =
-        error?.response?.data?.message ||
-        (Array.isArray(error?.response?.data?.message)
-          ? error.response.data.message.join(', ')
-          : 'Không thể xóa bàn. Vui lòng thử lại.')
+      console.error('Delete table error:', error)
+      console.error('Error status:', error?.response?.status)
+      console.error('Error message:', error?.response?.data?.message)
 
-      // Handle specific error cases
-      if (error?.response?.status === 409) {
-        toast.error('Không thể xóa bàn đang có đơn hàng')
+      // Handle specific error cases with custom message for 409
+      const status = error?.response?.status
+      if (status === 409) {
+        // Use message from backend or fallback to default
+        const message = getErrorMessage(error, 'Không thể xóa bàn đang có đơn hàng')
+        toast.error(message)
       } else {
-        toast.error(errorMessage)
+        // Use default error handler for other errors
+        handleErrorWithStatus(error, undefined, 'Không thể xóa bàn. Vui lòng thử lại.')
       }
       // Keep dialog open on error so user can try again or cancel
     }
@@ -146,6 +165,43 @@ export function TablesListTable() {
   const handleViewOnLayout = (table: Table) => {
     const floorParam = table.floor || 'Tất cả'
     router.push(`/admin/tables/layout?floor=${encodeURIComponent(floorParam)}&tableId=${table.id}`)
+  }
+
+  const handleRestore = async (table: Table) => {
+    try {
+      // Parse position from JSON string if exists
+      let position: TablePosition | undefined = undefined
+      if (table.position) {
+        try {
+          position = JSON.parse(table.position) as TablePosition
+        } catch {
+          // Invalid JSON, ignore position
+        }
+      }
+
+      await updateMutation.mutateAsync({
+        id: table.id,
+        payload: {
+          table_number: table.table_number,
+          capacity: table.capacity,
+          floor: table.floor || undefined,
+          shape: table.shape || undefined,
+          status: table.status,
+          is_active: true,
+          position,
+        },
+      })
+      toast.success('Bàn đã được khôi phục thành công')
+    } catch (error: any) {
+      handleErrorWithStatus(error, undefined, 'Không thể khôi phục bàn. Vui lòng thử lại.')
+    }
+  }
+
+  const handleDeletePermanently = async (table: Table) => {
+    // TODO: Implement permanent delete API when available
+    // For now, just show a message
+    toast.info('Chức năng xóa vĩnh viễn sẽ được triển khai khi API sẵn sàng')
+    console.log('Permanent delete requested for table:', table.id)
   }
 
   const handlePageChange = (newPage: number) => {
@@ -247,39 +303,67 @@ export function TablesListTable() {
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-end gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 rounded-full"
-                        onClick={() => handleEdit(table.id)}
-                        title="Chỉnh sửa bàn"
-                      >
-                        <Edit2 className="h-4 w-4" />
-                      </Button>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => handleEdit(table.id)}>
-                            <Edit2 className="mr-2 h-4 w-4" />
-                            Chỉnh sửa
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleViewOnLayout(table)}>
-                            <MapPin className="mr-2 h-4 w-4" />
-                            Xem trên sơ đồ
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            className="text-red-600"
-                            onClick={() => handleDeleteClick(table)}
+                      {isTrashView ? (
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                              onClick={() => handleRestore(table)}
+                              disabled={updateMutation.isPending}
+                            >
+                              <RotateCcw className="mr-2 h-4 w-4" />
+                              {updateMutation.isPending ? 'Đang khôi phục...' : 'Khôi phục'}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              className="text-red-600"
+                              onClick={() => handleDeletePermanently(table)}
+                            >
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              Xóa vĩnh viễn
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      ) : (
+                        <>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 rounded-full"
+                            onClick={() => handleEdit(table.id)}
+                            title="Chỉnh sửa bàn"
                           >
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Xóa
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                            <Edit2 className="h-4 w-4" />
+                          </Button>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
+                                <MoreVertical className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem onClick={() => handleEdit(table.id)}>
+                                <Edit2 className="mr-2 h-4 w-4" />
+                                Chỉnh sửa
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleViewOnLayout(table)}>
+                                <MapPin className="mr-2 h-4 w-4" />
+                                Xem trên sơ đồ
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                className="text-red-600"
+                                onClick={() => handleDeleteClick(table)}
+                              >
+                                <Trash2 className="mr-2 h-4 w-4" />
+                                Xóa
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </>
+                      )}
                     </div>
                   </td>
                 </tr>
@@ -336,46 +420,48 @@ export function TablesListTable() {
         </div>
       )}
 
-      {/* Delete Confirmation Dialog */}
-      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent className="rounded-2xl">
-          <AlertDialogHeader>
-            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-50 dark:bg-red-500/10">
-              <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-400" />
-            </div>
-            <AlertDialogTitle className="text-center text-lg font-semibold text-slate-900 dark:text-white">
-              Xóa bàn này?
-            </AlertDialogTitle>
-            <AlertDialogDescription className="text-center text-sm text-slate-500 dark:text-slate-400">
-              Bạn có chắc chắn muốn xóa{' '}
-              <span className="font-medium text-slate-900 dark:text-white">
-                {getTableDisplayInfo(tableToDelete)}
-              </span>
-              ? Hành động này không thể hoàn tác.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className="flex-row justify-end gap-3 sm:flex-row">
-            <AlertDialogCancel
-              disabled={deleteMutation.isPending}
-              className="m-0 rounded-full"
-              onClick={() => {
-                setDeleteDialogOpen(false)
-                setTableToDelete(null)
-              }}
-            >
-              Hủy
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleConfirmDelete}
-              disabled={deleteMutation.isPending}
-              className="m-0 gap-2 rounded-full bg-red-600 hover:bg-red-700"
-            >
-              {deleteMutation.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
-              {deleteMutation.isPending ? 'Đang xóa...' : 'Xóa bàn'}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {/* Delete Confirmation Dialog - Only show for active view */}
+      {!isTrashView && (
+        <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+          <AlertDialogContent className="rounded-2xl">
+            <AlertDialogHeader>
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-50 dark:bg-red-500/10">
+                <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-400" />
+              </div>
+              <AlertDialogTitle className="text-center text-lg font-semibold text-slate-900 dark:text-white">
+                Xóa bàn này?
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-center text-sm text-slate-500 dark:text-slate-400">
+                Bạn có chắc chắn muốn xóa{' '}
+                <span className="font-medium text-slate-900 dark:text-white">
+                  {getTableDisplayInfo(tableToDelete)}
+                </span>
+                ? Hành động này không thể hoàn tác.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter className="flex-row justify-end gap-3 sm:flex-row">
+              <AlertDialogCancel
+                disabled={deleteMutation.isPending}
+                className="m-0 rounded-full"
+                onClick={() => {
+                  setDeleteDialogOpen(false)
+                  setTableToDelete(null)
+                }}
+              >
+                Hủy
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleConfirmDelete}
+                disabled={deleteMutation.isPending}
+                className="m-0 gap-2 rounded-full bg-red-600 hover:bg-red-700"
+              >
+                {deleteMutation.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+                {deleteMutation.isPending ? 'Đang xóa...' : 'Xóa bàn'}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
     </div>
   )
 }

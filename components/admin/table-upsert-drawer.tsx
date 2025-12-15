@@ -16,10 +16,15 @@ import {
 } from '@/components/ui/select'
 import { X, Loader2 } from 'lucide-react'
 import { Switch } from '@/components/ui/switch'
-import { useTableQuery, useCreateTableMutation, useUpdateTableMutation } from '@/hooks/use-tables-query'
+import {
+  useTableQuery,
+  useCreateTableMutation,
+  useUpdateTableMutation,
+} from '@/hooks/use-tables-query'
 import { useFloorsQuery } from '@/hooks/use-tables-query'
 import { toast } from 'sonner'
 import type { TableStatus, TableShape, TablePosition } from '@/types/tables'
+import { useErrorHandler } from '@/hooks/use-error-handler'
 
 interface TableUpsertDrawerProps {
   open: boolean
@@ -155,6 +160,7 @@ export function TableUpsertDrawer({ open }: TableUpsertDrawerProps) {
 
   const createMutation = useCreateTableMutation()
   const updateMutation = useUpdateTableMutation()
+  const { getErrorMessage } = useErrorHandler()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -183,7 +189,6 @@ export function TableUpsertDrawer({ open }: TableUpsertDrawerProps) {
           id: tableId,
           payload: {
             ...payload,
-            auto_generate_qr: undefined, // Remove this field for update
           },
         })
         toast.success('Bàn đã được cập nhật thành công')
@@ -193,13 +198,11 @@ export function TableUpsertDrawer({ open }: TableUpsertDrawerProps) {
       closeDrawer()
     } catch (error: any) {
       console.error('Error saving table:', error)
-      
+
       // Handle specific error cases
       if (error?.response?.status === 409) {
         // Conflict - table number already exists
-        const conflictMessage = Array.isArray(error?.response?.data?.message)
-          ? error.response.data.message.join(', ')
-          : error?.response?.data?.message || 'Số bàn đã tồn tại'
+        const conflictMessage = getErrorMessage(error, 'Số bàn đã tồn tại')
         toast.error(conflictMessage)
         // Set error on table_number field
         setErrors({ table_number: 'Số bàn này đã tồn tại. Vui lòng chọn số khác.' })
@@ -209,24 +212,27 @@ export function TableUpsertDrawer({ open }: TableUpsertDrawerProps) {
         if (Array.isArray(validationErrors)) {
           validationErrors.forEach((msg: string) => {
             // Try to map validation errors to form fields
-            if (msg.toLowerCase().includes('table_number') || msg.toLowerCase().includes('số bàn')) {
+            if (
+              msg.toLowerCase().includes('table_number') ||
+              msg.toLowerCase().includes('số bàn')
+            ) {
               setErrors((prev) => ({ ...prev, table_number: msg }))
-            } else if (msg.toLowerCase().includes('capacity') || msg.toLowerCase().includes('sức chứa')) {
+            } else if (
+              msg.toLowerCase().includes('capacity') ||
+              msg.toLowerCase().includes('sức chứa')
+            ) {
               setErrors((prev) => ({ ...prev, capacity: msg }))
             } else {
               toast.error(msg)
             }
           })
         } else {
-          toast.error(validationErrors || 'Dữ liệu không hợp lệ')
+          const errorMessage = getErrorMessage(error, 'Dữ liệu không hợp lệ')
+          toast.error(errorMessage)
         }
       } else {
-        // Other errors
-        const errorMessage =
-          error?.response?.data?.message ||
-          (Array.isArray(error?.response?.data?.message)
-            ? error.response.data.message.join(', ')
-            : 'Có lỗi xảy ra khi lưu bàn')
+        // Other errors - use error handler to extract message
+        const errorMessage = getErrorMessage(error, 'Có lỗi xảy ra khi lưu bàn')
         toast.error(errorMessage)
       }
     } finally {
@@ -283,10 +289,7 @@ export function TableUpsertDrawer({ open }: TableUpsertDrawerProps) {
   if (mode === 'edit' && isLoadingTable) {
     return (
       <>
-        <div
-          className="fixed inset-0 z-60 bg-black/60 backdrop-blur-sm"
-          aria-hidden="true"
-        />
+        <div className="fixed inset-0 z-60 bg-black/60 backdrop-blur-sm" aria-hidden="true" />
         <div className="fixed top-1/2 left-1/2 z-70 flex max-h-[90vh] w-full max-w-xl -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-700 dark:bg-slate-900">
           <div className="flex items-center justify-center p-12">
             <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
@@ -416,7 +419,7 @@ export function TableUpsertDrawer({ open }: TableUpsertDrawerProps) {
               <Label htmlFor="shape">Hình dạng</Label>
               <Select
                 value={formData.shape}
-                onValueChange={(value) => setFormData({ ...formData, shape: value })}
+                onValueChange={(value) => setFormData({ ...formData, shape: value as TableShape })}
               >
                 <SelectTrigger id="shape">
                   <SelectValue />
