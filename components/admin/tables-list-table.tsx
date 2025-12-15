@@ -19,15 +19,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import {
-  Edit2,
-  MoreVertical,
-  MapPin,
-  Trash2,
-  Loader2,
-  AlertTriangle,
-  RotateCcw,
-} from 'lucide-react'
+import { Edit2, MapPin, Trash2, Loader2, AlertTriangle, RotateCcw } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import {
   useTablesQuery,
@@ -268,7 +260,7 @@ export function TablesListTable({ isTrashView = false }: TablesListTableProps) {
                   <td className="px-6 py-4">
                     <div>
                       <p className="text-sm font-medium text-slate-900 dark:text-white">
-                        Bàn #{table.table_number}
+                        Số {table.table_number}
                       </p>
                       <p className="text-xs text-slate-500 dark:text-slate-400">
                         {table.capacity} chỗ ngồi
@@ -307,7 +299,7 @@ export function TablesListTable({ isTrashView = false }: TablesListTableProps) {
                           <RotateCcw className="h-4 w-4" />
                         </Button>
                       ) : (
-                        <>
+                        <div className="flex items-center gap-1">
                           <Button
                             variant="ghost"
                             size="icon"
@@ -317,31 +309,25 @@ export function TablesListTable({ isTrashView = false }: TablesListTableProps) {
                           >
                             <Edit2 className="h-4 w-4" />
                           </Button>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
-                                <MoreVertical className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={() => handleEdit(table.id)}>
-                                <Edit2 className="mr-2 h-4 w-4" />
-                                Chỉnh sửa
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleViewOnLayout(table)}>
-                                <MapPin className="mr-2 h-4 w-4" />
-                                Xem trên sơ đồ
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                className="text-red-600"
-                                onClick={() => handleDeleteClick(table)}
-                              >
-                                <Trash2 className="mr-2 h-4 w-4" />
-                                Xóa
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 rounded-full"
+                            onClick={() => handleViewOnLayout(table)}
+                            title="Xem trên sơ đồ"
+                          >
+                            <MapPin className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 rounded-full text-red-600 hover:text-red-700"
+                            onClick={() => handleDeleteClick(table)}
+                            title="Xóa bàn"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
                       )}
                     </div>
                   </td>
