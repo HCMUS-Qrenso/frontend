@@ -24,12 +24,17 @@ const rawClient: AxiosInstance = axios.create({
   withCredentials: true,
 })
 
+// Extend AxiosRequestConfig to support custom flags
+interface TenantAwareRequestConfig extends AxiosRequestConfig {
+  withoutTenant?: boolean
+}
+
 const apiClient: AxiosInstance = axios.create({
   baseURL,
   withCredentials: true,
 })
 
-apiClient.interceptors.request.use((config) => {
+apiClient.interceptors.request.use((config: TenantAwareRequestConfig) => {
   // Đảm bảo headers tồn tại
   if (!config.headers) {
     config.headers = {} as AxiosRequestHeaders
@@ -40,8 +45,13 @@ apiClient.interceptors.request.use((config) => {
     config.headers.Authorization = `Bearer ${accessToken}`
   }
 
-  // Gắn x-tenant-id nếu đã có tenantId và request chưa override
-  if (tenantId && !('x-tenant-id' in config.headers)) {
+  // Cho phép skip gắn tenant cho một số request đặc biệt (ví dụ: GET /tenants for owner)
+  const skipTenantHeader =
+    (config as TenantAwareRequestConfig).withoutTenant ||
+    (config.headers as Record<string, string | boolean | undefined>)['x-skip-tenant'] === 'true'
+
+  // Gắn x-tenant-id nếu đã có tenantId, không bị skip và request chưa override
+  if (!skipTenantHeader && tenantId && !('x-tenant-id' in config.headers)) {
     ;(config.headers as Record<string, string>)['x-tenant-id'] = tenantId
   }
 

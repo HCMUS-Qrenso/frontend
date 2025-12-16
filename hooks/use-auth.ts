@@ -29,6 +29,9 @@ export const useAuth = () => {
   const profileQuery = useProfileQuery(isAuthenticated && isHydrated)
   useEffect(() => {
     if (profileQuery.data) {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[useAuth] ✅ /auth/me loaded:', profileQuery.data)
+      }
       setUser(profileQuery.data)
     }
   }, [profileQuery.data, setUser])

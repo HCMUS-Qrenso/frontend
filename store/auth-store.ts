@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { setAccessToken, setTenantId } from '@/lib/axios'
 import type { AuthResponse, User } from '@/types/auth'
+import { useTenantStore } from './tenant-store'
 
 const ACCESS_TOKEN_KEY = 'accessToken'
 const SESSION_TOKEN_KEY = 'accessToken_session'
@@ -24,8 +25,20 @@ export const useAuthStore = create<AuthState>((set) => ({
   isHydrated: false,
 
   setAuth: (payload, rememberMe = true) => {
+    const tenantStore = useTenantStore.getState()
+
     setAccessToken(payload.accessToken)
-    setTenantId(payload.user.tenantId)
+
+    // Role-aware tenant handling
+    if (payload.user.role === 'owner') {
+      // Owner can manage multiple tenants → do not bind a fixed tenantId here
+      setTenantId(null)
+      tenantStore.resetTenant()
+    } else {
+      // Admin/staff belong to exactly one tenant
+      setTenantId(payload.user.tenantId)
+      tenantStore.resetTenant()
+    }
     if (typeof window !== 'undefined') {
       if (rememberMe) {
         // Lưu vào localStorage (persist qua browser restart)
@@ -45,7 +58,27 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   setUser: (user) => {
-    setTenantId(user?.tenantId ?? null)
+    const tenantStore = useTenantStore.getState()
+
+    if (!user) {
+      // Logout: clear toàn bộ thông tin
+      setTenantId(null)
+      tenantStore.resetTenant()
+      set({ user: null })
+      return
+    }
+
+    if (user.role === 'owner') {
+      // Owner: tenant được chọn thông qua tenant-store (dropdown / auto-select).
+      // KHÔNG override tenantId ở đây để giữ nguyên x-tenant-id đã được set
+      // trong flow login hoặc AdminLayout.
+      set({ user })
+      return
+    }
+
+    // Admin/staff: luôn follow tenantId từ profile
+    setTenantId(user.tenantId ?? null)
+    tenantStore.resetTenant()
     set({ user })
   },
 
@@ -76,6 +109,8 @@ export const useAuthStore = create<AuthState>((set) => ({
   clearAuth: () => {
     setAccessToken(null)
     setTenantId(null)
+    const tenantStore = useTenantStore.getState()
+    tenantStore.resetTenant()
     if (typeof window !== 'undefined') {
       localStorage.removeItem(ACCESS_TOKEN_KEY)
       sessionStorage.removeItem(SESSION_TOKEN_KEY)
