@@ -51,7 +51,18 @@ export function FloorPlanCanvas({
   )
 
   const handleRotate = (tableId: string, currentRotation: number) => {
-    onTableUpdate(tableId, { rotation: (currentRotation + 90) % 360 })
+    const table = tables.find((t) => t.id === tableId)
+    if (!table) return
+
+    const newRotation = (currentRotation + 90) % 360
+    // Update both rotation field and position.rotation to keep them in sync
+    onTableUpdate(tableId, {
+      rotation: newRotation,
+      position: {
+        ...table.position,
+        rotation: newRotation,
+      },
+    })
   }
 
   // Filter tables by area and exclude tables with position -1,-1 (unplaced tables)
@@ -101,12 +112,20 @@ export function FloorPlanCanvas({
         const finalY = Math.max(0, Math.min(snappedY, maxY))
 
         onTableUpdate(table.id, {
-          position: { x: finalX, y: finalY },
+          position: {
+            x: finalX,
+            y: finalY,
+            rotation: table.position.rotation ?? table.rotation ?? 0,
+          },
         })
       } else {
         // Fallback if canvas ref is not available
         onTableUpdate(table.id, {
-          position: { x: Math.max(0, snappedX), y: Math.max(0, snappedY) },
+          position: {
+            x: Math.max(0, snappedX),
+            y: Math.max(0, snappedY),
+            rotation: table.position.rotation ?? table.rotation ?? 0,
+          },
         })
       }
     }
@@ -186,7 +205,9 @@ export function FloorPlanCanvas({
                   table={table}
                   isSelected={table.id === selectedTableId}
                   onSelect={() => onTableSelect(table.id)}
-                  onRotate={() => handleRotate(table.id, table.rotation)}
+                  onRotate={() =>
+                    handleRotate(table.id, table.position?.rotation ?? table.rotation ?? 0)
+                  }
                   onRemove={() => onTableRemove(table.id)}
                   zoom={zoom}
                 />
@@ -227,12 +248,13 @@ function DraggableTable({
 
   // Adjust transform for zoom: dnd-kit's transform is in screen coordinates,
   // but canvas is scaled, so we need to divide by zoom to get correct visual movement
+  const rotation = table.position?.rotation ?? table.rotation ?? 0
   const dragTransform = transform
     ? `translate3d(${transform.x / zoom}px, ${transform.y / zoom}px, 0)`
     : ''
   const combinedTransform = dragTransform
-    ? `${dragTransform} rotate(${table.rotation}deg)`
-    : `rotate(${table.rotation}deg)`
+    ? `${dragTransform} rotate(${rotation}deg)`
+    : `rotate(${rotation}deg)`
 
   return (
     <div
@@ -303,7 +325,7 @@ function DraggableTable({
             e.stopPropagation()
           }}
           className="no-drag absolute -top-2 -right-2 z-10 flex h-6 w-6 cursor-pointer items-center justify-center rounded-full border border-emerald-500 bg-white text-emerald-600 shadow-sm hover:bg-emerald-50 dark:bg-slate-800 dark:text-emerald-400"
-          style={{ transform: `rotate(-${table.rotation}deg)` }}
+          style={{ transform: `rotate(-${table.position?.rotation ?? table.rotation ?? 0}deg)` }}
         >
           <RotateCw className="h-3 w-3" />
         </button>

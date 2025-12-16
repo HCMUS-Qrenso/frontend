@@ -1,6 +1,6 @@
 'use client'
 
-import type React from 'react'
+import type { LucideIcon } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
 import { LayoutGrid, CheckCircle2, Users2, Clock, Loader2 } from 'lucide-react'
@@ -10,11 +10,21 @@ interface StatCardProps {
   title: string
   value: string
   subtext: string
-  icon: React.ReactNode
+  icon: LucideIcon
+  iconColor: string
+  iconBgColor: string
   className?: string
 }
 
-function StatCard({ title, value, subtext, icon, className }: StatCardProps) {
+function StatCard({
+  title,
+  value,
+  subtext,
+  icon: Icon,
+  iconColor,
+  iconBgColor,
+  className,
+}: StatCardProps) {
   return (
     <div
       className={cn(
@@ -32,8 +42,8 @@ function StatCard({ title, value, subtext, icon, className }: StatCardProps) {
           </p>
           <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{subtext}</p>
         </div>
-        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400">
-          {icon}
+        <div className={cn('flex h-12 w-12 items-center justify-center rounded-xl', iconBgColor)}>
+          <Icon className={cn('h-6 w-6', iconColor)} />
         </div>
       </div>
     </div>
@@ -58,34 +68,56 @@ export function TablesOverviewStats() {
     )
   }
 
-  const stats = data?.data
+  const statsData = data?.data
+
+  const stats = [
+    {
+      icon: LayoutGrid,
+      title: 'Tổng số bàn',
+      value: statsData?.total_tables.toString() || '0',
+      subtext: 'Đã cấu hình',
+      iconColor: 'text-slate-600 dark:text-slate-400',
+      iconBgColor: 'bg-slate-50 dark:bg-slate-800',
+    },
+    {
+      icon: CheckCircle2,
+      title: 'Bàn trống',
+      value: statsData?.available_tables.toString() || '0',
+      subtext: 'Có sẵn',
+      iconColor: 'text-emerald-600 dark:text-emerald-400',
+      iconBgColor: 'bg-emerald-50 dark:bg-emerald-500/10',
+    },
+    {
+      icon: Users2,
+      title: 'Đang phục vụ',
+      value: statsData?.occupied_tables.toString() || '0',
+      subtext: 'Đang sử dụng',
+      iconColor: 'text-amber-600 dark:text-amber-400',
+      iconBgColor: 'bg-amber-50 dark:bg-amber-500/10',
+    },
+    {
+      icon: Clock,
+      title: 'Chờ thanh toán',
+      value: statsData?.waiting_for_payment.toString() || '0',
+      subtext: 'Đang chờ thanh toán',
+      iconColor: 'text-indigo-600 dark:text-indigo-400',
+      iconBgColor: 'bg-indigo-50 dark:bg-indigo-500/10',
+    },
+  ]
 
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      <StatCard
-        title="Tổng số bàn"
-        value={stats?.total_tables.toString() || '0'}
-        subtext="Đã cấu hình"
-        icon={<LayoutGrid className="h-6 w-6" />}
-      />
-      <StatCard
-        title="Bàn trống"
-        value={stats?.available_tables.toString() || '0'}
-        subtext="Có sẵn"
-        icon={<CheckCircle2 className="h-6 w-6" />}
-      />
-      <StatCard
-        title="Đang phục vụ"
-        value={stats?.occupied_tables.toString() || '0'}
-        subtext="Đang sử dụng"
-        icon={<Users2 className="h-6 w-6" />}
-      />
-      <StatCard
-        title="Chờ thanh toán"
-        value={stats?.waiting_for_payment.toString() || '0'}
-        subtext="Đang chờ thanh toán"
-        icon={<Clock className="h-6 w-6" />}
-      />
+      {stats.map((stat) => (
+        <StatCard
+          key={stat.title}
+          title={stat.title}
+          value={stat.value}
+          subtext={stat.subtext}
+          icon={stat.icon}
+          iconColor={stat.iconColor}
+          iconBgColor={stat.iconBgColor}
+        />
+      ))}
     </div>
   )
 }

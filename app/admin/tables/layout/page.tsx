@@ -35,8 +35,8 @@ export interface TableItem {
   seats: number
   area: string
   status: 'Available' | 'Occupied' | 'Waiting for bill' | 'Disabled'
-  position: { x: number; y: number }
-  rotation: number
+  position: TablePosition
+  rotation: number // Kept for backward compatibility, should sync with position.rotation
   size: { width: number; height: number }
   canBeMerged: boolean
   notes?: string
@@ -114,6 +114,14 @@ function transformTableToItem(
   table: ZoneLayoutTable | (ZoneLayoutTable & { zone?: string }),
 ): TableItem {
   const tableType = mapShape(table.type)
+  // Read rotation from API response (default to 0 if not present)
+  const rotation = table.position?.rotation ?? 0
+  // Ensure position includes rotation
+  const position: TablePosition = {
+    x: table.position.x,
+    y: table.position.y,
+    rotation: rotation,
+  }
   return {
     id: table.id,
     type: tableType,
@@ -122,8 +130,8 @@ function transformTableToItem(
     // Backend hiện trả field `zone` (zone name), còn type cũ là `area`
     area: (table as any).zone ?? (table as any).area ?? '',
     status: mapStatus(table.status),
-    position: table.position,
-    rotation: 0,
+    position: position,
+    rotation: rotation, // Sync with position.rotation for backward compatibility
     size: calculateTableSize(tableType, table.seats),
     canBeMerged: tableType === 'rectangle',
   }
@@ -235,11 +243,18 @@ export default function TableLayoutPage() {
   const selectedTable = tables.find((t) => t.id === selectedTableId)
 
   const handleTableUpdate = (id: string, updates: Partial<TableItem>) => {
-    // Track position changes for batch save
+    // Track position changes for batch save (before processing)
     if (updates.position) {
       setPositionChanges((prev) => {
         const newMap = new Map(prev)
-        newMap.set(id, updates.position!)
+        // Get current table to preserve rotation if needed
+        const currentTable = localTables.find((t) => t.id === id)
+        const positionWithRotation: TablePosition = {
+          x: updates.position!.x,
+          y: updates.position!.y,
+          rotation: updates.position!.rotation ?? currentTable?.position?.rotation ?? currentTable?.rotation ?? 0,
+        }
+        newMap.set(id, positionWithRotation)
         return newMap
       })
     }
@@ -248,11 +263,33 @@ export default function TableLayoutPage() {
     setLocalTables((prevTables) => {
       const newTables = prevTables.map((t) => {
         if (t.id === id) {
+          // If position is being updated, preserve rotation if not explicitly provided
+          if (updates.position && updates.position.rotation === undefined) {
+            updates.position = {
+              ...updates.position,
+              rotation: t.position.rotation ?? t.rotation ?? 0,
+            }
+          }
+          
+          // If rotation field is updated, also update position.rotation
+          if (updates.rotation !== undefined && updates.position === undefined) {
+            updates.position = {
+              ...t.position,
+              rotation: updates.rotation,
+            }
+          }
+          
+          // Sync rotation field with position.rotation
           const updatedTable = { ...t, ...updates }
+          if (updates.position?.rotation !== undefined) {
+            updatedTable.rotation = updates.position.rotation
+          }
+          
           // Recalculate size if type or seats changed
           if (updates.type !== undefined || updates.seats !== undefined) {
             updatedTable.size = calculateTableSize(updatedTable.type, updatedTable.seats)
           }
+          
           return updatedTable
         }
         return t
@@ -274,8 +311,8 @@ export default function TableLayoutPage() {
   }
 
   const handleTableRemove = async (id: string) => {
-    // Move table back to library by setting position to -1,-1
-    await handleTableSave(id, { position: { x: -1, y: -1 } })
+    // Move table back to library by setting position to -1,-1 (reset rotation to 0)
+    await handleTableSave(id, { position: { x: -1, y: -1, rotation: 0 } })
     setSelectedTableId(null)
   }
 
@@ -324,7 +361,12 @@ export default function TableLayoutPage() {
         payload.shape = mapShapeToBackend(updates.type)
       }
       if (updates.position !== undefined) {
-        payload.position = updates.position
+        // Ensure position includes rotation (use from position or fallback to rotation field)
+        payload.position = {
+          x: updates.position.x,
+          y: updates.position.y,
+          rotation: updates.position.rotation ?? table.rotation ?? 0,
+        }
       }
 
       await updateTableMutation.mutateAsync({ id, payload })
@@ -346,7 +388,7 @@ export default function TableLayoutPage() {
         shape: mapShapeToBackend(tableTemplate.type) as 'circle' | 'rectangle' | 'oval',
         status: 'available',
         is_active: true,
-        position: { x: -1, y: -1 },
+        position: { x: -1, y: -1, rotation: 0 },
       })
 
       toast.success('Bàn đã được tạo thành công')
@@ -389,10 +431,18 @@ export default function TableLayoutPage() {
         return
       }
 
-      const updates = Array.from(positionChanges.entries()).map(([tableId, position]) => ({
-        table_id: tableId,
-        position,
-      }))
+      const updates = Array.from(positionChanges.entries()).map(([tableId, position]) => {
+        // Ensure position includes rotation
+        const table = tables.find((t) => t.id === tableId)
+        return {
+          table_id: tableId,
+          position: {
+            x: position.x,
+            y: position.y,
+            rotation: position.rotation ?? table?.rotation ?? 0,
+          },
+        }
+      })
 
       await batchUpdateMutation.mutateAsync({ updates })
       toast.success('Sơ đồ đã được lưu thành công')
@@ -411,11 +461,11 @@ export default function TableLayoutPage() {
   const handleConfirmReset = async () => {
     try {
       // Batch update API doesn't support null positions, so use individual PUT requests
-      // Send -1,-1 position to move tables back to library
+      // Send -1,-1 position to move tables back to library (reset rotation to 0)
       const updatePromises = localTables.map((table) =>
         updateTableMutation.mutateAsync({
           id: table.id,
-          payload: { position: { x: -1, y: -1 } }, // Send -1,-1 to move to library
+          payload: { position: { x: -1, y: -1, rotation: 0 } }, // Send -1,-1 to move to library
         } as any),
       )
       await Promise.all(updatePromises)
@@ -427,7 +477,7 @@ export default function TableLayoutPage() {
       setLocalTables((prevTables) =>
         prevTables.map((table) => ({
           ...table,
-          position: { x: -1, y: -1 },
+          position: { x: -1, y: -1, rotation: 0 },
         })),
       )
 

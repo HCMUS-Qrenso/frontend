@@ -6,6 +6,7 @@ export type TableShape = 'circle' | 'rectangle' | 'oval'
 export interface TablePosition {
   x: number
   y: number
+  rotation: number
 }
 
 // Main Table interface matching backend response

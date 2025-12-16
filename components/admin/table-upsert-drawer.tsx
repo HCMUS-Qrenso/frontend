@@ -50,7 +50,7 @@ const initialFormData: TableFormData = {
   status: 'available',
   is_active: true,
   autoGenerateQR: true,
-  position: { x: -1, y: -1 }, // Default position for new tables (not placed in layout)
+  position: { x: -1, y: -1, rotation: 0 }, // Default position for new tables (not placed in layout)
 }
 
 export function TableUpsertDrawer({ open }: TableUpsertDrawerProps) {

@@ -35,7 +35,6 @@ export function QRManagerToolbar({
   onSecurityInfo,
   isLoading = false,
 }: QRManagerToolbarProps) {
-  const [showPreview, setShowPreview] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
 
   const statusMap: Record<QRStatus, string> = {
@@ -102,16 +101,6 @@ export function QRManagerToolbar({
             ))}
           </DropdownMenuContent>
         </DropdownMenu>
-
-        {/* Show Preview Toggle */}
-        <Button
-          variant="outline"
-          size="icon"
-          className="rounded-full bg-transparent"
-          onClick={() => setShowPreview(!showPreview)}
-        >
-          {showPreview ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
-        </Button>
       </div>
 
       {/* Actions */}
