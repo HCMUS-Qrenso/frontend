@@ -2,7 +2,7 @@
 
 import { cn } from '@/lib/utils'
 import { formatRotation } from '@/lib/utils/table-utils'
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useState, useEffect, useMemo, useCallback, memo } from 'react'
 import { RotateCw } from 'lucide-react'
 import type { TableItem } from '@/app/admin/tables/layout/page'
 import {
@@ -89,88 +89,106 @@ export function FloorPlanCanvas({
     }),
   )
 
-  const handleRotateUpdate = (tableId: string, newRotation: number, applySnap: boolean = false) => {
-    const table = tables.find((t) => t.id === tableId)
-    if (!table) return
-
-    const finalRotation = applySnap ? snapToCardinalDirection(newRotation) : newRotation
-    const formattedRotation = formatRotation(finalRotation)
-
-    // Update both rotation field and position.rotation to keep them in sync
-    onTableUpdate(tableId, {
-      rotation: formattedRotation,
-      position: {
-        ...table.position,
-        rotation: formattedRotation,
-      },
-    })
-  }
-
-  // Filter tables by area and exclude tables with position -1,-1 (unplaced tables)
-  const filteredTables = tables.filter(
-    (t) => t.area === selectedArea && t.position && t.position.x !== -1 && t.position.y !== -1,
+  // Memoize filtered tables to avoid recalculating on every render
+  const filteredTables = useMemo(
+    () =>
+      tables.filter(
+        (t) => t.area === selectedArea && t.position && t.position.x !== -1 && t.position.y !== -1,
+      ),
+    [tables, selectedArea],
   )
 
-  // Dynamic canvas height so grid always covers all tables (especially when zoomed)
-  const contentBottom =
-    filteredTables.length > 0
-      ? Math.max(...filteredTables.map((t) => t.position.y + t.size.height)) + 200
-      : 600
-  // Multiply by zoom so when zoomed in, the grid extends further down to cover scaled tables
-  const canvasHeight = Math.max(600, contentBottom * zoom)
+  // Memoize canvas height calculation
+  const canvasHeight = useMemo(() => {
+    const contentBottom =
+      filteredTables.length > 0
+        ? Math.max(...filteredTables.map((t) => t.position.y + t.size.height)) + 200
+        : 600
+    // Multiply by zoom so when zoomed in, the grid extends further down to cover scaled tables
+    return Math.max(600, contentBottom * zoom)
+  }, [filteredTables, zoom])
 
-  const handleDragStart = (event: DragStartEvent) => {
-    const { active } = event
-    // Select table when drag starts
-    onTableSelect(active.id as string)
-  }
+  // Memoize rotate update handler
+  const handleRotateUpdate = useCallback(
+    (tableId: string, newRotation: number, applySnap: boolean = false) => {
+      const table = tables.find((t) => t.id === tableId)
+      if (!table) return
 
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, delta } = event
-    const table = tables.find((t) => t.id === active.id)
+      const finalRotation = applySnap ? snapToCardinalDirection(newRotation) : newRotation
+      const formattedRotation = formatRotation(finalRotation)
 
-    // Only process tables with valid positions (not -1,-1)
-    if (table && delta && table.position && table.position.x !== -1 && table.position.y !== -1) {
-      // Calculate new position with zoom adjustment
-      const dx = delta.x / zoom
-      const dy = delta.y / zoom
+      // Update both rotation field and position.rotation to keep them in sync
+      onTableUpdate(tableId, {
+        rotation: formattedRotation,
+        position: {
+          ...table.position,
+          rotation: formattedRotation,
+        },
+      })
+    },
+    [tables, onTableUpdate],
+  )
 
-      const newX = table.position.x + dx
-      const newY = table.position.y + dy
+  // Memoize drag start handler
+  const handleDragStart = useCallback(
+    (event: DragStartEvent) => {
+      const { active } = event
+      // Select table when drag starts
+      onTableSelect(active.id as string)
+    },
+    [onTableSelect],
+  )
 
-      // Snap to grid
-      const snappedX = Math.round(newX / GRID_SIZE) * GRID_SIZE
-      const snappedY = Math.round(newY / GRID_SIZE) * GRID_SIZE
+  // Memoize drag end handler
+  const handleDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      const { active, delta } = event
+      const table = tables.find((t) => t.id === active.id)
 
-      // Restrict bounds
-      const canvas = canvasRef.current
-      if (canvas && table) {
-        const canvasRect = canvas.getBoundingClientRect()
-        const maxX = canvasRect.width / zoom - table.size.width
-        const maxY = canvasRect.height / zoom - table.size.height
+      // Only process tables with valid positions (not -1,-1)
+      if (table && delta && table.position && table.position.x !== -1 && table.position.y !== -1) {
+        // Calculate new position with zoom adjustment
+        const dx = delta.x / zoom
+        const dy = delta.y / zoom
 
-        const finalX = Math.max(0, Math.min(snappedX, maxX))
-        const finalY = Math.max(0, Math.min(snappedY, maxY))
+        const newX = table.position.x + dx
+        const newY = table.position.y + dy
 
-        onTableUpdate(table.id, {
-          position: {
-            x: finalX,
-            y: finalY,
-            rotation: table.position.rotation ?? table.rotation ?? 0,
-          },
-        })
-      } else {
-        // Fallback if canvas ref is not available
-        onTableUpdate(table.id, {
-          position: {
-            x: Math.max(0, snappedX),
-            y: Math.max(0, snappedY),
-            rotation: table.position.rotation ?? table.rotation ?? 0,
-          },
-        })
+        // Snap to grid
+        const snappedX = Math.round(newX / GRID_SIZE) * GRID_SIZE
+        const snappedY = Math.round(newY / GRID_SIZE) * GRID_SIZE
+
+        // Restrict bounds
+        const canvas = canvasRef.current
+        if (canvas && table) {
+          const canvasRect = canvas.getBoundingClientRect()
+          const maxX = canvasRect.width / zoom - table.size.width
+          const maxY = canvasRect.height / zoom - table.size.height
+
+          const finalX = Math.max(0, Math.min(snappedX, maxX))
+          const finalY = Math.max(0, Math.min(snappedY, maxY))
+
+          onTableUpdate(table.id, {
+            position: {
+              x: finalX,
+              y: finalY,
+              rotation: table.position.rotation ?? table.rotation ?? 0,
+            },
+          })
+        } else {
+          // Fallback if canvas ref is not available
+          onTableUpdate(table.id, {
+            position: {
+              x: Math.max(0, snappedX),
+              y: Math.max(0, snappedY),
+              rotation: table.position.rotation ?? table.rotation ?? 0,
+            },
+          })
+        }
       }
-    }
-  }
+    },
+    [tables, zoom, onTableUpdate],
+  )
 
   return (
     <div className="rounded-2xl border border-slate-100 bg-white/80 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
@@ -236,7 +254,8 @@ export function FloorPlanCanvas({
               style={{
                 transform: `scale(${zoom})`,
                 transformOrigin: 'top left',
-                transition: 'transform 0.2s',
+                // Disable transition during drag to prevent lag
+                transition: 'none',
               }}
             >
               {/* Tables */}
@@ -245,11 +264,9 @@ export function FloorPlanCanvas({
                   key={table.id}
                   table={table}
                   isSelected={table.id === selectedTableId}
-                  onSelect={() => onTableSelect(table.id)}
-                  onRotateUpdate={(newRotation, applySnap) =>
-                    handleRotateUpdate(table.id, newRotation, applySnap)
-                  }
-                  onRemove={() => onTableRemove(table.id)}
+                  onSelect={onTableSelect}
+                  onRotateUpdate={handleRotateUpdate}
+                  onRemove={onTableRemove}
                   zoom={zoom}
                 />
               ))}
@@ -261,7 +278,7 @@ export function FloorPlanCanvas({
   )
 }
 
-function DraggableTable({
+const DraggableTable = memo(function DraggableTable({
   table,
   isSelected,
   onSelect,
@@ -271,9 +288,9 @@ function DraggableTable({
 }: {
   table: TableItem
   isSelected: boolean
-  onSelect: () => void
-  onRotateUpdate: (newRotation: number, applySnap: boolean) => void
-  onRemove: () => void
+  onSelect: (id: string | null) => void
+  onRotateUpdate: (tableId: string, newRotation: number, applySnap: boolean) => void
+  onRemove: (id: string) => void
   zoom: number
 }) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
@@ -290,48 +307,73 @@ function DraggableTable({
   } | null>(null)
   const tableRef = useRef<HTMLDivElement>(null)
 
-  const statusColors = {
-    Available: 'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-500/10',
-    Occupied: 'border-amber-500 bg-amber-50/50 dark:bg-amber-500/10',
-    'Waiting for bill': 'border-violet-500 bg-violet-50/50 dark:bg-violet-500/10',
-    Disabled: 'border-slate-400 bg-slate-50/50 dark:bg-slate-500/10',
-  }
+  // Memoize status colors to avoid recreating object on every render
+  const statusColors = useMemo(
+    () => ({
+      Available: 'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-500/10',
+      Occupied: 'border-amber-500 bg-amber-50/50 dark:bg-amber-500/10',
+      'Waiting for bill': 'border-violet-500 bg-violet-50/50 dark:bg-violet-500/10',
+      Disabled: 'border-slate-400 bg-slate-50/50 dark:bg-slate-500/10',
+    }),
+    [],
+  )
 
   // Adjust transform for zoom: dnd-kit's transform is in screen coordinates,
   // but canvas is scaled, so we need to divide by zoom to get correct visual movement
   const baseRotation = table.position?.rotation ?? table.rotation ?? 0
   const rotation = tempRotation !== null ? tempRotation : baseRotation
-  const dragTransform = transform
-    ? `translate3d(${transform.x / zoom}px, ${transform.y / zoom}px, 0)`
-    : ''
-  const combinedTransform = dragTransform
-    ? `${dragTransform} rotate(${rotation}deg)`
-    : `rotate(${rotation}deg)`
 
-  // Handle rotation drag
-  const handleRotateStart = (e: React.PointerEvent) => {
-    e.stopPropagation()
-    e.preventDefault()
+  // Memoize transform calculations to avoid string concatenation on every render
+  const combinedTransform = useMemo(() => {
+    const dragTransform = transform
+      ? `translate3d(${transform.x / zoom}px, ${transform.y / zoom}px, 0)`
+      : ''
+    return dragTransform ? `${dragTransform} rotate(${rotation}deg)` : `rotate(${rotation}deg)`
+  }, [transform, rotation, zoom])
 
-    if (!tableRef.current) return
+  // Memoize wrapper callbacks to avoid recreating on every render
+  const handleSelect = useCallback(() => {
+    onSelect(table.id)
+  }, [onSelect, table.id])
 
-    setIsRotating(true)
-    const rect = tableRef.current.getBoundingClientRect()
-    const centerX = rect.left + rect.width / 2
-    const centerY = rect.top + rect.height / 2
+  const handleRemove = useCallback(() => {
+    onRemove(table.id)
+  }, [onRemove, table.id])
 
-    const currentRotation = baseRotation
-    const initialAngle = calculateRotationFromMouse(e.clientX, e.clientY, centerX, centerY)
+  const handleRotateUpdateWrapper = useCallback(
+    (newRotation: number, applySnap: boolean) => {
+      onRotateUpdate(table.id, newRotation, applySnap)
+    },
+    [onRotateUpdate, table.id],
+  )
 
-    rotationStartRef.current = {
-      initialAngle,
-      initialRotation: currentRotation,
-      centerX,
-      centerY,
-    }
-  }
+  // Memoize rotate handlers to avoid recreating on every render
+  const handleRotateStart = useCallback(
+    (e: React.PointerEvent) => {
+      e.stopPropagation()
+      e.preventDefault()
 
-  const handleRotateMove = (e: PointerEvent) => {
+      if (!tableRef.current) return
+
+      setIsRotating(true)
+      const rect = tableRef.current.getBoundingClientRect()
+      const centerX = rect.left + rect.width / 2
+      const centerY = rect.top + rect.height / 2
+
+      const currentRotation = baseRotation
+      const initialAngle = calculateRotationFromMouse(e.clientX, e.clientY, centerX, centerY)
+
+      rotationStartRef.current = {
+        initialAngle,
+        initialRotation: currentRotation,
+        centerX,
+        centerY,
+      }
+    },
+    [baseRotation],
+  )
+
+  const handleRotateMove = useCallback((e: PointerEvent) => {
     if (!rotationStartRef.current || !tableRef.current) return
 
     e.preventDefault()
@@ -356,35 +398,32 @@ function DraggableTable({
 
     // Update temporary rotation for visual feedback (no snap during drag)
     setTempRotation(newRotation)
-  }
+  }, [])
 
-  const handleRotateEnd = () => {
+  const handleRotateEnd = useCallback(() => {
     if (tempRotation !== null) {
       // Apply snap when drag ends
-      onRotateUpdate(tempRotation, true)
+      handleRotateUpdateWrapper(tempRotation, true)
     }
     setIsRotating(false)
     setTempRotation(null)
     rotationStartRef.current = null
-  }
+  }, [tempRotation, handleRotateUpdateWrapper])
 
   // Set up global pointer move/up handlers when rotating
   useEffect(() => {
     if (!isRotating) return
 
-    const handleMove = (e: PointerEvent) => handleRotateMove(e)
-    const handleUp = () => handleRotateEnd()
-
-    window.addEventListener('pointermove', handleMove, { passive: false })
-    window.addEventListener('pointerup', handleUp)
-    window.addEventListener('pointercancel', handleUp)
+    window.addEventListener('pointermove', handleRotateMove, { passive: false })
+    window.addEventListener('pointerup', handleRotateEnd)
+    window.addEventListener('pointercancel', handleRotateEnd)
 
     return () => {
-      window.removeEventListener('pointermove', handleMove)
-      window.removeEventListener('pointerup', handleUp)
-      window.removeEventListener('pointercancel', handleUp)
+      window.removeEventListener('pointermove', handleRotateMove)
+      window.removeEventListener('pointerup', handleRotateEnd)
+      window.removeEventListener('pointercancel', handleRotateEnd)
     }
-  }, [isRotating, tempRotation, onRotateUpdate])
+  }, [isRotating, handleRotateMove, handleRotateEnd])
 
   return (
     <div
@@ -395,7 +434,7 @@ function DraggableTable({
       suppressHydrationWarning
       onClick={(e) => {
         e.stopPropagation()
-        onSelect()
+        handleSelect()
       }}
       style={{
         position: 'absolute',
@@ -405,7 +444,8 @@ function DraggableTable({
         height: table.size.height,
         transform: combinedTransform,
         opacity: isDragging ? 0.5 : 1,
-        transition: isDragging || isRotating ? 'none' : 'opacity 0.2s, transform 0.1s',
+        // Disable transition during drag/rotate to prevent lag
+        transition: isDragging || isRotating ? 'none' : 'opacity 0.2s',
       }}
       className={cn(
         'touch-none border-2 select-none',
@@ -421,7 +461,7 @@ function DraggableTable({
       <div
         onClick={(e) => {
           e.stopPropagation()
-          onSelect()
+          handleSelect()
         }}
         className="pointer-events-none flex h-full flex-col items-center justify-center p-2 text-center select-none"
       >
@@ -435,7 +475,7 @@ function DraggableTable({
           onClick={(e) => {
             e.stopPropagation()
             e.preventDefault()
-            onRemove()
+            handleRemove()
           }}
           onPointerDown={(e) => {
             e.stopPropagation()
@@ -462,4 +502,4 @@ function DraggableTable({
       )}
     </div>
   )
-}
+})

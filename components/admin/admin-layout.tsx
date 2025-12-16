@@ -2,7 +2,7 @@
 
 import type React from 'react'
 
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -17,6 +17,8 @@ import { useSearchParams } from 'next/navigation'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { useAuth } from '@/hooks/use-auth'
 import { useUserProfileQuery } from '@/hooks/use-users-query'
+import { useOwnerTenantsQuery, useCurrentTenantQuery } from '@/hooks/use-tenants-query'
+import { useTenantStore } from '@/store/tenant-store'
 import { AdminSidebar } from './admin-sidebar'
 import { getInitials } from './admin-utils'
 
@@ -31,6 +33,73 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   const { logout, logoutPending, isAuthenticated, isHydrated } = useAuth()
   const userProfileQuery = useUserProfileQuery(isAuthenticated && isHydrated)
   const userProfile = userProfileQuery.data
+  const hasProfile = !!userProfile
+
+  const isOwner = hasProfile && userProfile.role === 'owner'
+  const isStaff = hasProfile && userProfile.role !== 'owner'
+
+  // Tenant state (used mainly for owners)
+  const { tenants, selectedTenantId, setTenants, selectTenant } = useTenantStore()
+
+  // Owner: fetch all owned tenants (without x-tenant-id)
+  const ownerTenantsQuery = useOwnerTenantsQuery(
+    { status: 'active', limit: 50 },
+    isAuthenticated && isHydrated && isOwner,
+  )
+
+  // Current tenant details:
+  // - Owner: only fetch after a tenant has been selected (selectedTenantId set)
+  // - Admin/staff: fetch as soon as profile is known
+  const shouldFetchCurrentForOwner = isOwner && !!selectedTenantId
+  const shouldFetchCurrentForStaff = isStaff
+
+  const currentTenantQuery = useCurrentTenantQuery(
+    isAuthenticated &&
+      isHydrated &&
+      (shouldFetchCurrentForOwner || shouldFetchCurrentForStaff),
+  )
+
+  // Debug logging (development only)
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      if (userProfileQuery.data) {
+        console.log('[AdminLayout] ✅ /users/profile loaded:', userProfileQuery.data)
+      }
+      if (ownerTenantsQuery.data) {
+        console.log('[AdminLayout] ✅ /tenants loaded:', ownerTenantsQuery.data.data.tenants.length, 'tenants')
+      }
+      if (currentTenantQuery.data) {
+        console.log('[AdminLayout] ✅ /tenants/current loaded:', currentTenantQuery.data.data.name)
+      }
+    }
+  }, [userProfileQuery.data, ownerTenantsQuery.data, currentTenantQuery.data])
+
+  // Sync owner tenants list into tenant store
+  useEffect(() => {
+    if (!isOwner) return
+    if (!ownerTenantsQuery.data?.data.tenants) return
+
+    setTenants(ownerTenantsQuery.data.data.tenants)
+
+    // If no tenant selected yet but we have data, auto-select the first one
+    if (!selectedTenantId && ownerTenantsQuery.data.data.tenants.length > 0) {
+      const firstTenantId = ownerTenantsQuery.data.data.tenants[0].id
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[AdminLayout] 🔄 Auto-selecting first tenant:', firstTenantId)
+      }
+      selectTenant(firstTenantId)
+    }
+  }, [isOwner, ownerTenantsQuery.data, selectedTenantId, setTenants, selectTenant])
+
+  const selectedTenantName = useMemo(() => {
+    if (isOwner) {
+      const selected = tenants.find((t) => t.id === selectedTenantId)
+      return selected?.name ?? 'Chọn nhà hàng'
+    }
+
+    const detail = currentTenantQuery.data?.data
+    return detail?.name ?? 'Nhà hàng của bạn'
+  }, [isOwner, tenants, selectedTenantId, currentTenantQuery.data])
 
   // Check if any modal is open
   const isModalOpen = searchParams.get('modal') !== null || searchParams.get('delete') !== null
@@ -78,23 +147,47 @@ export function AdminLayout({ children }: AdminLayoutProps) {
 
             <div className="flex items-center gap-2 lg:gap-3">
               {/* Restaurant Selector */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="hidden gap-2 rounded-full bg-transparent md:flex"
-                  >
-                    <Store className="h-4 w-4" />
-                    <span>Chi nhánh Quận 1</span>
-                    <ChevronDown className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuItem>Chi nhánh Quận 1</DropdownMenuItem>
-                  <DropdownMenuItem>Chi nhánh Quận 3</DropdownMenuItem>
-                  <DropdownMenuItem>Chi nhánh Quận 7</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              {isOwner ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="hidden gap-2 rounded-full bg-transparent md:flex"
+                      disabled={ownerTenantsQuery.isLoading}
+                    >
+                      <Store className="h-4 w-4" />
+                      <span>{selectedTenantName}</span>
+                      <ChevronDown className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    {ownerTenantsQuery.isLoading && (
+                      <DropdownMenuItem disabled>Đang tải danh sách...</DropdownMenuItem>
+                    )}
+                    {!ownerTenantsQuery.isLoading &&
+                      tenants.map((tenant) => (
+                        <DropdownMenuItem
+                          key={tenant.id}
+                          onClick={() => selectTenant(tenant.id)}
+                        >
+                          {tenant.name}
+                        </DropdownMenuItem>
+                      ))}
+                    {!ownerTenantsQuery.isLoading && tenants.length === 0 && (
+                      <DropdownMenuItem disabled>Chưa có nhà hàng nào</DropdownMenuItem>
+                    )}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <Button
+                  variant="outline"
+                  className="hidden gap-2 rounded-full bg-transparent md:flex"
+                  disabled
+                >
+                  <Store className="h-4 w-4" />
+                  <span>{selectedTenantName}</span>
+                </Button>
+              )}
 
               {/* Date Range */}
               <DropdownMenu>

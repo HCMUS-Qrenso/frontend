@@ -1,8 +1,8 @@
 import axios, {
   AxiosError,
   type AxiosInstance,
-  type AxiosRequestConfig,
   type AxiosRequestHeaders,
+  type InternalAxiosRequestConfig,
 } from 'axios'
 
 const baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
@@ -24,12 +24,17 @@ const rawClient: AxiosInstance = axios.create({
   withCredentials: true,
 })
 
+// Extend InternalAxiosRequestConfig to support custom flags
+interface TenantAwareRequestConfig extends InternalAxiosRequestConfig {
+  withoutTenant?: boolean
+}
+
 const apiClient: AxiosInstance = axios.create({
   baseURL,
   withCredentials: true,
 })
 
-apiClient.interceptors.request.use((config) => {
+apiClient.interceptors.request.use((config: TenantAwareRequestConfig) => {
   // Đảm bảo headers tồn tại
   if (!config.headers) {
     config.headers = {} as AxiosRequestHeaders
@@ -40,8 +45,13 @@ apiClient.interceptors.request.use((config) => {
     config.headers.Authorization = `Bearer ${accessToken}`
   }
 
-  // Gắn x-tenant-id nếu đã có tenantId và request chưa override
-  if (tenantId && !('x-tenant-id' in config.headers)) {
+  // Cho phép skip gắn tenant cho một số request đặc biệt (ví dụ: GET /tenants for owner)
+  const skipTenantHeader =
+    (config as TenantAwareRequestConfig).withoutTenant ||
+    (config.headers as Record<string, string | boolean | undefined>)['x-skip-tenant'] === 'true'
+
+  // Gắn x-tenant-id nếu đã có tenantId, không bị skip và request chưa override
+  if (!skipTenantHeader && tenantId && !('x-tenant-id' in config.headers)) {
     ;(config.headers as Record<string, string>)['x-tenant-id'] = tenantId
   }
 
@@ -72,7 +82,9 @@ const refreshAccessToken = async (): Promise<string | null> => {
 apiClient.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
-    const originalConfig = error.config as (AxiosRequestConfig & { _retry?: boolean }) | undefined
+    const originalConfig = error.config as
+      | (InternalAxiosRequestConfig & { _retry?: boolean })
+      | undefined
 
     // Không refresh token cho các endpoint auth (login, signup, refresh, etc.)
     const authEndpoints = [
@@ -98,10 +110,11 @@ apiClient.interceptors.response.use(
       try {
         const newToken = await refreshAccessToken()
         if (newToken) {
-          originalConfig.headers = {
-            ...originalConfig.headers,
-            Authorization: `Bearer ${newToken}`,
+          // Đảm bảo headers tồn tại và là AxiosRequestHeaders, sau đó chỉ mutate thay vì gán object mới
+          if (!originalConfig.headers) {
+            originalConfig.headers = {} as AxiosRequestHeaders
           }
+          ;(originalConfig.headers as AxiosRequestHeaders).Authorization = `Bearer ${newToken}`
           return apiClient(originalConfig)
         }
       } catch (refreshError) {
