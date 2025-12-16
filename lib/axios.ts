@@ -1,8 +1,8 @@
 import axios, {
   AxiosError,
   type AxiosInstance,
-  type AxiosRequestConfig,
   type AxiosRequestHeaders,
+  type InternalAxiosRequestConfig,
 } from 'axios'
 
 const baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
@@ -24,8 +24,8 @@ const rawClient: AxiosInstance = axios.create({
   withCredentials: true,
 })
 
-// Extend AxiosRequestConfig to support custom flags
-interface TenantAwareRequestConfig extends AxiosRequestConfig {
+// Extend InternalAxiosRequestConfig to support custom flags
+interface TenantAwareRequestConfig extends InternalAxiosRequestConfig {
   withoutTenant?: boolean
 }
 
@@ -82,7 +82,9 @@ const refreshAccessToken = async (): Promise<string | null> => {
 apiClient.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
-    const originalConfig = error.config as (AxiosRequestConfig & { _retry?: boolean }) | undefined
+    const originalConfig = error.config as
+      | (InternalAxiosRequestConfig & { _retry?: boolean })
+      | undefined
 
     // Không refresh token cho các endpoint auth (login, signup, refresh, etc.)
     const authEndpoints = [
@@ -108,10 +110,11 @@ apiClient.interceptors.response.use(
       try {
         const newToken = await refreshAccessToken()
         if (newToken) {
-          originalConfig.headers = {
-            ...originalConfig.headers,
-            Authorization: `Bearer ${newToken}`,
+          // Đảm bảo headers tồn tại và là AxiosRequestHeaders, sau đó chỉ mutate thay vì gán object mới
+          if (!originalConfig.headers) {
+            originalConfig.headers = {} as AxiosRequestHeaders
           }
+          ;(originalConfig.headers as AxiosRequestHeaders).Authorization = `Bearer ${newToken}`
           return apiClient(originalConfig)
         }
       } catch (refreshError) {
