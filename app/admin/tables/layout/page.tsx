@@ -217,11 +217,23 @@ export default function TableLayoutPage() {
   const createTableMutation = useCreateTableMutation()
   const updateTableMutation = useUpdateTableMutation()
 
+  // Sync zoneParam with selectedZone when zones data is loaded
   useEffect(() => {
-    if (zoneParam) {
+    if (zoneParam && zones.length > 0) {
+      // Tìm zone theo ID hoặc name
+      const zone = zones.find((z) => z.id === zoneParam || z.name === zoneParam)
+      if (zone) {
+        // Set thành zone ID để tương thích với API và đảm bảo tìm được trong currentZoneObj
+        setSelectedZone(zone.id)
+      } else {
+        // Nếu không tìm thấy, giữ nguyên zoneParam (có thể là invalid zone)
+        setSelectedZone(zoneParam)
+      }
+    } else if (zoneParam) {
+      // Nếu zones chưa load nhưng có zoneParam, set tạm thời
       setSelectedZone(zoneParam)
     }
-  }, [zoneParam])
+  }, [zoneParam, zones])
 
   useEffect(() => {
     if (tableIdParam && tables.length > 0) {
@@ -252,7 +264,11 @@ export default function TableLayoutPage() {
         const positionWithRotation: TablePosition = {
           x: updates.position!.x,
           y: updates.position!.y,
-          rotation: updates.position!.rotation ?? currentTable?.position?.rotation ?? currentTable?.rotation ?? 0,
+          rotation:
+            updates.position!.rotation ??
+            currentTable?.position?.rotation ??
+            currentTable?.rotation ??
+            0,
         }
         newMap.set(id, positionWithRotation)
         return newMap
@@ -270,7 +286,7 @@ export default function TableLayoutPage() {
               rotation: t.position.rotation ?? t.rotation ?? 0,
             }
           }
-          
+
           // If rotation field is updated, also update position.rotation
           if (updates.rotation !== undefined && updates.position === undefined) {
             updates.position = {
@@ -278,18 +294,18 @@ export default function TableLayoutPage() {
               rotation: updates.rotation,
             }
           }
-          
+
           // Sync rotation field with position.rotation
           const updatedTable = { ...t, ...updates }
           if (updates.position?.rotation !== undefined) {
             updatedTable.rotation = updates.position.rotation
           }
-          
+
           // Recalculate size if type or seats changed
           if (updates.type !== undefined || updates.seats !== undefined) {
             updatedTable.size = calculateTableSize(updatedTable.type, updatedTable.seats)
           }
-          
+
           return updatedTable
         }
         return t

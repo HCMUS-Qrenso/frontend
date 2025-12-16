@@ -154,7 +154,10 @@ export function TablesListTable({ isTrashView = false }: TablesListTableProps) {
   }
 
   const handleViewOnLayout = (table: Table) => {
-    const zoneParam = table.zone_id || table.zone_name || table.floor || 'Tất cả'
+    // Ưu tiên zone_id từ nested zone object hoặc zone_id field
+    const zoneId = table.zone?.id || table.zone_id
+    // Chỉ fallback về zone_name/floor nếu không có zone_id
+    const zoneParam = zoneId || table.zone_name || table.floor || 'Tất cả'
     router.push(`/admin/tables/layout?zone=${encodeURIComponent(zoneParam)}&tableId=${table.id}`)
   }
 

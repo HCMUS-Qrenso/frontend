@@ -1,5 +1,11 @@
 import { useCallback } from 'react'
-import { handleApiError, handleApiErrorWithStatus, extractErrorMessage, getErrorStatus, isApiError } from '@/lib/utils/error-handler'
+import {
+  handleApiError,
+  handleApiErrorWithStatus,
+  extractErrorMessage,
+  getErrorStatus,
+  isApiError,
+} from '@/lib/utils/error-handler'
 
 /**
  * Custom hook for handling API errors
@@ -16,15 +22,18 @@ export function useErrorHandler() {
   /**
    * Handle API error with custom status code handlers
    */
-  const handleErrorWithStatus = useCallback((
-    error: any,
-    statusHandlers?: {
-      [status: number]: (error: any) => void | string
+  const handleErrorWithStatus = useCallback(
+    (
+      error: any,
+      statusHandlers?: {
+        [status: number]: (error: any) => void | string
+      },
+      defaultMessage?: string,
+    ) => {
+      handleApiErrorWithStatus(error, statusHandlers, defaultMessage)
     },
-    defaultMessage?: string
-  ) => {
-    handleApiErrorWithStatus(error, statusHandlers, defaultMessage)
-  }, [])
+    [],
+  )
 
   /**
    * Extract error message without showing toast
@@ -56,4 +65,3 @@ export function useErrorHandler() {
     checkIsApiError,
   }
 }
-
