@@ -1,6 +1,4 @@
 'use client'
-
-import { AdminLayout } from '@/components/admin/admin-layout'
 import { FloorPlanCanvas } from '@/components/admin/floor-plan-canvas'
 import { FloorPlanToolbar } from '@/components/admin/floor-plan-toolbar'
 import { FloorPlanSidePanel } from '@/components/admin/floor-plan-side-panel'
@@ -521,76 +519,72 @@ export default function TableLayoutPage() {
 
   if (isLoadingLayout) {
     return (
-      <AdminLayout>
-        <div className="flex items-center justify-center py-12">
-          <div className="text-center">
-            <p className="text-sm text-slate-500 dark:text-slate-400">Đang tải sơ đồ...</p>
-          </div>
+      <div className="flex items-center justify-center py-12">
+        <div className="text-center">
+          <p className="text-sm text-slate-500 dark:text-slate-400">Đang tải sơ đồ...</p>
         </div>
-      </AdminLayout>
+      </div>
     )
   }
 
   return (
-    <AdminLayout>
-      <div className="space-y-4">
-        {/* Toolbar */}
-        <FloorPlanToolbar
-          selectedArea={currentZoneName}
-          areas={zones.map((z) => z.name || z.id)}
-          onAreaChange={(area) => {
-            // Find zone by name or use as ID
-            const zone = zones.find((z) => z.name === area || z.id === area)
-            // Lưu id để gọi API, nhưng hiển thị tên trong dropdown
-            setSelectedZone(zone?.id || area)
-            setSelectedTableId(null)
-            setHistory([])
-            setHistoryIndex(0)
-            setPositionChanges(new Map())
-            // localTables will sync automatically via useEffect when currentZone changes
+    <div className="space-y-4">
+      {/* Toolbar */}
+      <FloorPlanToolbar
+        selectedArea={currentZoneName}
+        areas={zones.map((z) => z.name || z.id)}
+        onAreaChange={(area) => {
+          // Find zone by name or use as ID
+          const zone = zones.find((z) => z.name === area || z.id === area)
+          // Lưu id để gọi API, nhưng hiển thị tên trong dropdown
+          setSelectedZone(zone?.id || area)
+          setSelectedTableId(null)
+          setHistory([])
+          setHistoryIndex(0)
+          setPositionChanges(new Map())
+          // localTables will sync automatically via useEffect when currentZone changes
+        }}
+        zoom={zoom}
+        onZoomChange={setZoom}
+        showGrid={showGrid}
+        onShowGridChange={setShowGrid}
+        canUndo={historyIndex > 0}
+        canRedo={historyIndex < history.length - 1}
+        onUndo={handleUndo}
+        onRedo={handleRedo}
+        onSave={handleSave}
+        onReset={handleReset}
+      />
+
+      {/* Main content: Canvas + Side Panel */}
+      <div className="grid gap-4 lg:grid-cols-[1fr_380px]">
+        {/* Canvas */}
+        <FloorPlanCanvas
+          tables={tables}
+          selectedTableId={selectedTableId}
+          onTableSelect={setSelectedTableId}
+          onTableUpdate={(id, updates) => {
+            // Update local state immediately for UI feedback
+            handleTableUpdate(id, updates)
+            // Debounce and batch save positions
+            // This will be handled by a separate debounced save function if needed
           }}
           zoom={zoom}
-          onZoomChange={setZoom}
           showGrid={showGrid}
-          onShowGridChange={setShowGrid}
-          canUndo={historyIndex > 0}
-          canRedo={historyIndex < history.length - 1}
-          onUndo={handleUndo}
-          onRedo={handleRedo}
-          onSave={handleSave}
-          onReset={handleReset}
+          selectedArea={currentZoneName}
+          onTableRemove={(id) => handleTableRemove(id)}
         />
 
-        {/* Main content: Canvas + Side Panel */}
-        <div className="grid gap-4 lg:grid-cols-[1fr_380px]">
-          {/* Canvas */}
-          <FloorPlanCanvas
-            tables={tables}
-            selectedTableId={selectedTableId}
-            onTableSelect={setSelectedTableId}
-            onTableUpdate={(id, updates) => {
-              // Update local state immediately for UI feedback
-              handleTableUpdate(id, updates)
-              // Debounce and batch save positions
-              // This will be handled by a separate debounced save function if needed
-            }}
-            zoom={zoom}
-            showGrid={showGrid}
-            selectedArea={currentZoneName}
-            onTableRemove={(id) => handleTableRemove(id)}
-          />
-
-          {/* Side Panel */}
-          <FloorPlanSidePanel
-            selectedTable={selectedTable}
-            onTableUpdate={handleTableUpdate}
-            onTableSave={handleTableSave}
-            onTableDelete={handleTableDelete}
-            onAddTable={handleAddTable}
-            areas={zones.map((z) => z.name || z.id)}
-            libraryTables={libraryTables}
-          />
-        </div>
+        {/* Side Panel */}
+        <FloorPlanSidePanel
+          selectedTable={selectedTable}
+          onTableUpdate={handleTableUpdate}
+          onTableSave={handleTableSave}
+          onTableDelete={handleTableDelete}
+          onAddTable={handleAddTable}
+          areas={zones.map((z) => z.name || z.id)}
+          libraryTables={libraryTables}
+        />
       </div>
 
       {/* Reset Confirmation Dialog */}
@@ -631,6 +625,6 @@ export default function TableLayoutPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </AdminLayout>
+    </div>
   )
 }
