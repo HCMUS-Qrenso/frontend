@@ -1,7 +1,8 @@
 'use client'
 
 import { cn } from '@/lib/utils'
-import { useRef } from 'react'
+import { formatRotation } from '@/lib/utils/table-utils'
+import { useRef, useState, useEffect } from 'react'
 import { RotateCw } from 'lucide-react'
 import type { TableItem } from '@/app/admin/tables/layout/page'
 import {
@@ -27,6 +28,44 @@ interface FloorPlanCanvasProps {
 
 const GRID_SIZE = 20
 
+/**
+ * Snap rotation to nearest cardinal direction (0, 90, 180, 270) within tolerance
+ */
+function snapToCardinalDirection(angle: number, tolerance: number = 3): number {
+  const normalizedAngle = ((angle % 360) + 360) % 360
+  const cardinalDirections = [0, 90, 180, 270]
+
+  for (const cardinal of cardinalDirections) {
+    const diff = Math.abs(normalizedAngle - cardinal)
+    const minDiff = Math.min(diff, 360 - diff) // Handle wrap-around
+
+    if (minDiff <= tolerance) {
+      return cardinal
+    }
+  }
+
+  return normalizedAngle
+}
+
+/**
+ * Calculate rotation angle from mouse position relative to table center
+ * Returns angle in degrees (0-360), where 0° = top
+ */
+function calculateRotationFromMouse(
+  mouseX: number,
+  mouseY: number,
+  centerX: number,
+  centerY: number,
+): number {
+  const dx = mouseX - centerX
+  const dy = mouseY - centerY
+  const angle = Math.atan2(dy, dx) * (180 / Math.PI)
+  // Adjust for CSS rotation (0° = top, positive = clockwise)
+  const cssAngle = angle + 90
+  // Normalize to 0-360
+  return ((cssAngle % 360) + 360) % 360
+}
+
 export function FloorPlanCanvas({
   tables,
   selectedTableId,
@@ -50,17 +89,19 @@ export function FloorPlanCanvas({
     }),
   )
 
-  const handleRotate = (tableId: string, currentRotation: number) => {
+  const handleRotateUpdate = (tableId: string, newRotation: number, applySnap: boolean = false) => {
     const table = tables.find((t) => t.id === tableId)
     if (!table) return
 
-    const newRotation = (currentRotation + 90) % 360
+    const finalRotation = applySnap ? snapToCardinalDirection(newRotation) : newRotation
+    const formattedRotation = formatRotation(finalRotation)
+
     // Update both rotation field and position.rotation to keep them in sync
     onTableUpdate(tableId, {
-      rotation: newRotation,
+      rotation: formattedRotation,
       position: {
         ...table.position,
-        rotation: newRotation,
+        rotation: formattedRotation,
       },
     })
   }
@@ -205,8 +246,8 @@ export function FloorPlanCanvas({
                   table={table}
                   isSelected={table.id === selectedTableId}
                   onSelect={() => onTableSelect(table.id)}
-                  onRotate={() =>
-                    handleRotate(table.id, table.position?.rotation ?? table.rotation ?? 0)
+                  onRotateUpdate={(newRotation, applySnap) =>
+                    handleRotateUpdate(table.id, newRotation, applySnap)
                   }
                   onRemove={() => onTableRemove(table.id)}
                   zoom={zoom}
@@ -224,20 +265,30 @@ function DraggableTable({
   table,
   isSelected,
   onSelect,
-  onRotate,
+  onRotateUpdate,
   onRemove,
   zoom,
 }: {
   table: TableItem
   isSelected: boolean
   onSelect: () => void
-  onRotate: () => void
+  onRotateUpdate: (newRotation: number, applySnap: boolean) => void
   onRemove: () => void
   zoom: number
 }) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: table.id,
   })
+
+  const [isRotating, setIsRotating] = useState(false)
+  const [tempRotation, setTempRotation] = useState<number | null>(null)
+  const rotationStartRef = useRef<{
+    initialAngle: number
+    initialRotation: number
+    centerX: number
+    centerY: number
+  } | null>(null)
+  const tableRef = useRef<HTMLDivElement>(null)
 
   const statusColors = {
     Available: 'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-500/10',
@@ -248,7 +299,8 @@ function DraggableTable({
 
   // Adjust transform for zoom: dnd-kit's transform is in screen coordinates,
   // but canvas is scaled, so we need to divide by zoom to get correct visual movement
-  const rotation = table.position?.rotation ?? table.rotation ?? 0
+  const baseRotation = table.position?.rotation ?? table.rotation ?? 0
+  const rotation = tempRotation !== null ? tempRotation : baseRotation
   const dragTransform = transform
     ? `translate3d(${transform.x / zoom}px, ${transform.y / zoom}px, 0)`
     : ''
@@ -256,9 +308,90 @@ function DraggableTable({
     ? `${dragTransform} rotate(${rotation}deg)`
     : `rotate(${rotation}deg)`
 
+  // Handle rotation drag
+  const handleRotateStart = (e: React.PointerEvent) => {
+    e.stopPropagation()
+    e.preventDefault()
+
+    if (!tableRef.current) return
+
+    setIsRotating(true)
+    const rect = tableRef.current.getBoundingClientRect()
+    const centerX = rect.left + rect.width / 2
+    const centerY = rect.top + rect.height / 2
+
+    const currentRotation = baseRotation
+    const initialAngle = calculateRotationFromMouse(e.clientX, e.clientY, centerX, centerY)
+
+    rotationStartRef.current = {
+      initialAngle,
+      initialRotation: currentRotation,
+      centerX,
+      centerY,
+    }
+  }
+
+  const handleRotateMove = (e: PointerEvent) => {
+    if (!rotationStartRef.current || !tableRef.current) return
+
+    e.preventDefault()
+
+    const { initialAngle, initialRotation, centerX, centerY } = rotationStartRef.current
+
+    // Calculate current angle
+    const currentAngle = calculateRotationFromMouse(e.clientX, e.clientY, centerX, centerY)
+
+    // Calculate rotation delta
+    let deltaAngle = currentAngle - initialAngle
+
+    // Handle wrap-around (e.g., going from 350° to 10°)
+    if (deltaAngle > 180) {
+      deltaAngle -= 360
+    } else if (deltaAngle < -180) {
+      deltaAngle += 360
+    }
+
+    // Apply rotation delta to initial rotation
+    const newRotation = (((initialRotation + deltaAngle) % 360) + 360) % 360
+
+    // Update temporary rotation for visual feedback (no snap during drag)
+    setTempRotation(newRotation)
+  }
+
+  const handleRotateEnd = () => {
+    if (tempRotation !== null) {
+      // Apply snap when drag ends
+      onRotateUpdate(tempRotation, true)
+    }
+    setIsRotating(false)
+    setTempRotation(null)
+    rotationStartRef.current = null
+  }
+
+  // Set up global pointer move/up handlers when rotating
+  useEffect(() => {
+    if (!isRotating) return
+
+    const handleMove = (e: PointerEvent) => handleRotateMove(e)
+    const handleUp = () => handleRotateEnd()
+
+    window.addEventListener('pointermove', handleMove, { passive: false })
+    window.addEventListener('pointerup', handleUp)
+    window.addEventListener('pointercancel', handleUp)
+
+    return () => {
+      window.removeEventListener('pointermove', handleMove)
+      window.removeEventListener('pointerup', handleUp)
+      window.removeEventListener('pointercancel', handleUp)
+    }
+  }, [isRotating, tempRotation, onRotateUpdate])
+
   return (
     <div
-      ref={setNodeRef}
+      ref={(node) => {
+        setNodeRef(node)
+        tableRef.current = node
+      }}
       suppressHydrationWarning
       onClick={(e) => {
         e.stopPropagation()
@@ -272,7 +405,7 @@ function DraggableTable({
         height: table.size.height,
         transform: combinedTransform,
         opacity: isDragging ? 0.5 : 1,
-        transition: isDragging ? 'none' : 'opacity 0.2s',
+        transition: isDragging || isRotating ? 'none' : 'opacity 0.2s, transform 0.1s',
       }}
       className={cn(
         'touch-none border-2 select-none',
@@ -281,9 +414,9 @@ function DraggableTable({
         isSelected
           ? 'z-20 cursor-move ring-2 ring-emerald-500 ring-offset-2'
           : 'z-10 cursor-grab hover:shadow-md',
+        isRotating && 'cursor-grabbing',
       )}
-      {...listeners}
-      {...attributes}
+      {...(isRotating ? {} : { ...listeners, ...attributes })}
     >
       <div
         onClick={(e) => {
@@ -316,16 +449,13 @@ function DraggableTable({
       {/* Rotate handle */}
       {isSelected && (
         <button
-          onClick={(e) => {
-            e.stopPropagation()
-            e.preventDefault()
-            onRotate()
+          onPointerDown={handleRotateStart}
+          className="no-drag absolute -top-2 -right-2 z-10 flex h-6 w-6 cursor-grab items-center justify-center rounded-full border border-emerald-500 bg-white text-emerald-600 shadow-sm hover:bg-emerald-50 active:cursor-grabbing dark:bg-slate-800 dark:text-emerald-400"
+          style={{
+            transform: `rotate(-${rotation}deg)`,
+            transition: isRotating ? 'none' : 'transform 0.1s',
           }}
-          onPointerDown={(e) => {
-            e.stopPropagation()
-          }}
-          className="no-drag absolute -top-2 -right-2 z-10 flex h-6 w-6 cursor-pointer items-center justify-center rounded-full border border-emerald-500 bg-white text-emerald-600 shadow-sm hover:bg-emerald-50 dark:bg-slate-800 dark:text-emerald-400"
-          style={{ transform: `rotate(-${table.position?.rotation ?? table.rotation ?? 0}deg)` }}
+          title="Kéo để xoay tự do"
         >
           <RotateCw className="h-3 w-3" />
         </button>

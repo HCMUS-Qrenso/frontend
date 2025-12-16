@@ -16,6 +16,7 @@ import {
 import { toast } from 'sonner'
 import { useErrorHandler } from '@/hooks/use-error-handler'
 import type { ZoneLayoutTable, TablePosition } from '@/types/tables'
+import { formatRotation } from '@/lib/utils/table-utils'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -115,7 +116,8 @@ function transformTableToItem(
 ): TableItem {
   const tableType = mapShape(table.type)
   // Read rotation from API response (default to 0 if not present)
-  const rotation = table.position?.rotation ?? 0
+  const rawRotation = table.position?.rotation ?? 0
+  const rotation = formatRotation(rawRotation)
   // Ensure position includes rotation
   const position: TablePosition = {
     x: table.position.x,
@@ -261,14 +263,15 @@ export default function TableLayoutPage() {
         const newMap = new Map(prev)
         // Get current table to preserve rotation if needed
         const currentTable = localTables.find((t) => t.id === id)
+        const rawRotation =
+          updates.position!.rotation ??
+          currentTable?.position?.rotation ??
+          currentTable?.rotation ??
+          0
         const positionWithRotation: TablePosition = {
           x: updates.position!.x,
           y: updates.position!.y,
-          rotation:
-            updates.position!.rotation ??
-            currentTable?.position?.rotation ??
-            currentTable?.rotation ??
-            0,
+          rotation: formatRotation(rawRotation),
         }
         newMap.set(id, positionWithRotation)
         return newMap
@@ -281,9 +284,10 @@ export default function TableLayoutPage() {
         if (t.id === id) {
           // If position is being updated, preserve rotation if not explicitly provided
           if (updates.position && updates.position.rotation === undefined) {
+            const preservedRotation = t.position.rotation ?? t.rotation ?? 0
             updates.position = {
               ...updates.position,
-              rotation: t.position.rotation ?? t.rotation ?? 0,
+              rotation: formatRotation(preservedRotation),
             }
           }
 
@@ -291,14 +295,14 @@ export default function TableLayoutPage() {
           if (updates.rotation !== undefined && updates.position === undefined) {
             updates.position = {
               ...t.position,
-              rotation: updates.rotation,
+              rotation: formatRotation(updates.rotation),
             }
           }
 
           // Sync rotation field with position.rotation
           const updatedTable = { ...t, ...updates }
           if (updates.position?.rotation !== undefined) {
-            updatedTable.rotation = updates.position.rotation
+            updatedTable.rotation = formatRotation(updates.position.rotation)
           }
 
           // Recalculate size if type or seats changed
@@ -328,7 +332,7 @@ export default function TableLayoutPage() {
 
   const handleTableRemove = async (id: string) => {
     // Move table back to library by setting position to -1,-1 (reset rotation to 0)
-    await handleTableSave(id, { position: { x: -1, y: -1, rotation: 0 } })
+    await handleTableSave(id, { position: { x: -1, y: -1, rotation: formatRotation(0) } })
     setSelectedTableId(null)
   }
 
@@ -378,10 +382,11 @@ export default function TableLayoutPage() {
       }
       if (updates.position !== undefined) {
         // Ensure position includes rotation (use from position or fallback to rotation field)
+        const rotation = updates.position.rotation ?? table.rotation ?? 0
         payload.position = {
           x: updates.position.x,
           y: updates.position.y,
-          rotation: updates.position.rotation ?? table.rotation ?? 0,
+          rotation: formatRotation(rotation),
         }
       }
 
@@ -404,7 +409,7 @@ export default function TableLayoutPage() {
         shape: mapShapeToBackend(tableTemplate.type) as 'circle' | 'rectangle' | 'oval',
         status: 'available',
         is_active: true,
-        position: { x: -1, y: -1, rotation: 0 },
+        position: { x: -1, y: -1, rotation: formatRotation(0) },
       })
 
       toast.success('Bàn đã được tạo thành công')
@@ -450,12 +455,13 @@ export default function TableLayoutPage() {
       const updates = Array.from(positionChanges.entries()).map(([tableId, position]) => {
         // Ensure position includes rotation
         const table = tables.find((t) => t.id === tableId)
+        const rotation = position.rotation ?? table?.rotation ?? 0
         return {
           table_id: tableId,
           position: {
             x: position.x,
             y: position.y,
-            rotation: position.rotation ?? table?.rotation ?? 0,
+            rotation: formatRotation(rotation),
           },
         }
       })
@@ -481,7 +487,7 @@ export default function TableLayoutPage() {
       const updatePromises = localTables.map((table) =>
         updateTableMutation.mutateAsync({
           id: table.id,
-          payload: { position: { x: -1, y: -1, rotation: 0 } }, // Send -1,-1 to move to library
+          payload: { position: { x: -1, y: -1, rotation: formatRotation(0) } }, // Send -1,-1 to move to library
         } as any),
       )
       await Promise.all(updatePromises)
