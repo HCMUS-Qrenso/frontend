@@ -190,7 +190,7 @@ export function FloorPlanSidePanel({
                         // Update table position to add it to canvas via API
                         try {
                           await onTableSave(table.id, {
-                            position: { x: 200, y: 200 },
+                            position: { x: 200, y: 200, rotation: 0 },
                           })
                         } catch (error) {
                           // Error handling is done in parent component

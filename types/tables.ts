@@ -316,148 +316,45 @@ export interface TableQR {
   seats: number
 }
 
-  name: string
-
-  seats: number
-
-  area: string // Zone name/area label
-
-  status: TableStatus
-
-  position: TablePosition
-
-}
-
-
-
 export interface ZoneLayoutResponse {
-
   success: boolean
 
   data: {
-
     zone: string // Zone ID or name
 
     zone_id?: string // Zone ID if available
 
     tables: ZoneLayoutTable[]
-
   }
-
 }
-
-
-
-// Keep FloorLayoutResponse for backward compatibility
-
-/** @deprecated Use ZoneLayoutResponse instead */
-
-export interface FloorLayoutResponse {
-
-  success: boolean
-
-  data: {
-
-    floor: string
-
-    tables: FloorLayoutTable[]
-
-  }
-
-}
-
-
-
-/** @deprecated Use ZoneLayoutTable instead */
-
-export type FloorLayoutTable = ZoneLayoutTable
-
-
-
-export interface ZonesResponse {
-
-  success: boolean
-
-  data: {
-
-    zones: Array<{
-
-      id: string
-
-      name: string
-
-    }>
-
-  }
-
-}
-
-
-
-// Keep FloorsResponse for backward compatibility
-
-/** @deprecated Use ZonesResponse instead */
-
-export interface FloorsResponse {
-
-  success: boolean
-
-  data: {
-
-    floors: string[]
-
-  }
-
-}
-
-
 
 // Batch Position Update
 
 export interface PositionUpdateItem {
-
   table_id: string
 
   position: TablePosition
-
 }
-
-
 
 export interface BatchPositionUpdatePayload {
-
   updates: PositionUpdateItem[]
-
 }
 
-
-
 export interface BatchPositionUpdateResponse {
-
   success: boolean
 
   message: string
 
   data: {
-
     updated_count: number
 
     tables: Array<{
-
       id: string
 
       position: TablePosition
-
     }>
-
   }
-
 }
-
-
-
-// QR Status Types
-export type QRStatus = 'ready' | 'missing' | 'outdated'
 
 // QR Code Info (single table)
 export interface QRCodeInfo {
@@ -531,7 +428,6 @@ export interface BatchGenerateQRResponse {
 
 // TableQR interface for QR Manager page (UI)
 export interface TableQR {
-
   id: string
 
   tableNumber: string
@@ -547,7 +443,4 @@ export interface TableQR {
   updatedAt: string
 
   seats: number
-
 }
-
-
