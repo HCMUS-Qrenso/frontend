@@ -174,8 +174,8 @@ export function AdminSidebar({
         <div className="flex h-full flex-col">
           {/* Logo */}
           <div className="flex items-center gap-3 border-b border-slate-200 px-6 py-5 dark:border-slate-800">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500 text-white">
-              <UtensilsCrossed className="h-5 w-5" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl overflow-hidden">
+              <img src="/logo.png" alt="Logo" className="h-full w-full object-contain" />
             </div>
             <div>
               <h1 className="font-semibold text-slate-900 dark:text-white">Smart Restaurant</h1>

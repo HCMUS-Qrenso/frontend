@@ -1,5 +1,5 @@
 import type React from 'react'
-import { UtensilsCrossed, CheckCircle2 } from 'lucide-react'
+import { CheckCircle2 } from 'lucide-react'
 
 interface AuthContainerProps {
   children: React.ReactNode
@@ -14,8 +14,8 @@ export function AuthContainer({ children }: AuthContainerProps) {
           {/* Logo & Brand */}
           <div>
             <div className="mb-8 flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm">
-                <UtensilsCrossed className="h-6 w-6 text-white" />
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm overflow-hidden">
+                <img src="/logo.png" alt="Logo" className="h-full w-full object-contain" />
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-white">Qrenso</h1>

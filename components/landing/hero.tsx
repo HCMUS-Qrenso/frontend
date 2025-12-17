@@ -45,7 +45,9 @@ export function Hero() {
 
           {/* Social Proof */}
           <div className="mt-16">
-            <p className="text-sm text-slate-500 dark:text-slate-400">Được tin dùng bởi các nhà hàng hàng đầu</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400">
+              Được tin dùng bởi các nhà hàng hàng đầu
+            </p>
             <div className="mt-6 flex flex-wrap items-center justify-center gap-8 opacity-60 grayscale">
               {[1, 2, 3, 4].map((i) => (
                 <div
@@ -62,15 +64,21 @@ export function Hero() {
           <div className="mt-16 grid grid-cols-1 gap-8 sm:grid-cols-3">
             <div>
               <div className="text-3xl font-bold text-emerald-400">-40%</div>
-              <div className="mt-2 text-sm text-slate-500 dark:text-slate-400">Thời gian xử lý order</div>
+              <div className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+                Thời gian xử lý order
+              </div>
             </div>
             <div>
               <div className="text-3xl font-bold text-emerald-400">-85%</div>
-              <div className="mt-2 text-sm text-slate-500 dark:text-slate-400">Sai sót đơn hàng</div>
+              <div className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+                Sai sót đơn hàng
+              </div>
             </div>
             <div>
               <div className="text-3xl font-bold text-emerald-400">+60%</div>
-              <div className="mt-2 text-sm text-slate-500 dark:text-slate-400">Tốc độ phục vụ bàn</div>
+              <div className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+                Tốc độ phục vụ bàn
+              </div>
             </div>
           </div>
         </div>

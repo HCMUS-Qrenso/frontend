@@ -6,12 +6,14 @@ export function Footer() {
           {/* Brand */}
           <div>
             <div className="flex items-center gap-2">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600">
-                <span className="text-lg font-bold text-white">Q</span>
+              <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl">
+                <img src="/logo.png" alt="Logo" className="h-full w-full object-contain" />
               </div>
               <span className="text-xl font-bold text-slate-900 dark:text-white">Qrenso</span>
             </div>
-            <p className="mt-4 text-sm text-slate-500 dark:text-slate-400">Giải pháp QR Ordering & quản lý nhà hàng toàn diện</p>
+            <p className="mt-4 text-sm text-slate-500 dark:text-slate-400">
+              Giải pháp QR Ordering & quản lý nhà hàng toàn diện
+            </p>
           </div>
 
           {/* Product */}

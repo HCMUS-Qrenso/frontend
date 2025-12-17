@@ -10,8 +10,8 @@ export function ContactHeader() {
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600">
-            <span className="text-lg font-bold text-white">Q</span>
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl overflow-hidden">
+            <img src="/logo.png" alt="Logo" className="h-full w-full object-contain" />
           </div>
           <span className="text-xl font-bold text-white">Qrenso</span>
         </Link>
