@@ -33,18 +33,11 @@ export function MenuItemsTable() {
   const limit = Number.parseInt(searchParams.get('limit') || '10')
   const search = searchParams.get('search') || undefined
   const category_id = searchParams.get('category_id')
-  const sort = searchParams.get('sort') || 'create'
 
-  // Map frontend params to API params
-  const sort_by: MenuItemSortBy =
-    sort === 'create'
-      ? 'created_at'
-      : sort === 'popularity'
-        ? 'popularity_score'
-        : sort === 'price_asc'
-          ? 'base_price'
-          : 'base_price'
-  const sort_order: MenuItemSortOrder = sort === 'price_desc' ? 'desc' : 'asc'
+  // Get sort params directly from URL (matching API format)
+  const sort_by: MenuItemSortBy = (searchParams.get('sort_by') as MenuItemSortBy) || 'createdAt'
+  const sort_order: MenuItemSortOrder =
+    (searchParams.get('sort_order') as MenuItemSortOrder) || 'desc'
 
   // Fetch menu items from API (status is not sent to API)
   const { data, isLoading, error } = useMenuItemsQuery({

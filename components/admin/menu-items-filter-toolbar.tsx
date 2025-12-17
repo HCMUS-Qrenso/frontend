@@ -10,7 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Search, Plus, Download, ChevronDown } from 'lucide-react'
+import { Search, Plus, Download, ChevronDown, ArrowUpDown } from 'lucide-react'
 import { AdminFilterToolbarWrapper } from './admin-filter-toolbar-wrapper'
 import { useCategoriesQuery } from '@/hooks/use-categories-query'
 
@@ -30,12 +30,18 @@ export function MenuItemsFilterToolbar() {
     unavailable: 'Tạm ẩn',
   }
 
-  // Map sort values to UI labels
-  const sortMap: Record<string, string> = {
-    updated: 'Mới cập nhật',
-    popularity: 'Phổ biến',
-    price_asc: 'Giá tăng dần',
-    price_desc: 'Giá giảm dần',
+  // Map sort_by values to UI labels
+  const sortByLabels: Record<string, string> = {
+    createdAt: 'Ngày tạo',
+    name: 'Tên món',
+    basePrice: 'Giá',
+    popularityScore: 'Độ phổ biến',
+  }
+
+  // Map sort_order values to UI labels
+  const sortOrderLabels: Record<string, string> = {
+    asc: 'Tăng dần',
+    desc: 'Giảm dần',
   }
 
   // Get filter values from URL params
@@ -43,7 +49,10 @@ export function MenuItemsFilterToolbar() {
   const selectedCategoryId =
     searchParams.get('category_id') || searchParams.get('category') || 'all'
   const selectedStatus = searchParams.get('status') || 'all'
-  const selectedSort = searchParams.get('sort') || searchParams.get('order_by') || 'updated'
+  const sortBy =
+    (searchParams.get('sort_by') as 'createdAt' | 'name' | 'basePrice' | 'popularityScore') ||
+    'createdAt'
+  const sortOrder = (searchParams.get('sort_order') as 'asc' | 'desc') || 'desc'
 
   // Get labels for display
   const selectedCategoryLabel =
@@ -51,14 +60,21 @@ export function MenuItemsFilterToolbar() {
       ? 'Tất cả danh mục'
       : categories.find((c) => c.id === selectedCategoryId)?.name || 'Tất cả danh mục'
   const selectedStatusLabel = statusMap[selectedStatus] || 'Tất cả'
-  const selectedSortLabel = sortMap[selectedSort] || 'Mới cập nhật'
 
   const [localSearchQuery, setLocalSearchQuery] = useState(searchQuery)
 
   // Update URL params when filters change
   const updateFilter = (key: string, value: string) => {
     const params = new URLSearchParams(searchParams.toString())
-    if (value === 'Tất cả' || value === '' || value === 'all' || value === 'updated') {
+    // Handle default values - remove from URL if default
+    const isDefaultValue =
+      value === 'Tất cả' ||
+      value === '' ||
+      value === 'all' ||
+      (key === 'sort_by' && value === 'createdAt') ||
+      (key === 'sort_order' && value === 'desc')
+
+    if (isDefaultValue) {
       params.delete(key)
     } else {
       params.set(key, value)
@@ -149,20 +165,46 @@ export function MenuItemsFilterToolbar() {
           </DropdownMenuContent>
         </DropdownMenu>
 
-        {/* Sort */}
+        {/* Sort By */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="h-8 gap-1 rounded-lg bg-transparent px-3">
-              <span className="text-sm">Sắp xếp: {selectedSortLabel}</span>
+              <ArrowUpDown className="h-3 w-3" />
+              <span className="text-sm">Sắp xếp: {sortByLabels[sortBy] ?? 'Ngày tạo'}</span>
               <ChevronDown className="h-3 w-3" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-48">
-            {Object.entries(sortMap).map(([key, label]) => (
-              <DropdownMenuItem key={key} onClick={() => updateFilter('sort', key)}>
-                {label}
-              </DropdownMenuItem>
-            ))}
+            <DropdownMenuItem onClick={() => updateFilter('sort_by', 'createdAt')}>
+              Ngày tạo
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => updateFilter('sort_by', 'name')}>
+              Tên món
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => updateFilter('sort_by', 'basePrice')}>
+              Giá
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => updateFilter('sort_by', 'popularityScore')}>
+              Độ phổ biến
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        {/* Sort Order */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="h-8 gap-1 rounded-lg bg-transparent px-3">
+              <span className="text-sm">{sortOrderLabels[sortOrder] ?? 'Giảm dần'}</span>
+              <ChevronDown className="h-3 w-3" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-40">
+            <DropdownMenuItem onClick={() => updateFilter('sort_order', 'asc')}>
+              Tăng dần
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => updateFilter('sort_order', 'desc')}>
+              Giảm dần
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

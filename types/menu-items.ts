@@ -2,6 +2,11 @@
 export type MenuItemStatus = 'available' | 'unavailable' | 'sold_out'
 export type MenuItemSortBy =
   | 'name'
+  | 'basePrice'
+  | 'popularityScore'
+  | 'createdAt'
+  | 'updatedAt'
+  // Legacy snake_case (backend maps these to camelCase)
   | 'base_price'
   | 'popularity_score'
   | 'created_at'

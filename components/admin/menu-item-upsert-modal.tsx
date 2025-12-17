@@ -47,7 +47,7 @@ export function MenuItemUpsertModal({ open }: MenuItemUpsertModalProps) {
   const { handleErrorWithStatus } = useErrorHandler()
 
   // Fetch categories for dropdown
-  const { data: categoriesData } = useCategoriesQuery()
+  const { data: categoriesData, isLoading: isLoadingCategories } = useCategoriesQuery()
   const categories = categoriesData?.data.categories || []
 
   // Fetch menu item data for editing
@@ -77,6 +77,9 @@ export function MenuItemUpsertModal({ open }: MenuItemUpsertModalProps) {
     calories: '',
   })
 
+  // Store original item data for comparison
+  const [originalItemData, setOriginalItemData] = useState<any>(null)
+
   const [errors, setErrors] = useState({
     name: '',
     base_price: '',
@@ -86,6 +89,7 @@ export function MenuItemUpsertModal({ open }: MenuItemUpsertModalProps) {
   useEffect(() => {
     if (mode === 'edit' && itemData?.data) {
       const item = itemData.data
+      setOriginalItemData(item) // Store original data for comparison
       setFormData({
         name: item.name,
         category_id: item.category.id,
@@ -95,13 +99,14 @@ export function MenuItemUpsertModal({ open }: MenuItemUpsertModalProps) {
         status: item.status,
         is_chef_recommendation: item.is_chef_recommendation,
         allergen_info: item.allergen_info || '',
-        fat: item.nutritional_info.fat.toString(),
-        carbs: item.nutritional_info.carbs.toString(),
-        protein: item.nutritional_info.protein.toString(),
-        calories: item.nutritional_info.calories.toString(),
+        fat: item.nutritional_info?.fat?.toString() || '',
+        carbs: item.nutritional_info?.carbs?.toString() || '',
+        protein: item.nutritional_info?.protein?.toString() || '',
+        calories: item.nutritional_info?.calories?.toString() || '',
       })
-      setImages(item.images.map((url) => ({ url, is_primary: false })))
+      setImages(item.images?.map((url) => ({ url, is_primary: false })) || [])
     } else if (mode === 'create') {
+      setOriginalItemData(null)
       setFormData({
         name: '',
         category_id: '',
@@ -142,6 +147,52 @@ export function MenuItemUpsertModal({ open }: MenuItemUpsertModalProps) {
     })
     setImages([])
     setErrors({ name: '', base_price: '' })
+    setOriginalItemData(null) // Reset original data
+  }
+
+  // Helper function to build payload with only changed fields
+  const buildUpdatePayload = () => {
+    if (!originalItemData) return {}
+
+    const payload: any = {}
+
+    // Compare each field with original data
+    if (formData.name.trim() !== originalItemData.name) {
+      payload.name = formData.name.trim()
+    }
+
+    if (formData.category_id !== originalItemData.category.id) {
+      payload.category_id = formData.category_id
+    }
+
+    if (formData.base_price !== originalItemData.base_price) {
+      payload.base_price = formData.base_price
+    }
+
+    if ((formData.description || '').trim() !== (originalItemData.description || '')) {
+      payload.description = formData.description.trim() || undefined
+    }
+
+    if (Number(formData.preparation_time) !== originalItemData.preparation_time) {
+      payload.preparation_time = Number(formData.preparation_time)
+    }
+
+    if (formData.status !== originalItemData.status) {
+      payload.status = formData.status
+    }
+
+    if (formData.is_chef_recommendation !== originalItemData.is_chef_recommendation) {
+      payload.is_chef_recommendation = formData.is_chef_recommendation
+    }
+
+    if ((formData.allergen_info || '').trim() !== (originalItemData.allergen_info || '')) {
+      payload.allergen_info = formData.allergen_info.trim() || undefined
+    }
+
+    // Note: nutritional_info and images are not included in update payload
+    // as they are not allowed by backend DTO
+
+    return payload
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -163,28 +214,30 @@ export function MenuItemUpsertModal({ open }: MenuItemUpsertModalProps) {
     }
 
     try {
-      const payload = {
-        name: formData.name.trim(),
-        description: formData.description.trim() || undefined,
-        base_price: formData.base_price,
-        preparation_time: Number(formData.preparation_time),
-        status: formData.status,
-        is_chef_recommendation: formData.is_chef_recommendation,
-        allergen_info: formData.allergen_info.trim() || undefined,
-        category_id: formData.category_id,
-        nutritional_info: {
-          fat: Number(formData.fat) || 0,
-          carbs: Number(formData.carbs) || 0,
-          protein: Number(formData.protein) || 0,
-          calories: Number(formData.calories) || 0,
-        },
-        images: images.map((img) => img.url),
-      }
-
       if (mode === 'create') {
+        const payload = {
+          name: formData.name.trim(),
+          description: formData.description.trim() || undefined,
+          base_price: formData.base_price,
+          preparation_time: Number(formData.preparation_time),
+          status: formData.status,
+          is_chef_recommendation: formData.is_chef_recommendation,
+          allergen_info: formData.allergen_info.trim() || undefined,
+          category_id: formData.category_id,
+          image_urls: images.map((img) => img.url), // Note: using image_urls for create
+        }
         await createMutation.mutateAsync(payload)
         toast.success('Đã tạo món ăn thành công')
       } else if (mode === 'edit' && itemId) {
+        const payload = buildUpdatePayload()
+
+        // If no changes, don't send request
+        if (Object.keys(payload).length === 0) {
+          toast.info('Không có thay đổi nào để cập nhật')
+          handleClose()
+          return
+        }
+
         await updateMutation.mutateAsync({
           id: itemId,
           payload,
@@ -265,10 +318,22 @@ export function MenuItemUpsertModal({ open }: MenuItemUpsertModalProps) {
                     <Select
                       value={formData.category_id}
                       onValueChange={(value) => setFormData({ ...formData, category_id: value })}
-                      disabled={isSubmitting || (mode === 'edit' && isLoadingItem)}
+                      disabled={
+                        isSubmitting || isLoadingCategories || (mode === 'edit' && isLoadingItem)
+                      }
                     >
                       <SelectTrigger id="category">
-                        <SelectValue placeholder="Chọn danh mục" />
+                        {formData.category_id ? (
+                          <span className="block truncate">
+                            {categories.find((c) => c.id === formData.category_id)?.name ||
+                              itemData?.data?.category?.name ||
+                              'Đang tải...'}
+                          </span>
+                        ) : (
+                          <SelectValue
+                            placeholder={isLoadingCategories ? 'Đang tải...' : 'Chọn danh mục'}
+                          />
+                        )}
                       </SelectTrigger>
                       <SelectContent>
                         {categories.map((category) => (
@@ -327,6 +392,9 @@ export function MenuItemUpsertModal({ open }: MenuItemUpsertModalProps) {
                 </div>
               </div>
 
+              {/* Divider */}
+              <hr className="border-slate-200 dark:border-slate-700" />
+
               {/* Section 2: Operations */}
               <div className="space-y-4">
                 <h3 className="text-sm font-semibold text-slate-900 dark:text-white">Vận hành</h3>
@@ -369,6 +437,9 @@ export function MenuItemUpsertModal({ open }: MenuItemUpsertModalProps) {
                   />
                 </div>
               </div>
+
+              {/* Divider */}
+              <hr className="border-slate-200 dark:border-slate-700" />
 
               {/* Section 3: Images */}
               <div className="space-y-4">
@@ -426,6 +497,9 @@ export function MenuItemUpsertModal({ open }: MenuItemUpsertModalProps) {
                   </button>
                 </div>
               </div>
+
+              {/* Divider */}
+              <hr className="border-slate-200 dark:border-slate-700" />
 
               {/* Section 4: Allergens & Nutrition */}
               <div className="space-y-4">
@@ -492,6 +566,9 @@ export function MenuItemUpsertModal({ open }: MenuItemUpsertModalProps) {
                   </div>
                 </div>
               </div>
+
+              {/* Divider */}
+              <hr className="border-slate-200 dark:border-slate-700" />
 
               {/* Section 5: Modifiers Hook */}
               <div className="space-y-4">
