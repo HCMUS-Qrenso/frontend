@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Search, Plus, LayoutGrid, QrCode, ChevronDown, ArrowUpDown } from 'lucide-react'
 import Link from 'next/link'
+import { AdminFilterToolbarWrapper } from './admin-filter-toolbar-wrapper'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useZonesSimpleQuery } from '@/hooks/use-zones-query'
 import type { SimpleZone } from '@/types/zones'
@@ -101,7 +102,7 @@ export function TablesFilterToolbar({ isTrashView = false }: TablesFilterToolbar
   }
 
   return (
-    <div className="flex flex-col gap-3 rounded-2xl border border-slate-100 bg-white/80 p-4 shadow-sm md:flex-row md:items-center md:justify-between dark:border-slate-800 dark:bg-slate-900/80">
+    <AdminFilterToolbarWrapper>
       {/* Left - Filters */}
       <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
         {/* Search */}
@@ -233,6 +234,6 @@ export function TablesFilterToolbar({ isTrashView = false }: TablesFilterToolbar
           </>
         )}
       </div>
-    </div>
+    </AdminFilterToolbarWrapper>
   )
 }

@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Search, Plus, Download, ChevronDown } from 'lucide-react'
+import { AdminFilterToolbarWrapper } from './admin-filter-toolbar-wrapper'
 
 // TODO: Fetch categories from API (similar to zones in tables-filter-toolbar)
 // For now, using hardcoded categories
@@ -93,26 +94,26 @@ export function MenuItemsFilterToolbar() {
   }
 
   return (
-    <div className="flex flex-col gap-3 rounded-2xl border border-slate-100 bg-white/80 p-4 shadow-sm md:flex-row md:items-center md:justify-between dark:border-slate-800 dark:bg-slate-900/80">
+    <AdminFilterToolbarWrapper>
       {/* Left: Search and Filters */}
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
         {/* Search */}
         <div className="relative">
-          <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400" />
+          <Search className="absolute top-1/2 left-3 h-3 w-3 -translate-y-1/2 text-slate-400" />
           <Input
             placeholder="Tìm theo tên món..."
             value={localSearchQuery}
             onChange={(e) => setLocalSearchQuery(e.target.value)}
-            className="h-10 w-full rounded-full border-slate-200 bg-slate-50 pr-4 pl-9 text-sm focus:bg-white sm:w-64 dark:border-slate-700 dark:bg-slate-800 dark:focus:bg-slate-900"
+            className="h-8 w-full rounded-lg border-slate-200 bg-slate-50 pr-4 pl-9 text-sm focus:bg-white sm:w-64 dark:border-slate-700 dark:bg-slate-800 dark:focus:bg-slate-900"
           />
         </div>
 
         {/* Category Filter */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="h-10 gap-2 rounded-full bg-transparent">
+            <Button variant="outline" className="h-8 gap-1 rounded-lg bg-transparent px-3">
               <span className="text-sm">Danh mục: {selectedCategoryLabel}</span>
-              <ChevronDown className="h-4 w-4" />
+              <ChevronDown className="h-3 w-3" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-48">
@@ -133,9 +134,9 @@ export function MenuItemsFilterToolbar() {
         {/* Status Filter */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="h-10 gap-2 rounded-full bg-transparent">
+            <Button variant="outline" className="h-8 gap-1 rounded-lg bg-transparent px-3">
               <span className="text-sm">Trạng thái: {selectedStatusLabel}</span>
-              <ChevronDown className="h-4 w-4" />
+              <ChevronDown className="h-3 w-3" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-48">
@@ -155,9 +156,9 @@ export function MenuItemsFilterToolbar() {
         {/* Sort */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="h-10 gap-2 rounded-full bg-transparent">
+            <Button variant="outline" className="h-8 gap-1 rounded-lg bg-transparent px-3">
               <span className="text-sm">Sắp xếp: {selectedSortLabel}</span>
-              <ChevronDown className="h-4 w-4" />
+              <ChevronDown className="h-3 w-3" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-48">
@@ -175,19 +176,19 @@ export function MenuItemsFilterToolbar() {
         <Button
           variant="outline"
           onClick={handleImportExport}
-          className="h-10 gap-2 rounded-full bg-transparent"
+          className="h-8 gap-1 rounded-lg bg-transparent px-3"
         >
-          <Download className="h-4 w-4" />
-          <span className="hidden sm:inline">Import/Export</span>
+          <Download className="h-3 w-3" />
+          <span className="hidden text-sm sm:inline">Import/Export</span>
         </Button>
         <Button
           onClick={handleCreateItem}
-          className="h-10 gap-2 rounded-full bg-emerald-600 px-4 hover:bg-emerald-700"
+          className="h-8 gap-1 rounded-lg bg-emerald-600 px-3 hover:bg-emerald-700"
         >
-          <Plus className="h-4 w-4" />
-          <span className="hidden sm:inline">Thêm món</span>
+          <Plus className="h-3 w-3" />
+          <span className="hidden text-sm sm:inline">Thêm món</span>
         </Button>
       </div>
-    </div>
+    </AdminFilterToolbarWrapper>
   )
 }
