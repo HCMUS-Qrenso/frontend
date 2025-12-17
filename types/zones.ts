@@ -43,32 +43,19 @@ export interface UpdateZonePayload {
 
 // API Responses
 export interface ZoneListResponse {
-  success: boolean
-  data: {
-    zones: Zone[]
-    pagination: {
-      page: number
-      limit: number
-      total: number
-      total_pages: number
-      has_next: boolean
-      has_prev: boolean
-    }
+  data: Zone[]
+  pagination: {
+    total: number
+    page: number
+    limit: number
+    total_pages: number
   }
 }
 
-export interface ZoneResponse {
-  success: boolean
-  data: {
-    zone: Zone
-  }
-}
+export type ZoneResponse = Zone
 
 export interface ZoneStatsResponse {
-  success: boolean
-  data: {
-    total_zones: number
-    active_zones: number
-    inactive_zones: number
-  }
+  total: number
+  active: number
+  inactive: number
 }

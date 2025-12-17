@@ -23,9 +23,9 @@ export function TablesFilterToolbar({ isTrashView = false }: TablesFilterToolbar
   const router = useRouter()
   const searchParams = useSearchParams()
   const { data: zonesData } = useZonesSimpleQuery()
-  const zones: SimpleZone[] = Array.isArray(zonesData?.data)
-    ? (zonesData?.data as SimpleZone[])
-    : (zonesData?.data as { zones?: SimpleZone[] } | undefined)?.zones || []
+  const zones: SimpleZone[] =
+    zonesData?.zones ??
+    ((zonesData as { zones?: SimpleZone[] } | undefined)?.zones || [])
 
   // Map backend status to UI labels
   const statusMap: Record<string, string> = {

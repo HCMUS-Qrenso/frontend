@@ -33,7 +33,7 @@ export const zonesApi = {
   },
 
   updateZone: async (id: string, payload: UpdateZonePayload): Promise<ZoneResponse> => {
-    const { data } = await apiClient.patch<ZoneResponse>(`/zones/${id}`, payload)
+    const { data } = await apiClient.put<ZoneResponse>(`/zones/${id}`, payload)
     return data
   },
 
@@ -45,12 +45,12 @@ export const zonesApi = {
   // Simple zones list (for dropdowns, etc.)
   getZonesSimple: async (): Promise<{ zones: { id: string; name: string }[] }> => {
     const { data } = await apiClient.get<ZoneListResponse>('/zones', {
-      params: { limit: 100, is_active: 'all' },
+      params: { limit: 100, is_active: true },
     })
 
     // Transform to simple format
     return {
-      zones: data.data.zones.map((zone) => ({
+      zones: data.data.map((zone) => ({
         id: zone.id,
         name: zone.name,
       })),

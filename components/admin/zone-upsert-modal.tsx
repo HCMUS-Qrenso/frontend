@@ -60,8 +60,8 @@ export function ZoneUpsertModal({ open }: ZoneUpsertModalProps) {
 
   // Load zone data for edit mode
   useEffect(() => {
-    if (open && isEdit && zoneData?.data.zone) {
-      const zone = zoneData.data.zone
+    if (open && isEdit && zoneData) {
+      const zone = zoneData
       setFormData({
         name: zone.name,
         description: zone.description || '',
@@ -163,7 +163,7 @@ export function ZoneUpsertModal({ open }: ZoneUpsertModalProps) {
               placeholder="Mô tả ngắn gọn về khu vực này..."
               value={formData.description}
               onChange={(e) => handleInputChange('description', e.target.value)}
-              className="min-h-[80px] rounded-lg resize-none"
+              className="min-h-[80px] resize-none rounded-lg"
               disabled={isLoading}
             />
           </div>

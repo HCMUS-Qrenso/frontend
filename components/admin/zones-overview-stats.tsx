@@ -68,13 +68,11 @@ export function ZonesOverviewStats() {
     )
   }
 
-  const statsData = data?.data
-
   const stats = [
     {
       icon: MapPin,
       title: 'Tổng khu vực',
-      value: statsData?.total_zones.toString() || '0',
+      value: String(data?.total ?? 0),
       subtext: 'Đã tạo',
       iconColor: 'text-slate-600 dark:text-slate-400',
       iconBgColor: 'bg-slate-50 dark:bg-slate-800',
@@ -82,7 +80,7 @@ export function ZonesOverviewStats() {
     {
       icon: CheckCircle2,
       title: 'Đang hoạt động',
-      value: statsData?.active_zones.toString() || '0',
+      value: String(data?.active ?? 0),
       subtext: 'Active',
       iconColor: 'text-emerald-600 dark:text-emerald-400',
       iconBgColor: 'bg-emerald-50 dark:bg-emerald-500/10',
@@ -90,7 +88,7 @@ export function ZonesOverviewStats() {
     {
       icon: EyeOff,
       title: 'Tạm ẩn',
-      value: statsData?.inactive_zones.toString() || '0',
+      value: String(data?.inactive ?? 0),
       subtext: 'Inactive',
       iconColor: 'text-slate-600 dark:text-slate-400',
       iconBgColor: 'bg-slate-50 dark:bg-slate-800',

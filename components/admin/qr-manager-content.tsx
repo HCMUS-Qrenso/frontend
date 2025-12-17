@@ -110,9 +110,9 @@ export function QRManagerContent() {
 
   const { handleError } = useErrorHandler()
   const { data: zonesData } = useZonesSimpleQuery()
-  const zones = Array.isArray(zonesData?.data)
-    ? zonesData.data
-    : (zonesData?.data as { zones?: Array<{ id: string; name: string }> } | undefined)?.zones || []
+  const zones =
+    zonesData?.zones ??
+    ((zonesData as { zones?: Array<{ id: string; name: string }> } | undefined)?.zones || [])
 
   const {
     data: qrData,
