@@ -575,6 +575,7 @@ export default function TableLayoutPage() {
               // This will be handled by a separate debounced save function if needed
             }}
             zoom={zoom}
+            onZoomChange={setZoom}
             showGrid={showGrid}
             selectedArea={currentZoneName}
             onTableRemove={(id) => handleTableRemove(id)}
