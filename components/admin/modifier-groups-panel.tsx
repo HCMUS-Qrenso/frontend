@@ -1,25 +1,30 @@
-"use client"
+'use client'
 
-import type React from "react"
+import type React from 'react'
 
-import { useState } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
+import { useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Badge } from '@/components/ui/badge'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Plus, Search, MoreVertical, GripVertical, Users } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { DndContext, closestCenter, type DragEndEvent } from "@dnd-kit/core"
-import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable"
-import { CSS } from "@dnd-kit/utilities"
-import type { ModifierGroup } from "@/app/admin/menu/modifiers/page"
+} from '@/components/ui/dropdown-menu'
+import { Plus, Search, MoreVertical, GripVertical, Users } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { DndContext, closestCenter, type DragEndEvent } from '@dnd-kit/core'
+import {
+  arrayMove,
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
+import type { ModifierGroup } from '@/app/admin/menu/modifiers/page'
 
 interface ModifierGroupsPanelProps {
   groups: ModifierGroup[]
@@ -36,9 +41,11 @@ export function ModifierGroupsPanel({
 }: ModifierGroupsPanelProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const [searchQuery, setSearchQuery] = useState("")
+  const [searchQuery, setSearchQuery] = useState('')
 
-  const filteredGroups = groups.filter((group) => group.name.toLowerCase().includes(searchQuery.toLowerCase()))
+  const filteredGroups = groups.filter((group) =>
+    group.name.toLowerCase().includes(searchQuery.toLowerCase()),
+  )
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event
@@ -56,8 +63,8 @@ export function ModifierGroupsPanel({
 
   const openCreateModal = () => {
     const params = new URLSearchParams(searchParams.toString())
-    params.set("modal", "group")
-    params.set("mode", "create")
+    params.set('modal', 'group')
+    params.set('mode', 'create')
     router.push(`?${params.toString()}`)
   }
 
@@ -67,7 +74,11 @@ export function ModifierGroupsPanel({
       <div className="border-b border-slate-200 p-6 dark:border-slate-800">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Nhóm tuỳ chọn</h2>
-          <Button onClick={openCreateModal} size="sm" className="bg-emerald-600 hover:bg-emerald-700">
+          <Button
+            onClick={openCreateModal}
+            size="sm"
+            className="bg-emerald-600 hover:bg-emerald-700"
+          >
             <Plus className="mr-2 h-4 w-4" />
             Tạo nhóm
           </Button>
@@ -75,7 +86,7 @@ export function ModifierGroupsPanel({
 
         {/* Search */}
         <div className="relative mt-4">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+          <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400" />
           <Input
             placeholder="Tìm nhóm..."
             value={searchQuery}
@@ -88,7 +99,10 @@ export function ModifierGroupsPanel({
       {/* Groups List */}
       <div className="max-h-[600px] overflow-y-auto p-4">
         <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-          <SortableContext items={filteredGroups.map((g) => g.id)} strategy={verticalListSortingStrategy}>
+          <SortableContext
+            items={filteredGroups.map((g) => g.id)}
+            strategy={verticalListSortingStrategy}
+          >
             <div className="space-y-2">
               {filteredGroups.map((group) => (
                 <SortableGroupItem
@@ -123,7 +137,9 @@ function SortableGroupItem({
 }) {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: group.id })
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: group.id,
+  })
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -133,21 +149,21 @@ function SortableGroupItem({
 
   const handleEdit = () => {
     const params = new URLSearchParams(searchParams.toString())
-    params.set("modal", "group")
-    params.set("mode", "edit")
-    params.set("id", group.id)
+    params.set('modal', 'group')
+    params.set('mode', 'edit')
+    params.set('id', group.id)
     router.push(`?${params.toString()}`)
   }
 
   const handleDuplicate = () => {
     // TODO: Implement duplicate
-    console.log("Duplicate group", group.id)
+    console.log('Duplicate group', group.id)
   }
 
   const handleDelete = () => {
     const params = new URLSearchParams(searchParams.toString())
-    params.set("delete", "group")
-    params.set("id", group.id)
+    params.set('delete', 'group')
+    params.set('id', group.id)
     router.push(`?${params.toString()}`)
   }
 
@@ -162,28 +178,31 @@ function SortableGroupItem({
       style={style}
       onClick={onSelect}
       className={cn(
-        "group relative rounded-lg border p-4 transition-all cursor-pointer",
+        'group relative cursor-pointer rounded-lg border p-4 transition-all',
         isSelected
-          ? "border-emerald-500 bg-emerald-50/50 dark:border-emerald-500 dark:bg-emerald-500/10"
-          : "border-slate-200 bg-slate-50/50 hover:border-slate-300 dark:border-slate-700 dark:bg-slate-800/50 dark:hover:border-slate-600",
+          ? 'border-emerald-500 bg-emerald-50/50 dark:border-emerald-500 dark:bg-emerald-500/10'
+          : 'border-slate-200 bg-slate-50/50 hover:border-slate-300 dark:border-slate-700 dark:bg-slate-800/50 dark:hover:border-slate-600',
       )}
     >
       {/* Drag Handle */}
       <div
         {...attributes}
         {...listeners}
-        className="absolute left-2 top-1/2 -translate-y-1/2 cursor-grab text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+        className="absolute top-1/2 left-2 -translate-y-1/2 cursor-grab text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
       >
         <GripVertical className="h-5 w-5" />
       </div>
 
       <div className="ml-6">
         <div className="flex items-start justify-between">
-          <div className="flex-1 min-w-0">
+          <div className="min-w-0 flex-1">
             <h3 className="font-medium text-slate-900 dark:text-white">{group.name}</h3>
             <div className="mt-2 flex flex-wrap gap-2">
-              <Badge variant={group.type === "single_choice" ? "default" : "secondary"} className="text-xs">
-                {group.type === "single_choice" ? "Single" : "Multiple"}
+              <Badge
+                variant={group.type === 'single_choice' ? 'default' : 'secondary'}
+                className="text-xs"
+              >
+                {group.type === 'single_choice' ? 'Single' : 'Multiple'}
               </Badge>
               {group.is_required && (
                 <Badge variant="destructive" className="text-xs">
@@ -196,7 +215,11 @@ function SortableGroupItem({
           {/* Actions Menu */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-              <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 opacity-0 group-hover:opacity-100"
+              >
                 <MoreVertical className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>

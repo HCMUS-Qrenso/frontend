@@ -1,4 +1,4 @@
-"use server"
+'use server'
 
 type ContactFormData = {
   fullName: string
@@ -15,8 +15,8 @@ type ContactFormData = {
 export async function submitContactForm(data: ContactFormData) {
   // Honeypot check
   if (data.honeypot) {
-    console.log("Spam detected via honeypot")
-    return { success: false, error: "Invalid submission" }
+    console.log('Spam detected via honeypot')
+    return { success: false, error: 'Invalid submission' }
   }
 
   // Rate limiting would go here in production
@@ -29,7 +29,7 @@ export async function submitContactForm(data: ContactFormData) {
     // 3. Send confirmation email to customer
     // 4. Add to CRM (HubSpot, Salesforce, etc.)
 
-    console.log("Contact form submission:", {
+    console.log('Contact form submission:', {
       fullName: data.fullName,
       email: data.email,
       phone: data.phone,
@@ -46,7 +46,7 @@ export async function submitContactForm(data: ContactFormData) {
 
     return { success: true }
   } catch (error) {
-    console.error("Error submitting contact form:", error)
-    return { success: false, error: "Failed to submit form" }
+    console.error('Error submitting contact form:', error)
+    return { success: false, error: 'Failed to submit form' }
   }
 }

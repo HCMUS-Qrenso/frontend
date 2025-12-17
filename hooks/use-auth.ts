@@ -20,7 +20,8 @@ import type {
 } from '@/types/auth'
 
 export const useAuth = () => {
-  const { user, accessToken, isAuthenticated, isHydrated, authStatus, bootstrapAuth, setUser } = useAuthStore()
+  const { user, accessToken, isAuthenticated, isHydrated, authStatus, bootstrapAuth, setUser } =
+    useAuthStore()
 
   useEffect(() => {
     bootstrapAuth()

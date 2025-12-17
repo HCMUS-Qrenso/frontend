@@ -1,6 +1,6 @@
-"use client"
+'use client'
 
-import { cn } from "@/lib/utils"
+import { cn } from '@/lib/utils'
 
 interface TopItem {
   id: string
@@ -11,12 +11,24 @@ interface TopItem {
 }
 
 const topItems: TopItem[] = [
-  { id: "1", name: "Phở bò tái chín", image: "/pho-bo-vietnamese.jpg", sold: 45, revenue: 2925000 },
-  { id: "2", name: "Bún chả Hà Nội", image: "/bun-cha-hanoi.jpg", sold: 38, revenue: 2850000 },
-  { id: "3", name: "Bánh mì thịt nướng", image: "/banh-mi-vietnamese.jpg", sold: 32, revenue: 1280000 },
-  { id: "4", name: "Cơm tấm sườn bì", image: "/com-tam-suon-bi.jpg", sold: 28, revenue: 1960000 },
-  { id: "5", name: "Gỏi cuốn tôm thịt", image: "/goi-cuon-tom-thit.jpg", sold: 25, revenue: 1125000 },
-  { id: "6", name: "Cà phê sữa đá", image: "/ca-phe-sua-da.jpg", sold: 68, revenue: 2040000 },
+  { id: '1', name: 'Phở bò tái chín', image: '/pho-bo-vietnamese.jpg', sold: 45, revenue: 2925000 },
+  { id: '2', name: 'Bún chả Hà Nội', image: '/bun-cha-hanoi.jpg', sold: 38, revenue: 2850000 },
+  {
+    id: '3',
+    name: 'Bánh mì thịt nướng',
+    image: '/banh-mi-vietnamese.jpg',
+    sold: 32,
+    revenue: 1280000,
+  },
+  { id: '4', name: 'Cơm tấm sườn bì', image: '/com-tam-suon-bi.jpg', sold: 28, revenue: 1960000 },
+  {
+    id: '5',
+    name: 'Gỏi cuốn tôm thịt',
+    image: '/goi-cuon-tom-thit.jpg',
+    sold: 25,
+    revenue: 1125000,
+  },
+  { id: '6', name: 'Cà phê sữa đá', image: '/ca-phe-sua-da.jpg', sold: 68, revenue: 2040000 },
 ]
 
 interface TopItemsProps {
@@ -29,7 +41,7 @@ export function TopItems({ className }: TopItemsProps) {
   return (
     <div
       className={cn(
-        "rounded-2xl border border-slate-100 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900",
+        'rounded-2xl border border-slate-100 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900',
         className,
       )}
     >
@@ -53,21 +65,23 @@ export function TopItems({ className }: TopItemsProps) {
 
             {/* Image */}
             <img
-              src={item.image || "/placeholder.svg"}
+              src={item.image || '/placeholder.svg'}
               alt={item.name}
               className="h-12 w-12 flex-shrink-0 rounded-xl object-cover"
             />
 
             {/* Info */}
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-medium text-slate-900 dark:text-white">{item.name}</p>
+              <p className="truncate text-sm font-medium text-slate-900 dark:text-white">
+                {item.name}
+              </p>
               <div className="mt-1 flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
                 <span>{item.sold} đã bán</span>
                 <span>
-                  {new Intl.NumberFormat("vi-VN", {
-                    style: "currency",
-                    currency: "VND",
-                    notation: "compact",
+                  {new Intl.NumberFormat('vi-VN', {
+                    style: 'currency',
+                    currency: 'VND',
+                    notation: 'compact',
                   }).format(item.revenue)}
                 </span>
               </div>

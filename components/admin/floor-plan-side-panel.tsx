@@ -156,13 +156,13 @@ function FloorPlanSidePanelComponent({
     }
   }
   return (
-    <div className="rounded-2xl border border-slate-100 bg-white/80 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
+    <div className="overflow-hidden rounded-2xl border border-slate-100 bg-white/80 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
       <Tabs value={activeTab} onValueChange={(v: any) => setActiveTab(v)} className="h-full">
         <TabsList className="w-full rounded-b-none border-b border-slate-100 bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900">
-          <TabsTrigger value="library" className="flex-1">
+          <TabsTrigger value="library" className="flex-1 rounded-lg">
             Thư viện
           </TabsTrigger>
-          <TabsTrigger value="properties" className="flex-1">
+          <TabsTrigger value="properties" className="flex-1 rounded-lg">
             Thuộc tính
           </TabsTrigger>
         </TabsList>

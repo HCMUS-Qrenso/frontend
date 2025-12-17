@@ -151,7 +151,6 @@ export function QRPreviewModal({ table, onClose }: QRPreviewModalProps) {
               <span className="text-xs">PDF</span>
             </Button>
           </div>
-
         </div>
       </div>
     </div>

@@ -1,20 +1,30 @@
-"use client"
+'use client'
 
-import type React from "react"
+import type React from 'react'
 
-import { useState } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Switch } from "@/components/ui/switch"
-import { Badge } from "@/components/ui/badge"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Plus, Search, Filter, MoreVertical, GripVertical, Eye, EyeOff } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { DndContext, closestCenter, type DragEndEvent } from "@dnd-kit/core"
-import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable"
-import { CSS } from "@dnd-kit/utilities"
-import type { ModifierGroup, Modifier } from "@/app/admin/menu/modifiers/page"
+import { useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Switch } from '@/components/ui/switch'
+import { Badge } from '@/components/ui/badge'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { Plus, Search, Filter, MoreVertical, GripVertical, Eye, EyeOff } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { DndContext, closestCenter, type DragEndEvent } from '@dnd-kit/core'
+import {
+  arrayMove,
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
+import type { ModifierGroup, Modifier } from '@/app/admin/menu/modifiers/page'
 
 interface ModifiersPanelProps {
   selectedGroup: ModifierGroup | null
@@ -22,10 +32,14 @@ interface ModifiersPanelProps {
   onReorderModifiers: (modifiers: Modifier[]) => void
 }
 
-export function ModifiersPanel({ selectedGroup, modifiers, onReorderModifiers }: ModifiersPanelProps) {
+export function ModifiersPanel({
+  selectedGroup,
+  modifiers,
+  onReorderModifiers,
+}: ModifiersPanelProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const [searchQuery, setSearchQuery] = useState("")
+  const [searchQuery, setSearchQuery] = useState('')
   const [showOnlyAvailable, setShowOnlyAvailable] = useState(false)
 
   const filteredModifiers = modifiers.filter((mod) => {
@@ -54,14 +68,14 @@ export function ModifiersPanel({ selectedGroup, modifiers, onReorderModifiers }:
   const openCreateModal = () => {
     if (!selectedGroup) return
     const params = new URLSearchParams(searchParams.toString())
-    params.set("modal", "modifier")
-    params.set("mode", "create")
+    params.set('modal', 'modifier')
+    params.set('mode', 'create')
     router.push(`?${params.toString()}`)
   }
 
   const formatPrice = (amount: number) => {
-    if (amount === 0) return "Chuẩn"
-    const formatted = new Intl.NumberFormat("vi-VN").format(Math.abs(amount))
+    if (amount === 0) return 'Chuẩn'
+    const formatted = new Intl.NumberFormat('vi-VN').format(Math.abs(amount))
     return amount > 0 ? `+${formatted}đ` : `-${formatted}đ`
   }
 
@@ -71,7 +85,9 @@ export function ModifiersPanel({ selectedGroup, modifiers, onReorderModifiers }:
         <div className="flex h-[400px] items-center justify-center">
           <div className="text-center">
             <Eye className="mx-auto h-12 w-12 text-slate-300 dark:text-slate-600" />
-            <p className="mt-4 text-sm text-slate-500 dark:text-slate-400">Chọn nhóm để xem các option</p>
+            <p className="mt-4 text-sm text-slate-500 dark:text-slate-400">
+              Chọn nhóm để xem các option
+            </p>
           </div>
         </div>
       </div>
@@ -84,7 +100,9 @@ export function ModifiersPanel({ selectedGroup, modifiers, onReorderModifiers }:
       <div className="border-b border-slate-200 p-6 dark:border-slate-800">
         <div className="flex items-start justify-between">
           <div>
-            <h2 className="text-lg font-semibold text-slate-900 dark:text-white">{selectedGroup.name}</h2>
+            <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
+              {selectedGroup.name}
+            </h2>
             <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
               {selectedGroup.is_required && <span>• Bắt buộc chọn</span>}
               {selectedGroup.min_selections !== null && selectedGroup.min_selections > 0 && (
@@ -103,7 +121,7 @@ export function ModifiersPanel({ selectedGroup, modifiers, onReorderModifiers }:
         <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           {/* Search */}
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400" />
             <Input
               placeholder="Tìm option..."
               value={searchQuery}
@@ -128,7 +146,11 @@ export function ModifiersPanel({ selectedGroup, modifiers, onReorderModifiers }:
                 </div>
               </DropdownMenuContent>
             </DropdownMenu>
-            <Button onClick={openCreateModal} size="sm" className="bg-emerald-600 hover:bg-emerald-700">
+            <Button
+              onClick={openCreateModal}
+              size="sm"
+              className="bg-emerald-600 hover:bg-emerald-700"
+            >
               <Plus className="mr-2 h-4 w-4" />
               Thêm option
             </Button>
@@ -139,10 +161,17 @@ export function ModifiersPanel({ selectedGroup, modifiers, onReorderModifiers }:
       {/* Modifiers List */}
       <div className="max-h-[600px] overflow-y-auto p-4">
         <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-          <SortableContext items={filteredModifiers.map((m) => m.id)} strategy={verticalListSortingStrategy}>
+          <SortableContext
+            items={filteredModifiers.map((m) => m.id)}
+            strategy={verticalListSortingStrategy}
+          >
             <div className="space-y-2">
               {filteredModifiers.map((modifier) => (
-                <SortableModifierItem key={modifier.id} modifier={modifier} formatPrice={formatPrice} />
+                <SortableModifierItem
+                  key={modifier.id}
+                  modifier={modifier}
+                  formatPrice={formatPrice}
+                />
               ))}
             </div>
           </SortableContext>
@@ -151,7 +180,9 @@ export function ModifiersPanel({ selectedGroup, modifiers, onReorderModifiers }:
         {filteredModifiers.length === 0 && (
           <div className="py-12 text-center">
             <p className="text-sm text-slate-500 dark:text-slate-400">
-              {modifiers.length === 0 ? "Chưa có option nào. Thêm mới để bắt đầu." : "Không tìm thấy option nào"}
+              {modifiers.length === 0
+                ? 'Chưa có option nào. Thêm mới để bắt đầu.'
+                : 'Không tìm thấy option nào'}
             </p>
           </div>
         )}
@@ -169,7 +200,9 @@ function SortableModifierItem({
 }) {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: modifier.id })
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: modifier.id,
+  })
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -179,23 +212,23 @@ function SortableModifierItem({
 
   const handleEdit = () => {
     const params = new URLSearchParams(searchParams.toString())
-    params.set("modal", "modifier")
-    params.set("mode", "edit")
-    params.set("id", modifier.id)
+    params.set('modal', 'modifier')
+    params.set('mode', 'edit')
+    params.set('id', modifier.id)
     router.push(`?${params.toString()}`)
   }
 
   const handleDelete = () => {
     const params = new URLSearchParams(searchParams.toString())
-    params.set("delete", "modifier")
-    params.set("id", modifier.id)
+    params.set('delete', 'modifier')
+    params.set('id', modifier.id)
     router.push(`?${params.toString()}`)
   }
 
   const handleToggleAvailability = (e: React.MouseEvent) => {
     e.stopPropagation()
     // TODO: API call to toggle
-    console.log("Toggle availability", modifier.id)
+    console.log('Toggle availability', modifier.id)
   }
 
   return (
@@ -227,12 +260,12 @@ function SortableModifierItem({
           </div>
           <p
             className={cn(
-              "mt-1 text-sm font-medium",
+              'mt-1 text-sm font-medium',
               modifier.price_adjustment === 0
-                ? "text-slate-500 dark:text-slate-400"
+                ? 'text-slate-500 dark:text-slate-400'
                 : modifier.price_adjustment > 0
-                  ? "text-emerald-600 dark:text-emerald-400"
-                  : "text-red-600 dark:text-red-400",
+                  ? 'text-emerald-600 dark:text-emerald-400'
+                  : 'text-red-600 dark:text-red-400',
             )}
           >
             {formatPrice(modifier.price_adjustment)}
@@ -244,10 +277,10 @@ function SortableModifierItem({
           <button
             onClick={handleToggleAvailability}
             className={cn(
-              "rounded-full p-2 transition-colors",
+              'rounded-full p-2 transition-colors',
               modifier.is_available
-                ? "text-emerald-600 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-500/10"
-                : "text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700",
+                ? 'text-emerald-600 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-500/10'
+                : 'text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700',
             )}
           >
             {modifier.is_available ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
@@ -256,7 +289,11 @@ function SortableModifierItem({
           {/* Actions Menu */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 opacity-0 group-hover:opacity-100"
+              >
                 <MoreVertical className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>

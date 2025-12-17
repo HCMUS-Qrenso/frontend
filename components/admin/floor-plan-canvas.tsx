@@ -111,49 +111,58 @@ function FloorPlanCanvasComponent({
   )
 
   // Pan handlers - only pan when clicking on empty canvas
-  const handlePanStart = useCallback((e: React.PointerEvent) => {
-    // Only pan if clicking directly on the canvas background, not on draggable elements
-    if (e.target === e.currentTarget && (e.button === 1 || e.button === 0)) {
-      e.preventDefault()
-      setIsPanning(true)
-      setPanStart({ x: e.clientX - panOffset.x, y: e.clientY - panOffset.y })
-    }
-  }, [panOffset])
+  const handlePanStart = useCallback(
+    (e: React.PointerEvent) => {
+      // Only pan if clicking directly on the canvas background, not on draggable elements
+      if (e.target === e.currentTarget && (e.button === 1 || e.button === 0)) {
+        e.preventDefault()
+        setIsPanning(true)
+        setPanStart({ x: e.clientX - panOffset.x, y: e.clientY - panOffset.y })
+      }
+    },
+    [panOffset],
+  )
 
-  const handlePanMove = useCallback((e: PointerEvent) => {
-    if (!isPanning) return
-    e.preventDefault()
-    setPanOffset({
-      x: e.clientX - panStart.x,
-      y: e.clientY - panStart.y,
-    })
-  }, [isPanning, panStart])
+  const handlePanMove = useCallback(
+    (e: PointerEvent) => {
+      if (!isPanning) return
+      e.preventDefault()
+      setPanOffset({
+        x: e.clientX - panStart.x,
+        y: e.clientY - panStart.y,
+      })
+    },
+    [isPanning, panStart],
+  )
 
   const handlePanEnd = useCallback(() => {
     setIsPanning(false)
   }, [])
 
   // Zoom handler with zoom-to-cursor functionality
-  const handleWheel = useCallback((e: React.WheelEvent) => {
-    e.preventDefault()
+  const handleWheel = useCallback(
+    (e: React.WheelEvent) => {
+      e.preventDefault()
 
-    const rect = canvasRef.current?.getBoundingClientRect()
-    if (!rect) return
+      const rect = canvasRef.current?.getBoundingClientRect()
+      if (!rect) return
 
-    const mouseX = e.clientX - rect.left
-    const mouseY = e.clientY - rect.top
+      const mouseX = e.clientX - rect.left
+      const mouseY = e.clientY - rect.top
 
-    const delta = e.deltaY > 0 ? -0.1 : 0.1
-    const newZoom = Math.max(0.1, Math.min(3, zoom + delta))
+      const delta = e.deltaY > 0 ? -0.1 : 0.1
+      const newZoom = Math.max(0.1, Math.min(3, zoom + delta))
 
-    // Zoom towards mouse cursor
-    const zoomFactor = newZoom / zoom
-    const newPanX = mouseX - (mouseX - panOffset.x) * zoomFactor
-    const newPanY = mouseY - (mouseY - panOffset.y) * zoomFactor
+      // Zoom towards mouse cursor
+      const zoomFactor = newZoom / zoom
+      const newPanX = mouseX - (mouseX - panOffset.x) * zoomFactor
+      const newPanY = mouseY - (mouseY - panOffset.y) * zoomFactor
 
-    setPanOffset({ x: newPanX, y: newPanY })
-    onZoomChange(newZoom)
-  }, [zoom, panOffset, onZoomChange])
+      setPanOffset({ x: newPanX, y: newPanY })
+      onZoomChange(newZoom)
+    },
+    [zoom, panOffset, onZoomChange],
+  )
 
   // Set up global pan handlers
   useEffect(() => {
@@ -249,7 +258,9 @@ function FloorPlanCanvasComponent({
         <div className="flex items-center justify-between">
           <div>
             <h3 className="font-semibold text-slate-900 dark:text-white">{selectedArea}</h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400">Canvas không giới hạn - Kéo thả để di chuyển</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Canvas không giới hạn - Kéo thả để di chuyển
+            </p>
           </div>
 
           {/* Legend */}
@@ -559,10 +570,7 @@ const DraggableTable = memo(function DraggableTable({
 })
 
 // Custom comparison function for React.memo
-const areEqual = (
-  prevProps: FloorPlanCanvasProps,
-  nextProps: FloorPlanCanvasProps,
-): boolean => {
+const areEqual = (prevProps: FloorPlanCanvasProps, nextProps: FloorPlanCanvasProps): boolean => {
   // Compare primitive props
   if (
     prevProps.selectedTableId !== nextProps.selectedTableId ||

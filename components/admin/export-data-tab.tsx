@@ -1,28 +1,28 @@
-"use client"
+'use client'
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
-import { Download, FileSpreadsheet, Clock } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
+import { Download, FileSpreadsheet, Clock } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
-type ExportScope = "all" | "category" | "available_only"
-type ExportFormat = "csv" | "xlsx"
+type ExportScope = 'all' | 'category' | 'available_only'
+type ExportFormat = 'csv' | 'xlsx'
 
 export function ExportDataTab() {
-  const [exportScope, setExportScope] = useState<ExportScope>("all")
-  const [format, setFormat] = useState<ExportFormat>("xlsx")
+  const [exportScope, setExportScope] = useState<ExportScope>('all')
+  const [format, setFormat] = useState<ExportFormat>('xlsx')
   const [includeImages, setIncludeImages] = useState(true)
   const [includeModifiers, setIncludeModifiers] = useState(true)
   const [includeHidden, setIncludeHidden] = useState(false)
   const [isExporting, setIsExporting] = useState(false)
-  const [lastExport, setLastExport] = useState<string | null>("2024-12-15 14:30")
+  const [lastExport, setLastExport] = useState<string | null>('2024-12-15 14:30')
 
   const handleExport = () => {
     setIsExporting(true)
     setTimeout(() => {
       setIsExporting(false)
-      setLastExport(new Date().toLocaleString("vi-VN"))
+      setLastExport(new Date().toLocaleString('vi-VN'))
       // Mock download
     }, 2000)
   }
@@ -34,22 +34,32 @@ export function ExportDataTab() {
         <h3 className="mb-4 font-semibold text-slate-900 dark:text-white">Phạm vi xuất dữ liệu</h3>
         <div className="grid gap-3 sm:grid-cols-3">
           {[
-            { value: "all", label: "Tất cả", description: "Toàn bộ categories + items + modifiers" },
-            { value: "category", label: "Theo danh mục", description: "Chọn một category cụ thể" },
-            { value: "available_only", label: "Chỉ đang bán", description: "Items có status = available" },
+            {
+              value: 'all',
+              label: 'Tất cả',
+              description: 'Toàn bộ categories + items + modifiers',
+            },
+            { value: 'category', label: 'Theo danh mục', description: 'Chọn một category cụ thể' },
+            {
+              value: 'available_only',
+              label: 'Chỉ đang bán',
+              description: 'Items có status = available',
+            },
           ].map((option) => (
             <button
               key={option.value}
               onClick={() => setExportScope(option.value as ExportScope)}
               className={cn(
-                "rounded-xl border-2 p-4 text-left transition-all",
+                'rounded-xl border-2 p-4 text-left transition-all',
                 exportScope === option.value
-                  ? "border-emerald-500 bg-emerald-50 dark:border-emerald-600 dark:bg-emerald-500/10"
-                  : "border-slate-200 bg-white hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700",
+                  ? 'border-emerald-500 bg-emerald-50 dark:border-emerald-600 dark:bg-emerald-500/10'
+                  : 'border-slate-200 bg-white hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700',
               )}
             >
               <p className="font-medium text-slate-900 dark:text-white">{option.label}</p>
-              <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{option.description}</p>
+              <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                {option.description}
+              </p>
             </button>
           ))}
         </div>
@@ -67,7 +77,9 @@ export function ExportDataTab() {
               className="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
             />
             <div>
-              <span className="text-sm font-medium text-slate-900 dark:text-white">Include images</span>
+              <span className="text-sm font-medium text-slate-900 dark:text-white">
+                Include images
+              </span>
               <p className="text-xs text-slate-500 dark:text-slate-400">Xuất URLs ảnh món ăn</p>
             </div>
           </label>
@@ -79,8 +91,12 @@ export function ExportDataTab() {
               className="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
             />
             <div>
-              <span className="text-sm font-medium text-slate-900 dark:text-white">Include modifier mapping</span>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Xuất liên kết item ↔ modifier groups</p>
+              <span className="text-sm font-medium text-slate-900 dark:text-white">
+                Include modifier mapping
+              </span>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Xuất liên kết item ↔ modifier groups
+              </p>
             </div>
           </label>
           <label className="flex items-center gap-3">
@@ -91,8 +107,12 @@ export function ExportDataTab() {
               className="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
             />
             <div>
-              <span className="text-sm font-medium text-slate-900 dark:text-white">Include hidden categories</span>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Xuất cả categories có is_active=false</p>
+              <span className="text-sm font-medium text-slate-900 dark:text-white">
+                Include hidden categories
+              </span>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Xuất cả categories có is_active=false
+              </p>
             </div>
           </label>
         </div>
@@ -103,12 +123,12 @@ export function ExportDataTab() {
         <h3 className="mb-4 font-semibold text-slate-900 dark:text-white">Định dạng file</h3>
         <div className="flex gap-3">
           <button
-            onClick={() => setFormat("csv")}
+            onClick={() => setFormat('csv')}
             className={cn(
-              "flex flex-1 items-center gap-3 rounded-xl border-2 p-4 transition-all",
-              format === "csv"
-                ? "border-emerald-500 bg-emerald-50 dark:border-emerald-600 dark:bg-emerald-500/10"
-                : "border-slate-200 bg-white hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700",
+              'flex flex-1 items-center gap-3 rounded-xl border-2 p-4 transition-all',
+              format === 'csv'
+                ? 'border-emerald-500 bg-emerald-50 dark:border-emerald-600 dark:bg-emerald-500/10'
+                : 'border-slate-200 bg-white hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700',
             )}
           >
             <FileSpreadsheet className="h-8 w-8 text-slate-400" />
@@ -118,12 +138,12 @@ export function ExportDataTab() {
             </div>
           </button>
           <button
-            onClick={() => setFormat("xlsx")}
+            onClick={() => setFormat('xlsx')}
             className={cn(
-              "flex flex-1 items-center gap-3 rounded-xl border-2 p-4 transition-all",
-              format === "xlsx"
-                ? "border-emerald-500 bg-emerald-50 dark:border-emerald-600 dark:bg-emerald-500/10"
-                : "border-slate-200 bg-white hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700",
+              'flex flex-1 items-center gap-3 rounded-xl border-2 p-4 transition-all',
+              format === 'xlsx'
+                ? 'border-emerald-500 bg-emerald-50 dark:border-emerald-600 dark:bg-emerald-500/10'
+                : 'border-slate-200 bg-white hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700',
             )}
           >
             <FileSpreadsheet className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
@@ -151,7 +171,11 @@ export function ExportDataTab() {
             <Button variant="outline" disabled={isExporting}>
               Copy link
             </Button>
-            <Button onClick={handleExport} disabled={isExporting} className="bg-emerald-600 hover:bg-emerald-700">
+            <Button
+              onClick={handleExport}
+              disabled={isExporting}
+              className="bg-emerald-600 hover:bg-emerald-700"
+            >
               {isExporting ? (
                 <>
                   <span className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
@@ -170,12 +194,14 @@ export function ExportDataTab() {
 
       {/* Export History */}
       <Card className="rounded-2xl border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
-        <h3 className="mb-4 font-semibold text-slate-900 dark:text-white">Lịch sử export gần đây</h3>
+        <h3 className="mb-4 font-semibold text-slate-900 dark:text-white">
+          Lịch sử export gần đây
+        </h3>
         <div className="space-y-3">
           {[
-            { name: "menu-export-all-20241215.xlsx", date: "15/12/2024 14:30", size: "2.4 MB" },
-            { name: "categories-20241210.csv", date: "10/12/2024 09:15", size: "156 KB" },
-            { name: "menu-available-20241208.xlsx", date: "08/12/2024 16:45", size: "1.8 MB" },
+            { name: 'menu-export-all-20241215.xlsx', date: '15/12/2024 14:30', size: '2.4 MB' },
+            { name: 'categories-20241210.csv', date: '10/12/2024 09:15', size: '156 KB' },
+            { name: 'menu-available-20241208.xlsx', date: '08/12/2024 16:45', size: '1.8 MB' },
           ].map((file, idx) => (
             <div
               key={idx}

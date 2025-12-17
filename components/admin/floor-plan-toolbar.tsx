@@ -1,8 +1,13 @@
-"use client"
+'use client'
 
-import { Button } from "@/components/ui/button"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { ChevronDown, Grid3x3, Minus, Plus, RotateCcw, Save, Undo2, Redo2 } from "lucide-react"
+import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { ChevronDown, Grid3x3, Minus, Plus, RotateCcw, Save, Undo2, Redo2 } from 'lucide-react'
 
 interface FloorPlanToolbarProps {
   selectedArea: string
@@ -35,7 +40,6 @@ export function FloorPlanToolbar({
   onSave,
   onReset,
 }: FloorPlanToolbarProps) {
-
   return (
     <div className="flex items-center justify-between rounded-2xl border border-slate-100 bg-white/80 px-6 py-4 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
       {/* Left: Title & Area selector */}
@@ -65,10 +69,24 @@ export function FloorPlanToolbar({
       {/* Right: Actions */}
       <div className="flex items-center gap-2">
         {/* Undo/Redo */}
-        <Button variant="ghost" size="icon" className="rounded-full" disabled={!canUndo} onClick={onUndo} title="Hoàn tác">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="rounded-full"
+          disabled={!canUndo}
+          onClick={onUndo}
+          title="Hoàn tác"
+        >
           <Undo2 className="h-4 w-4" />
         </Button>
-        <Button variant="ghost" size="icon" className="rounded-full" disabled={!canRedo} onClick={onRedo} title="Làm lại">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="rounded-full"
+          disabled={!canRedo}
+          onClick={onRedo}
+          title="Làm lại"
+        >
           <Redo2 className="h-4 w-4" />
         </Button>
 
@@ -99,7 +117,7 @@ export function FloorPlanToolbar({
 
         {/* Grid toggle */}
         <Button
-          variant={showGrid ? "default" : "ghost"}
+          variant={showGrid ? 'default' : 'ghost'}
           size="icon"
           className="rounded-full"
           onClick={() => onShowGridChange(!showGrid)}

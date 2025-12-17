@@ -1,7 +1,7 @@
-"use client"
+'use client'
 
-import { useState } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -11,23 +11,23 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
-import { Loader2 } from "lucide-react"
+} from '@/components/ui/alert-dialog'
+import { Loader2 } from 'lucide-react'
 
 export function ModifierDeleteDialog() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const open = searchParams.get("delete") === "modifier"
-  const modifierId = searchParams.get("id")
+  const open = searchParams.get('delete') === 'modifier'
+  const modifierId = searchParams.get('id')
   const [isDeleting, setIsDeleting] = useState(false)
 
   // TODO: Fetch actual modifier data
-  const modifierName = "Lớn (Large)"
+  const modifierName = 'Lớn (Large)'
 
   const handleClose = () => {
     const params = new URLSearchParams(searchParams.toString())
-    params.delete("delete")
-    params.delete("id")
+    params.delete('delete')
+    params.delete('id')
     router.push(`?${params.toString()}`)
   }
 
@@ -38,7 +38,7 @@ export function ModifierDeleteDialog() {
       await new Promise((resolve) => setTimeout(resolve, 1000))
       handleClose()
     } catch (error) {
-      console.error("Error deleting modifier:", error)
+      console.error('Error deleting modifier:', error)
     } finally {
       setIsDeleting(false)
     }
@@ -50,9 +50,11 @@ export function ModifierDeleteDialog() {
         <AlertDialogHeader>
           <AlertDialogTitle>Xác nhận xoá option</AlertDialogTitle>
           <AlertDialogDescription>
-            Bạn có chắc muốn xoá option{" "}
-            <span className="font-semibold text-slate-900 dark:text-white">&quot;{modifierName}&quot;</span>? Hành động
-            này không thể hoàn tác.
+            Bạn có chắc muốn xoá option{' '}
+            <span className="font-semibold text-slate-900 dark:text-white">
+              &quot;{modifierName}&quot;
+            </span>
+            ? Hành động này không thể hoàn tác.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -68,7 +70,7 @@ export function ModifierDeleteDialog() {
                 Đang xoá...
               </>
             ) : (
-              "Xoá option"
+              'Xoá option'
             )}
           </AlertDialogAction>
         </AlertDialogFooter>

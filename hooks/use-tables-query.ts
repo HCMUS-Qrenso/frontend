@@ -8,6 +8,7 @@ import type {
   BatchPositionUpdatePayload,
   TableListResponse,
   TableStatsResponse,
+  QrStatsResponse,
   TableResponse,
   QRGenerationResponse,
   ZoneLayoutResponse,
@@ -20,6 +21,7 @@ import type {
   QRCodeListResponse,
   BatchGenerateQRPayload,
   BatchGenerateQRResponse,
+  QrStats,
 } from '@/types/tables'
 import type { MessageResponse } from '@/types/auth'
 
@@ -38,6 +40,7 @@ export const tablesQueryKeys = {
     list: (params?: QRCodeListQueryParams) =>
       [...tablesQueryKeys.qr.all(), 'list', params] as const,
     detail: (id: string) => [...tablesQueryKeys.qr.all(), 'detail', id] as const,
+    stats: () => [...tablesQueryKeys.qr.all(), 'stats'] as const,
   },
 }
 
@@ -217,5 +220,14 @@ export const useBatchUpdatePositionsMutation = () => {
       // Invalidate layout queries
       queryClient.invalidateQueries({ queryKey: tablesQueryKeys.all })
     },
+  })
+}
+
+export const useQrStatsQuery = (enabled = true) => {
+  return useQuery<QrStatsResponse>({
+    queryKey: tablesQueryKeys.qr.stats(),
+    queryFn: () => tablesApi.getQrStats(),
+    enabled,
+    staleTime: 30 * 1000,
   })
 }

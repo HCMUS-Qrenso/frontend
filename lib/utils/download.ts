@@ -66,4 +66,3 @@ export function downloadBlobWithHeaders(
   const filename = extractFilenameFromHeader(contentDisposition, defaultFilename)
   downloadBlob(blob, filename)
 }
-

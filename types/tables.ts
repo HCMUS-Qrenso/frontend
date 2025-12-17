@@ -80,6 +80,12 @@ export interface TableStatsResponse {
   data: TableStats
 }
 
+// QR Stats Response
+export interface QrStatsResponse {
+  success: boolean
+  data: QrStats
+}
+
 // Single Table Response
 export interface TableResponse {
   success: boolean
@@ -449,4 +455,11 @@ export interface TableQR {
   updatedAt: string
 
   seats: number
+}
+
+export interface QrStats {
+  total_active_tables: number
+  tables_with_qr: number
+  tables_without_qr: number
+  latest_qr_update: string | null
 }

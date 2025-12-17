@@ -1,37 +1,44 @@
-import { CheckCircle2 } from "lucide-react"
+import { CheckCircle2 } from 'lucide-react'
 
 const steps = [
   {
-    number: "01",
-    title: "Setup menu & bàn",
-    description: "Tạo menu món ăn, categories, giá. Thiết lập bàn và tạo QR code.",
+    number: '01',
+    title: 'Setup menu & bàn',
+    description: 'Tạo menu món ăn, categories, giá. Thiết lập bàn và tạo QR code.',
   },
   {
-    number: "02",
-    title: "Khách scan QR",
-    description: "Khách quét QR trên bàn, xem menu và order trực tiếp trên điện thoại.",
+    number: '02',
+    title: 'Khách scan QR',
+    description: 'Khách quét QR trên bàn, xem menu và order trực tiếp trên điện thoại.',
   },
   {
-    number: "03",
-    title: "Bếp & Waiter nhận realtime",
-    description: "Order hiển thị ngay trên KDS bếp và dashboard waiter. Xử lý tức thì.",
+    number: '03',
+    title: 'Bếp & Waiter nhận realtime',
+    description: 'Order hiển thị ngay trên KDS bếp và dashboard waiter. Xử lý tức thì.',
   },
   {
-    number: "04",
-    title: "Phục vụ & Thanh toán",
-    description: "Phục vụ món ăn theo thứ tự. Khách thanh toán sau bữa ăn, linh hoạt.",
+    number: '04',
+    title: 'Phục vụ & Thanh toán',
+    description: 'Phục vụ món ăn theo thứ tự. Khách thanh toán sau bữa ăn, linh hoạt.',
   },
 ]
 
 export function HowItWorks() {
   return (
-    <section id="how-it-works" className="border-b border-slate-200 bg-white py-20 dark:border-slate-800/50 dark:bg-slate-950 md:py-32">
+    <section
+      id="how-it-works"
+      className="border-b border-slate-200 bg-white py-20 md:py-32 dark:border-slate-800/50 dark:bg-slate-950"
+    >
       <div className="container mx-auto px-4">
         <div className="mx-auto max-w-5xl">
           {/* Section Header */}
           <div className="mb-16 text-center">
-            <h2 className="text-3xl font-bold text-slate-900 md:text-4xl dark:text-white">Cách hoạt động đơn giản</h2>
-            <p className="mt-4 text-lg text-slate-500 dark:text-slate-400">4 bước để số hoá nhà hàng của bạn</p>
+            <h2 className="text-3xl font-bold text-slate-900 md:text-4xl dark:text-white">
+              Cách hoạt động đơn giản
+            </h2>
+            <p className="mt-4 text-lg text-slate-500 dark:text-slate-400">
+              4 bước để số hoá nhà hàng của bạn
+            </p>
           </div>
 
           {/* Steps */}
@@ -50,7 +57,9 @@ export function HowItWorks() {
 
                 {/* Content */}
                 <div className="flex-1">
-                  <h3 className="mb-2 text-xl font-semibold text-slate-900 dark:text-white">{step.title}</h3>
+                  <h3 className="mb-2 text-xl font-semibold text-slate-900 dark:text-white">
+                    {step.title}
+                  </h3>
                   <p className="text-slate-600 dark:text-slate-400">{step.description}</p>
                 </div>
 

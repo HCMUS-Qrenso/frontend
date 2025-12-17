@@ -110,7 +110,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({
       accessToken: token,
       isAuthenticated: !!token,
-      authStatus: !!token ? 'authenticated' : 'unauthenticated'
+      authStatus: !!token ? 'authenticated' : 'unauthenticated',
     })
   },
 
@@ -135,7 +135,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       user: null,
       accessToken: null,
       isAuthenticated: false,
-      authStatus: 'unauthenticated'
+      authStatus: 'unauthenticated',
     })
   },
 
@@ -157,8 +157,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       // Role-aware tenant handling
       if (authResponse.user.role === 'owner') {
-        setTenantId(null)
-        tenantStore.resetTenant()
+        const persistedTenantId =
+          typeof window !== 'undefined' ? localStorage.getItem('selectedTenantId') : null
+        setTenantId(persistedTenantId)
+        // Don't reset tenant store for owner to preserve selectedTenantId
       } else {
         setTenantId(authResponse.user.tenantId)
         tenantStore.resetTenant()

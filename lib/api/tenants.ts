@@ -32,5 +32,3 @@ export const tenantsApi = {
     return data
   },
 }
-
-

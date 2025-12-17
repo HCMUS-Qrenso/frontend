@@ -1,7 +1,7 @@
-"use client"
+'use client'
 
-import { useState } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -11,24 +11,24 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
-import { AlertCircle, Loader2 } from "lucide-react"
+} from '@/components/ui/alert-dialog'
+import { AlertCircle, Loader2 } from 'lucide-react'
 
 export function ModifierGroupDeleteDialog() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const open = searchParams.get("delete") === "group"
-  const groupId = searchParams.get("id")
+  const open = searchParams.get('delete') === 'group'
+  const groupId = searchParams.get('id')
   const [isDeleting, setIsDeleting] = useState(false)
 
   // TODO: Fetch actual group data
-  const groupName = "Kích cỡ (Size)"
+  const groupName = 'Kích cỡ (Size)'
   const usedByCount = 12
 
   const handleClose = () => {
     const params = new URLSearchParams(searchParams.toString())
-    params.delete("delete")
-    params.delete("id")
+    params.delete('delete')
+    params.delete('id')
     router.push(`?${params.toString()}`)
   }
 
@@ -39,7 +39,7 @@ export function ModifierGroupDeleteDialog() {
       await new Promise((resolve) => setTimeout(resolve, 1000))
       handleClose()
     } catch (error) {
-      console.error("Error deleting group:", error)
+      console.error('Error deleting group:', error)
     } finally {
       setIsDeleting(false)
     }
@@ -53,8 +53,11 @@ export function ModifierGroupDeleteDialog() {
           <AlertDialogDescription asChild>
             <div className="space-y-3">
               <p>
-                Bạn có chắc muốn xoá nhóm{" "}
-                <span className="font-semibold text-slate-900 dark:text-white">&quot;{groupName}&quot;</span>?
+                Bạn có chắc muốn xoá nhóm{' '}
+                <span className="font-semibold text-slate-900 dark:text-white">
+                  &quot;{groupName}&quot;
+                </span>
+                ?
               </p>
 
               <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-500/20 dark:bg-amber-500/10">
@@ -66,7 +69,8 @@ export function ModifierGroupDeleteDialog() {
                     </p>
                     {usedByCount > 0 && (
                       <p className="text-amber-700 dark:text-amber-300">
-                        Nhóm này đang được dùng bởi {usedByCount} món. Khuyến nghị gỡ nhóm khỏi các món trước khi xoá.
+                        Nhóm này đang được dùng bởi {usedByCount} món. Khuyến nghị gỡ nhóm khỏi các
+                        món trước khi xoá.
                       </p>
                     )}
                   </div>
@@ -88,7 +92,7 @@ export function ModifierGroupDeleteDialog() {
                 Đang xoá...
               </>
             ) : (
-              "Xoá nhóm"
+              'Xoá nhóm'
             )}
           </AlertDialogAction>
         </AlertDialogFooter>
