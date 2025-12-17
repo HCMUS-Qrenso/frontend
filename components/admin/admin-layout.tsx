@@ -3,6 +3,7 @@
 import type React from 'react'
 
 import { useEffect, useMemo, useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -19,6 +20,7 @@ import { useAuth } from '@/hooks/use-auth'
 import { useUserProfileQuery } from '@/hooks/use-users-query'
 import { useOwnerTenantsQuery, useCurrentTenantQuery } from '@/hooks/use-tenants-query'
 import { useTenantStore } from '@/store/tenant-store'
+import { invalidateTenantQueries } from '@/lib/query-utils'
 import { AdminSidebar } from './admin-sidebar'
 import { getInitials } from './admin-utils'
 
@@ -54,9 +56,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   const shouldFetchCurrentForStaff = isStaff
 
   const currentTenantQuery = useCurrentTenantQuery(
-    isAuthenticated &&
-      isHydrated &&
-      (shouldFetchCurrentForOwner || shouldFetchCurrentForStaff),
+    isAuthenticated && isHydrated && (shouldFetchCurrentForOwner || shouldFetchCurrentForStaff),
   )
 
   // Debug logging (development only)
@@ -66,7 +66,11 @@ export function AdminLayout({ children }: AdminLayoutProps) {
         console.log('[AdminLayout] ✅ /users/profile loaded:', userProfileQuery.data)
       }
       if (ownerTenantsQuery.data) {
-        console.log('[AdminLayout] ✅ /tenants loaded:', ownerTenantsQuery.data.data.tenants.length, 'tenants')
+        console.log(
+          '[AdminLayout] ✅ /tenants loaded:',
+          ownerTenantsQuery.data.data.tenants.length,
+          'tenants',
+        )
       }
       if (currentTenantQuery.data) {
         console.log('[AdminLayout] ✅ /tenants/current loaded:', currentTenantQuery.data.data.name)
@@ -87,6 +91,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
       if (process.env.NODE_ENV === 'development') {
         console.log('[AdminLayout] 🔄 Auto-selecting first tenant:', firstTenantId)
       }
+      // Use selectTenant directly for auto-select (no need to invalidate on initial load)
       selectTenant(firstTenantId)
     }
   }, [isOwner, ownerTenantsQuery.data, selectedTenantId, setTenants, selectTenant])
@@ -100,6 +105,19 @@ export function AdminLayout({ children }: AdminLayoutProps) {
     const detail = currentTenantQuery.data?.data
     return detail?.name ?? 'Nhà hàng của bạn'
   }, [isOwner, tenants, selectedTenantId, currentTenantQuery.data])
+
+  // Query client for invalidating queries
+  const queryClient = useQueryClient()
+
+  // Handle tenant selection with query invalidation
+  const handleSelectTenant = (tenantId: string) => {
+    // Update store and x-tenant-id header
+    selectTenant(tenantId)
+
+    // Invalidate all tenant-dependent queries
+    // This ensures all data is refetched with the new tenant context
+    invalidateTenantQueries(queryClient)
+  }
 
   // Check if any modal is open
   const isModalOpen = searchParams.get('modal') !== null || searchParams.get('delete') !== null
@@ -168,7 +186,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                       tenants.map((tenant) => (
                         <DropdownMenuItem
                           key={tenant.id}
-                          onClick={() => selectTenant(tenant.id)}
+                          onClick={() => handleSelectTenant(tenant.id)}
                         >
                           {tenant.name}
                         </DropdownMenuItem>
