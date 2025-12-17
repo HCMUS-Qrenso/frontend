@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Eye, EyeOff, Loader2, UtensilsCrossed, AlertCircle } from 'lucide-react'
+import { Eye, EyeOff, Loader2, AlertCircle } from 'lucide-react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { useAuth } from '@/hooks/use-auth'
 import type { ApiErrorResponse } from '@/types/auth'
@@ -124,8 +124,8 @@ export default function LoginPage() {
       <div className="mx-auto w-full max-w-sm">
         {/* Mobile Logo */}
         <div className="mb-8 flex items-center justify-center gap-3 lg:hidden">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500 text-white">
-            <UtensilsCrossed className="h-6 w-6" />
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl overflow-hidden">
+            <img src="/logo.png" alt="Logo" className="h-full w-full object-contain" />
           </div>
         </div>
 

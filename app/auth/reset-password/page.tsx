@@ -12,7 +12,6 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
   Loader2,
-  UtensilsCrossed,
   CheckCircle2,
   Eye,
   EyeOff,
@@ -234,8 +233,8 @@ function ResetPasswordContent() {
       <div className="mx-auto w-full max-w-sm">
         {/* Mobile Logo */}
         <div className="mb-8 flex items-center justify-center gap-3 lg:hidden">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500 text-white">
-            <UtensilsCrossed className="h-6 w-6" />
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl overflow-hidden">
+            <img src="/logo.png" alt="Logo" className="h-full w-full object-contain" />
           </div>
         </div>
 
