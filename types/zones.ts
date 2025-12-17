@@ -67,4 +67,3 @@ export interface SimpleZone {
 export interface ZonesSimpleResponse {
   data: SimpleZone[]
 }
-

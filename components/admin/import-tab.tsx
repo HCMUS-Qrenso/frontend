@@ -1,11 +1,11 @@
-"use client"
+'use client'
 
-import type React from "react"
+import type React from 'react'
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
 import {
   Upload,
   FileSpreadsheet,
@@ -16,12 +16,18 @@ import {
   ChevronLeft,
   X,
   FileWarning,
-} from "lucide-react"
-import { cn } from "@/lib/utils"
+} from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 type ImportStep = 1 | 2 | 3 | 4
-type ImportMode = "create" | "update" | "upsert"
-type DataType = "categories" | "items" | "images" | "modifier_groups" | "modifiers" | "item_modifiers"
+type ImportMode = 'create' | 'update' | 'upsert'
+type DataType =
+  | 'categories'
+  | 'items'
+  | 'images'
+  | 'modifier_groups'
+  | 'modifiers'
+  | 'item_modifiers'
 
 interface UploadedFile {
   name: string
@@ -33,54 +39,54 @@ interface UploadedFile {
 export function ImportTab() {
   const [currentStep, setCurrentStep] = useState<ImportStep>(1)
   const [uploadedFile, setUploadedFile] = useState<UploadedFile | null>(null)
-  const [importMode, setImportMode] = useState<ImportMode>("create")
+  const [importMode, setImportMode] = useState<ImportMode>('create')
   const [selectedDataTypes, setSelectedDataTypes] = useState<Set<DataType>>(new Set())
   const [isValidating, setIsValidating] = useState(false)
   const [isImporting, setIsImporting] = useState(false)
 
   const steps = [
-    { number: 1, title: "Upload file", description: "Chọn file CSV hoặc Excel" },
-    { number: 2, title: "Chọn dữ liệu", description: "Loại dữ liệu muốn import" },
-    { number: 3, title: "Map columns", description: "Ánh xạ cột và rules" },
-    { number: 4, title: "Preview & Import", description: "Kiểm tra và thực hiện" },
+    { number: 1, title: 'Upload file', description: 'Chọn file CSV hoặc Excel' },
+    { number: 2, title: 'Chọn dữ liệu', description: 'Loại dữ liệu muốn import' },
+    { number: 3, title: 'Map columns', description: 'Ánh xạ cột và rules' },
+    { number: 4, title: 'Preview & Import', description: 'Kiểm tra và thực hiện' },
   ]
 
   const dataTypeOptions: { value: DataType; label: string; description: string; icon: string }[] = [
     {
-      value: "categories",
-      label: "Danh mục",
-      description: "Categories cho menu",
-      icon: "📁",
+      value: 'categories',
+      label: 'Danh mục',
+      description: 'Categories cho menu',
+      icon: '📁',
     },
     {
-      value: "items",
-      label: "Món ăn",
-      description: "Menu items với giá, mô tả",
-      icon: "🍽️",
+      value: 'items',
+      label: 'Món ăn',
+      description: 'Menu items với giá, mô tả',
+      icon: '🍽️',
     },
     {
-      value: "images",
-      label: "Hình ảnh món",
-      description: "URLs ảnh cho items",
-      icon: "🖼️",
+      value: 'images',
+      label: 'Hình ảnh món',
+      description: 'URLs ảnh cho items',
+      icon: '🖼️',
     },
     {
-      value: "modifier_groups",
-      label: "Nhóm tuỳ chọn",
-      description: "Modifier groups",
-      icon: "⚙️",
+      value: 'modifier_groups',
+      label: 'Nhóm tuỳ chọn',
+      description: 'Modifier groups',
+      icon: '⚙️',
     },
     {
-      value: "modifiers",
-      label: "Tuỳ chọn",
-      description: "Các option trong groups",
-      icon: "✨",
+      value: 'modifiers',
+      label: 'Tuỳ chọn',
+      description: 'Các option trong groups',
+      icon: '✨',
     },
     {
-      value: "item_modifiers",
-      label: "Liên kết Item-Modifier",
-      description: "Mapping items với groups",
-      icon: "🔗",
+      value: 'item_modifiers',
+      label: 'Liên kết Item-Modifier',
+      description: 'Mapping items với groups',
+      icon: '🔗',
     },
   ]
 
@@ -91,7 +97,7 @@ export function ImportTab() {
         name: file.name,
         size: file.size,
         type: file.type,
-        sheets: file.name.endsWith(".xlsx") ? ["Sheet1", "Categories", "Items"] : undefined,
+        sheets: file.name.endsWith('.xlsx') ? ['Sheet1', 'Categories', 'Items'] : undefined,
       })
     }
   }
@@ -125,9 +131,9 @@ export function ImportTab() {
   }
 
   const formatFileSize = (bytes: number) => {
-    if (bytes < 1024) return bytes + " B"
-    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB"
-    return (bytes / (1024 * 1024)).toFixed(1) + " MB"
+    if (bytes < 1024) return bytes + ' B'
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB'
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB'
   }
 
   return (
@@ -140,10 +146,10 @@ export function ImportTab() {
               <div className="flex items-center gap-3">
                 <div
                   className={cn(
-                    "flex h-10 w-10 items-center justify-center rounded-full font-semibold transition-colors",
+                    'flex h-10 w-10 items-center justify-center rounded-full font-semibold transition-colors',
                     currentStep >= step.number
-                      ? "bg-emerald-500 text-white"
-                      : "bg-slate-100 text-slate-400 dark:bg-slate-800 dark:text-slate-600",
+                      ? 'bg-emerald-500 text-white'
+                      : 'bg-slate-100 text-slate-400 dark:bg-slate-800 dark:text-slate-600',
                   )}
                 >
                   {currentStep > step.number ? <CheckCircle2 className="h-5 w-5" /> : step.number}
@@ -151,10 +157,10 @@ export function ImportTab() {
                 <div className="hidden md:block">
                   <p
                     className={cn(
-                      "text-sm font-medium",
+                      'text-sm font-medium',
                       currentStep >= step.number
-                        ? "text-slate-900 dark:text-white"
-                        : "text-slate-400 dark:text-slate-600",
+                        ? 'text-slate-900 dark:text-white'
+                        : 'text-slate-400 dark:text-slate-600',
                     )}
                   >
                     {step.title}
@@ -165,8 +171,8 @@ export function ImportTab() {
               {idx < steps.length - 1 && (
                 <div
                   className={cn(
-                    "mx-4 h-0.5 flex-1 transition-colors",
-                    currentStep > step.number ? "bg-emerald-500" : "bg-slate-200 dark:bg-slate-800",
+                    'mx-4 h-0.5 flex-1 transition-colors',
+                    currentStep > step.number ? 'bg-emerald-500' : 'bg-slate-200 dark:bg-slate-800',
                   )}
                 />
               )}
@@ -181,7 +187,12 @@ export function ImportTab() {
           <Card className="rounded-2xl border-slate-200 bg-white p-8 dark:border-slate-800 dark:bg-slate-900">
             {!uploadedFile ? (
               <label className="group block cursor-pointer">
-                <input type="file" accept=".csv,.xlsx,.xls" className="hidden" onChange={handleFileUpload} />
+                <input
+                  type="file"
+                  accept=".csv,.xlsx,.xls"
+                  className="hidden"
+                  onChange={handleFileUpload}
+                />
                 <div className="flex flex-col items-center gap-4 rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 px-8 py-12 transition-colors group-hover:border-emerald-400 group-hover:bg-emerald-50/50 dark:border-slate-700 dark:bg-slate-800/50 dark:group-hover:border-emerald-600 dark:group-hover:bg-emerald-500/5">
                   <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400">
                     <Upload className="h-8 w-8" />
@@ -190,7 +201,9 @@ export function ImportTab() {
                     <p className="text-lg font-medium text-slate-900 dark:text-white">
                       Kéo thả file vào đây hoặc click để chọn
                     </p>
-                    <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Hỗ trợ CSV, XLSX (tối đa 10MB)</p>
+                    <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                      Hỗ trợ CSV, XLSX (tối đa 10MB)
+                    </p>
                   </div>
                 </div>
               </label>
@@ -200,9 +213,13 @@ export function ImportTab() {
                   <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-emerald-100 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400">
                     <FileSpreadsheet className="h-6 w-6" />
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-slate-900 dark:text-white">{uploadedFile.name}</p>
-                    <p className="text-sm text-slate-500 dark:text-slate-400">{formatFileSize(uploadedFile.size)}</p>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium text-slate-900 dark:text-white">
+                      {uploadedFile.name}
+                    </p>
+                    <p className="text-sm text-slate-500 dark:text-slate-400">
+                      {formatFileSize(uploadedFile.size)}
+                    </p>
                     {uploadedFile.sheets && (
                       <div className="mt-2">
                         <p className="text-xs text-slate-500 dark:text-slate-500">Sheets:</p>
@@ -227,25 +244,29 @@ export function ImportTab() {
                 </div>
 
                 <div className="space-y-3">
-                  <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Chế độ import</label>
+                  <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                    Chế độ import
+                  </label>
                   <div className="grid gap-3 sm:grid-cols-3">
                     {[
-                      { value: "create", label: "Tạo mới", description: "Chỉ tạo records mới" },
-                      { value: "update", label: "Cập nhật", description: "Cập nhật theo khóa" },
-                      { value: "upsert", label: "Upsert", description: "Tạo hoặc cập nhật" },
+                      { value: 'create', label: 'Tạo mới', description: 'Chỉ tạo records mới' },
+                      { value: 'update', label: 'Cập nhật', description: 'Cập nhật theo khóa' },
+                      { value: 'upsert', label: 'Upsert', description: 'Tạo hoặc cập nhật' },
                     ].map((mode) => (
                       <button
                         key={mode.value}
                         onClick={() => setImportMode(mode.value as ImportMode)}
                         className={cn(
-                          "rounded-xl border-2 p-4 text-left transition-all",
+                          'rounded-xl border-2 p-4 text-left transition-all',
                           importMode === mode.value
-                            ? "border-emerald-500 bg-emerald-50 dark:border-emerald-600 dark:bg-emerald-500/10"
-                            : "border-slate-200 bg-white hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700",
+                            ? 'border-emerald-500 bg-emerald-50 dark:border-emerald-600 dark:bg-emerald-500/10'
+                            : 'border-slate-200 bg-white hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700',
                         )}
                       >
                         <p className="font-medium text-slate-900 dark:text-white">{mode.label}</p>
-                        <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{mode.description}</p>
+                        <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                          {mode.description}
+                        </p>
                       </button>
                     ))}
                   </div>
@@ -300,24 +321,28 @@ export function ImportTab() {
       {currentStep === 2 && (
         <div className="space-y-6">
           <Card className="rounded-2xl border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
-            <h3 className="mb-4 font-semibold text-slate-900 dark:text-white">Chọn loại dữ liệu muốn import</h3>
+            <h3 className="mb-4 font-semibold text-slate-900 dark:text-white">
+              Chọn loại dữ liệu muốn import
+            </h3>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {dataTypeOptions.map((option) => (
                 <button
                   key={option.value}
                   onClick={() => toggleDataType(option.value)}
                   className={cn(
-                    "rounded-xl border-2 p-4 text-left transition-all",
+                    'rounded-xl border-2 p-4 text-left transition-all',
                     selectedDataTypes.has(option.value)
-                      ? "border-emerald-500 bg-emerald-50 dark:border-emerald-600 dark:bg-emerald-500/10"
-                      : "border-slate-200 bg-white hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700",
+                      ? 'border-emerald-500 bg-emerald-50 dark:border-emerald-600 dark:bg-emerald-500/10'
+                      : 'border-slate-200 bg-white hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700',
                   )}
                 >
                   <div className="flex items-start gap-3">
                     <span className="text-2xl">{option.icon}</span>
                     <div className="flex-1">
                       <p className="font-medium text-slate-900 dark:text-white">{option.label}</p>
-                      <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{option.description}</p>
+                      <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                        {option.description}
+                      </p>
                     </div>
                     {selectedDataTypes.has(option.value) && (
                       <CheckCircle2 className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
@@ -327,12 +352,14 @@ export function ImportTab() {
               ))}
             </div>
 
-            {selectedDataTypes.has("items") && !selectedDataTypes.has("categories") && (
+            {selectedDataTypes.has('items') && !selectedDataTypes.has('categories') && (
               <div className="mt-4 flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-800/50 dark:bg-amber-500/5">
                 <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-600 dark:text-amber-500" />
                 <div className="text-sm text-amber-800 dark:text-amber-200">
                   <p className="font-medium">Khuyến nghị</p>
-                  <p className="mt-1">Nên import Categories trước khi import Items để tránh lỗi tham chiếu</p>
+                  <p className="mt-1">
+                    Nên import Categories trước khi import Items để tránh lỗi tham chiếu
+                  </p>
                 </div>
               </div>
             )}
@@ -359,7 +386,9 @@ export function ImportTab() {
       {currentStep === 3 && (
         <div className="space-y-6">
           <Card className="rounded-2xl border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
-            <h3 className="mb-4 font-semibold text-slate-900 dark:text-white">Ánh xạ cột dữ liệu</h3>
+            <h3 className="mb-4 font-semibold text-slate-900 dark:text-white">
+              Ánh xạ cột dữ liệu
+            </h3>
             <div className="space-y-4">
               {/* Mock mapping table */}
               <div className="overflow-x-auto rounded-lg border border-slate-200 dark:border-slate-800">
@@ -383,28 +412,36 @@ export function ImportTab() {
                       <td className="px-4 py-3">
                         <Badge variant="secondary">name</Badge>
                       </td>
-                      <td className="px-4 py-3 text-slate-500 dark:text-slate-400">Phở Bò, Bún Chả, Cơm Tấm</td>
+                      <td className="px-4 py-3 text-slate-500 dark:text-slate-400">
+                        Phở Bò, Bún Chả, Cơm Tấm
+                      </td>
                     </tr>
                     <tr>
                       <td className="px-4 py-3 text-slate-900 dark:text-white">gia</td>
                       <td className="px-4 py-3">
                         <Badge variant="secondary">base_price</Badge>
                       </td>
-                      <td className="px-4 py-3 text-slate-500 dark:text-slate-400">75000, 55000, 45000</td>
+                      <td className="px-4 py-3 text-slate-500 dark:text-slate-400">
+                        75000, 55000, 45000
+                      </td>
                     </tr>
                     <tr>
                       <td className="px-4 py-3 text-slate-900 dark:text-white">category</td>
                       <td className="px-4 py-3">
                         <Badge variant="secondary">category_id</Badge>
                       </td>
-                      <td className="px-4 py-3 text-slate-500 dark:text-slate-400">Món chính, Món chính, Cơm</td>
+                      <td className="px-4 py-3 text-slate-500 dark:text-slate-400">
+                        Món chính, Món chính, Cơm
+                      </td>
                     </tr>
                   </tbody>
                 </table>
               </div>
 
               <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-800/50">
-                <h4 className="mb-3 text-sm font-medium text-slate-700 dark:text-slate-300">Rules & Options</h4>
+                <h4 className="mb-3 text-sm font-medium text-slate-700 dark:text-slate-300">
+                  Rules & Options
+                </h4>
                 <div className="space-y-2 text-sm">
                   <label className="flex items-center gap-2">
                     <input
@@ -429,7 +466,9 @@ export function ImportTab() {
                       type="checkbox"
                       className="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
                     />
-                    <span className="text-slate-600 dark:text-slate-400">Đặt status = 'available' nếu trống</span>
+                    <span className="text-slate-600 dark:text-slate-400">
+                      Đặt status = 'available' nếu trống
+                    </span>
                   </label>
                 </div>
               </div>
@@ -441,7 +480,11 @@ export function ImportTab() {
               <ChevronLeft className="mr-2 h-4 w-4" />
               Quay lại
             </Button>
-            <Button onClick={handleValidate} disabled={isValidating} className="bg-emerald-600 hover:bg-emerald-700">
+            <Button
+              onClick={handleValidate}
+              disabled={isValidating}
+              className="bg-emerald-600 hover:bg-emerald-700"
+            >
               {isValidating ? (
                 <>
                   <span className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
@@ -522,11 +565,21 @@ export function ImportTab() {
               <table className="w-full text-sm">
                 <thead className="bg-slate-50 dark:bg-slate-800/50">
                   <tr>
-                    <th className="px-4 py-3 text-left font-medium text-slate-700 dark:text-slate-300">#</th>
-                    <th className="px-4 py-3 text-left font-medium text-slate-700 dark:text-slate-300">Tên món</th>
-                    <th className="px-4 py-3 text-left font-medium text-slate-700 dark:text-slate-300">Giá</th>
-                    <th className="px-4 py-3 text-left font-medium text-slate-700 dark:text-slate-300">Category</th>
-                    <th className="px-4 py-3 text-left font-medium text-slate-700 dark:text-slate-300">Status</th>
+                    <th className="px-4 py-3 text-left font-medium text-slate-700 dark:text-slate-300">
+                      #
+                    </th>
+                    <th className="px-4 py-3 text-left font-medium text-slate-700 dark:text-slate-300">
+                      Tên món
+                    </th>
+                    <th className="px-4 py-3 text-left font-medium text-slate-700 dark:text-slate-300">
+                      Giá
+                    </th>
+                    <th className="px-4 py-3 text-left font-medium text-slate-700 dark:text-slate-300">
+                      Category
+                    </th>
+                    <th className="px-4 py-3 text-left font-medium text-slate-700 dark:text-slate-300">
+                      Status
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
@@ -579,7 +632,11 @@ export function ImportTab() {
             </Button>
             <div className="flex gap-3">
               <Button variant="outline">Bỏ qua lỗi & Import</Button>
-              <Button onClick={handleImport} disabled={isImporting} className="bg-emerald-600 hover:bg-emerald-700">
+              <Button
+                onClick={handleImport}
+                disabled={isImporting}
+                className="bg-emerald-600 hover:bg-emerald-700"
+              >
                 {isImporting ? (
                   <>
                     <span className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />

@@ -1,9 +1,9 @@
-"use client"
+'use client'
 
-import type React from "react"
+import type React from 'react'
 
-import { useEffect, useState } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useEffect, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import {
   Dialog,
   DialogContent,
@@ -11,13 +11,13 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Switch } from "@/components/ui/switch"
-import { Loader2 } from "lucide-react"
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { Switch } from '@/components/ui/switch'
+import { Loader2 } from 'lucide-react'
 
 interface CategoryUpsertModalProps {
   open: boolean
@@ -26,33 +26,33 @@ interface CategoryUpsertModalProps {
 export function CategoryUpsertModal({ open }: CategoryUpsertModalProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const mode = searchParams.get("mode") as "create" | "edit"
-  const categoryId = searchParams.get("id")
+  const mode = searchParams.get('mode') as 'create' | 'edit'
+  const categoryId = searchParams.get('id')
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [formData, setFormData] = useState({
-    name: "",
-    description: "",
+    name: '',
+    description: '',
     is_active: true,
   })
 
   const [errors, setErrors] = useState({
-    name: "",
+    name: '',
   })
 
   // Load data if editing
   useEffect(() => {
-    if (mode === "edit" && categoryId) {
+    if (mode === 'edit' && categoryId) {
       // TODO: Load category data
       setFormData({
-        name: "Khai vị",
-        description: "Các món khai vị truyền thống",
+        name: 'Khai vị',
+        description: 'Các món khai vị truyền thống',
         is_active: true,
       })
     } else {
       setFormData({
-        name: "",
-        description: "",
+        name: '',
+        description: '',
         is_active: true,
       })
     }
@@ -60,26 +60,26 @@ export function CategoryUpsertModal({ open }: CategoryUpsertModalProps) {
 
   const handleClose = () => {
     const params = new URLSearchParams(searchParams.toString())
-    params.delete("modal")
-    params.delete("mode")
-    params.delete("id")
+    params.delete('modal')
+    params.delete('mode')
+    params.delete('id')
     router.push(`?${params.toString()}`)
-    setFormData({ name: "", description: "", is_active: true })
-    setErrors({ name: "" })
+    setFormData({ name: '', description: '', is_active: true })
+    setErrors({ name: '' })
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setErrors({ name: "" })
+    setErrors({ name: '' })
 
     // Validation
     if (!formData.name.trim()) {
-      setErrors({ name: "Vui lòng nhập tên danh mục" })
+      setErrors({ name: 'Vui lòng nhập tên danh mục' })
       return
     }
 
     if (formData.name.length > 100) {
-      setErrors({ name: "Tên danh mục không được vượt quá 100 ký tự" })
+      setErrors({ name: 'Tên danh mục không được vượt quá 100 ký tự' })
       return
     }
 
@@ -92,7 +92,7 @@ export function CategoryUpsertModal({ open }: CategoryUpsertModalProps) {
       // Success
       handleClose()
     } catch (error) {
-      console.error("Error saving category:", error)
+      console.error('Error saving category:', error)
     } finally {
       setIsSubmitting(false)
     }
@@ -102,9 +102,13 @@ export function CategoryUpsertModal({ open }: CategoryUpsertModalProps) {
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>{mode === "create" ? "Thêm danh mục mới" : "Chỉnh sửa danh mục"}</DialogTitle>
+          <DialogTitle>
+            {mode === 'create' ? 'Thêm danh mục mới' : 'Chỉnh sửa danh mục'}
+          </DialogTitle>
           <DialogDescription>
-            {mode === "create" ? "Tạo danh mục mới để nhóm các món ăn theo loại" : "Cập nhật thông tin danh mục"}
+            {mode === 'create'
+              ? 'Tạo danh mục mới để nhóm các món ăn theo loại'
+              : 'Cập nhật thông tin danh mục'}
           </DialogDescription>
         </DialogHeader>
 
@@ -143,7 +147,9 @@ export function CategoryUpsertModal({ open }: CategoryUpsertModalProps) {
               <Label htmlFor="is_active" className="text-base">
                 Hiển thị danh mục
               </Label>
-              <p className="text-sm text-slate-500 dark:text-slate-400">Bật để hiển thị danh mục trong menu</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400">
+                Bật để hiển thị danh mục trong menu
+              </p>
             </div>
             <Switch
               id="is_active"
@@ -157,14 +163,18 @@ export function CategoryUpsertModal({ open }: CategoryUpsertModalProps) {
             <Button type="button" variant="outline" onClick={handleClose} disabled={isSubmitting}>
               Hủy
             </Button>
-            <Button type="submit" disabled={isSubmitting} className="bg-emerald-600 hover:bg-emerald-700">
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="bg-emerald-600 hover:bg-emerald-700"
+            >
               {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Đang lưu...
                 </>
               ) : (
-                "Lưu"
+                'Lưu'
               )}
             </Button>
           </DialogFooter>

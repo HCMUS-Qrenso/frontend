@@ -1,5 +1,5 @@
-import { ContactInfo } from "./contact-info"
-import { ContactFormCard } from "./contact-form-card"
+import { ContactInfo } from './contact-info'
+import { ContactFormCard } from './contact-form-card'
 
 export function ContactContent() {
   return (

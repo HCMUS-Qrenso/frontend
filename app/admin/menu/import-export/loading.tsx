@@ -1,5 +1,5 @@
-import { AdminLayout } from "@/components/admin/admin-layout"
-import { Loader2 } from "lucide-react"
+import { AdminLayout } from '@/components/admin/admin-layout'
+import { Loader2 } from 'lucide-react'
 
 export default function Loading() {
   return (

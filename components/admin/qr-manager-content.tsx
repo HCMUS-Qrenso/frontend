@@ -11,6 +11,7 @@ import {
   useQRCodesQuery,
   useBatchGenerateQRMutation,
   useGenerateQRMutation,
+  useQrStatsQuery,
 } from '@/hooks/use-tables-query'
 import { useZonesSimpleQuery } from '@/hooks/use-zones-query'
 import { tablesApi } from '@/lib/api/tables'
@@ -18,7 +19,7 @@ import { downloadBlobWithHeaders } from '@/lib/utils/download'
 import { toast } from 'sonner'
 import { useErrorHandler } from '@/hooks/use-error-handler'
 import { Loader2 } from 'lucide-react'
-import type { QRStatus, TableQR } from '@/types/tables'
+import { QrStats, type QRStatus, type TableQR } from '@/types/tables'
 
 // Helper function to map backend QR status to UI status
 // API returns title case: "Missing", "Ready", "Outdated"
@@ -128,6 +129,8 @@ export function QRManagerContent() {
   const batchGenerateMutation = useBatchGenerateQRMutation()
   const generateMutation = useGenerateQRMutation()
 
+  const { data: qrStatsData } = useQrStatsQuery()
+
   const tableQRs = useMemo(() => {
     if (!qrData?.data.tables) return []
     const base = qrData.data.tables.map(transformQRToTableQR)
@@ -230,7 +233,7 @@ export function QRManagerContent() {
   return (
     <div className="space-y-6">
       {/* Stats */}
-      <QRManagerStats tables={tableQRs} />
+      <QRManagerStats {...(qrStatsData?.data || {})} />
 
       {/* Main content grid */}
       <div className="space-y-4">

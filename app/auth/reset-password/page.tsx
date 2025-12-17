@@ -10,14 +10,7 @@ import { AuthContainer } from '@/components/auth/auth-container'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import {
-  Loader2,
-  CheckCircle2,
-  Eye,
-  EyeOff,
-  AlertCircle,
-  AlertTriangle,
-} from 'lucide-react'
+import { Loader2, CheckCircle2, Eye, EyeOff, AlertCircle, AlertTriangle } from 'lucide-react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { useAuth } from '@/hooks/use-auth'
 import type { ApiErrorResponse } from '@/types/auth'
@@ -233,7 +226,7 @@ function ResetPasswordContent() {
       <div className="mx-auto w-full max-w-sm">
         {/* Mobile Logo */}
         <div className="mb-8 flex items-center justify-center gap-3 lg:hidden">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl overflow-hidden">
+          <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl">
             <img src="/logo.png" alt="Logo" className="h-full w-full object-contain" />
           </div>
         </div>

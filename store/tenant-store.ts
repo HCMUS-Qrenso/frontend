@@ -12,7 +12,11 @@ interface TenantState {
 
 export const useTenantStore = create<TenantState>((set, get) => ({
   tenants: [],
-  selectedTenantId: null,
+  selectedTenantId: (() => {
+    const id = typeof window !== 'undefined' ? localStorage.getItem('selectedTenantId') : null
+    if (id) setTenantId(id)
+    return id
+  })(),
 
   setTenants: (tenants) => {
     set({ tenants })
@@ -25,12 +29,16 @@ export const useTenantStore = create<TenantState>((set, get) => ({
 
     setTenantId(tenantId)
     set({ selectedTenantId: tenantId })
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('selectedTenantId', tenantId)
+    }
   },
 
   resetTenant: () => {
     setTenantId(null)
     set({ selectedTenantId: null, tenants: [] })
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('selectedTenantId')
+    }
   },
 }))
-
-

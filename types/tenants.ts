@@ -57,5 +57,3 @@ export interface TenantListQueryParams {
   status?: string
   subscription_tier?: string
 }
-
-

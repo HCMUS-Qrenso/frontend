@@ -1,7 +1,7 @@
-"use client"
+'use client'
 
-import { useState } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import {
   AlertDialog,
   AlertDialogContent,
@@ -9,18 +9,18 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
-import { Button } from "@/components/ui/button"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { AlertTriangle, Loader2 } from "lucide-react"
+} from '@/components/ui/alert-dialog'
+import { Button } from '@/components/ui/button'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { AlertTriangle, Loader2 } from 'lucide-react'
 
 export function CategoryDeleteDialog() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [isDeleting, setIsDeleting] = useState(false)
 
-  const open = searchParams.get("delete") === "category"
-  const categoryId = searchParams.get("id")
+  const open = searchParams.get('delete') === 'category'
+  const categoryId = searchParams.get('id')
 
   // Mock: Check if category has items
   const hasItems = true
@@ -28,8 +28,8 @@ export function CategoryDeleteDialog() {
 
   const handleClose = () => {
     const params = new URLSearchParams(searchParams.toString())
-    params.delete("delete")
-    params.delete("id")
+    params.delete('delete')
+    params.delete('id')
     router.push(`?${params.toString()}`)
   }
 
@@ -42,7 +42,7 @@ export function CategoryDeleteDialog() {
 
       handleClose()
     } catch (error) {
-      console.error("Error deleting category:", error)
+      console.error('Error deleting category:', error)
     } finally {
       setIsDeleting(false)
     }
@@ -62,7 +62,8 @@ export function CategoryDeleteDialog() {
           <Alert variant="destructive">
             <AlertTriangle className="h-4 w-4" />
             <AlertDescription>
-              Danh mục đang chứa {itemCount} món ăn. Bạn cần chuyển các món sang danh mục khác trước khi xóa.
+              Danh mục đang chứa {itemCount} món ăn. Bạn cần chuyển các món sang danh mục khác trước
+              khi xóa.
             </AlertDescription>
           </Alert>
         )}
@@ -78,7 +79,7 @@ export function CategoryDeleteDialog() {
                 Đang xóa...
               </>
             ) : (
-              "Xóa danh mục"
+              'Xóa danh mục'
             )}
           </Button>
         </AlertDialogFooter>

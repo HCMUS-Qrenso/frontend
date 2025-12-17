@@ -1,7 +1,7 @@
-"use client"
+'use client'
 
-import { useState } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import {
   AlertDialog,
   AlertDialogContent,
@@ -9,21 +9,21 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
-import { Button } from "@/components/ui/button"
-import { Loader2 } from "lucide-react"
+} from '@/components/ui/alert-dialog'
+import { Button } from '@/components/ui/button'
+import { Loader2 } from 'lucide-react'
 
 export function MenuItemDeleteDialog() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const open = searchParams.get("delete") === "item"
-  const itemId = searchParams.get("id")
+  const open = searchParams.get('delete') === 'item'
+  const itemId = searchParams.get('id')
   const [isDeleting, setIsDeleting] = useState(false)
 
   const handleClose = () => {
     const params = new URLSearchParams(searchParams.toString())
-    params.delete("delete")
-    params.delete("id")
+    params.delete('delete')
+    params.delete('id')
     router.push(`?${params.toString()}`)
   }
 
@@ -36,7 +36,7 @@ export function MenuItemDeleteDialog() {
 
       handleClose()
     } catch (error) {
-      console.error("Error deleting menu item:", error)
+      console.error('Error deleting menu item:', error)
     } finally {
       setIsDeleting(false)
     }
@@ -67,7 +67,7 @@ export function MenuItemDeleteDialog() {
                 Đang xóa...
               </>
             ) : (
-              "Xóa"
+              'Xóa'
             )}
           </Button>
         </AlertDialogFooter>

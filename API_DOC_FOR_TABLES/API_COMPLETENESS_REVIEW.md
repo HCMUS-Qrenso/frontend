@@ -125,20 +125,20 @@ This document verifies that all UI features have corresponding API endpoints.
 
 ### Database Schema Compatibility
 
-| UI Field                  | Database Field                        | Mapping                                           | Status                             |
-| ------------------------- | ------------------------------------- | ------------------------------------------------- | ---------------------------------- |
-| `table_number`            | `tables.table_number`                 | Direct                                            | ✅ Covered                         |
-| `capacity`                | `tables.capacity`                     | Direct                                            | ✅ Covered                         |
-| `floor`                   | `tables.floor`                        | Direct                                            | ✅ Covered                         |
-| `shape`                   | `tables.shape`                        | Direct mapping                                    | ✅ Covered                         |
-| `status`                  | `tables.status`                       | Direct (UI uses 'Available', DB uses 'available') | ✅ Covered (transformation needed) |
-| `position.x, position.y`  | `tables.position` (JSON)              | Stored as JSON string                             | ✅ Covered                         |
-| `rotation`                | `tables.position` (JSON)              | Stored in position JSON                           | ✅ Covered                         |
-| `size.width, size.height` | `tables.position` (JSON)              | Stored in position JSON                           | ✅ Covered                         |
-| `canBeMerged`             | `tables.position` (JSON)              | Stored in position JSON metadata                  | ✅ Covered                         |
-| `notes`                   | `tables.position` (JSON)              | Stored in position JSON metadata                  | ✅ Covered                         |
-| `qr_code_url`             | `tables.qr_code_url`                  | External QR image URL (from api.qrserver.com)     | ✅ Covered                         |
-| `ordering_url`            | `tables.ordering_url`                 | Actual ordering link embedded in QR code          | ✅ Covered                         |
+| UI Field                  | Database Field           | Mapping                                           | Status                             |
+| ------------------------- | ------------------------ | ------------------------------------------------- | ---------------------------------- |
+| `table_number`            | `tables.table_number`    | Direct                                            | ✅ Covered                         |
+| `capacity`                | `tables.capacity`        | Direct                                            | ✅ Covered                         |
+| `floor`                   | `tables.floor`           | Direct                                            | ✅ Covered                         |
+| `shape`                   | `tables.shape`           | Direct mapping                                    | ✅ Covered                         |
+| `status`                  | `tables.status`          | Direct (UI uses 'Available', DB uses 'available') | ✅ Covered (transformation needed) |
+| `position.x, position.y`  | `tables.position` (JSON) | Stored as JSON string                             | ✅ Covered                         |
+| `rotation`                | `tables.position` (JSON) | Stored in position JSON                           | ✅ Covered                         |
+| `size.width, size.height` | `tables.position` (JSON) | Stored in position JSON                           | ✅ Covered                         |
+| `canBeMerged`             | `tables.position` (JSON) | Stored in position JSON metadata                  | ✅ Covered                         |
+| `notes`                   | `tables.position` (JSON) | Stored in position JSON metadata                  | ✅ Covered                         |
+| `qr_code_url`             | `tables.qr_code_url`     | External QR image URL (from api.qrserver.com)     | ✅ Covered                         |
+| `ordering_url`            | `tables.ordering_url`    | Actual ordering link embedded in QR code          | ✅ Covered                         |
 
 **Status: ✅ All mappings documented**
 

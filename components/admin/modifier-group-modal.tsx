@@ -1,9 +1,9 @@
-"use client"
+'use client'
 
-import type React from "react"
+import type React from 'react'
 
-import { useEffect, useState } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useEffect, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import {
   Dialog,
   DialogContent,
@@ -11,14 +11,14 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Switch } from "@/components/ui/switch"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Loader2 } from "lucide-react"
-import type { ModifierGroup } from "@/app/admin/menu/modifiers/page"
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Switch } from '@/components/ui/switch'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { Loader2 } from 'lucide-react'
+import type { ModifierGroup } from '@/app/admin/menu/modifiers/page'
 
 interface ModifierGroupModalProps {
   open: boolean
@@ -28,32 +28,32 @@ interface ModifierGroupModalProps {
 export function ModifierGroupModal({ open, groups }: ModifierGroupModalProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const mode = searchParams.get("mode") as "create" | "edit"
-  const groupId = searchParams.get("id")
+  const mode = searchParams.get('mode') as 'create' | 'edit'
+  const groupId = searchParams.get('id')
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [formData, setFormData] = useState<{
     name: string
-    type: "single_choice" | "multiple_choice"
+    type: 'single_choice' | 'multiple_choice'
     is_required: boolean
     min_selections: number
     max_selections: number | null
   }>({
-    name: "",
-    type: "single_choice",
+    name: '',
+    type: 'single_choice',
     is_required: false,
     min_selections: 0,
     max_selections: 1,
   })
 
   const [errors, setErrors] = useState({
-    name: "",
-    selections: "",
+    name: '',
+    selections: '',
   })
 
   // Load data if editing
   useEffect(() => {
-    if (mode === "edit" && groupId) {
+    if (mode === 'edit' && groupId) {
       const group = groups.find((g) => g.id === groupId)
       if (group) {
         setFormData({
@@ -66,8 +66,8 @@ export function ModifierGroupModal({ open, groups }: ModifierGroupModalProps) {
       }
     } else {
       setFormData({
-        name: "",
-        type: "single_choice",
+        name: '',
+        type: 'single_choice',
         is_required: false,
         min_selections: 0,
         max_selections: 1,
@@ -77,7 +77,7 @@ export function ModifierGroupModal({ open, groups }: ModifierGroupModalProps) {
 
   // Auto-adjust min/max based on type and required
   useEffect(() => {
-    if (formData.type === "single_choice") {
+    if (formData.type === 'single_choice') {
       setFormData((prev) => ({
         ...prev,
         max_selections: 1,
@@ -90,30 +90,30 @@ export function ModifierGroupModal({ open, groups }: ModifierGroupModalProps) {
 
   const handleClose = () => {
     const params = new URLSearchParams(searchParams.toString())
-    params.delete("modal")
-    params.delete("mode")
-    params.delete("id")
+    params.delete('modal')
+    params.delete('mode')
+    params.delete('id')
     router.push(`?${params.toString()}`)
-    setErrors({ name: "", selections: "" })
+    setErrors({ name: '', selections: '' })
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setErrors({ name: "", selections: "" })
+    setErrors({ name: '', selections: '' })
 
     // Validation
     if (!formData.name.trim()) {
-      setErrors({ name: "Vui lòng nhập tên nhóm", selections: "" })
+      setErrors({ name: 'Vui lòng nhập tên nhóm', selections: '' })
       return
     }
 
     if (formData.name.length > 100) {
-      setErrors({ name: "Tên nhóm không được vượt quá 100 ký tự", selections: "" })
+      setErrors({ name: 'Tên nhóm không được vượt quá 100 ký tự', selections: '' })
       return
     }
 
     if (formData.max_selections !== null && formData.min_selections > formData.max_selections) {
-      setErrors({ name: "", selections: "Số lượng tối thiểu không được lớn hơn tối đa" })
+      setErrors({ name: '', selections: 'Số lượng tối thiểu không được lớn hơn tối đa' })
       return
     }
 
@@ -124,7 +124,7 @@ export function ModifierGroupModal({ open, groups }: ModifierGroupModalProps) {
       await new Promise((resolve) => setTimeout(resolve, 1000))
       handleClose()
     } catch (error) {
-      console.error("Error saving group:", error)
+      console.error('Error saving group:', error)
     } finally {
       setIsSubmitting(false)
     }
@@ -134,11 +134,13 @@ export function ModifierGroupModal({ open, groups }: ModifierGroupModalProps) {
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[550px]">
         <DialogHeader>
-          <DialogTitle>{mode === "create" ? "Tạo nhóm tuỳ chọn mới" : "Chỉnh sửa nhóm tuỳ chọn"}</DialogTitle>
+          <DialogTitle>
+            {mode === 'create' ? 'Tạo nhóm tuỳ chọn mới' : 'Chỉnh sửa nhóm tuỳ chọn'}
+          </DialogTitle>
           <DialogDescription>
-            {mode === "create"
-              ? "Tạo nhóm mới để phân loại các tuỳ chọn (Size, Topping, Độ chín...)"
-              : "Cập nhật thông tin nhóm tuỳ chọn"}
+            {mode === 'create'
+              ? 'Tạo nhóm mới để phân loại các tuỳ chọn (Size, Topping, Độ chín...)'
+              : 'Cập nhật thông tin nhóm tuỳ chọn'}
           </DialogDescription>
         </DialogHeader>
 
@@ -166,7 +168,7 @@ export function ModifierGroupModal({ open, groups }: ModifierGroupModalProps) {
             <RadioGroup
               value={formData.type}
               onValueChange={(value) =>
-                setFormData({ ...formData, type: value as "single_choice" | "multiple_choice" })
+                setFormData({ ...formData, type: value as 'single_choice' | 'multiple_choice' })
               }
               disabled={isSubmitting}
             >
@@ -174,14 +176,18 @@ export function ModifierGroupModal({ open, groups }: ModifierGroupModalProps) {
                 <RadioGroupItem value="single_choice" id="single" />
                 <Label htmlFor="single" className="flex-1 cursor-pointer font-normal">
                   <div className="font-medium">Single Choice</div>
-                  <div className="text-xs text-slate-500 dark:text-slate-400">Chỉ chọn được 1 option (VD: Size)</div>
+                  <div className="text-xs text-slate-500 dark:text-slate-400">
+                    Chỉ chọn được 1 option (VD: Size)
+                  </div>
                 </Label>
               </div>
               <div className="flex items-center space-x-2 rounded-lg border border-slate-200 p-3 dark:border-slate-700">
                 <RadioGroupItem value="multiple_choice" id="multiple" />
                 <Label htmlFor="multiple" className="flex-1 cursor-pointer font-normal">
                   <div className="font-medium">Multiple Choice</div>
-                  <div className="text-xs text-slate-500 dark:text-slate-400">Chọn được nhiều option (VD: Topping)</div>
+                  <div className="text-xs text-slate-500 dark:text-slate-400">
+                    Chọn được nhiều option (VD: Topping)
+                  </div>
                 </Label>
               </div>
             </RadioGroup>
@@ -193,7 +199,9 @@ export function ModifierGroupModal({ open, groups }: ModifierGroupModalProps) {
               <Label htmlFor="is_required" className="text-base">
                 Bắt buộc chọn
               </Label>
-              <p className="text-sm text-slate-500 dark:text-slate-400">Khách hàng phải chọn ít nhất 1 option</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400">
+                Khách hàng phải chọn ít nhất 1 option
+              </p>
             </div>
             <Switch
               id="is_required"
@@ -204,7 +212,7 @@ export function ModifierGroupModal({ open, groups }: ModifierGroupModalProps) {
           </div>
 
           {/* Min/Max Selections */}
-          {formData.type === "multiple_choice" && (
+          {formData.type === 'multiple_choice' && (
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="min">Số lượng tối thiểu</Label>
@@ -213,7 +221,12 @@ export function ModifierGroupModal({ open, groups }: ModifierGroupModalProps) {
                   type="number"
                   min={0}
                   value={formData.min_selections}
-                  onChange={(e) => setFormData({ ...formData, min_selections: Number.parseInt(e.target.value) || 0 })}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      min_selections: Number.parseInt(e.target.value) || 0,
+                    })
+                  }
                   disabled={isSubmitting}
                 />
               </div>
@@ -224,7 +237,7 @@ export function ModifierGroupModal({ open, groups }: ModifierGroupModalProps) {
                     id="max"
                     type="number"
                     min={1}
-                    value={formData.max_selections || ""}
+                    value={formData.max_selections || ''}
                     onChange={(e) => {
                       const val = e.target.value ? Number.parseInt(e.target.value) : null
                       setFormData({ ...formData, max_selections: val })
@@ -242,14 +255,18 @@ export function ModifierGroupModal({ open, groups }: ModifierGroupModalProps) {
             <Button type="button" variant="outline" onClick={handleClose} disabled={isSubmitting}>
               Hủy
             </Button>
-            <Button type="submit" disabled={isSubmitting} className="bg-emerald-600 hover:bg-emerald-700">
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="bg-emerald-600 hover:bg-emerald-700"
+            >
               {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Đang lưu...
                 </>
               ) : (
-                "Lưu"
+                'Lưu'
               )}
             </Button>
           </DialogFooter>

@@ -113,7 +113,7 @@ export default function ForgotPasswordPage() {
       <div className="mx-auto w-full max-w-sm">
         {/* Mobile Logo */}
         <div className="mb-8 flex items-center justify-center gap-3 lg:hidden">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl overflow-hidden">
+          <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl">
             <img src="/logo.png" alt="Logo" className="h-full w-full object-contain" />
           </div>
         </div>

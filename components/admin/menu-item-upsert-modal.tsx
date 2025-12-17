@@ -1,8 +1,8 @@
-"use client"
+'use client'
 
-import type React from "react"
-import { useEffect, useState } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
+import type React from 'react'
+import { useEffect, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import {
   Dialog,
   DialogContent,
@@ -10,16 +10,22 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Switch } from "@/components/ui/switch"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Loader2, Upload, X, LinkIcon } from "lucide-react"
-import { cn } from "@/lib/utils"
-import Image from "next/image"
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { Switch } from '@/components/ui/switch'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Loader2, Upload, X, LinkIcon } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import Image from 'next/image'
 
 interface MenuItemUpsertModalProps {
   open: boolean
@@ -28,55 +34,55 @@ interface MenuItemUpsertModalProps {
 export function MenuItemUpsertModal({ open }: MenuItemUpsertModalProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const mode = searchParams.get("mode") as "create" | "edit"
-  const itemId = searchParams.get("id")
+  const mode = searchParams.get('mode') as 'create' | 'edit'
+  const itemId = searchParams.get('id')
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [images, setImages] = useState<{ url: string; is_primary: boolean }[]>([])
   const [formData, setFormData] = useState({
-    name: "",
-    category_id: "",
-    base_price: "",
-    description: "",
-    preparation_time: "",
-    status: "available" as "available" | "unavailable" | "sold_out",
+    name: '',
+    category_id: '',
+    base_price: '',
+    description: '',
+    preparation_time: '',
+    status: 'available' as 'available' | 'unavailable' | 'sold_out',
     is_chef_recommendation: false,
-    allergen_info: "",
-    nutritional_info: "",
+    allergen_info: '',
+    nutritional_info: '',
   })
 
   const [errors, setErrors] = useState({
-    name: "",
-    base_price: "",
+    name: '',
+    base_price: '',
   })
 
   // Load data if editing
   useEffect(() => {
-    if (mode === "edit" && itemId) {
+    if (mode === 'edit' && itemId) {
       // TODO: Load item data from API
       setFormData({
-        name: "Phở Bò Tái",
-        category_id: "2",
-        base_price: "85000",
-        description: "Phở bò tái truyền thống Hà Nội",
-        preparation_time: "15",
-        status: "available",
+        name: 'Phở Bò Tái',
+        category_id: '2',
+        base_price: '85000',
+        description: 'Phở bò tái truyền thống Hà Nội',
+        preparation_time: '15',
+        status: 'available',
         is_chef_recommendation: true,
-        allergen_info: "Không",
-        nutritional_info: "Calories: 450, Protein: 25g",
+        allergen_info: 'Không',
+        nutritional_info: 'Calories: 450, Protein: 25g',
       })
-      setImages([{ url: "/pho-bo.jpg", is_primary: true }])
+      setImages([{ url: '/pho-bo.jpg', is_primary: true }])
     } else {
       setFormData({
-        name: "",
-        category_id: "",
-        base_price: "",
-        description: "",
-        preparation_time: "",
-        status: "available",
+        name: '',
+        category_id: '',
+        base_price: '',
+        description: '',
+        preparation_time: '',
+        status: 'available',
         is_chef_recommendation: false,
-        allergen_info: "",
-        nutritional_info: "",
+        allergen_info: '',
+        nutritional_info: '',
       })
       setImages([])
     }
@@ -84,36 +90,36 @@ export function MenuItemUpsertModal({ open }: MenuItemUpsertModalProps) {
 
   const handleClose = () => {
     const params = new URLSearchParams(searchParams.toString())
-    params.delete("modal")
-    params.delete("mode")
-    params.delete("id")
+    params.delete('modal')
+    params.delete('mode')
+    params.delete('id')
     router.push(`?${params.toString()}`)
     setFormData({
-      name: "",
-      category_id: "",
-      base_price: "",
-      description: "",
-      preparation_time: "",
-      status: "available",
+      name: '',
+      category_id: '',
+      base_price: '',
+      description: '',
+      preparation_time: '',
+      status: 'available',
       is_chef_recommendation: false,
-      allergen_info: "",
-      nutritional_info: "",
+      allergen_info: '',
+      nutritional_info: '',
     })
     setImages([])
-    setErrors({ name: "", base_price: "" })
+    setErrors({ name: '', base_price: '' })
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setErrors({ name: "", base_price: "" })
+    setErrors({ name: '', base_price: '' })
 
     // Validation
-    const newErrors = { name: "", base_price: "" }
+    const newErrors = { name: '', base_price: '' }
     if (!formData.name.trim()) {
-      newErrors.name = "Vui lòng nhập tên món"
+      newErrors.name = 'Vui lòng nhập tên món'
     }
     if (!formData.base_price || Number(formData.base_price) <= 0) {
-      newErrors.base_price = "Vui lòng nhập giá hợp lệ"
+      newErrors.base_price = 'Vui lòng nhập giá hợp lệ'
     }
 
     if (newErrors.name || newErrors.base_price) {
@@ -130,7 +136,7 @@ export function MenuItemUpsertModal({ open }: MenuItemUpsertModalProps) {
       // Success
       handleClose()
     } catch (error) {
-      console.error("Error saving menu item:", error)
+      console.error('Error saving menu item:', error)
     } finally {
       setIsSubmitting(false)
     }
@@ -139,7 +145,7 @@ export function MenuItemUpsertModal({ open }: MenuItemUpsertModalProps) {
   const handleImageUpload = () => {
     // TODO: Implement image upload
     const newImage = {
-      url: "/vietnamese-food.jpg",
+      url: '/vietnamese-food.jpg',
       is_primary: images.length === 0,
     }
     setImages([...images, newImage])
@@ -154,23 +160,25 @@ export function MenuItemUpsertModal({ open }: MenuItemUpsertModalProps) {
   }
 
   const handleModifiersLink = () => {
-    router.push("/admin/menu/modifiers")
+    router.push('/admin/menu/modifiers')
   }
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-[700px]">
         <DialogHeader>
-          <DialogTitle>{mode === "create" ? "Thêm món mới" : "Chỉnh sửa món"}</DialogTitle>
+          <DialogTitle>{mode === 'create' ? 'Thêm món mới' : 'Chỉnh sửa món'}</DialogTitle>
           <DialogDescription>
-            {mode === "create" ? "Tạo món ăn mới cho menu" : "Cập nhật thông tin món ăn"}
+            {mode === 'create' ? 'Tạo món ăn mới cho menu' : 'Cập nhật thông tin món ăn'}
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Section 1: Basic Info */}
           <div className="space-y-4">
-            <h3 className="text-sm font-semibold text-slate-900 dark:text-white">Thông tin cơ bản</h3>
+            <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
+              Thông tin cơ bản
+            </h3>
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
@@ -276,12 +284,16 @@ export function MenuItemUpsertModal({ open }: MenuItemUpsertModalProps) {
                 <Label htmlFor="chef_pick" className="text-base">
                   Chef's recommendation
                 </Label>
-                <p className="text-sm text-slate-500 dark:text-slate-400">Đánh dấu là món đặc biệt của đầu bếp</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">
+                  Đánh dấu là món đặc biệt của đầu bếp
+                </p>
               </div>
               <Switch
                 id="chef_pick"
                 checked={formData.is_chef_recommendation}
-                onCheckedChange={(checked) => setFormData({ ...formData, is_chef_recommendation: checked })}
+                onCheckedChange={(checked) =>
+                  setFormData({ ...formData, is_chef_recommendation: checked })
+                }
                 disabled={isSubmitting}
               />
             </div>
@@ -296,12 +308,14 @@ export function MenuItemUpsertModal({ open }: MenuItemUpsertModalProps) {
                 <div key={index} className="relative">
                   <div
                     className={cn(
-                      "relative h-24 w-24 overflow-hidden rounded-lg border-2",
-                      image.is_primary ? "border-emerald-500" : "border-slate-200 dark:border-slate-800",
+                      'relative h-24 w-24 overflow-hidden rounded-lg border-2',
+                      image.is_primary
+                        ? 'border-emerald-500'
+                        : 'border-slate-200 dark:border-slate-800',
                     )}
                   >
                     <Image
-                      src={image.url || "/placeholder.svg"}
+                      src={image.url || '/placeholder.svg'}
                       alt={`Image ${index + 1}`}
                       fill
                       className="object-cover"
@@ -310,7 +324,7 @@ export function MenuItemUpsertModal({ open }: MenuItemUpsertModalProps) {
                   <button
                     type="button"
                     onClick={() => handleRemoveImage(index)}
-                    className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-white hover:bg-red-600"
+                    className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-white hover:bg-red-600"
                   >
                     <X className="h-3 w-3" />
                   </button>
@@ -318,13 +332,13 @@ export function MenuItemUpsertModal({ open }: MenuItemUpsertModalProps) {
                     <button
                       type="button"
                       onClick={() => handleSetPrimaryImage(index)}
-                      className="absolute bottom-0 left-0 right-0 bg-black/60 py-1 text-xs text-white hover:bg-black/80"
+                      className="absolute right-0 bottom-0 left-0 bg-black/60 py-1 text-xs text-white hover:bg-black/80"
                     >
                       Đặt chính
                     </button>
                   )}
                   {image.is_primary && (
-                    <div className="absolute bottom-0 left-0 right-0 bg-emerald-500 py-1 text-center text-xs text-white">
+                    <div className="absolute right-0 bottom-0 left-0 bg-emerald-500 py-1 text-center text-xs text-white">
                       Ảnh chính
                     </div>
                   )}
@@ -344,7 +358,9 @@ export function MenuItemUpsertModal({ open }: MenuItemUpsertModalProps) {
 
           {/* Section 4: Allergens & Nutrition */}
           <div className="space-y-4">
-            <h3 className="text-sm font-semibold text-slate-900 dark:text-white">Allergens & Dinh dưỡng</h3>
+            <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
+              Allergens & Dinh dưỡng
+            </h3>
 
             <div className="space-y-2">
               <Label htmlFor="allergen">Dị ứng</Label>
@@ -372,10 +388,12 @@ export function MenuItemUpsertModal({ open }: MenuItemUpsertModalProps) {
 
           {/* Section 5: Modifiers Hook */}
           <div className="space-y-4">
-            <h3 className="text-sm font-semibold text-slate-900 dark:text-white">Nhóm tuỳ chọn (Modifiers)</h3>
+            <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
+              Nhóm tuỳ chọn (Modifiers)
+            </h3>
 
             <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-800/50">
-              <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">
+              <p className="mb-3 text-sm text-slate-600 dark:text-slate-400">
                 Chưa có nhóm tuỳ chọn nào. Vui lòng tạo nhóm tuỳ chọn trước.
               </p>
               <Button type="button" variant="outline" size="sm" onClick={handleModifiersLink}>
@@ -389,14 +407,18 @@ export function MenuItemUpsertModal({ open }: MenuItemUpsertModalProps) {
             <Button type="button" variant="outline" onClick={handleClose} disabled={isSubmitting}>
               Hủy
             </Button>
-            <Button type="submit" disabled={isSubmitting} className="bg-emerald-600 hover:bg-emerald-700">
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="bg-emerald-600 hover:bg-emerald-700"
+            >
               {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Đang lưu...
                 </>
               ) : (
-                "Lưu"
+                'Lưu'
               )}
             </Button>
           </DialogFooter>

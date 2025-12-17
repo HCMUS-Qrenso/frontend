@@ -36,7 +36,7 @@ export default function LoginPage() {
     if (typeof window !== 'undefined') {
       const savedRememberMe = localStorage.getItem(REMEMBER_ME_KEY) === 'true'
       const savedEmail = localStorage.getItem(REMEMBERED_EMAIL_KEY)
-      
+
       if (savedRememberMe) {
         setRememberMe(true)
       }
@@ -124,7 +124,7 @@ export default function LoginPage() {
       <div className="mx-auto w-full max-w-sm">
         {/* Mobile Logo */}
         <div className="mb-8 flex items-center justify-center gap-3 lg:hidden">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl overflow-hidden">
+          <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl">
             <img src="/logo.png" alt="Logo" className="h-full w-full object-contain" />
           </div>
         </div>
