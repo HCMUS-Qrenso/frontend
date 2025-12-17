@@ -1,28 +1,58 @@
 import { create } from 'zustand'
 import { setAccessToken, setTenantId } from '@/lib/axios'
+import { authApi } from '@/lib/api/auth'
 import type { AuthResponse, User } from '@/types/auth'
 import { useTenantStore } from './tenant-store'
 
-const ACCESS_TOKEN_KEY = 'accessToken'
-const SESSION_TOKEN_KEY = 'accessToken_session'
+// BroadcastChannel for cross-tab logout synchronization
+const logoutChannel = typeof window !== 'undefined' ? new BroadcastChannel('auth-logout') : null
+
+type AuthStatus = 'unknown' | 'authenticated' | 'unauthenticated'
 
 interface AuthState {
   user: User | null
   accessToken: string | null
   isAuthenticated: boolean
   isHydrated: boolean
+  authStatus: AuthStatus
   setAuth: (payload: AuthResponse, rememberMe?: boolean) => void
   setUser: (user: User | null) => void
   setToken: (token: string | null) => void
   clearAuth: () => void
-  initAuth: () => void
+  bootstrapAuth: () => Promise<void>
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
+// Listen for logout events from other tabs
+if (logoutChannel) {
+  logoutChannel.onmessage = () => {
+    console.log('[AuthStore] Logout broadcast received from another tab')
+    // Clear auth state when receiving logout from another tab
+    const tenantStore = useTenantStore.getState()
+    setAccessToken(null)
+    setTenantId(null)
+    tenantStore.resetTenant()
+
+    // Cleanup localStorage/sessionStorage nếu còn token cũ
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('accessToken')
+      sessionStorage.removeItem('accessToken_session')
+    }
+
+    useAuthStore.setState({
+      user: null,
+      accessToken: null,
+      isAuthenticated: false,
+      authStatus: 'unauthenticated',
+    })
+  }
+}
+
+export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
   accessToken: null,
   isAuthenticated: false,
   isHydrated: false,
+  authStatus: 'unknown',
 
   setAuth: (payload, rememberMe = true) => {
     const tenantStore = useTenantStore.getState()
@@ -39,21 +69,13 @@ export const useAuthStore = create<AuthState>((set) => ({
       setTenantId(payload.user.tenantId)
       tenantStore.resetTenant()
     }
-    if (typeof window !== 'undefined') {
-      if (rememberMe) {
-        // Lưu vào localStorage (persist qua browser restart)
-        localStorage.setItem(ACCESS_TOKEN_KEY, payload.accessToken)
-        sessionStorage.removeItem(SESSION_TOKEN_KEY)
-      } else {
-        // Lưu vào sessionStorage (chỉ tồn tại trong session hiện tại)
-        sessionStorage.setItem(SESSION_TOKEN_KEY, payload.accessToken)
-        localStorage.removeItem(ACCESS_TOKEN_KEY)
-      }
-    }
+
+    // Access token chỉ lưu trong memory, không lưu vào storage
     set({
       user: payload.user,
       accessToken: payload.accessToken,
       isAuthenticated: true,
+      authStatus: 'authenticated',
     })
   },
 
@@ -84,26 +106,12 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   setToken: (token) => {
     setAccessToken(token)
-    if (typeof window !== 'undefined') {
-      if (token) {
-        // Kiểm tra xem token đang ở đâu để giữ nguyên storage type
-        const localToken = localStorage.getItem(ACCESS_TOKEN_KEY)
-        const sessionToken = sessionStorage.getItem(SESSION_TOKEN_KEY)
-
-        if (localToken) {
-          localStorage.setItem(ACCESS_TOKEN_KEY, token)
-        } else if (sessionToken) {
-          sessionStorage.setItem(SESSION_TOKEN_KEY, token)
-        } else {
-          // Mặc định lưu vào localStorage nếu không có token nào
-          localStorage.setItem(ACCESS_TOKEN_KEY, token)
-        }
-      } else {
-        localStorage.removeItem(ACCESS_TOKEN_KEY)
-        sessionStorage.removeItem(SESSION_TOKEN_KEY)
-      }
-    }
-    set({ accessToken: token, isAuthenticated: !!token })
+    // Access token chỉ lưu trong memory, không lưu vào storage
+    set({
+      accessToken: token,
+      isAuthenticated: !!token,
+      authStatus: !!token ? 'authenticated' : 'unauthenticated'
+    })
   },
 
   clearAuth: () => {
@@ -111,32 +119,71 @@ export const useAuthStore = create<AuthState>((set) => ({
     setTenantId(null)
     const tenantStore = useTenantStore.getState()
     tenantStore.resetTenant()
+    // Cleanup localStorage/sessionStorage nếu còn token cũ
     if (typeof window !== 'undefined') {
-      localStorage.removeItem(ACCESS_TOKEN_KEY)
-      sessionStorage.removeItem(SESSION_TOKEN_KEY)
+      localStorage.removeItem('accessToken')
+      sessionStorage.removeItem('accessToken_session')
     }
-    set({ user: null, accessToken: null, isAuthenticated: false })
+
+    // Broadcast logout to other tabs
+    if (logoutChannel) {
+      console.log('[AuthStore] Broadcasting logout to other tabs')
+      logoutChannel.postMessage('LOGOUT')
+    }
+
+    set({
+      user: null,
+      accessToken: null,
+      isAuthenticated: false,
+      authStatus: 'unauthenticated'
+    })
   },
 
-  initAuth: () => {
+  bootstrapAuth: async () => {
     if (typeof window === 'undefined') return
-    // Ưu tiên localStorage (rememberMe = true), sau đó mới đến sessionStorage
-    const localToken = localStorage.getItem(ACCESS_TOKEN_KEY)
-    const sessionToken = sessionStorage.getItem(SESSION_TOKEN_KEY)
-    const storedToken = localToken || sessionToken
 
-    if (storedToken) {
-      setAccessToken(storedToken)
+    // Chỉ bootstrap một lần
+    if (get().authStatus !== 'unknown') return
+
+    try {
+      set({ authStatus: 'unknown' })
+
+      // Gọi refresh endpoint để lấy access token mới từ refresh cookie
+      const authResponse = await authApi.refresh()
+
+      // Thành công: set access token vào memory
+      setAccessToken(authResponse.accessToken)
+      const tenantStore = useTenantStore.getState()
+
+      // Role-aware tenant handling
+      if (authResponse.user.role === 'owner') {
+        setTenantId(null)
+        tenantStore.resetTenant()
+      } else {
+        setTenantId(authResponse.user.tenantId)
+        tenantStore.resetTenant()
+      }
+
       set({
-        accessToken: storedToken,
+        user: authResponse.user,
+        accessToken: authResponse.accessToken,
         isAuthenticated: true,
         isHydrated: true,
+        authStatus: 'authenticated',
       })
-    } else {
+    } catch (error) {
+      // Thất bại: clear token và set unauthenticated
+      setAccessToken(null)
+      setTenantId(null)
+      const tenantStore = useTenantStore.getState()
+      tenantStore.resetTenant()
+
       set({
+        user: null,
         accessToken: null,
         isAuthenticated: false,
         isHydrated: true,
+        authStatus: 'unauthenticated',
       })
     }
   },

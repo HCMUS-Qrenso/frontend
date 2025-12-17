@@ -12,15 +12,15 @@ interface ProtectedRouteProps {
 
 export function ProtectedRoute({ children, redirectTo = '/auth/login' }: ProtectedRouteProps) {
   const router = useRouter()
-  const { isAuthenticated, isHydrated, isLoadingProfile } = useAuth()
+  const { authStatus } = useAuth()
 
   useEffect(() => {
-    if (isHydrated && !isAuthenticated && !isLoadingProfile) {
+    if (authStatus === 'unauthenticated') {
       router.replace(redirectTo)
     }
-  }, [isAuthenticated, isHydrated, isLoadingProfile, redirectTo, router])
+  }, [authStatus, redirectTo, router])
 
-  if (!isHydrated || isLoadingProfile) {
+  if (authStatus === 'unknown') {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <Loader2 className="h-6 w-6 animate-spin text-emerald-600 dark:text-emerald-400" />
@@ -28,7 +28,7 @@ export function ProtectedRoute({ children, redirectTo = '/auth/login' }: Protect
     )
   }
 
-  if (!isAuthenticated) return null
+  if (authStatus === 'unauthenticated') return null
 
   return <>{children}</>
 }
