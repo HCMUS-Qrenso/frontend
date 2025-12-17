@@ -27,7 +27,13 @@ import {
   useUpdateTableMutation,
 } from '@/hooks/use-tables-query'
 import { toast } from 'sonner'
-import type { Table, TableStatus, TablePosition } from '@/types/tables'
+import type {
+  Table,
+  TableStatus,
+  TablePosition,
+  TableSortBy,
+  TableSortOrder,
+} from '@/types/tables'
 import { useErrorHandler } from '@/hooks/use-error-handler'
 
 function getStatusBadge(status: TableStatus) {
@@ -86,6 +92,10 @@ export function TablesListTable({ isTrashView = false }: TablesListTableProps) {
   const search = searchParams.get('search') || undefined
   const zone_id = searchParams.get('zone_id') || undefined
   const status = (searchParams.get('status') as TableStatus | null) || undefined
+  const sort_by =
+    (searchParams.get('sort_by') as TableSortBy | null) || ('tableNumber' as TableSortBy)
+  const sort_order =
+    (searchParams.get('sort_order') as TableSortOrder | null) || ('asc' as TableSortOrder)
 
   // Set is_active filter based on trash view
   // If trash view: show inactive tables (is_active = false)
@@ -99,6 +109,8 @@ export function TablesListTable({ isTrashView = false }: TablesListTableProps) {
     zone_id,
     status,
     is_active: isActive,
+    sort_by,
+    sort_order,
   })
 
   const tables = data?.data.tables || []

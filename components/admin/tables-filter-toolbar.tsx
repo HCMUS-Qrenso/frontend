@@ -9,7 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Search, Plus, LayoutGrid, QrCode, ChevronDown } from 'lucide-react'
+import { Search, Plus, LayoutGrid, QrCode, ChevronDown, ArrowUpDown } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useZonesSimpleQuery } from '@/hooks/use-zones-query'
@@ -39,6 +39,20 @@ export function TablesFilterToolbar({ isTrashView = false }: TablesFilterToolbar
   const searchQuery = searchParams.get('search') || ''
   const selectedZoneId = searchParams.get('zone_id') || 'Tất cả'
   const selectedStatusKey = searchParams.get('status') || ''
+  const sortBy = (searchParams.get('sort_by') as 'tableNumber' | 'status' | 'createdAt' | 'updatedAt') || 'tableNumber'
+  const sortOrder = (searchParams.get('sort_order') as 'asc' | 'desc') || 'asc'
+
+  const sortByLabels: Record<string, string> = {
+    tableNumber: 'Số bàn',
+    status: 'Trạng thái',
+    createdAt: 'Ngày tạo',
+    updatedAt: 'Ngày cập nhật',
+  }
+
+  const sortOrderLabels: Record<string, string> = {
+    asc: 'Tăng dần',
+    desc: 'Giảm dần',
+  }
 
   // Map backend status key to frontend label for display
   const selectedStatusLabel = selectedStatusKey
@@ -87,7 +101,7 @@ export function TablesFilterToolbar({ isTrashView = false }: TablesFilterToolbar
   return (
     <div className="flex flex-col gap-3 rounded-2xl border border-slate-100 bg-white/80 p-4 shadow-sm md:flex-row md:items-center md:justify-between dark:border-slate-800 dark:bg-slate-900/80">
       {/* Left - Filters */}
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
         {/* Search */}
         <div className="relative">
           <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400" />
@@ -136,6 +150,49 @@ export function TablesFilterToolbar({ isTrashView = false }: TablesFilterToolbar
                 {label}
               </DropdownMenuItem>
             ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        {/* Sort By */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="h-10 gap-2 rounded-full bg-transparent">
+              <ArrowUpDown className="h-4 w-4" />
+              <span className="text-sm">Sắp xếp: {sortByLabels[sortBy] ?? 'Số bàn'}</span>
+              <ChevronDown className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-56">
+            <DropdownMenuItem onClick={() => updateFilter('sort_by', 'tableNumber')}>
+              Số bàn
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => updateFilter('sort_by', 'status')}>
+              Trạng thái
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => updateFilter('sort_by', 'createdAt')}>
+              Ngày tạo
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => updateFilter('sort_by', 'updatedAt')}>
+              Ngày cập nhật
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        {/* Sort Order */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="h-10 gap-2 rounded-full bg-transparent">
+              <span className="text-sm">Thứ tự: {sortOrderLabels[sortOrder] ?? 'Tăng dần'}</span>
+              <ChevronDown className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-40">
+            <DropdownMenuItem onClick={() => updateFilter('sort_order', 'asc')}>
+              Tăng dần
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => updateFilter('sort_order', 'desc')}>
+              Giảm dần
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
