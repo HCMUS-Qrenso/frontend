@@ -20,11 +20,11 @@ import type {
 } from '@/types/auth'
 
 export const useAuth = () => {
-  const { user, accessToken, isAuthenticated, isHydrated, initAuth, setUser } = useAuthStore()
+  const { user, accessToken, isAuthenticated, isHydrated, authStatus, bootstrapAuth, setUser } = useAuthStore()
 
   useEffect(() => {
-    initAuth()
-  }, [initAuth])
+    bootstrapAuth()
+  }, [bootstrapAuth])
 
   const profileQuery = useProfileQuery(isAuthenticated && isHydrated)
   useEffect(() => {
@@ -48,6 +48,7 @@ export const useAuth = () => {
     accessToken,
     isAuthenticated,
     isHydrated,
+    authStatus,
     isLoadingProfile: profileQuery.isLoading || profileQuery.isFetching,
     login: (payload: LoginCredentials) => loginMutation.mutateAsync(payload),
     loginPending: loginMutation.isPending,

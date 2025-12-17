@@ -13,9 +13,8 @@ import type {
 
 export const authApi = {
   login: async (payload: LoginCredentials): Promise<AuthResponse> => {
-    // Tách rememberMe ra khỏi payload vì backend không cần
-    const { rememberMe, ...loginPayload } = payload
-    const { data } = await apiClient.post<AuthResponse>('/auth/login', loginPayload)
+    // Gửi toàn bộ payload bao gồm rememberMe lên backend
+    const { data } = await apiClient.post<AuthResponse>('/auth/login', payload)
     return data
   },
 

@@ -54,20 +54,20 @@ export function QRManagerToolbar({
       {/* Search & Filters */}
       <div className="flex flex-1 flex-col gap-2 sm:flex-row sm:items-center">
         {/* Search */}
-        <div className="relative flex-1 sm:max-w-xs">
-          <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400" />
+        <div className="relative sm:max-w-xs">
+          <Search className="absolute top-1/2 left-3 h-3 w-3 -translate-y-1/2 text-slate-400" />
           <Input
             placeholder="Tìm theo số bàn, khu vực hoặc link QR..."
-            className="rounded-full border-slate-200 bg-slate-50/50 pl-9 dark:border-slate-700 dark:bg-slate-800/50"
+            className="h-8 rounded-lg border-slate-200 bg-slate-50 pr-4 pl-9 text-sm focus:bg-white sm:w-64 dark:border-slate-700 dark:bg-slate-800 dark:focus:bg-slate-900"
           />
         </div>
 
         {/* Zone Filter */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="gap-2 rounded-full bg-transparent">
+            <Button variant="outline" className="h-8 gap-1 rounded-lg bg-transparent px-3">
               <span className="text-sm">Khu vực: {selectedZoneName}</span>
-              <ChevronDown className="h-4 w-4" />
+              <ChevronDown className="h-3 w-3" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start">
@@ -85,9 +85,9 @@ export function QRManagerToolbar({
         {/* Status Filter */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="gap-2 rounded-full bg-transparent">
+            <Button variant="outline" className="h-8 gap-1 rounded-lg bg-transparent px-3">
               <span className="text-sm">{selectedStatusLabel}</span>
-              <ChevronDown className="h-4 w-4" />
+              <ChevronDown className="h-3 w-3" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start">
@@ -108,17 +108,17 @@ export function QRManagerToolbar({
         <Button
           onClick={onSecurityInfo}
           variant="outline"
-          className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-transparent px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+          className="h-8 gap-1 rounded-lg border border-slate-200 bg-transparent px-3 text-sm font-medium text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
         >
-          <Shield className="h-3.5 w-3.5" />
+          <Shield className="h-3 w-3" />
           <span className="hidden sm:inline">Lưu ý bảo mật QR</span>
         </Button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="gap-2 rounded-full bg-transparent">
-              <Download className="h-4 w-4" />
-              <span className="hidden sm:inline">Tải xuống</span>
-              <ChevronDown className="h-4 w-4" />
+            <Button variant="outline" className="h-8 gap-1 rounded-lg bg-transparent px-3">
+              <Download className="h-3 w-3" />
+              <span className="hidden text-sm sm:inline">Tải xuống</span>
+              <ChevronDown className="h-3 w-3" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
@@ -129,10 +129,10 @@ export function QRManagerToolbar({
         <Button
           onClick={onGenerateAll}
           disabled={isLoading}
-          className="gap-2 rounded-full bg-emerald-500 hover:bg-emerald-600"
+          className="h-8 gap-1 rounded-lg bg-emerald-500 px-3 hover:bg-emerald-600"
         >
-          <QrCode className="h-4 w-4" />
-          <span className="hidden sm:inline">Tạo tất cả</span>
+          <QrCode className="h-3 w-3" />
+          <span className="hidden text-sm sm:inline">Tạo tất cả</span>
         </Button>
       </div>
     </div>
