@@ -21,6 +21,8 @@ import {
   LogOut,
   Table,
   LayoutGrid,
+  FolderOpen,
+  Upload,
 } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
@@ -38,7 +40,17 @@ import { getInitials, getRoleLabel } from './admin-utils'
 const menuItems = [
   { icon: LayoutDashboard, label: 'Tổng quan', href: '/admin/dashboard' },
   { icon: ClipboardList, label: 'Đơn hàng', href: '/admin/orders' },
-  { icon: UtensilsCrossed, label: 'Thực đơn', href: '/admin/menu' },
+  {
+    icon: UtensilsCrossed,
+    label: 'Thực đơn',
+    href: '/admin/menu',
+    subItems: [
+      { icon: FolderOpen, label: 'Danh mục', href: '/admin/menu/categories' },
+      { icon: UtensilsCrossed, label: 'Món ăn', href: '/admin/menu/items' },
+      { icon: Settings, label: 'Tuỳ chọn', href: '/admin/menu/modifiers' },
+      { icon: Upload, label: 'Import/Export', href: '/admin/menu/import-export' },
+    ],
+  },
   {
     icon: QrCode,
     label: 'Bàn & QR',

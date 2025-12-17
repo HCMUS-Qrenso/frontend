@@ -13,6 +13,14 @@ import Image from 'next/image'
 import { useState } from 'react'
 import { Checkbox } from '@/components/ui/checkbox'
 import type { TableQR } from '@/types/tables'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 
 interface QRTableListProps {
   tables: TableQR[]
@@ -122,62 +130,62 @@ export function QRTableList({
       )}
 
       {/* Table */}
-      <div className="relative overflow-x-auto rounded-2xl border border-slate-100 bg-white/80 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-slate-100 bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900">
-              <th className="px-6 py-3 text-left">
+      <div className="overflow-x-auto rounded-2xl border border-slate-100 bg-white/80 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
+        <Table>
+          <TableHeader>
+            <TableRow className="border-b border-slate-100 bg-slate-50/80 hover:bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900">
+              <TableHead className="px-6 py-3 text-left">
                 <Checkbox
                   checked={selectedTables.length === tables.length}
                   onCheckedChange={onSelectAll}
                   aria-label="Chọn tất cả"
                 />
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+              </TableHead>
+              <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
                 Bàn
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+              </TableHead>
+              <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
                 Xem trước QR
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+              </TableHead>
+              <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
                 Liên kết / Đích đến
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+              </TableHead>
+              <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
                 Trạng thái
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+              </TableHead>
+              <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
                 Cập nhật lúc
-              </th>
-              <th className="px-6 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+              </TableHead>
+              <TableHead className="px-6 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
                 Thao tác
-              </th>
-            </tr>
-          </thead>
-          <tbody>
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {tables.map((table, index) => (
-              <tr
+              <TableRow
                 key={table.id}
                 className={cn(
                   'border-b border-slate-100 transition-colors hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800',
                   index === tables.length - 1 && 'border-b-0',
                 )}
               >
-                <td className="px-6 py-4">
+                <TableCell className="px-6 py-4">
                   <Checkbox
                     checked={selectedTables.includes(table.id)}
                     onCheckedChange={() => onSelectTable(table.id)}
                     aria-label={`Select table ${table.tableNumber}`}
                   />
-                </td>
-                <td className="px-6 py-4">
+                </TableCell>
+                <TableCell className="px-6 py-4">
                   <div>
                     <p className="text-sm font-medium text-slate-900 dark:text-white">
                       Bàn {table.tableNumber}
                     </p>
                     <p className="text-xs text-slate-500 dark:text-slate-400">{table.tableArea}</p>
                   </div>
-                </td>
-                <td className="px-6 py-4">
+                </TableCell>
+                <TableCell className="px-6 py-4">
                   {table.qrUrl ? (
                     <button
                       onClick={() => onPreview(table)}
@@ -204,8 +212,8 @@ export function QRTableList({
                       />
                     </div>
                   )}
-                </td>
-                <td className="px-6 py-4">
+                </TableCell>
+                <TableCell className="px-6 py-4">
                   {table.qrLink ? (
                     <div className="flex items-center gap-2">
                       <code className="max-w-[200px] truncate text-xs text-slate-600 dark:text-slate-400">
@@ -227,12 +235,12 @@ export function QRTableList({
                   ) : (
                     <span className="text-xs text-slate-400 dark:text-slate-500">—</span>
                   )}
-                </td>
-                <td className="px-6 py-4">{getStatusBadge(table.status)}</td>
-                <td className="px-6 py-4">
+                </TableCell>
+                <TableCell className="px-6 py-4">{getStatusBadge(table.status)}</TableCell>
+                <TableCell className="px-6 py-4">
                   <p className="text-sm text-slate-600 dark:text-slate-400">{table.updatedAt}</p>
-                </td>
-                <td className="px-6 py-4">
+                </TableCell>
+                <TableCell className="px-6 py-4">
                   <div className="flex items-center justify-end gap-1">
                     <Button
                       variant="ghost"
@@ -278,11 +286,11 @@ export function QRTableList({
                       </Button>
                     )}
                   </div>
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
 
         {/* Loading overlay */}
         {isDataLoading && (
