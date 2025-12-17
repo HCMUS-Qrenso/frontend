@@ -79,7 +79,7 @@ function transformQRToTableQR(qr: {
 function transformSingleQRDetail(qr: {
   id: string
   table_number: string
-  table_zone?: string | null
+  tableZone?: string | null
   seats?: number | null
   qr_code_url: string | null
   ordering_url: string | null
@@ -89,7 +89,7 @@ function transformSingleQRDetail(qr: {
   return {
     id: qr.id,
     tableNumber: qr.table_number,
-    tableArea: qr.table_zone || '—',
+    tableArea: qr.tableZone || '—',
     qrUrl: qr.qr_code_url || '',
     qrLink: qr.ordering_url || '',
     status: mapQRStatus(qr.status),
@@ -113,7 +113,11 @@ export function QRManagerContent() {
     ? zonesData.data
     : (zonesData?.data as { zones?: Array<{ id: string; name: string }> } | undefined)?.zones || []
 
-  const { data: qrData, isLoading, error } = useQRCodesQuery(
+  const {
+    data: qrData,
+    isLoading,
+    error,
+  } = useQRCodesQuery(
     {
       status: statusFilter,
       zone_id: zoneFilter,
