@@ -43,6 +43,7 @@ export const useZonesStatsQuery = (enabled = true) => {
     queryKey: zonesQueryKeys.stats(),
     queryFn: () => zonesApi.getZonesStats(),
     enabled,
+    staleTime: 30 * 1000,
   })
 }
 

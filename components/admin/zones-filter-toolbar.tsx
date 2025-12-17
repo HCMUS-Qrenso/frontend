@@ -60,7 +60,7 @@ export function ZonesFilterToolbar() {
       params.set(key, value)
     }
     params.set('page', '1') // Reset to first page when filtering
-    router.push(`/admin/tables/zones?${params.toString()}`)
+    router.replace(`/admin/tables/zones?${params.toString()}`)
   }
 
   // Debounce search
