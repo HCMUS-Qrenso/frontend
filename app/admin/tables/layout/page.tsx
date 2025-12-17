@@ -610,6 +610,7 @@ export default function TableLayoutPage() {
           onTableSelect={setSelectedTableId}
           onTableUpdate={handleCanvasTableUpdate}
           zoom={zoom}
+          onZoomChange={setZoom}
           showGrid={showGrid}
           selectedArea={currentZoneName}
           onTableRemove={handleTableRemove}
