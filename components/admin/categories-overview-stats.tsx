@@ -1,19 +1,22 @@
 'use client'
 
-import type React from 'react'
+import React from 'react'
 
 import { cn } from '@/lib/utils'
-import { FolderOpen, Eye, EyeOff } from 'lucide-react'
+import { FolderOpen, Eye, EyeOff, Loader2 } from 'lucide-react'
+import { useCategoriesStatsQuery } from '@/hooks/use-categories-query'
 
 interface StatCardProps {
   title: string
   value: string
   subtext: string
-  icon: React.ReactNode
+  icon: React.ComponentType<{ className?: string }>
+  iconColor?: string
+  iconBgColor?: string
   className?: string
 }
 
-function StatCard({ title, value, subtext, icon, className }: StatCardProps) {
+function StatCard({ title, value, subtext, icon: Icon, iconColor, iconBgColor, className }: StatCardProps) {
   return (
     <div
       className={cn(
@@ -31,8 +34,8 @@ function StatCard({ title, value, subtext, icon, className }: StatCardProps) {
           </p>
           <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{subtext}</p>
         </div>
-        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400">
-          {icon}
+        <div className={cn('flex h-12 w-12 items-center justify-center rounded-xl', iconBgColor || 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400')}>
+          <Icon className={cn('h-6 w-6', iconColor)} />
         </div>
       </div>
     </div>
@@ -40,21 +43,77 @@ function StatCard({ title, value, subtext, icon, className }: StatCardProps) {
 }
 
 export function CategoriesOverviewStats() {
+  const { data, isLoading } = useCategoriesStatsQuery()
+
+  if (isLoading) {
+    return (
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {[1, 2, 3, 4].map((i) => (
+          <div
+            key={i}
+            className="flex items-center justify-center rounded-2xl border border-slate-100 bg-white/80 p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900/80"
+          >
+            <Loader2 className="h-6 w-6 animate-spin text-emerald-600" />
+          </div>
+        ))}
+      </div>
+    )
+  }
+
+  const statsData = data?.data
+
+  const stats = [
+    {
+      icon: FolderOpen,
+      title: 'Tổng danh mục',
+      value: statsData?.total_categories.toString() || '0',
+      subtext: 'Đã tạo',
+      iconColor: 'text-slate-600 dark:text-slate-400',
+      iconBgColor: 'bg-slate-50 dark:bg-slate-800',
+    },
+    {
+      icon: Eye,
+      title: 'Đang hiển thị',
+      value: statsData?.active_categories.toString() || '0',
+      subtext: 'Active',
+      iconColor: 'text-emerald-600 dark:text-emerald-400',
+      iconBgColor: 'bg-emerald-50 dark:bg-emerald-500/10',
+    },
+    {
+      icon: EyeOff,
+      title: 'Đang ẩn',
+      value: statsData?.hidden_categories.toString() || '0',
+      subtext: 'Hidden',
+      iconColor: 'text-rose-600 dark:text-rose-400',
+      iconBgColor: 'bg-rose-50 dark:bg-rose-500/10',
+    },
+  ]
+
+  // Add total menu items card if available
+  if (statsData?.total_menu_items !== undefined) {
+    stats.push({
+      icon: FolderOpen,
+      title: 'Tổng món ăn',
+      value: statsData.total_menu_items.toString(),
+      subtext: 'Thuộc các danh mục',
+      iconColor: 'text-blue-600 dark:text-blue-400',
+      iconBgColor: 'bg-blue-50 dark:bg-blue-500/10',
+    })
+  }
+
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      <StatCard
-        title="Tổng danh mục"
-        value="12"
-        subtext="Đã tạo"
-        icon={<FolderOpen className="h-6 w-6" />}
-      />
-      <StatCard
-        title="Đang hiển thị"
-        value="10"
-        subtext="Active"
-        icon={<Eye className="h-6 w-6" />}
-      />
-      <StatCard title="Đang ẩn" value="2" subtext="Hidden" icon={<EyeOff className="h-6 w-6" />} />
+    <div className={cn("grid gap-4 sm:grid-cols-2", stats.length === 4 ? "lg:grid-cols-4" : "lg:grid-cols-3")}>
+      {stats.map((stat) => (
+        <StatCard
+          key={stat.title}
+          title={stat.title}
+          value={stat.value}
+          subtext={stat.subtext}
+          icon={stat.icon}
+          iconColor={stat.iconColor}
+          iconBgColor={stat.iconBgColor}
+        />
+      ))}
     </div>
   )
 }

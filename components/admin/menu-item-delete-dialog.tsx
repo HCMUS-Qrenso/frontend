@@ -12,13 +12,23 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { Loader2 } from 'lucide-react'
+import { useMenuItemQuery, useDeleteMenuItemMutation } from '@/hooks/use-menu-items-query'
+import { useErrorHandler } from '@/hooks/use-error-handler'
+import { toast } from 'sonner'
 
 export function MenuItemDeleteDialog() {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const { handleErrorWithStatus } = useErrorHandler()
   const open = searchParams.get('delete') === 'item'
   const itemId = searchParams.get('id')
-  const [isDeleting, setIsDeleting] = useState(false)
+
+  // Fetch menu item data
+  const { data: itemData } = useMenuItemQuery(itemId || null, open && !!itemId)
+  const item = itemData?.data
+
+  // Mutation
+  const deleteMutation = useDeleteMenuItemMutation()
 
   const handleClose = () => {
     const params = new URLSearchParams(searchParams.toString())
@@ -28,17 +38,14 @@ export function MenuItemDeleteDialog() {
   }
 
   const handleDelete = async () => {
-    setIsDeleting(true)
+    if (!itemId) return
 
     try {
-      // TODO: Call delete API
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
+      await deleteMutation.mutateAsync(itemId)
+      toast.success('Đã xóa món ăn thành công')
       handleClose()
     } catch (error) {
-      console.error('Error deleting menu item:', error)
-    } finally {
-      setIsDeleting(false)
+      handleErrorWithStatus(error, undefined, 'Không thể xóa món ăn')
     }
   }
 
@@ -46,28 +53,27 @@ export function MenuItemDeleteDialog() {
     <AlertDialog open={open} onOpenChange={handleClose}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Xác nhận xóa món ăn</AlertDialogTitle>
+          <AlertDialogTitle>Xóa món "{item?.name}"?</AlertDialogTitle>
           <AlertDialogDescription>
-            Bạn có chắc chắn muốn xóa món ăn này? Hành động này không thể hoàn tác.
+            Hành động này không thể hoàn tác. Món ăn sẽ bị xóa vĩnh viễn khỏi menu.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <Button variant="outline" onClick={handleClose} disabled={isDeleting}>
+          <Button variant="outline" onClick={handleClose} disabled={deleteMutation.isPending}>
             Hủy
           </Button>
           <Button
             variant="destructive"
             onClick={handleDelete}
-            disabled={isDeleting}
-            className="bg-red-600 hover:bg-red-700"
+            disabled={deleteMutation.isPending}
           >
-            {isDeleting ? (
+            {deleteMutation.isPending ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Đang xóa...
               </>
             ) : (
-              'Xóa'
+              'Xóa món ăn'
             )}
           </Button>
         </AlertDialogFooter>

@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { GripVertical, Pencil, Trash2, Eye, EyeOff } from 'lucide-react'
+import { GripVertical, Pencil, Trash2, Eye, EyeOff, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { DndContext, closestCenter, type DragEndEvent } from '@dnd-kit/core'
 import {
@@ -22,59 +22,23 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import {
+  useCategoriesQuery,
+  useReorderCategoriesMutation,
+  useToggleCategoryStatusMutation,
+} from '@/hooks/use-categories-query'
+import { useErrorHandler } from '@/hooks/use-error-handler'
+import type { CategorySortBy, CategorySortOrder } from '@/types/categories'
+import { toast } from 'sonner'
 
 interface Category {
   id: string
   name: string
-  description: string
+  description: string | null
   display_order: number
   is_active: boolean
   item_count: number
 }
-
-// Mock data
-const mockCategories: Category[] = [
-  {
-    id: '1',
-    name: 'Khai vị',
-    description: 'Các món khai vị truyền thống',
-    display_order: 1,
-    is_active: true,
-    item_count: 8,
-  },
-  {
-    id: '2',
-    name: 'Món chính',
-    description: 'Các món chính phong phú',
-    display_order: 2,
-    is_active: true,
-    item_count: 24,
-  },
-  {
-    id: '3',
-    name: 'Tráng miệng',
-    description: 'Các món tráng miệng ngọt ngào',
-    display_order: 3,
-    is_active: true,
-    item_count: 12,
-  },
-  {
-    id: '4',
-    name: 'Đồ uống',
-    description: 'Nước giải khát và cocktail',
-    display_order: 4,
-    is_active: true,
-    item_count: 18,
-  },
-  {
-    id: '5',
-    name: 'Món đặc biệt',
-    description: 'Các món đặc biệt của nhà hàng',
-    display_order: 5,
-    is_active: false,
-    item_count: 6,
-  },
-]
 
 interface CategoriesTableProps {
   reorderMode: boolean
@@ -204,7 +168,36 @@ function SortableCategoryRow({
 export function CategoriesTable({ reorderMode, setReorderMode }: CategoriesTableProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const [categories, setCategories] = useState(mockCategories)
+  const { handleErrorWithStatus } = useErrorHandler()
+
+  // Get query params from URL
+  const page = Number.parseInt(searchParams.get('page') || '1')
+  const limit = Number.parseInt(searchParams.get('limit') || '10')
+  const search = searchParams.get('search') || undefined
+  const status = (searchParams.get('status') as 'active' | 'inactive' | 'all') || 'all'
+  const sort = searchParams.get('sort') || 'order'
+
+  // Map frontend params to API params
+  const sort_by: CategorySortBy = sort === 'updated' ? 'updated_at' : 'display_order'
+  const sort_order: CategorySortOrder = sort === 'updated' ? 'desc' : 'asc'
+
+  // Fetch categories from API
+  const { data, isLoading, error } = useCategoriesQuery({
+    page,
+    limit,
+    search,
+    status,
+    sort_by,
+    sort_order,
+    include_item_count: true,
+  })
+
+  const categories = data?.data.categories || []
+  const pagination = data?.data.pagination
+
+  // Mutations
+  const reorderMutation = useReorderCategoriesMutation()
+  const toggleStatusMutation = useToggleCategoryStatusMutation()
 
   const handleEdit = (categoryId: string) => {
     const params = new URLSearchParams(searchParams.toString())
@@ -225,172 +218,230 @@ export function CategoriesTable({ reorderMode, setReorderMode }: CategoriesTable
     router.push(`/admin/menu/items?categoryId=${categoryId}`)
   }
 
-  const handleToggleActive = (categoryId: string) => {
-    setCategories((prev) =>
-      prev.map((cat) => (cat.id === categoryId ? { ...cat, is_active: !cat.is_active } : cat)),
-    )
+  const handleToggleActive = async (categoryId: string) => {
+    try {
+      const category = categories.find((c) => c.id === categoryId)
+      if (!category) return
+
+      await toggleStatusMutation.mutateAsync({
+        id: categoryId,
+        payload: { is_active: !category.is_active },
+      })
+
+      toast.success(`Đã ${category.is_active ? 'ẩn' : 'hiện'} danh mục thành công`)
+    } catch (error) {
+      handleErrorWithStatus(error, undefined, 'Không thể thay đổi trạng thái danh mục')
+    }
   }
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event
     if (over && active.id !== over.id) {
-      const oldIndex = categories.findIndex((c) => c.id === active.id)
-      const newIndex = categories.findIndex((c) => c.id === over.id)
-      const reordered = arrayMove(categories, oldIndex, newIndex).map((cat, idx) => ({
-        ...cat,
-        display_order: idx + 1,
-      }))
-      setCategories(reordered)
+      // For reorder mode, we'll handle the reordering in the backend
+      // The UI will update via query invalidation after the API call
     }
   }
 
-  const handleSaveOrder = () => {
-    // TODO: Save order to backend
-    // API call to save new display_order for all categories
-    setReorderMode(false)
+  const handleSaveOrder = async () => {
+    try {
+      // Transform categories array to API payload format
+      const payload = {
+        categories: categories.map((cat, idx) => ({
+          id: cat.id,
+          display_order: idx + 1,
+        })),
+      }
+
+      await reorderMutation.mutateAsync(payload)
+      toast.success('Đã cập nhật thứ tự danh mục thành công')
+      setReorderMode(false)
+    } catch (error) {
+      handleErrorWithStatus(error, undefined, 'Không thể lưu thứ tự danh mục')
+    }
   }
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center rounded-2xl border border-slate-100 bg-white/80 py-12 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
+        <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
+      </div>
+    )
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="flex items-center justify-center rounded-2xl border border-slate-100 bg-white/80 py-12 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
+        <div className="text-center">
+          <p className="text-red-600 dark:text-red-400">Không thể tải danh mục</p>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Vui lòng thử lại sau</p>
+        </div>
+      </div>
+    )
+  }
+
+  const tableContent = (
+    <Table>
+      <TableHeader>
+        <TableRow className="border-b border-slate-100 bg-slate-50/80 hover:bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900">
+          {reorderMode && <TableHead className="w-[50px] px-6 py-3"></TableHead>}
+          <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+            Danh mục
+          </TableHead>
+          <TableHead className="w-[150px] px-6 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+            Thứ tự
+          </TableHead>
+          <TableHead className="w-[150px] px-6 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+            Trạng thái
+          </TableHead>
+          <TableHead className="w-[150px] px-6 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+            # Món ăn
+          </TableHead>
+          <TableHead className="w-[150px] px-6 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+            Thao tác
+          </TableHead>
+        </TableRow>
+      </TableHeader>
+      {reorderMode ? (
+        <SortableContext items={categories.map((c) => c.id)} strategy={verticalListSortingStrategy}>
+          <TableBody>
+            {categories.map((category) => (
+              <SortableCategoryRow
+                key={category.id}
+                category={category}
+                reorderMode={reorderMode}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+                onToggleActive={handleToggleActive}
+                onViewItems={handleViewItems}
+              />
+            ))}
+          </TableBody>
+        </SortableContext>
+      ) : (
+        <TableBody>
+          {categories.map((category) => (
+            <TableRow
+              key={category.id}
+              className={cn(
+                'cursor-pointer border-b border-slate-100 transition-colors hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800',
+                !category.is_active && 'opacity-60',
+              )}
+              onClick={() => handleViewItems(category.id)}
+            >
+              <TableCell className="px-6 py-4">
+                <div className="flex flex-col gap-1">
+                  <span className="font-medium text-slate-900 dark:text-white">
+                    {category.name}
+                  </span>
+                  <span className="text-sm text-slate-500 dark:text-slate-400">
+                    {category.description}
+                  </span>
+                </div>
+              </TableCell>
+              <TableCell className="px-6 py-4 text-center text-slate-600 dark:text-slate-400">
+                {category.display_order}
+              </TableCell>
+              <TableCell className="px-6 py-4 text-center">
+                <Badge
+                  variant={category.is_active ? 'default' : 'secondary'}
+                  className={cn(
+                    'font-medium',
+                    category.is_active
+                      ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400'
+                      : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400',
+                  )}
+                >
+                  {category.is_active ? 'Active' : 'Hidden'}
+                </Badge>
+              </TableCell>
+              <TableCell className="px-6 py-4 text-center text-slate-600 dark:text-slate-400">
+                {category.item_count}
+              </TableCell>
+              <TableCell className="px-6 py-4 text-right">
+                <div className="flex items-center justify-end gap-1">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 rounded-full"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleEdit(category.id)
+                    }}
+                    title="Chỉnh sửa"
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 rounded-full"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleToggleActive(category.id)
+                    }}
+                    title={category.is_active ? 'Ẩn danh mục' : 'Hiện danh mục'}
+                  >
+                    {category.is_active ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 rounded-full text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-500"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleDelete(category.id)
+                    }}
+                    title="Xóa"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      )}
+    </Table>
+  )
 
   return (
     <div className="rounded-2xl border border-slate-100 bg-white/80 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
-      <Table>
-        <TableHeader>
-          <TableRow className="border-b border-slate-100 bg-slate-50/80 hover:bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900">
-            {reorderMode && <TableHead className="w-[50px] px-6 py-3"></TableHead>}
-            <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-              Danh mục
-            </TableHead>
-            <TableHead className="w-[150px] px-6 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-              Thứ tự
-            </TableHead>
-            <TableHead className="w-[150px] px-6 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-              Trạng thái
-            </TableHead>
-            <TableHead className="w-[150px] px-6 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-              # Món ăn
-            </TableHead>
-            <TableHead className="w-[150px] px-6 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-              Thao tác
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        {reorderMode ? (
-          <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-            <SortableContext
-              items={categories.map((c) => c.id)}
-              strategy={verticalListSortingStrategy}
-            >
-              <TableBody>
-                {categories.map((category) => (
-                  <SortableCategoryRow
-                    key={category.id}
-                    category={category}
-                    reorderMode={reorderMode}
-                    onEdit={handleEdit}
-                    onDelete={handleDelete}
-                    onToggleActive={handleToggleActive}
-                    onViewItems={handleViewItems}
-                  />
-                ))}
-              </TableBody>
-            </SortableContext>
-          </DndContext>
-        ) : (
-          <TableBody>
-            {categories.map((category) => (
-              <TableRow
-                key={category.id}
-                className={cn(
-                  'cursor-pointer border-b border-slate-100 transition-colors hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800',
-                  !category.is_active && 'opacity-60',
-                )}
-                onClick={() => handleViewItems(category.id)}
-              >
-                <TableCell className="px-6 py-4">
-                  <div className="flex flex-col gap-1">
-                    <span className="font-medium text-slate-900 dark:text-white">
-                      {category.name}
-                    </span>
-                    <span className="text-sm text-slate-500 dark:text-slate-400">
-                      {category.description}
-                    </span>
-                  </div>
-                </TableCell>
-                <TableCell className="px-6 py-4 text-center text-slate-600 dark:text-slate-400">
-                  {category.display_order}
-                </TableCell>
-                <TableCell className="px-6 py-4 text-center">
-                  <Badge
-                    variant={category.is_active ? 'default' : 'secondary'}
-                    className={cn(
-                      'font-medium',
-                      category.is_active
-                        ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400'
-                        : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400',
-                    )}
-                  >
-                    {category.is_active ? 'Active' : 'Hidden'}
-                  </Badge>
-                </TableCell>
-                <TableCell className="px-6 py-4 text-center text-slate-600 dark:text-slate-400">
-                  {category.item_count}
-                </TableCell>
-                <TableCell className="px-6 py-4 text-right">
-                  <div className="flex items-center justify-end gap-1">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 rounded-full"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        handleEdit(category.id)
-                      }}
-                      title="Chỉnh sửa"
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 rounded-full"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        handleToggleActive(category.id)
-                      }}
-                      title={category.is_active ? 'Ẩn danh mục' : 'Hiện danh mục'}
-                    >
-                      {category.is_active ? (
-                        <EyeOff className="h-4 w-4" />
-                      ) : (
-                        <Eye className="h-4 w-4" />
-                      )}
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 rounded-full text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-500"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        handleDelete(category.id)
-                      }}
-                      title="Xóa"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        )}
-      </Table>
+      {reorderMode ? (
+        <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+          {tableContent}
+        </DndContext>
+      ) : (
+        tableContent
+      )}
 
       {reorderMode && (
         <div className="sticky bottom-0 flex items-center justify-end gap-3 border-t border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
-          <Button variant="outline" onClick={() => setReorderMode(false)}>
+          <Button
+            variant="outline"
+            onClick={() => setReorderMode(false)}
+            disabled={reorderMutation.isPending}
+          >
             Hủy
           </Button>
-          <Button onClick={handleSaveOrder} className="bg-emerald-600 hover:bg-emerald-700">
-            Lưu thứ tự
+          <Button
+            onClick={handleSaveOrder}
+            disabled={reorderMutation.isPending}
+            className="bg-emerald-600 hover:bg-emerald-700"
+          >
+            {reorderMutation.isPending ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Đang lưu...
+              </>
+            ) : (
+              'Lưu thứ tự'
+            )}
           </Button>
         </div>
       )}

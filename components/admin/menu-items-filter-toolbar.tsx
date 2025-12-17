@@ -12,19 +12,15 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Search, Plus, Download, ChevronDown } from 'lucide-react'
 import { AdminFilterToolbarWrapper } from './admin-filter-toolbar-wrapper'
-
-// TODO: Fetch categories from API (similar to zones in tables-filter-toolbar)
-// For now, using hardcoded categories
-const mockCategories = [
-  { id: '1', name: 'Khai vị' },
-  { id: '2', name: 'Món chính' },
-  { id: '3', name: 'Tráng miệng' },
-  { id: '4', name: 'Đồ uống' },
-]
+import { useCategoriesQuery } from '@/hooks/use-categories-query'
 
 export function MenuItemsFilterToolbar() {
   const router = useRouter()
   const searchParams = useSearchParams()
+
+  // Fetch categories from API
+  const { data: categoriesData } = useCategoriesQuery()
+  const categories = categoriesData?.data.categories || []
 
   // Map status values to UI labels
   const statusMap: Record<string, string> = {
@@ -53,7 +49,7 @@ export function MenuItemsFilterToolbar() {
   const selectedCategoryLabel =
     selectedCategoryId === 'all'
       ? 'Tất cả danh mục'
-      : mockCategories.find((c) => c.id === selectedCategoryId)?.name || 'Tất cả danh mục'
+      : categories.find((c) => c.id === selectedCategoryId)?.name || 'Tất cả danh mục'
   const selectedStatusLabel = statusMap[selectedStatus] || 'Tất cả'
   const selectedSortLabel = sortMap[selectedSort] || 'Mới cập nhật'
 
@@ -120,7 +116,7 @@ export function MenuItemsFilterToolbar() {
             <DropdownMenuItem onClick={() => updateFilter('category_id', 'all')}>
               Tất cả danh mục
             </DropdownMenuItem>
-            {mockCategories.map((category) => (
+            {categories.map((category) => (
               <DropdownMenuItem
                 key={category.id}
                 onClick={() => updateFilter('category_id', category.id)}

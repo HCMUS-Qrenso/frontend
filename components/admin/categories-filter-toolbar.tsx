@@ -29,7 +29,7 @@ export function CategoriesFilterToolbar({
   const statusMap: Record<string, string> = {
     all: 'Tất cả',
     active: 'Đang hiển thị',
-    hidden: 'Đang ẩn',
+    inactive: 'Đang ẩn',
   }
 
   // Map sort values to UI labels
@@ -40,8 +40,8 @@ export function CategoriesFilterToolbar({
 
   // Get filter values from URL params
   const searchQuery = searchParams.get('search') || ''
-  const selectedStatus = searchParams.get('status') || searchParams.get('is_active') || 'all'
-  const selectedSort = searchParams.get('sort') || searchParams.get('order_by') || 'order'
+  const selectedStatus = searchParams.get('status') || 'all'
+  const selectedSort = searchParams.get('sort') || 'order'
 
   const selectedStatusLabel = statusMap[selectedStatus] || 'Tất cả'
   const selectedSortLabel = sortMap[selectedSort] || 'Theo thứ tự'
@@ -108,7 +108,7 @@ export function CategoriesFilterToolbar({
             <DropdownMenuItem onClick={() => updateFilter('status', 'active')}>
               Đang hiển thị
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => updateFilter('status', 'hidden')}>
+            <DropdownMenuItem onClick={() => updateFilter('status', 'inactive')}>
               Đang ẩn
             </DropdownMenuItem>
           </DropdownMenuContent>
