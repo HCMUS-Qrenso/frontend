@@ -47,8 +47,8 @@ export function Header() {
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600">
-            <span className="text-lg font-bold text-white">Q</span>
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl overflow-hidden">
+            <img src="/logo.png" alt="Logo" className="h-full w-full object-contain" />
           </div>
           <span className="text-xl font-bold text-slate-900 dark:text-white">Qrenso</span>
         </Link>
@@ -104,7 +104,7 @@ export function Header() {
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="border-t border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950 md:hidden">
+        <div className="border-t border-slate-200 bg-white md:hidden dark:border-slate-800 dark:bg-slate-950">
           <nav className="container mx-auto flex flex-col gap-4 px-4 py-6">
             {navItems.map((item) =>
               item.href.startsWith('#') ? (
