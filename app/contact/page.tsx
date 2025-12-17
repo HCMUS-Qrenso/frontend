@@ -2,6 +2,7 @@ import { ContactHeader } from '@/components/contact/contact-header'
 import { ContactContent } from '@/components/contact/contact-content'
 import { Footer } from '@/components/landing/footer'
 import type { Metadata } from 'next'
+import { Header } from '@/components/landing/header'
 
 export const metadata: Metadata = {
   title: 'Liên hệ - Đăng ký dùng thử Qrenso | Đặt lịch demo miễn phí',
@@ -17,8 +18,8 @@ export const metadata: Metadata = {
 
 export default function ContactPage() {
   return (
-    <div className="min-h-screen bg-slate-950">
-      <ContactHeader />
+    <div className="min-h-screen bg-white dark:bg-slate-950">
+      <Header />
       <main>
         <ContactContent />
       </main>

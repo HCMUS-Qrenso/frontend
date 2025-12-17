@@ -122,7 +122,7 @@ export function BuiltForRoles() {
           {/* Pain Points & Solutions */}
           <div className="grid gap-8 md:grid-cols-2">
             {/* Pain Points */}
-            <div className="rounded-2xl border border-slate-200 bg-white p-8 dark:border-slate-800 dark:bg-slate-900/50">
+            <div className="rounded-2xl border bg-white p-8 dark:bg-slate-900/50 hover:scale-105 outline-2 outline-red-500/30 transition-all duration-100">
               <h3 className="mb-6 text-xl font-semibold text-slate-900 dark:text-white">
                 Vấn đề thường gặp
               </h3>
@@ -137,7 +137,7 @@ export function BuiltForRoles() {
             </div>
 
             {/* Solutions */}
-            <div className="rounded-2xl border border-emerald-500/50 bg-emerald-500/5 p-8">
+            <div className="rounded-2xl bg-emerald-500/5 p-8 hover:scale-105 outline-2 outline-emerald-500/30 transition-all duration-100">
               <h3 className="mb-6 text-xl font-semibold text-slate-900 dark:text-white">
                 Qrenso giải quyết
               </h3>

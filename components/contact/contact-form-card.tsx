@@ -139,15 +139,15 @@ export function ContactFormCard() {
 
   if (isSuccess) {
     return (
-      <div className="flex min-h-[600px] items-center justify-center rounded-2xl border border-slate-800 bg-slate-900/70 p-8">
+      <div className="flex min-h-[600px] items-center justify-center rounded-2xl border border-slate-200 bg-slate-50/70 p-8 dark:border-slate-800 dark:bg-slate-900/70">
         <div className="text-center">
           <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500/10">
             <Check className="h-8 w-8 text-emerald-500" />
           </div>
-          <h3 className="mb-3 text-2xl font-bold text-white">Cảm ơn bạn đã liên hệ!</h3>
-          <p className="mb-6 text-slate-300">
+          <h3 className="mb-3 text-2xl font-bold text-black dark:text-white">Cảm ơn bạn đã liên hệ!</h3>
+          <p className="mb-6 text-slate-600 dark:text-slate-300">
             Đội ngũ Qrenso sẽ liên hệ với bạn trong vòng{' '}
-            <strong className="text-white">24 giờ làm việc</strong>.
+            <strong className="text-black dark:text-white">24 giờ làm việc</strong>.
           </p>
           <Button className="bg-emerald-600 text-white hover:bg-emerald-700" asChild>
             <a href="/">Quay về trang chủ</a>
@@ -158,8 +158,8 @@ export function ContactFormCard() {
   }
 
   return (
-    <div className="rounded-2xl border border-slate-800 bg-slate-900/70 p-6 md:p-8">
-      <h2 className="mb-6 text-2xl font-bold text-white">Gửi yêu cầu</h2>
+    <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-6 md:p-8 dark:border-slate-800 dark:bg-slate-900/70">
+      <h2 className="mb-6 text-2xl font-bold text-black dark:text-white">Gửi yêu cầu</h2>
 
       <form onSubmit={handleSubmit} className="space-y-5">
         {/* Honeypot field - hidden from users */}
@@ -175,7 +175,7 @@ export function ContactFormCard() {
 
         {/* Full Name */}
         <div className="space-y-2">
-          <Label htmlFor="fullName" className="text-slate-200">
+          <Label htmlFor="fullName" className="text-slate-700 dark:text-slate-200">
             Họ và tên <span className="text-red-500">*</span>
           </Label>
           <Input
@@ -184,7 +184,7 @@ export function ContactFormCard() {
             value={formData.fullName}
             onChange={(e) => handleChange('fullName', e.target.value)}
             onBlur={() => handleBlur('fullName')}
-            className={`border-slate-700 bg-slate-800/50 text-white placeholder:text-slate-500 ${
+            className={`border-slate-300 bg-white text-black placeholder:text-slate-500 dark:border-slate-700 dark:bg-slate-800/50 dark:text-white dark:placeholder:text-slate-500 ${
               errors.fullName ? 'border-red-500' : ''
             }`}
           />
@@ -193,7 +193,7 @@ export function ContactFormCard() {
 
         {/* Email */}
         <div className="space-y-2">
-          <Label htmlFor="email" className="text-slate-200">
+          <Label htmlFor="email" className="text-slate-700 dark:text-slate-200">
             Email công việc <span className="text-red-500">*</span>
           </Label>
           <Input
@@ -203,7 +203,7 @@ export function ContactFormCard() {
             value={formData.email}
             onChange={(e) => handleChange('email', e.target.value)}
             onBlur={() => handleBlur('email')}
-            className={`border-slate-700 bg-slate-800/50 text-white placeholder:text-slate-500 ${
+            className={`border-slate-300 bg-white text-black placeholder:text-slate-500 dark:border-slate-700 dark:bg-slate-800/50 dark:text-white dark:placeholder:text-slate-500 ${
               errors.email ? 'border-red-500' : ''
             }`}
           />
@@ -212,7 +212,7 @@ export function ContactFormCard() {
 
         {/* Phone */}
         <div className="space-y-2">
-          <Label htmlFor="phone" className="text-slate-200">
+          <Label htmlFor="phone" className="text-slate-700 dark:text-slate-200">
             Số điện thoại <span className="text-red-500">*</span>
           </Label>
           <Input
@@ -222,7 +222,7 @@ export function ContactFormCard() {
             value={formData.phone}
             onChange={(e) => handleChange('phone', e.target.value)}
             onBlur={() => handleBlur('phone')}
-            className={`border-slate-700 bg-slate-800/50 text-white placeholder:text-slate-500 ${
+            className={`border-slate-300 bg-white text-black placeholder:text-slate-500 dark:border-slate-700 dark:bg-slate-800/50 dark:text-white dark:placeholder:text-slate-500 ${
               errors.phone ? 'border-red-500' : ''
             }`}
           />
@@ -231,7 +231,7 @@ export function ContactFormCard() {
 
         {/* Restaurant Name */}
         <div className="space-y-2">
-          <Label htmlFor="restaurantName" className="text-slate-200">
+          <Label htmlFor="restaurantName" className="text-slate-700 dark:text-slate-200">
             Tên nhà hàng <span className="text-red-500">*</span>
           </Label>
           <Input
@@ -240,7 +240,7 @@ export function ContactFormCard() {
             value={formData.restaurantName}
             onChange={(e) => handleChange('restaurantName', e.target.value)}
             onBlur={() => handleBlur('restaurantName')}
-            className={`border-slate-700 bg-slate-800/50 text-white placeholder:text-slate-500 ${
+            className={`border-slate-300 bg-white text-black placeholder:text-slate-500 dark:border-slate-700 dark:bg-slate-800/50 dark:text-white dark:placeholder:text-slate-500 ${
               errors.restaurantName ? 'border-red-500' : ''
             }`}
           />
@@ -249,39 +249,39 @@ export function ContactFormCard() {
 
         {/* City */}
         <div className="space-y-2">
-          <Label htmlFor="city" className="text-slate-200">
-            Khu vực / Thành phố <span className="text-sm text-slate-400">(Tùy chọn)</span>
+          <Label htmlFor="city" className="text-slate-700 dark:text-slate-200">
+            Khu vực / Thành phố <span className="text-sm text-slate-500 dark:text-slate-400">(Tùy chọn)</span>
           </Label>
           <Input
             id="city"
             placeholder="TP. Hồ Chí Minh"
             value={formData.city}
             onChange={(e) => handleChange('city', e.target.value)}
-            className="border-slate-700 bg-slate-800/50 text-white placeholder:text-slate-500"
+            className="border-slate-300 bg-white text-black placeholder:text-slate-500 dark:border-slate-700 dark:bg-slate-800/50 dark:text-white dark:placeholder:text-slate-500"
           />
         </div>
 
         {/* Branches */}
         <div className="space-y-2">
-          <Label htmlFor="branches" className="text-slate-200">
-            Số chi nhánh / Số bàn <span className="text-sm text-slate-400">(Tùy chọn)</span>
+          <Label htmlFor="branches" className="text-slate-700 dark:text-slate-200">
+            Số chi nhánh / Số bàn <span className="text-sm text-slate-500 dark:text-slate-400">(Tùy chọn)</span>
           </Label>
           <Input
             id="branches"
             placeholder="VD: 3 chi nhánh, ~30 bàn/chi nhánh"
             value={formData.branches}
             onChange={(e) => handleChange('branches', e.target.value)}
-            className="border-slate-700 bg-slate-800/50 text-white placeholder:text-slate-500"
+            className="border-slate-300 bg-white text-black placeholder:text-slate-500 dark:border-slate-700 dark:bg-slate-800/50 dark:text-white dark:placeholder:text-slate-500"
           />
         </div>
 
         {/* Needs */}
         <div className="space-y-2">
-          <Label htmlFor="needs" className="text-slate-200">
+          <Label htmlFor="needs" className="text-slate-700 dark:text-slate-200">
             Nhu cầu
           </Label>
           <Select value={formData.needs} onValueChange={(value) => handleChange('needs', value)}>
-            <SelectTrigger className="border-slate-700 bg-slate-800/50 text-white">
+            <SelectTrigger className="border-slate-300 bg-white text-black dark:border-slate-700 dark:bg-slate-800/50 dark:text-white">
               <SelectValue placeholder="Chọn nhu cầu của bạn" />
             </SelectTrigger>
             <SelectContent>
@@ -295,8 +295,8 @@ export function ContactFormCard() {
 
         {/* Notes */}
         <div className="space-y-2">
-          <Label htmlFor="notes" className="text-slate-200">
-            Ghi chú <span className="text-sm text-slate-400">(Tùy chọn)</span>
+          <Label htmlFor="notes" className="text-slate-700 dark:text-slate-200">
+            Ghi chú <span className="text-sm text-slate-500 dark:text-slate-400">(Tùy chọn)</span>
           </Label>
           <Textarea
             id="notes"
@@ -304,7 +304,7 @@ export function ContactFormCard() {
             value={formData.notes}
             onChange={(e) => handleChange('notes', e.target.value)}
             rows={4}
-            className="border-slate-700 bg-slate-800/50 text-white placeholder:text-slate-500"
+            className="border-slate-300 bg-white text-black placeholder:text-slate-500 dark:border-slate-700 dark:bg-slate-800/50 dark:text-white dark:placeholder:text-slate-500"
           />
         </div>
 
@@ -326,7 +326,7 @@ export function ContactFormCard() {
           </Button>
 
           {/* Privacy Note */}
-          <p className="text-center text-xs text-slate-400">
+          <p className="text-center text-xs text-slate-500 dark:text-slate-400">
             Chúng tôi chỉ sử dụng thông tin của bạn để liên hệ tư vấn và không chia sẻ cho bên thứ
             ba.
           </p>
