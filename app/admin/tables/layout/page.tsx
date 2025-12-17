@@ -610,21 +610,43 @@ export default function TableLayoutPage() {
           onTableSelect={setSelectedTableId}
           onTableUpdate={handleCanvasTableUpdate}
           zoom={zoom}
+          onZoomChange={setZoom}
           showGrid={showGrid}
           selectedArea={currentZoneName}
           onTableRemove={handleTableRemove}
         />
 
-        {/* Side Panel */}
-        <FloorPlanSidePanel
-          selectedTable={selectedTable}
-          onTableUpdate={handleTableUpdate}
-          onTableSave={handleTableSave}
-          onTableDelete={handleTableDelete}
-          onAddTable={handleAddTable}
-          areas={areas}
-          libraryTables={libraryTables}
-        />
+        {/* Main content: Canvas + Side Panel */}
+        <div className="grid gap-4 lg:grid-cols-[1fr_380px]">
+          {/* Canvas */}
+          <FloorPlanCanvas
+            tables={tables}
+            selectedTableId={selectedTableId}
+            onTableSelect={setSelectedTableId}
+            onTableUpdate={(id, updates) => {
+              // Update local state immediately for UI feedback
+              handleTableUpdate(id, updates)
+              // Debounce and batch save positions
+              // This will be handled by a separate debounced save function if needed
+            }}
+            zoom={zoom}
+            onZoomChange={setZoom}
+            showGrid={showGrid}
+            selectedArea={currentZoneName}
+            onTableRemove={(id) => handleTableRemove(id)}
+          />
+
+          {/* Side Panel */}
+          <FloorPlanSidePanel
+            selectedTable={selectedTable}
+            onTableUpdate={handleTableUpdate}
+            onTableSave={handleTableSave}
+            onTableDelete={handleTableDelete}
+            onAddTable={handleAddTable}
+            areas={zones.map((z) => z.name || z.id)}
+            libraryTables={libraryTables}
+          />
+        </div>
       </div>
 
       {/* Reset Confirmation Dialog */}
