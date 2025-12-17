@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, memo } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -116,7 +116,7 @@ const tableTemplates = [
   },
 ]
 
-export function FloorPlanSidePanel({
+function FloorPlanSidePanelComponent({
   selectedTable,
   onTableUpdate,
   onTableSave,
@@ -371,3 +371,56 @@ export function FloorPlanSidePanel({
     </div>
   )
 }
+
+// Custom comparison function for React.memo
+const areEqual = (
+  prevProps: FloorPlanSidePanelProps,
+  nextProps: FloorPlanSidePanelProps,
+): boolean => {
+  // Compare selectedTable by reference and id
+  if (prevProps.selectedTable?.id !== nextProps.selectedTable?.id) {
+    return false
+  }
+
+  // Deep compare selectedTable if it exists
+  if (prevProps.selectedTable && nextProps.selectedTable) {
+    const prev = prevProps.selectedTable
+    const next = nextProps.selectedTable
+    if (
+      prev.id !== next.id ||
+      prev.name !== next.name ||
+      prev.seats !== next.seats ||
+      prev.type !== next.type ||
+      prev.status !== next.status ||
+      prev.area !== next.area ||
+      prev.notes !== next.notes
+    ) {
+      return false
+    }
+  }
+
+  // Compare areas array
+  if (prevProps.areas.length !== nextProps.areas.length) {
+    return false
+  }
+  for (let i = 0; i < prevProps.areas.length; i++) {
+    if (prevProps.areas[i] !== nextProps.areas[i]) {
+      return false
+    }
+  }
+
+  // Compare libraryTables array length and IDs
+  if (prevProps.libraryTables.length !== nextProps.libraryTables.length) {
+    return false
+  }
+  for (let i = 0; i < prevProps.libraryTables.length; i++) {
+    if (prevProps.libraryTables[i].id !== nextProps.libraryTables[i].id) {
+      return false
+    }
+  }
+
+  // Callbacks are compared by reference - they should be memoized in parent
+  return true
+}
+
+export const FloorPlanSidePanel = memo(FloorPlanSidePanelComponent, areEqual)

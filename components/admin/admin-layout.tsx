@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Menu, Store, ChevronDown, User, Settings, LogOut } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, usePathname } from 'next/navigation'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { useAuth } from '@/hooks/use-auth'
 import { useUserProfileQuery } from '@/hooks/use-users-query'
@@ -32,6 +32,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [logoutDialogOpen, setLogoutDialogOpen] = useState(false)
   const searchParams = useSearchParams()
+  const pathname = usePathname()
   const { logout, logoutPending, isAuthenticated, isHydrated } = useAuth()
   const userProfileQuery = useUserProfileQuery(isAuthenticated && isHydrated)
   const userProfile = userProfileQuery.data
@@ -122,6 +123,35 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   // Check if any modal is open
   const isModalOpen = searchParams.get('modal') !== null || searchParams.get('delete') !== null
 
+  // Page headers mapping
+  const pageHeaders: Record<string, { title: string; description: string }> = {
+    '/admin/menu/categories': {
+      title: 'Thực đơn / Danh mục',
+      description: 'Quản lý danh mục để nhóm món ăn; thay đổi sẽ ảnh hưởng filter ở trang Món ăn',
+    },
+    '/admin/menu/items': {
+      title: 'Thực đơn / Món ăn',
+      description: 'Quản lý món, trạng thái bán, ảnh và tuỳ chọn (modifiers)',
+    },
+    '/admin/menu/modifiers': {
+      title: 'Thực đơn / Nhóm tuỳ chọn (Modifiers)',
+      description: 'Quản lý các nhóm tuỳ chọn (Size, Topping...) và các option trong từng nhóm',
+    },
+    '/admin/menu/import-export': {
+      title: 'Import / Export Thực đơn',
+      description: 'Nhập dữ liệu từ CSV/Excel, xuất backup, hoặc thiết kế menu in đẹp',
+    },
+  }
+
+  const currentPageHeader = useMemo(() => {
+    return (
+      pageHeaders[pathname] || {
+        title: 'Bảng điều khiển',
+        description: 'Tổng quan hôm nay',
+      }
+    )
+  }, [pathname])
+
   // Wrapper to ensure logout returns Promise<void>
   const handleLogout = async () => {
     await logout()
@@ -157,9 +187,11 @@ export function AdminLayout({ children }: AdminLayoutProps) {
               </Button>
               <div>
                 <h2 className="text-xl font-semibold text-slate-900 lg:text-2xl dark:text-white">
-                  Bảng điều khiển
+                  {currentPageHeader.title}
                 </h2>
-                <p className="text-sm text-slate-500 dark:text-slate-400">Tổng quan hôm nay</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">
+                  {currentPageHeader.description}
+                </p>
               </div>
             </div>
 

@@ -2,6 +2,10 @@
 export type TableStatus = 'available' | 'occupied' | 'waiting_for_payment' | 'maintenance'
 export type TableShape = 'circle' | 'rectangle' | 'oval'
 
+// Table sorting types
+export type TableSortBy = 'tableNumber' | 'status' | 'createdAt' | 'updatedAt'
+export type TableSortOrder = 'asc' | 'desc'
+
 // Position interface
 export interface TablePosition {
   x: number
@@ -120,6 +124,8 @@ export interface TableQueryParams {
   floor?: string
   status?: TableStatus
   is_active?: boolean
+  sort_by?: TableSortBy
+  sort_order?: TableSortOrder
 }
 
 // QR Code Generation Response
