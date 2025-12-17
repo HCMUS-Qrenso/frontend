@@ -8,7 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Eye, Download, Printer, RefreshCw, Copy, Check } from 'lucide-react'
+import { Eye, Download, Printer, RefreshCw, Copy, Check, Loader2 } from 'lucide-react'
 import Image from 'next/image'
 import { useState } from 'react'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -25,6 +25,7 @@ interface QRTableListProps {
   onBatchGenerate?: (forceRegenerate: boolean) => void
   onBatchDownload?: (format: 'png' | 'pdf') => void
   isLoading?: boolean
+  isDataLoading?: boolean
 }
 
 function getStatusBadge(status: TableQR['status']) {
@@ -66,6 +67,7 @@ export function QRTableList({
   onBatchGenerate,
   onBatchDownload,
   isLoading = false,
+  isDataLoading = false,
 }: QRTableListProps) {
   const [copiedId, setCopiedId] = useState<string | null>(null)
 
@@ -120,7 +122,7 @@ export function QRTableList({
       )}
 
       {/* Table */}
-      <div className="overflow-x-auto rounded-2xl border border-slate-100 bg-white/80 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
+      <div className="relative overflow-x-auto rounded-2xl border border-slate-100 bg-white/80 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
         <table className="w-full">
           <thead>
             <tr className="border-b border-slate-100 bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900">
@@ -281,6 +283,16 @@ export function QRTableList({
             ))}
           </tbody>
         </table>
+
+        {/* Loading overlay */}
+        {isDataLoading && (
+          <div className="absolute inset-0 flex items-center justify-center rounded-2xl bg-white/80 backdrop-blur-sm dark:bg-slate-900/80">
+            <div className="flex items-center gap-2">
+              <Loader2 className="h-6 w-6 animate-spin text-emerald-600" />
+              <span className="text-sm text-slate-600 dark:text-slate-300">Đang tải...</span>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Table count */}

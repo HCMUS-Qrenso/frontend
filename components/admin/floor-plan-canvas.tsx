@@ -5,6 +5,7 @@ import { formatRotation } from '@/lib/utils/table-utils'
 import { useRef, useState, useEffect, useMemo, useCallback, memo } from 'react'
 import { RotateCw } from 'lucide-react'
 import type { TableItem } from '@/app/admin/tables/layout/page'
+import type React from 'react'
 import {
   DndContext,
   type DragEndEvent,
@@ -67,7 +68,7 @@ function calculateRotationFromMouse(
   return ((cssAngle % 360) + 360) % 360
 }
 
-export function FloorPlanCanvas({
+function FloorPlanCanvasComponent({
   tables,
   selectedTableId,
   onTableSelect,
@@ -556,3 +557,49 @@ const DraggableTable = memo(function DraggableTable({
     </div>
   )
 })
+
+// Custom comparison function for React.memo
+const areEqual = (
+  prevProps: FloorPlanCanvasProps,
+  nextProps: FloorPlanCanvasProps,
+): boolean => {
+  // Compare primitive props
+  if (
+    prevProps.selectedTableId !== nextProps.selectedTableId ||
+    prevProps.zoom !== nextProps.zoom ||
+    prevProps.showGrid !== nextProps.showGrid ||
+    prevProps.selectedArea !== nextProps.selectedArea
+  ) {
+    return false
+  }
+
+  // Compare tables array length
+  if (prevProps.tables.length !== nextProps.tables.length) {
+    return false
+  }
+
+  // Deep compare tables - only check relevant properties that affect rendering
+  for (let i = 0; i < prevProps.tables.length; i++) {
+    const prevTable = prevProps.tables[i]
+    const nextTable = nextProps.tables[i]
+
+    if (
+      prevTable.id !== nextTable.id ||
+      prevTable.position.x !== nextTable.position.x ||
+      prevTable.position.y !== nextTable.position.y ||
+      prevTable.position.rotation !== nextTable.position.rotation ||
+      prevTable.status !== nextTable.status ||
+      prevTable.name !== nextTable.name ||
+      prevTable.seats !== nextTable.seats ||
+      prevTable.type !== nextTable.type ||
+      prevTable.area !== nextTable.area
+    ) {
+      return false
+    }
+  }
+
+  // Callbacks are compared by reference - they should be memoized in parent
+  return true
+}
+
+export const FloorPlanCanvas = memo(FloorPlanCanvasComponent, areEqual)

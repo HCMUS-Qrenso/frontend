@@ -1,7 +1,6 @@
 'use client'
 
 import { Suspense } from 'react'
-import { AdminLayout } from '@/components/admin/admin-layout'
 import { TablesOverviewStats } from '@/components/admin/tables-overview-stats'
 import { TablesFilterToolbar } from '@/components/admin/tables-filter-toolbar'
 import { TablesListTable } from '@/components/admin/tables-list-table'
@@ -32,48 +31,44 @@ function TablesListContent() {
   }
 
   return (
-    <AdminLayout>
-      <div className="space-y-6">
-        {/* KPI Cards - Overview stats - Only show for active tables */}
-        <TablesOverviewStats />
-        {/* Tabs */}
-        <Tabs value={currentTab} onValueChange={handleTabChange}>
-          <TabsList>
-            <TabsTrigger value="active">Danh sách bàn</TabsTrigger>
-            <TabsTrigger value="trash">Lịch sử xóa bàn</TabsTrigger>
-          </TabsList>
+    <div className="space-y-6">
+      {/* KPI Cards - Overview stats - Only show for active tables */}
+      <TablesOverviewStats />
+      {/* Tabs */}
+      <Tabs value={currentTab} onValueChange={handleTabChange}>
+        <TabsList>
+          <TabsTrigger value="active">Danh sách bàn</TabsTrigger>
+          <TabsTrigger value="trash">Lịch sử xóa bàn</TabsTrigger>
+        </TabsList>
 
-          <TabsContent value="active" className="mt-6 space-y-6">
-            {/* Filter Toolbar */}
-            <TablesFilterToolbar isTrashView={false} />
+        <TabsContent value="active" className="mt-6 space-y-6">
+          {/* Filter Toolbar */}
+          <TablesFilterToolbar isTrashView={false} />
 
-            {/* Tables List Table */}
-            <TablesListTable isTrashView={false} />
-          </TabsContent>
+          {/* Tables List Table */}
+          <TablesListTable isTrashView={false} />
+        </TabsContent>
 
-          <TabsContent value="trash" className="mt-6 space-y-6">
-            {/* Filter Toolbar */}
-            <TablesFilterToolbar isTrashView={true} />
+        <TabsContent value="trash" className="mt-6 space-y-6">
+          {/* Filter Toolbar */}
+          <TablesFilterToolbar isTrashView={true} />
 
-            {/* Tables List Table */}
-            <TablesListTable isTrashView={true} />
-          </TabsContent>
-        </Tabs>
-      </div>
+          {/* Tables List Table */}
+          <TablesListTable isTrashView={true} />
+        </TabsContent>
+      </Tabs>
 
       {/* Modal for Create/Edit */}
       <TableUpsertDrawer open={modalOpen} />
-    </AdminLayout>
+    </div>
   )
 }
 
 function LoadingFallback() {
   return (
-    <AdminLayout>
-      <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
-      </div>
-    </AdminLayout>
+    <div className="flex items-center justify-center py-12">
+      <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
+    </div>
   )
 }
 

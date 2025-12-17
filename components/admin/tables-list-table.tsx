@@ -27,7 +27,13 @@ import {
   useUpdateTableMutation,
 } from '@/hooks/use-tables-query'
 import { toast } from 'sonner'
-import type { Table, TableStatus, TablePosition } from '@/types/tables'
+import type {
+  Table,
+  TableStatus,
+  TablePosition,
+  TableSortBy,
+  TableSortOrder,
+} from '@/types/tables'
 import { useErrorHandler } from '@/hooks/use-error-handler'
 
 function getStatusBadge(status: TableStatus) {
@@ -86,6 +92,10 @@ export function TablesListTable({ isTrashView = false }: TablesListTableProps) {
   const search = searchParams.get('search') || undefined
   const zone_id = searchParams.get('zone_id') || undefined
   const status = (searchParams.get('status') as TableStatus | null) || undefined
+  const sort_by =
+    (searchParams.get('sort_by') as TableSortBy | null) || ('tableNumber' as TableSortBy)
+  const sort_order =
+    (searchParams.get('sort_order') as TableSortOrder | null) || ('asc' as TableSortOrder)
 
   // Set is_active filter based on trash view
   // If trash view: show inactive tables (is_active = false)
@@ -99,6 +109,8 @@ export function TablesListTable({ isTrashView = false }: TablesListTableProps) {
     zone_id,
     status,
     is_active: isActive,
+    sort_by,
+    sort_order,
   })
 
   const tables = data?.data.tables || []
@@ -219,7 +231,15 @@ export function TablesListTable({ isTrashView = false }: TablesListTableProps) {
     <div className="space-y-4">
       {/* Table */}
       <div className="overflow-x-auto rounded-2xl border border-slate-100 bg-white/80 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
-        <table className="w-full">
+        <table className="w-full table-fixed">
+          <colgroup>
+            <col className="w-[18%]" />
+            <col className="w-[22%]" />
+            <col className="w-[10%]" />
+            <col className="w-[18%]" />
+            <col className="w-[18%]" />
+            <col className="w-[14%]" />
+          </colgroup>
           <thead>
             <tr className="border-b border-slate-100 bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900">
               <th className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
@@ -271,7 +291,7 @@ export function TablesListTable({ isTrashView = false }: TablesListTableProps) {
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <p className="text-sm text-slate-700 dark:text-slate-300">
+                    <p className="max-w-[160px] truncate text-sm text-slate-700 dark:text-slate-300">
                       {table.zone?.name || '—'}
                     </p>
                   </td>
@@ -281,7 +301,7 @@ export function TablesListTable({ isTrashView = false }: TablesListTableProps) {
                   <td className="px-6 py-4">{getStatusBadge(table.status)}</td>
                   <td className="px-6 py-4">
                     {table.current_order ? (
-                      <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400">
+                      <p className="max-w-[180px] truncate text-sm font-medium text-emerald-600 dark:text-emerald-400">
                         {table.current_order}
                       </p>
                     ) : (
