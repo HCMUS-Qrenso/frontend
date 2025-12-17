@@ -289,8 +289,8 @@ export function QRTableList({
                 </TableCell>
               </TableRow>
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
 
         {/* Loading overlay */}
         {isDataLoading && (

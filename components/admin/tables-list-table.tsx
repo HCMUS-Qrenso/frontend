@@ -28,7 +28,7 @@ import {
 } from '@/hooks/use-tables-query'
 import { toast } from 'sonner'
 import type {
-  Table,
+  Table as TableType,
   TableStatus,
   TablePosition,
   TableSortBy,
@@ -239,7 +239,7 @@ export function TablesListTable({ isTrashView = false }: TablesListTableProps) {
     <div className="space-y-4">
       {/* Table */}
       <div className="overflow-x-auto rounded-2xl border border-slate-100 bg-white/80 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
-        <table className="w-full table-fixed">
+        <Table className="w-full table-fixed">
           <colgroup>
             <col className="w-[18%]" />
             <col className="w-[22%]" />
@@ -248,9 +248,9 @@ export function TablesListTable({ isTrashView = false }: TablesListTableProps) {
             <col className="w-[18%]" />
             <col className="w-[14%]" />
           </colgroup>
-          <thead>
-            <tr className="border-b border-slate-100 bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900">
-              <th className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+          <TableHeader>
+            <TableRow className="border-b border-slate-100 bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900">
+              <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
                 Bàn
               </TableHead>
               <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
