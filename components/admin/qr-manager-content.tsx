@@ -217,14 +217,6 @@ export function QRManagerContent() {
     }
   }
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
-      </div>
-    )
-  }
-
   if (error) {
     return (
       <div className="rounded-2xl border border-red-200 bg-red-50 p-6 dark:border-red-800 dark:bg-red-500/10">
@@ -275,6 +267,7 @@ export function QRManagerContent() {
             Promise.all(selectedTables.map((id) => handleDownloadQR(id, format)))
           }}
           isLoading={generateMutation.isPending || batchGenerateMutation.isPending}
+          isDataLoading={isLoading}
         />
       </div>
 
