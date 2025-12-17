@@ -23,6 +23,7 @@ import {
   LayoutGrid,
   FolderOpen,
   Upload,
+  MapPin,
 } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
@@ -59,6 +60,7 @@ const menuItems = [
       { icon: Table, label: 'Danh sách bàn', href: '/admin/tables/list' },
       { icon: LayoutGrid, label: 'Sơ đồ', href: '/admin/tables/layout' },
       { icon: QrCode, label: 'Quản lý QR', href: '/admin/tables/qr' },
+      { icon: MapPin, label: 'Khu vực', href: '/admin/tables/zones' },
     ],
   },
   { icon: Users, label: 'Nhân viên', href: '/admin/staff' },
