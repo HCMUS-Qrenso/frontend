@@ -2,7 +2,7 @@
 import { FloorPlanCanvas } from '@/components/admin/floor-plan-canvas'
 import { FloorPlanToolbar } from '@/components/admin/floor-plan-toolbar'
 import { FloorPlanSidePanel } from '@/components/admin/floor-plan-side-panel'
-import { useState, useEffect, useMemo, useRef } from 'react'
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { useSearchParams } from 'next/navigation'
 import {
   useZonesQuery,
@@ -204,6 +204,15 @@ export default function TableLayoutPage() {
   // Use localTables instead of tables memo
   const tables = localTables
 
+  // Memoize areas array
+  const areas = useMemo(() => zones.map((z) => z.name || z.id), [zones])
+
+  // Memoize selectedTable
+  const selectedTable = useMemo(
+    () => tables.find((t) => t.id === selectedTableId),
+    [tables, selectedTableId],
+  )
+
   // Filter tables without positions (not in layout or position is null/-1,-1)
   const libraryTables = useMemo(() => {
     return tables.filter((table) => {
@@ -252,87 +261,98 @@ export default function TableLayoutPage() {
     }
   }, [tables, history.length])
 
-  const selectedTable = tables.find((t) => t.id === selectedTableId)
-
-  const handleTableUpdate = (id: string, updates: Partial<TableItem>) => {
-    // Track position changes for batch save (before processing)
-    if (updates.position) {
-      setPositionChanges((prev) => {
-        const newMap = new Map(prev)
-        // Get current table to preserve rotation if needed
-        const currentTable = localTables.find((t) => t.id === id)
-        const rawRotation =
-          updates.position!.rotation ??
-          currentTable?.position?.rotation ??
-          currentTable?.rotation ??
-          0
-        const positionWithRotation: TablePosition = {
-          x: updates.position!.x,
-          y: updates.position!.y,
-          rotation: formatRotation(rawRotation),
-        }
-        newMap.set(id, positionWithRotation)
-        return newMap
+  // Memoize addToHistory function
+  const addToHistory = useCallback(
+    (newTables: TableItem[]) => {
+      setHistory((prevHistory) => {
+        const newHistory = prevHistory.slice(0, historyIndex + 1)
+        newHistory.push(newTables)
+        setHistoryIndex(newHistory.length - 1)
+        return newHistory
       })
-    }
+    },
+    [historyIndex],
+  )
 
-    // Update localTables state directly for immediate UI feedback
-    setLocalTables((prevTables) => {
-      const newTables = prevTables.map((t) => {
-        if (t.id === id) {
-          // If position is being updated, preserve rotation if not explicitly provided
-          if (updates.position && updates.position.rotation === undefined) {
-            const preservedRotation = t.position.rotation ?? t.rotation ?? 0
-            updates.position = {
-              ...updates.position,
-              rotation: formatRotation(preservedRotation),
+  const handleTableUpdate = useCallback(
+    (id: string, updates: Partial<TableItem>) => {
+      // Track position changes for batch save (before processing)
+      if (updates.position) {
+        setPositionChanges((prev) => {
+          const newMap = new Map(prev)
+          // Get current table to preserve rotation if needed
+          const currentTable = localTables.find((t) => t.id === id)
+          const rawRotation =
+            updates.position!.rotation ??
+            currentTable?.position?.rotation ??
+            currentTable?.rotation ??
+            0
+          const positionWithRotation: TablePosition = {
+            x: updates.position!.x,
+            y: updates.position!.y,
+            rotation: formatRotation(rawRotation),
+          }
+          newMap.set(id, positionWithRotation)
+          return newMap
+        })
+      }
+
+      // Update localTables state directly for immediate UI feedback
+      setLocalTables((prevTables) => {
+        const newTables = prevTables.map((t) => {
+          if (t.id === id) {
+            // If position is being updated, preserve rotation if not explicitly provided
+            if (updates.position && updates.position.rotation === undefined) {
+              const preservedRotation = t.position.rotation ?? t.rotation ?? 0
+              updates.position = {
+                ...updates.position,
+                rotation: formatRotation(preservedRotation),
+              }
             }
-          }
 
-          // If rotation field is updated, also update position.rotation
-          if (updates.rotation !== undefined && updates.position === undefined) {
-            updates.position = {
-              ...t.position,
-              rotation: formatRotation(updates.rotation),
+            // If rotation field is updated, also update position.rotation
+            if (updates.rotation !== undefined && updates.position === undefined) {
+              updates.position = {
+                ...t.position,
+                rotation: formatRotation(updates.rotation),
+              }
             }
-          }
 
-          // Sync rotation field with position.rotation
-          const updatedTable = { ...t, ...updates }
-          if (updates.position?.rotation !== undefined) {
-            updatedTable.rotation = formatRotation(updates.position.rotation)
-          }
+            // Sync rotation field with position.rotation
+            const updatedTable = { ...t, ...updates }
+            if (updates.position?.rotation !== undefined) {
+              updatedTable.rotation = formatRotation(updates.position.rotation)
+            }
 
-          // Recalculate size if type or seats changed
-          if (updates.type !== undefined || updates.seats !== undefined) {
-            updatedTable.size = calculateTableSize(updatedTable.type, updatedTable.seats)
-          }
+            // Recalculate size if type or seats changed
+            if (updates.type !== undefined || updates.seats !== undefined) {
+              updatedTable.size = calculateTableSize(updatedTable.type, updatedTable.seats)
+            }
 
-          return updatedTable
-        }
-        return t
+            return updatedTable
+          }
+          return t
+        })
+        addToHistory(newTables)
+        return newTables
       })
-      addToHistory(newTables)
-      return newTables
-    })
-  }
+    },
+    [localTables, addToHistory],
+  )
 
-  const handleTableDelete = (id: string) => {
-    // This is handled by the side panel component which calls the API directly
-    // We just update local state for immediate UI feedback
-    setLocalTables((prevTables) => {
-      const newTables = prevTables.filter((t) => t.id !== id)
-      addToHistory(newTables)
-      return newTables
-    })
-    setSelectedTableId(null)
-  }
-
-  const handleTableRemove = async (id: string) => {
-    // Move table back to library by setting position to -1,-1 (reset rotation to 0)
-    await handleTableSave(id, { position: { x: -1, y: -1, rotation: formatRotation(0) } })
-    setSelectedTableId(null)
-  }
+  const handleTableDelete = useCallback(
+    (id: string) => {
+      // This is handled by the side panel component which calls the API directly
+      // We just update local state for immediate UI feedback
+      setLocalTables((prevTables) => {
+        const newTables = prevTables.filter((t) => t.id !== id)
+        addToHistory(newTables)
+        return newTables
+      })
+      setSelectedTableId(null)
+    },
+    [addToHistory],
+  )
 
   // Map frontend status to backend status
   const mapStatusToBackend = (status: TableItem['status']): string => {
@@ -352,79 +372,87 @@ export default function TableLayoutPage() {
     return 'rectangle'
   }
 
-  const handleTableSave = async (id: string, updates: Partial<TableItem>) => {
-    try {
-      const table = tables.find((t) => t.id === id)
-      if (!table) return
+  const handleTableSave = useCallback(
+    async (id: string, updates: Partial<TableItem>) => {
+      try {
+        const table = tables.find((t) => t.id === id)
+        if (!table) return
 
-      const payload: any = {}
+        const payload: any = {}
 
-      if (updates.name !== undefined) {
-        payload.table_number = updates.name
-      }
-      if (updates.seats !== undefined) {
-        payload.capacity = updates.seats
-      }
-      if (updates.area !== undefined) {
-        // Find zone by name/id
-        const zone = zones.find((z) => z.name === updates.area || z.id === updates.area)
-        if (zone) {
-          payload.zone_id = zone.id
+        if (updates.name !== undefined) {
+          payload.table_number = updates.name
         }
-      }
-      if (updates.status !== undefined) {
-        payload.status = mapStatusToBackend(updates.status)
-      }
-      if (updates.type !== undefined) {
-        payload.shape = mapShapeToBackend(updates.type)
-      }
-      if (updates.position !== undefined) {
-        // Ensure position includes rotation (use from position or fallback to rotation field)
-        const rotation = updates.position.rotation ?? table.rotation ?? 0
-        payload.position = {
-          x: updates.position.x,
-          y: updates.position.y,
-          rotation: formatRotation(rotation),
+        if (updates.seats !== undefined) {
+          payload.capacity = updates.seats
         }
+        if (updates.area !== undefined) {
+          // Find zone by name/id
+          const zone = zones.find((z) => z.name === updates.area || z.id === updates.area)
+          if (zone) {
+            payload.zone_id = zone.id
+          }
+        }
+        if (updates.status !== undefined) {
+          payload.status = mapStatusToBackend(updates.status)
+        }
+        if (updates.type !== undefined) {
+          payload.shape = mapShapeToBackend(updates.type)
+        }
+        if (updates.position !== undefined) {
+          // Ensure position includes rotation (use from position or fallback to rotation field)
+          const rotation = updates.position.rotation ?? table.rotation ?? 0
+          payload.position = {
+            x: updates.position.x,
+            y: updates.position.y,
+            rotation: formatRotation(rotation),
+          }
+        }
+
+        await updateTableMutation.mutateAsync({ id, payload })
+        toast.success('Bàn đã được cập nhật thành công')
+
+        // Update local state for immediate UI feedback
+        handleTableUpdate(id, updates)
+      } catch (error: any) {
+        handleError(error, 'Có lỗi xảy ra khi cập nhật bàn')
       }
+    },
+    [tables, zones, updateTableMutation, handleError, handleTableUpdate],
+  )
 
-      await updateTableMutation.mutateAsync({ id, payload })
-      toast.success('Bàn đã được cập nhật thành công')
+  const handleTableRemove = useCallback(
+    async (id: string) => {
+      // Move table back to library by setting position to -1,-1 (reset rotation to 0)
+      await handleTableSave(id, { position: { x: -1, y: -1, rotation: formatRotation(0) } })
+      setSelectedTableId(null)
+    },
+    [handleTableSave],
+  )
 
-      // Update local state for immediate UI feedback
-      handleTableUpdate(id, updates)
-    } catch (error: any) {
-      handleError(error, 'Có lỗi xảy ra khi cập nhật bàn')
-    }
-  }
+  const handleAddTable = useCallback(
+    async (tableTemplate: Omit<TableItem, 'id' | 'position' | 'area'>) => {
+      try {
+        const newTable = await createTableMutation.mutateAsync({
+          table_number: tableTemplate.name,
+          capacity: tableTemplate.seats,
+          zone_id: currentZoneObj?.id || currentZoneId,
+          shape: mapShapeToBackend(tableTemplate.type) as 'circle' | 'rectangle' | 'oval',
+          status: 'available',
+          is_active: true,
+          position: { x: -1, y: -1, rotation: formatRotation(0) },
+        })
 
-  const handleAddTable = async (tableTemplate: Omit<TableItem, 'id' | 'position' | 'area'>) => {
-    try {
-      const newTable = await createTableMutation.mutateAsync({
-        table_number: tableTemplate.name,
-        capacity: tableTemplate.seats,
-        zone_id: currentZoneObj?.id || currentZoneId,
-        shape: mapShapeToBackend(tableTemplate.type) as 'circle' | 'rectangle' | 'oval',
-        status: 'available',
-        is_active: true,
-        position: { x: -1, y: -1, rotation: formatRotation(0) },
-      })
+        toast.success('Bàn đã được tạo thành công')
+        // The query will refetch automatically, so we don't need to update local state
+      } catch (error: any) {
+        handleError(error, 'Có lỗi xảy ra khi tạo bàn')
+      }
+    },
+    [currentZoneObj, currentZoneId, createTableMutation, handleError],
+  )
 
-      toast.success('Bàn đã được tạo thành công')
-      // The query will refetch automatically, so we don't need to update local state
-    } catch (error: any) {
-      handleError(error, 'Có lỗi xảy ra khi tạo bàn')
-    }
-  }
-
-  const addToHistory = (newTables: TableItem[]) => {
-    const newHistory = history.slice(0, historyIndex + 1)
-    newHistory.push(newTables)
-    setHistory(newHistory)
-    setHistoryIndex(newHistory.length - 1)
-  }
-
-  const handleUndo = () => {
+  const handleUndo = useCallback(() => {
     if (historyIndex > 0 && history.length > 0) {
       const newIndex = historyIndex - 1
       setHistoryIndex(newIndex)
@@ -432,17 +460,17 @@ export default function TableLayoutPage() {
       // Undo/redo would need to be handled differently with API integration
       // For now, we'll keep the history but tables will sync from API
     }
-  }
+  }, [historyIndex, history.length])
 
-  const handleRedo = () => {
+  const handleRedo = useCallback(() => {
     if (historyIndex < history.length - 1 && history.length > 0) {
       const newIndex = historyIndex + 1
       setHistoryIndex(newIndex)
       // Note: Same as undo - tables sync from API
     }
-  }
+  }, [historyIndex, history.length])
 
-  const handleSave = async () => {
+  const handleSave = useCallback(async () => {
     try {
       // Only send tables with position changes
       if (positionChanges.size === 0) {
@@ -472,13 +500,13 @@ export default function TableLayoutPage() {
     } catch (error: any) {
       handleError(error, 'Có lỗi xảy ra khi lưu sơ đồ')
     }
-  }
+  }, [positionChanges, tables, batchUpdateMutation, handleError])
 
-  const handleReset = () => {
+  const handleReset = useCallback(() => {
     setResetDialogOpen(true)
-  }
+  }, [])
 
-  const handleConfirmReset = async () => {
+  const handleConfirmReset = useCallback(async () => {
     try {
       // Batch update API doesn't support null positions, so use individual PUT requests
       // Send -1,-1 position to move tables back to library (reset rotation to 0)
@@ -515,7 +543,34 @@ export default function TableLayoutPage() {
     } catch (error: any) {
       handleError(error, 'Có lỗi xảy ra khi đặt lại layout')
     }
-  }
+  }, [localTables, updateTableMutation, handleError])
+
+  // Memoize onAreaChange callback
+  const handleAreaChange = useCallback(
+    (area: string) => {
+      // Find zone by name or use as ID
+      const zone = zones.find((z) => z.name === area || z.id === area)
+      // Lưu id để gọi API, nhưng hiển thị tên trong dropdown
+      setSelectedZone(zone?.id || area)
+      setSelectedTableId(null)
+      setHistory([])
+      setHistoryIndex(0)
+      setPositionChanges(new Map())
+      // localTables will sync automatically via useEffect when currentZone changes
+    },
+    [zones],
+  )
+
+  // Memoize onTableUpdate callback for canvas
+  const handleCanvasTableUpdate = useCallback(
+    (id: string, updates: Partial<TableItem>) => {
+      // Update local state immediately for UI feedback
+      handleTableUpdate(id, updates)
+      // Debounce and batch save positions
+      // This will be handled by a separate debounced save function if needed
+    },
+    [handleTableUpdate],
+  )
 
   if (isLoadingLayout) {
     return (
@@ -532,18 +587,8 @@ export default function TableLayoutPage() {
       {/* Toolbar */}
       <FloorPlanToolbar
         selectedArea={currentZoneName}
-        areas={zones.map((z) => z.name || z.id)}
-        onAreaChange={(area) => {
-          // Find zone by name or use as ID
-          const zone = zones.find((z) => z.name === area || z.id === area)
-          // Lưu id để gọi API, nhưng hiển thị tên trong dropdown
-          setSelectedZone(zone?.id || area)
-          setSelectedTableId(null)
-          setHistory([])
-          setHistoryIndex(0)
-          setPositionChanges(new Map())
-          // localTables will sync automatically via useEffect when currentZone changes
-        }}
+        areas={areas}
+        onAreaChange={handleAreaChange}
         zoom={zoom}
         onZoomChange={setZoom}
         showGrid={showGrid}
@@ -563,16 +608,11 @@ export default function TableLayoutPage() {
           tables={tables}
           selectedTableId={selectedTableId}
           onTableSelect={setSelectedTableId}
-          onTableUpdate={(id, updates) => {
-            // Update local state immediately for UI feedback
-            handleTableUpdate(id, updates)
-            // Debounce and batch save positions
-            // This will be handled by a separate debounced save function if needed
-          }}
+          onTableUpdate={handleCanvasTableUpdate}
           zoom={zoom}
           showGrid={showGrid}
           selectedArea={currentZoneName}
-          onTableRemove={(id) => handleTableRemove(id)}
+          onTableRemove={handleTableRemove}
         />
 
         {/* Side Panel */}
@@ -582,7 +622,7 @@ export default function TableLayoutPage() {
           onTableSave={handleTableSave}
           onTableDelete={handleTableDelete}
           onAddTable={handleAddTable}
-          areas={zones.map((z) => z.name || z.id)}
+          areas={areas}
           libraryTables={libraryTables}
         />
       </div>
