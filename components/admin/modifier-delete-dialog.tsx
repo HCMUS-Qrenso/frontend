@@ -69,14 +69,16 @@ export function ModifierDeleteDialog({ selectedGroupId }: ModifierDeleteDialogPr
   return (
     <AlertDialog open={open} onOpenChange={handleClose}>
       <AlertDialogContent>
-        {isLoadingModifiers ? (
-          <div className="flex items-center justify-center py-8">
-            <Loader2 className="h-6 w-6 animate-spin text-emerald-600" />
-          </div>
-        ) : (
-          <>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Xác nhận xoá option</AlertDialogTitle>
+        <AlertDialogHeader>
+          <AlertDialogTitle>
+            {isLoadingModifiers ? 'Đang tải...' : 'Xác nhận xoá option'}
+          </AlertDialogTitle>
+          {isLoadingModifiers ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="h-6 w-6 animate-spin text-emerald-600" />
+            </div>
+          ) : (
+            <>
               <AlertDialogDescription>
                 Bạn có chắc muốn xoá option{' '}
                 <span className="font-semibold text-slate-900 dark:text-white">
@@ -84,26 +86,26 @@ export function ModifierDeleteDialog({ selectedGroupId }: ModifierDeleteDialogPr
                 </span>
                 ? Hành động này không thể hoàn tác.
               </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel disabled={isDeleting}>Hủy</AlertDialogCancel>
-              <AlertDialogAction
-                onClick={handleDelete}
-                disabled={isDeleting}
-                className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
-              >
-                {isDeleting ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Đang xoá...
-                  </>
-                ) : (
-                  'Xoá option'
-                )}
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </>
-        )}
+              <AlertDialogFooter>
+                <AlertDialogCancel disabled={isDeleting}>Hủy</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={handleDelete}
+                  disabled={isDeleting}
+                  className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
+                >
+                  {isDeleting ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Đang xoá...
+                    </>
+                  ) : (
+                    'Xoá option'
+                  )}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </>
+          )}
+        </AlertDialogHeader>
       </AlertDialogContent>
     </AlertDialog>
   )

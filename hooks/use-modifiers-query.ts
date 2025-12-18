@@ -175,9 +175,9 @@ export const useCreateModifierMutation = () => {
   >({
     mutationFn: ({ groupId, payload }) => modifiersApi.createModifier(groupId, payload),
     onSuccess: (data, variables) => {
-      // Invalidate modifiers list for this group
+      // Invalidate ALL modifiers lists for this group (regardless of params)
       queryClient.invalidateQueries({
-        queryKey: modifiersQueryKeys.modifiers.list(variables.groupId),
+        queryKey: [...modifiersQueryKeys.modifiers.all(), 'list', variables.groupId],
       })
       // Also invalidate the group detail to update modifiers array
       queryClient.invalidateQueries({
@@ -200,9 +200,9 @@ export const useUpdateModifierMutation = () => {
   >({
     mutationFn: ({ id, payload }) => modifiersApi.updateModifier(id, payload),
     onSuccess: (data, variables) => {
-      // Invalidate modifiers list for this group
+      // Invalidate ALL modifiers lists for this group (regardless of params)
       queryClient.invalidateQueries({
-        queryKey: modifiersQueryKeys.modifiers.list(variables.groupId),
+        queryKey: [...modifiersQueryKeys.modifiers.all(), 'list', variables.groupId],
       })
       // Also invalidate the group detail
       queryClient.invalidateQueries({
@@ -221,9 +221,9 @@ export const useDeleteModifierMutation = () => {
   return useMutation<MessageResponse, unknown, { id: string; groupId: string }>({
     mutationFn: ({ id }) => modifiersApi.deleteModifier(id),
     onSuccess: (data, variables) => {
-      // Invalidate modifiers list for this group
+      // Invalidate ALL modifiers lists for this group (regardless of params)
       queryClient.invalidateQueries({
-        queryKey: modifiersQueryKeys.modifiers.list(variables.groupId),
+        queryKey: [...modifiersQueryKeys.modifiers.all(), 'list', variables.groupId],
       })
       // Also invalidate the group detail
       queryClient.invalidateQueries({
@@ -239,17 +239,19 @@ export const useDeleteModifierMutation = () => {
 export const useReorderModifiersMutation = () => {
   const queryClient = useQueryClient()
 
-  return useMutation<MessageResponse, unknown, { groupId: string; payload: ReorderModifiersPayload }>(
-    {
-      mutationFn: ({ groupId, payload }) => modifiersApi.reorderModifiers(groupId, payload),
-      onSuccess: (data, variables) => {
-        // Invalidate modifiers list for this group to refresh the order
-        queryClient.invalidateQueries({
-          queryKey: modifiersQueryKeys.modifiers.list(variables.groupId),
-        })
-      },
+  return useMutation<
+    MessageResponse,
+    unknown,
+    { groupId: string; payload: ReorderModifiersPayload }
+  >({
+    mutationFn: ({ groupId, payload }) => modifiersApi.reorderModifiers(groupId, payload),
+    onSuccess: (data, variables) => {
+      // Invalidate ALL modifiers lists for this group to refresh the order (regardless of params)
+      queryClient.invalidateQueries({
+        queryKey: [...modifiersQueryKeys.modifiers.all(), 'list', variables.groupId],
+      })
     },
-  )
+  })
 }
 
 /**
@@ -263,14 +265,12 @@ export const useToggleModifierAvailabilityMutation = () => {
     unknown,
     { id: string; groupId: string; is_available: boolean }
   >({
-    mutationFn: ({ id, is_available }) =>
-      modifiersApi.updateModifier(id, { is_available }),
+    mutationFn: ({ id, is_available }) => modifiersApi.updateModifier(id, { is_available }),
     onSuccess: (data, variables) => {
-      // Invalidate modifiers list for this group
+      // Invalidate ALL modifiers lists for this group (regardless of params)
       queryClient.invalidateQueries({
-        queryKey: modifiersQueryKeys.modifiers.list(variables.groupId),
+        queryKey: [...modifiersQueryKeys.modifiers.all(), 'list', variables.groupId],
       })
     },
   })
 }
-
