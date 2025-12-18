@@ -8,156 +8,60 @@ import { ModifierModal } from '@/components/admin/modifier-modal'
 import { ModifierGroupDeleteDialog } from '@/components/admin/modifier-group-delete-dialog'
 import { ModifierDeleteDialog } from '@/components/admin/modifier-delete-dialog'
 import { useSearchParams } from 'next/navigation'
-import { Loader2 } from 'lucide-react'
-
-// Mock data structure
-export interface ModifierGroup {
-  id: string
-  tenant_id: string
-  name: string
-  type: 'single_choice' | 'multiple_choice'
-  is_required: boolean
-  min_selections: number | null
-  max_selections: number | null
-  display_order: number
-  created_at: string
-  updated_at: string
-  used_by_count?: number
-}
-
-export interface Modifier {
-  id: string
-  modifier_group_id: string
-  name: string
-  price_adjustment: number
-  is_available: boolean
-  display_order: number
-  created_at: string
-  updated_at: string
-}
+import { Loader2, AlertCircle } from 'lucide-react'
+import { useModifierGroupsQuery } from '@/hooks/use-modifiers-query'
+import { useErrorHandler } from '@/hooks/use-error-handler'
+import type { ModifierGroup } from '@/types/modifiers'
 
 function ModifiersContent() {
   const searchParams = useSearchParams()
-  const [selectedGroupId, setSelectedGroupId] = useState<string | null>('1')
+  const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null)
+  const { handleErrorWithStatus } = useErrorHandler()
 
-  // Mock data
-  const [modifierGroups, setModifierGroups] = useState<ModifierGroup[]>([
-    {
-      id: '1',
-      tenant_id: 'tenant-1',
-      name: 'Kích cỡ (Size)',
-      type: 'single_choice',
-      is_required: true,
-      min_selections: 1,
-      max_selections: 1,
-      display_order: 1,
-      created_at: '2024-01-01',
-      updated_at: '2024-01-01',
-      used_by_count: 12,
-    },
-    {
-      id: '2',
-      tenant_id: 'tenant-1',
-      name: 'Topping',
-      type: 'multiple_choice',
-      is_required: false,
-      min_selections: 0,
-      max_selections: null,
-      display_order: 2,
-      created_at: '2024-01-01',
-      updated_at: '2024-01-01',
-      used_by_count: 8,
-    },
-    {
-      id: '3',
-      tenant_id: 'tenant-1',
-      name: 'Độ chín',
-      type: 'single_choice',
-      is_required: false,
-      min_selections: 0,
-      max_selections: 1,
-      display_order: 3,
-      created_at: '2024-01-01',
-      updated_at: '2024-01-01',
-      used_by_count: 5,
-    },
-  ])
+  // Fetch modifier groups from API
+  const {
+    data: groupsData,
+    isLoading: isLoadingGroups,
+    error: groupsError,
+  } = useModifierGroupsQuery({
+    include_usage_count: true,
+    sort_by: 'display_order',
+    sort_order: 'asc',
+  })
 
-  const [modifiers, setModifiers] = useState<Modifier[]>([
-    {
-      id: '1',
-      modifier_group_id: '1',
-      name: 'Nhỏ (Small)',
-      price_adjustment: -10000,
-      is_available: true,
-      display_order: 1,
-      created_at: '2024-01-01',
-      updated_at: '2024-01-01',
-    },
-    {
-      id: '2',
-      modifier_group_id: '1',
-      name: 'Vừa (Medium)',
-      price_adjustment: 0,
-      is_available: true,
-      display_order: 2,
-      created_at: '2024-01-01',
-      updated_at: '2024-01-01',
-    },
-    {
-      id: '3',
-      modifier_group_id: '1',
-      name: 'Lớn (Large)',
-      price_adjustment: 15000,
-      is_available: true,
-      display_order: 3,
-      created_at: '2024-01-01',
-      updated_at: '2024-01-01',
-    },
-    {
-      id: '4',
-      modifier_group_id: '2',
-      name: 'Phô mai thêm',
-      price_adjustment: 10000,
-      is_available: true,
-      display_order: 1,
-      created_at: '2024-01-01',
-      updated_at: '2024-01-01',
-    },
-    {
-      id: '5',
-      modifier_group_id: '2',
-      name: 'Thịt xông khói',
-      price_adjustment: 15000,
-      is_available: true,
-      display_order: 2,
-      created_at: '2024-01-01',
-      updated_at: '2024-01-01',
-    },
-    {
-      id: '6',
-      modifier_group_id: '3',
-      name: 'Tái',
-      price_adjustment: 0,
-      is_available: true,
-      display_order: 1,
-      created_at: '2024-01-01',
-      updated_at: '2024-01-01',
-    },
-    {
-      id: '7',
-      modifier_group_id: '3',
-      name: 'Chín vừa',
-      price_adjustment: 0,
-      is_available: true,
-      display_order: 2,
-      created_at: '2024-01-01',
-      updated_at: '2024-01-01',
-    },
-  ])
+  // Handle errors
+  if (groupsError) {
+    handleErrorWithStatus(groupsError)
+  }
+
+  const modifierGroups = groupsData?.data.modifier_groups || []
+
+  // Auto-select first group if none selected
+  if (modifierGroups.length > 0 && !selectedGroupId) {
+    setSelectedGroupId(modifierGroups[0].id)
+  }
 
   const modalGroupOpen = searchParams.get('modal') === 'group'
   const modalModifierOpen = searchParams.get('modal') === 'modifier'
+
+  // Loading state
+  if (isLoadingGroups) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
+      </div>
+    )
+  }
+
+  // Error state
+  if (groupsError && !groupsData) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12">
+        <AlertCircle className="mb-4 h-12 w-12 text-red-600" />
+        <p className="text-sm text-slate-500">Không thể tải dữ liệu. Vui lòng thử lại.</p>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">
@@ -168,22 +72,20 @@ function ModifiersContent() {
           groups={modifierGroups}
           selectedGroupId={selectedGroupId}
           onSelectGroup={setSelectedGroupId}
-          onReorderGroups={setModifierGroups}
         />
 
         {/* Right Panel - Modifiers */}
         <ModifiersPanel
           selectedGroup={modifierGroups.find((g) => g.id === selectedGroupId) || null}
-          modifiers={modifiers.filter((m) => m.modifier_group_id === selectedGroupId)}
-          onReorderModifiers={setModifiers}
+          selectedGroupId={selectedGroupId}
         />
       </div>
 
       {/* Modals */}
-      <ModifierGroupModal open={modalGroupOpen} groups={modifierGroups} />
+      <ModifierGroupModal open={modalGroupOpen} />
       <ModifierModal open={modalModifierOpen} selectedGroupId={selectedGroupId} />
       <ModifierGroupDeleteDialog />
-      <ModifierDeleteDialog />
+      <ModifierDeleteDialog selectedGroupId={selectedGroupId} />
     </div>
   )
 }

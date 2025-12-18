@@ -18,23 +18,42 @@ import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Loader2 } from 'lucide-react'
-import type { ModifierGroup } from '@/app/admin/menu/modifiers/page'
+import type { ModifierGroupType } from '@/types/modifiers'
+import {
+  useCreateModifierGroupMutation,
+  useUpdateModifierGroupMutation,
+  useModifierGroupQuery,
+} from '@/hooks/use-modifiers-query'
+import { useErrorHandler } from '@/hooks/use-error-handler'
+import { toast } from 'sonner'
 
 interface ModifierGroupModalProps {
   open: boolean
-  groups: ModifierGroup[]
 }
 
-export function ModifierGroupModal({ open, groups }: ModifierGroupModalProps) {
+export function ModifierGroupModal({ open }: ModifierGroupModalProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const mode = searchParams.get('mode') as 'create' | 'edit'
   const groupId = searchParams.get('id')
+  const { handleErrorWithStatus } = useErrorHandler()
 
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  // Mutations
+  const createMutation = useCreateModifierGroupMutation()
+  const updateMutation = useUpdateModifierGroupMutation()
+
+  // Fetch existing group data if editing
+  const { data: groupData, isLoading: isLoadingGroup } = useModifierGroupQuery(
+    groupId,
+    false,
+    open && mode === 'edit' && !!groupId,
+  )
+
+  const isSubmitting = createMutation.isPending || updateMutation.isPending
+
   const [formData, setFormData] = useState<{
     name: string
-    type: 'single_choice' | 'multiple_choice'
+    type: ModifierGroupType
     is_required: boolean
     min_selections: number
     max_selections: number | null
@@ -53,18 +72,16 @@ export function ModifierGroupModal({ open, groups }: ModifierGroupModalProps) {
 
   // Load data if editing
   useEffect(() => {
-    if (mode === 'edit' && groupId) {
-      const group = groups.find((g) => g.id === groupId)
-      if (group) {
-        setFormData({
-          name: group.name,
-          type: group.type,
-          is_required: group.is_required,
-          min_selections: group.min_selections || 0,
-          max_selections: group.max_selections,
-        })
-      }
-    } else {
+    if (mode === 'edit' && groupData?.data.modifier_group) {
+      const group = groupData.data.modifier_group
+      setFormData({
+        name: group.name,
+        type: group.type,
+        is_required: group.is_required,
+        min_selections: group.min_selections,
+        max_selections: group.max_selections,
+      })
+    } else if (mode === 'create') {
       setFormData({
         name: '',
         type: 'single_choice',
@@ -73,7 +90,7 @@ export function ModifierGroupModal({ open, groups }: ModifierGroupModalProps) {
         max_selections: 1,
       })
     }
-  }, [mode, groupId, groups])
+  }, [mode, groupData])
 
   // Auto-adjust min/max based on type and required
   useEffect(() => {
@@ -117,16 +134,39 @@ export function ModifierGroupModal({ open, groups }: ModifierGroupModalProps) {
       return
     }
 
-    setIsSubmitting(true)
+    const payload = {
+      name: formData.name,
+      type: formData.type,
+      is_required: formData.is_required,
+      min_selections: formData.min_selections,
+      max_selections: formData.max_selections,
+    }
 
-    try {
-      // TODO: Submit to backend
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-      handleClose()
-    } catch (error) {
-      console.error('Error saving group:', error)
-    } finally {
-      setIsSubmitting(false)
+    if (mode === 'create') {
+      createMutation.mutate(payload, {
+        onSuccess: () => {
+          toast.success('Đã tạo nhóm tuỳ chọn')
+          handleClose()
+        },
+        onError: (error) => {
+          handleErrorWithStatus(error)
+          toast.error('Không thể tạo nhóm')
+        },
+      })
+    } else if (mode === 'edit' && groupId) {
+      updateMutation.mutate(
+        { id: groupId, payload },
+        {
+          onSuccess: () => {
+            toast.success('Đã cập nhật nhóm tuỳ chọn')
+            handleClose()
+          },
+          onError: (error) => {
+            handleErrorWithStatus(error)
+            toast.error('Không thể cập nhật nhóm')
+          },
+        },
+      )
     }
   }
 
@@ -144,7 +184,12 @@ export function ModifierGroupModal({ open, groups }: ModifierGroupModalProps) {
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        {mode === 'edit' && isLoadingGroup ? (
+          <div className="flex items-center justify-center py-8">
+            <Loader2 className="h-6 w-6 animate-spin text-emerald-600" />
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-5">
           {/* Name */}
           <div className="space-y-2">
             <Label htmlFor="name">
@@ -271,6 +316,7 @@ export function ModifierGroupModal({ open, groups }: ModifierGroupModalProps) {
             </Button>
           </DialogFooter>
         </form>
+        )}
       </DialogContent>
     </Dialog>
   )
