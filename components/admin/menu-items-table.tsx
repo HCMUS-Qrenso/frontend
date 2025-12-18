@@ -104,11 +104,12 @@ export function MenuItemsTable() {
     )
   }
 
-  const formatPrice = (price: number) => {
+  const formatPrice = (price: string | number) => {
+    const numPrice = typeof price === 'string' ? parseFloat(price) : price
     return new Intl.NumberFormat('vi-VN', {
       style: 'currency',
       currency: 'VND',
-    }).format(price)
+    }).format(numPrice)
   }
 
   const formatDate = (dateString: string) => {

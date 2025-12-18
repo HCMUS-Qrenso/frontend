@@ -34,6 +34,7 @@ import {
 import { useCategoriesQuery } from '@/hooks/use-categories-query'
 import { useErrorHandler } from '@/hooks/use-error-handler'
 import { toast } from 'sonner'
+import { ModifierGroupSelector } from './menu-item-modifier-groups-selector'
 
 interface MenuItemUpsertModalProps {
   open: boolean
@@ -62,6 +63,7 @@ export function MenuItemUpsertModal({ open }: MenuItemUpsertModalProps) {
 
   const isSubmitting = createMutation.isPending || updateMutation.isPending
   const [images, setImages] = useState<{ url: string; is_primary: boolean }[]>([])
+  const [selectedModifierGroupIds, setSelectedModifierGroupIds] = useState<string[]>([])
   const [formData, setFormData] = useState({
     name: '',
     category_id: '',
@@ -105,6 +107,7 @@ export function MenuItemUpsertModal({ open }: MenuItemUpsertModalProps) {
         calories: item.nutritional_info?.calories?.toString() || '',
       })
       setImages(item.images?.map((url) => ({ url, is_primary: false })) || [])
+      setSelectedModifierGroupIds(item.modifier_groups?.map((g) => g.id) || [])
     } else if (mode === 'create') {
       setOriginalItemData(null)
       setFormData({
@@ -122,6 +125,7 @@ export function MenuItemUpsertModal({ open }: MenuItemUpsertModalProps) {
         calories: '',
       })
       setImages([])
+      setSelectedModifierGroupIds([])
     }
   }, [mode, itemData])
 
@@ -146,6 +150,7 @@ export function MenuItemUpsertModal({ open }: MenuItemUpsertModalProps) {
       calories: '',
     })
     setImages([])
+    setSelectedModifierGroupIds([])
     setErrors({ name: '', base_price: '' })
     setOriginalItemData(null) // Reset original data
   }
@@ -201,11 +206,59 @@ export function MenuItemUpsertModal({ open }: MenuItemUpsertModalProps) {
 
     // Validation
     const newErrors = { name: '', base_price: '' }
+
     if (!formData.name.trim()) {
       newErrors.name = 'Vui lòng nhập tên món'
+    } else if (formData.name.trim().length > 200) {
+      newErrors.name = 'Tên món không được vượt quá 200 ký tự'
     }
-    if (!formData.base_price || Number(formData.base_price) <= 0) {
-      newErrors.base_price = 'Vui lòng nhập giá hợp lệ'
+
+    if (!formData.base_price) {
+      newErrors.base_price = 'Vui lòng nhập giá'
+    } else if (Number(formData.base_price) <= 0) {
+      newErrors.base_price = 'Giá phải lớn hơn 0'
+    } else if (isNaN(Number(formData.base_price))) {
+      newErrors.base_price = 'Giá không hợp lệ'
+    }
+
+    // Validate preparation time
+    if (formData.preparation_time && isNaN(Number(formData.preparation_time))) {
+      toast.error('Thời gian chuẩn bị không hợp lệ')
+      return
+    }
+    if (formData.preparation_time && Number(formData.preparation_time) < 0) {
+      toast.error('Thời gian chuẩn bị phải lớn hơn hoặc bằng 0')
+      return
+    }
+
+    // Validate category selection
+    if (!formData.category_id) {
+      toast.error('Vui lòng chọn danh mục')
+      return
+    }
+
+    // Validate nutritional info if provided
+    if (formData.fat && (isNaN(parseFloat(formData.fat)) || parseFloat(formData.fat) < 0)) {
+      toast.error('Lượng chất béo không hợp lệ')
+      return
+    }
+    if (formData.carbs && (isNaN(parseFloat(formData.carbs)) || parseFloat(formData.carbs) < 0)) {
+      toast.error('Lượng carbs không hợp lệ')
+      return
+    }
+    if (
+      formData.protein &&
+      (isNaN(parseFloat(formData.protein)) || parseFloat(formData.protein) < 0)
+    ) {
+      toast.error('Lượng protein không hợp lệ')
+      return
+    }
+    if (
+      formData.calories &&
+      (isNaN(parseFloat(formData.calories)) || parseFloat(formData.calories) < 0)
+    ) {
+      toast.error('Lượng calories không hợp lệ')
+      return
     }
 
     if (newErrors.name || newErrors.base_price) {
@@ -219,12 +272,18 @@ export function MenuItemUpsertModal({ open }: MenuItemUpsertModalProps) {
           name: formData.name.trim(),
           description: formData.description.trim() || undefined,
           base_price: formData.base_price,
-          preparation_time: Number(formData.preparation_time),
+          preparation_time: Number(formData.preparation_time) || 0,
           status: formData.status,
           is_chef_recommendation: formData.is_chef_recommendation,
           allergen_info: formData.allergen_info.trim() || undefined,
           category_id: formData.category_id,
-          image_urls: images.map((img) => img.url), // Note: using image_urls for create
+          nutritional_info: {
+            fat: parseFloat(formData.fat) || 0,
+            carbs: parseFloat(formData.carbs) || 0,
+            protein: parseFloat(formData.protein) || 0,
+            calories: parseFloat(formData.calories) || 0,
+          },
+          images: images.map((img) => img.url),
         }
         await createMutation.mutateAsync(payload)
         toast.success('Đã tạo món ăn thành công')
@@ -501,7 +560,22 @@ export function MenuItemUpsertModal({ open }: MenuItemUpsertModalProps) {
               {/* Divider */}
               <hr className="border-slate-200 dark:border-slate-700" />
 
-              {/* Section 4: Allergens & Nutrition */}
+              {/* Section 4: Modifier Groups */}
+              <div className="space-y-4">
+                <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
+                  Tuỳ chọn món ăn (Modifiers)
+                </h3>
+                <ModifierGroupSelector
+                  selectedGroupIds={selectedModifierGroupIds}
+                  onChange={setSelectedModifierGroupIds}
+                  disabled={isSubmitting || (mode === 'edit' && isLoadingItem)}
+                />
+              </div>
+
+              {/* Divider */}
+              <hr className="border-slate-200 dark:border-slate-700" />
+
+              {/* Section 5: Allergens & Nutrition */}
               <div className="space-y-4">
                 <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
                   Allergens & Dinh dưỡng
@@ -564,26 +638,6 @@ export function MenuItemUpsertModal({ open }: MenuItemUpsertModalProps) {
                       disabled={isSubmitting || (mode === 'edit' && isLoadingItem)}
                     />
                   </div>
-                </div>
-              </div>
-
-              {/* Divider */}
-              <hr className="border-slate-200 dark:border-slate-700" />
-
-              {/* Section 5: Modifiers Hook */}
-              <div className="space-y-4">
-                <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
-                  Nhóm tuỳ chọn (Modifiers)
-                </h3>
-
-                <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-800/50">
-                  <p className="mb-3 text-sm text-slate-600 dark:text-slate-400">
-                    Chưa có nhóm tuỳ chọn nào. Vui lòng tạo nhóm tuỳ chọn trước.
-                  </p>
-                  <Button type="button" variant="outline" size="sm" onClick={handleModifiersLink}>
-                    <LinkIcon className="mr-2 h-4 w-4" />
-                    Quản lý nhóm tuỳ chọn
-                  </Button>
                 </div>
               </div>
 
