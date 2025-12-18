@@ -62,7 +62,7 @@ export function MenuItemUpsertModal({ open }: MenuItemUpsertModalProps) {
   const updateMutation = useUpdateMenuItemMutation()
 
   const isSubmitting = createMutation.isPending || updateMutation.isPending
-  const [images, setImages] = useState<{ url: string; is_primary: boolean }[]>([])
+  const [images, setImages] = useState<{ url: string; is_primary: boolean; file?: File }[]>([])
   const [selectedModifierGroupIds, setSelectedModifierGroupIds] = useState<string[]>([])
   const [formData, setFormData] = useState({
     name: '',
@@ -130,6 +130,13 @@ export function MenuItemUpsertModal({ open }: MenuItemUpsertModalProps) {
   }, [mode, itemData])
 
   const handleClose = () => {
+    // Clean up object URLs
+    images.forEach((img) => {
+      if (img.url.startsWith('blob:')) {
+        URL.revokeObjectURL(img.url)
+      }
+    })
+
     const params = new URLSearchParams(searchParams.toString())
     params.delete('modal')
     params.delete('mode')
@@ -312,20 +319,85 @@ export function MenuItemUpsertModal({ open }: MenuItemUpsertModalProps) {
   }
 
   const handleImageUpload = () => {
-    // TODO: Implement image upload
-    const newImage = {
-      url: '/vietnamese-food.jpg',
-      is_primary: images.length === 0,
+    // Trigger file input click
+    const fileInput = document.createElement('input')
+    fileInput.type = 'file'
+    fileInput.accept = 'image/*'
+    fileInput.multiple = true
+    fileInput.onchange = async (e: Event) => {
+      const target = e.target as HTMLInputElement
+      if (target.files && target.files.length > 0) {
+        await handleFileSelect(target.files)
+      }
     }
-    setImages([...images, newImage])
+    fileInput.click()
+  }
+
+  const handleFileSelect = async (files: FileList) => {
+    const maxSize = 5 * 1024 * 1024 // 5MB
+    const maxFiles = 10
+
+    // Validate number of files
+    if (images.length + files.length > maxFiles) {
+      toast.error(`Tối đa ${maxFiles} ảnh`)
+      return
+    }
+
+    const validFiles: File[] = []
+
+    // Validate each file
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i]
+
+      // Check file type
+      if (!file.type.startsWith('image/')) {
+        toast.error(`${file.name} không phải là file ảnh`)
+        continue
+      }
+
+      // Check file size
+      if (file.size > maxSize) {
+        toast.error(`${file.name} vượt quá 5MB`)
+        continue
+      }
+
+      validFiles.push(file)
+    }
+
+    if (validFiles.length === 0) return
+
+    // Create object URLs for preview
+    const newImages = validFiles.map((file, index) => ({
+      url: URL.createObjectURL(file),
+      is_primary: images.length === 0 && index === 0,
+      file, // Store file for later upload
+    }))
+
+    setImages([...images, ...(newImages as any)])
+    toast.success(`Đã thêm ${validFiles.length} ảnh`)
   }
 
   const handleRemoveImage = (index: number) => {
-    setImages(images.filter((_, i) => i !== index))
+    // Revoke object URL to free memory
+    if (images[index].url.startsWith('blob:')) {
+      URL.revokeObjectURL(images[index].url)
+    }
+
+    const newImages = images.filter((_, i) => i !== index)
+    // If removed image was primary, set first image as primary
+    if (images[index].is_primary && newImages.length > 0) {
+      newImages[0].is_primary = true
+    }
+    setImages(newImages)
   }
 
   const handleSetPrimaryImage = (index: number) => {
-    setImages(images.map((img, i) => ({ ...img, is_primary: i === index })))
+    setImages(
+      images.map((img, i) => ({
+        ...img,
+        is_primary: i === index,
+      })),
+    )
   }
 
   const handleModifiersLink = () => {
@@ -549,12 +621,16 @@ export function MenuItemUpsertModal({ open }: MenuItemUpsertModalProps) {
                   <button
                     type="button"
                     onClick={handleImageUpload}
-                    className="flex h-24 w-24 flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-slate-300 bg-slate-50 text-slate-400 hover:border-emerald-500 hover:bg-emerald-50 hover:text-emerald-600 dark:border-slate-700 dark:bg-slate-800 dark:hover:border-emerald-500 dark:hover:bg-emerald-500/10"
+                    disabled={isSubmitting || images.length >= 10}
+                    className="flex h-24 w-24 flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-slate-300 bg-slate-50 text-slate-400 transition-all hover:border-emerald-500 hover:bg-emerald-50 hover:text-emerald-600 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-800 dark:hover:border-emerald-500 dark:hover:bg-emerald-500/10"
                   >
                     <Upload className="h-5 w-5" />
-                    <span className="text-xs">Upload</span>
+                    <span className="text-xs">Tải ảnh</span>
                   </button>
                 </div>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Tải lên tối đa 10 ảnh (JPG, PNG, GIF). Kích thước tối đa 5MB mỗi ảnh.
+                </p>
               </div>
 
               {/* Divider */}

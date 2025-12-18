@@ -54,11 +54,6 @@ export function ModifierGroupSelector({
 
   return (
     <div className="space-y-2">
-      <Label>Nhóm tuỳ chọn (Modifier Groups)</Label>
-      <p className="text-xs text-slate-500 dark:text-slate-400">
-        Chọn các nhóm tuỳ chọn có thể áp dụng cho món này (size, topping, v.v.)
-      </p>
-
       {/* Display selected groups */}
       {selectedGroups.length > 0 && (
         <div className="flex flex-wrap gap-2">
