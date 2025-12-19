@@ -254,9 +254,8 @@ function FloorPlanCanvasComponent({
   return (
     <div className="rounded-2xl border border-slate-100 bg-white/80 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
       {/* Header */}
-      <div className="border-b border-slate-100 px-6 py-4 dark:border-slate-800">
-        <div className="flex items-center justify-between">
-          <div>
+      <div className="border-b border-slate-100 px-6 py-4 dark:border-slate-800 flex items-center justify-between gap-4 md:flex-row flex-col">
+          <div className="md:text-left text-center">
             <h3 className="font-semibold text-slate-900 dark:text-white">{selectedArea}</h3>
             <p className="text-xs text-slate-500 dark:text-slate-400">
               Canvas không giới hạn - Kéo thả để di chuyển
@@ -282,7 +281,6 @@ function FloorPlanCanvasComponent({
               <span className="text-slate-600 dark:text-slate-400">Vô hiệu</span>
             </div>
           </div>
-        </div>
       </div>
 
       {/* Canvas */}

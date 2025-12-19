@@ -1,54 +1,8 @@
 'use client'
 
-import type { LucideIcon } from 'lucide-react'
-
-import { cn } from '@/lib/utils'
 import { MapPin, CheckCircle2, EyeOff, Loader2 } from 'lucide-react'
 import { useZonesStatsQuery } from '@/hooks/use-zones-query'
-
-interface StatCardProps {
-  title: string
-  value: string
-  subtext: string
-  icon: LucideIcon
-  iconColor: string
-  iconBgColor: string
-  className?: string
-}
-
-function StatCard({
-  title,
-  value,
-  subtext,
-  icon: Icon,
-  iconColor,
-  iconBgColor,
-  className,
-}: StatCardProps) {
-  return (
-    <div
-      className={cn(
-        'rounded-2xl border border-slate-100 bg-white/80 p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900/80',
-        className,
-      )}
-    >
-      <div className="flex items-start justify-between">
-        <div>
-          <p className="text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-            {title}
-          </p>
-          <p className="mt-2 text-2xl font-semibold tracking-tight text-slate-900 dark:text-white">
-            {value}
-          </p>
-          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{subtext}</p>
-        </div>
-        <div className={cn('flex h-12 w-12 items-center justify-center rounded-xl', iconBgColor)}>
-          <Icon className={cn('h-6 w-6', iconColor)} />
-        </div>
-      </div>
-    </div>
-  )
-}
+import { StatCard } from '../ui/stat-card'
 
 export function ZonesOverviewStats() {
   const { data, isLoading } = useZonesStatsQuery()

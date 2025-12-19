@@ -41,11 +41,11 @@ export function FloorPlanToolbar({
   onReset,
 }: FloorPlanToolbarProps) {
   return (
-    <div className="flex items-center justify-between rounded-2xl border border-slate-100 bg-white/80 px-6 py-4 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
+    <div className="flex flex-col md:flex-row items-center gap-4 justify-between rounded-2xl border border-slate-100 bg-white/80 px-6 py-4 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
       {/* Left: Title & Area selector */}
-      <div className="flex items-center gap-4">
-        <div>
-          <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Sơ đồ bàn</h2>
+      <div className="flex md:flex-row flex-col items-center gap-4 justify-center">
+        <div className="min-w-25">
+          <h2 className="text-xl font-semibold text-slate-900 dark:text-white md:text-left text-center">Sơ đồ bàn</h2>
           <p className="text-sm text-slate-500 dark:text-slate-400">Sơ đồ mặt bằng & bố trí bàn</p>
         </div>
 
@@ -67,76 +67,78 @@ export function FloorPlanToolbar({
       </div>
 
       {/* Right: Actions */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 flex-wrap md:justify-end justify-center">
         {/* Undo/Redo */}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="rounded-full"
-          disabled={!canUndo}
-          onClick={onUndo}
-          title="Hoàn tác"
-        >
-          <Undo2 className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="rounded-full"
-          disabled={!canRedo}
-          onClick={onRedo}
-          title="Làm lại"
-        >
-          <Redo2 className="h-4 w-4" />
-        </Button>
-
-        <div className="mx-2 h-6 w-px bg-slate-200 dark:bg-slate-700" />
-
+        <div className="flex items-center gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-full">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="rounded-full"
+            disabled={!canUndo}
+            onClick={onUndo}
+            title="Hoàn tác"
+          >
+            <Undo2 className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="rounded-full"
+            disabled={!canRedo}
+            onClick={onRedo}
+            title="Làm lại"
+          >
+            <Redo2 className="h-4 w-4" />
+          </Button>
+        </div>
+        
         {/* Zoom controls */}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="rounded-full"
-          disabled={zoom <= 0.5}
-          onClick={() => onZoomChange(Math.max(0.5, zoom - 0.1))}
-        >
-          <Minus className="h-4 w-4" />
-        </Button>
-        <span className="min-w-[60px] text-center text-sm font-medium text-slate-700 dark:text-slate-300">
-          {Math.round(zoom * 100)}%
-        </span>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="rounded-full"
-          disabled={zoom >= 2}
-          onClick={() => onZoomChange(Math.min(2, zoom + 0.1))}
-        >
-          <Plus className="h-4 w-4" />
-        </Button>
+        <div className="flex items-center gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-full">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="rounded-full"
+            disabled={zoom <= 0.5}
+            onClick={() => onZoomChange(Math.max(0.5, zoom - 0.1))}
+          >
+            <Minus className="h-4 w-4" />
+          </Button>
+          <span className="min-w-[60px] text-center text-sm font-medium text-slate-700 dark:text-slate-300">
+            {Math.round(zoom * 100)}%
+          </span>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="rounded-full"
+            disabled={zoom >= 2}
+            onClick={() => onZoomChange(Math.min(2, zoom + 0.1))}
+          >
+            <Plus className="h-4 w-4" />
+          </Button>
 
-        {/* Grid toggle */}
-        <Button
-          variant={showGrid ? 'default' : 'ghost'}
-          size="icon"
-          className="rounded-full"
-          onClick={() => onShowGridChange(!showGrid)}
-          title="Bật/tắt lưới"
-        >
-          <Grid3x3 className="h-4 w-4" />
-        </Button>
-
-        <div className="mx-2 h-6 w-px bg-slate-200 dark:bg-slate-700" />
+          {/* Grid toggle */}
+          <Button
+            variant={showGrid ? 'default' : 'ghost'}
+            size="icon"
+            className="rounded-full"
+            onClick={() => onShowGridChange(!showGrid)}
+            title="Bật/tắt lưới"
+          >
+            <Grid3x3 className="h-4 w-4" />
+          </Button>
+        </div>
 
         {/* Reset & Save */}
-        <Button variant="ghost" size="sm" className="rounded-full text-red-600" onClick={onReset}>
-          <RotateCcw className="mr-2 h-4 w-4" />
-          Đặt lại
-        </Button>
-        <Button size="sm" className="rounded-full" onClick={onSave}>
-          <Save className="mr-2 h-4 w-4" />
-          Lưu thay đổi
-        </Button>
+        <div className="flex items-center gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-full">
+          <Button variant="ghost" size="sm" className="rounded-full text-red-600" onClick={onReset}>
+            <RotateCcw className="h-4 w-4" />
+            Đặt lại
+          </Button>
+          <Button size="sm" className="rounded-full" onClick={onSave}>
+            <Save className="h-4 w-4" />
+            Lưu
+          </Button>
+        </div>
       </div>
     </div>
   )
