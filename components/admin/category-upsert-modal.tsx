@@ -54,8 +54,8 @@ export function CategoryUpsertModal({ open }: CategoryUpsertModalProps) {
 
   // Load data if editing
   useEffect(() => {
-    if (mode === 'edit' && categoryData?.data) {
-      const category = categoryData.data
+    if (mode === 'edit' && categoryData?.data?.category) {
+      const category = categoryData.data.category
       setFormData({
         name: category.name,
         description: category.description || '',

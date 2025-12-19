@@ -28,7 +28,7 @@ export function CategoryDeleteDialog() {
 
   // Fetch category data to check if it has items
   const { data: categoryData } = useCategoryQuery(categoryId || null, open && !!categoryId)
-  const category = categoryData?.data
+  const category = categoryData?.data?.category
 
   // Check if category has items
   const hasItems = category ? category.item_count > 0 : false

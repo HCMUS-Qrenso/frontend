@@ -241,7 +241,7 @@ export function MenuItemsTable() {
                   </TableCell>
                   <TableCell className="px-2 md:px-4 py-3">
                     <span className="text-xs md:text-sm text-slate-600 dark:text-slate-400 break-words">
-                      {item.category.name}
+                      {item.category?.name || 'Chưa phân loại'}
                     </span>
                   </TableCell>
                   <TableCell className="px-2 md:px-4 py-3 text-right">

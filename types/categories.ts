@@ -50,7 +50,9 @@ export interface CategoryStatsResponse {
 export interface CategoryResponse {
   success: boolean
   message?: string
-  data: Category
+  data: {
+    category: Category
+  }
 }
 
 // Create Category Payload
