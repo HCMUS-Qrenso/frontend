@@ -175,11 +175,8 @@ export function CategoriesTable({ reorderMode, setReorderMode }: CategoriesTable
   const limit = Number.parseInt(searchParams.get('limit') || '10')
   const search = searchParams.get('search') || undefined
   const status = (searchParams.get('status') as 'active' | 'inactive' | 'all') || 'all'
-  const sort = searchParams.get('sort') || 'order'
-
-  // Map frontend params to API params
-  const sort_by: CategorySortBy = sort === 'updated' ? 'updated_at' : 'display_order'
-  const sort_order: CategorySortOrder = sort === 'updated' ? 'desc' : 'asc'
+  const sort_by = (searchParams.get('sort_by') as CategorySortBy) || 'display_order'
+  const sort_order = (searchParams.get('sort_order') as CategorySortOrder) || 'asc'
 
   // Fetch categories from API
   const { data, isLoading, error } = useCategoriesQuery({

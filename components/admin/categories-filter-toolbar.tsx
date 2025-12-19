@@ -32,26 +32,41 @@ export function CategoriesFilterToolbar({
     inactive: 'Đang ẩn',
   }
 
-  // Map sort values to UI labels
-  const sortMap: Record<string, string> = {
-    order: 'Theo thứ tự',
-    updated: 'Mới cập nhật',
+  // Map sort_by values to UI labels
+  const sortByMap: Record<string, string> = {
+    display_order: 'Thứ tự hiển thị',
+    name: 'Tên danh mục',
+    created_at: 'Ngày tạo',
+    updated_at: 'Ngày cập nhật',
+  }
+
+  // Map sort_order values to UI labels
+  const sortOrderMap: Record<string, string> = {
+    asc: 'Tăng dần',
+    desc: 'Giảm dần',
   }
 
   // Get filter values from URL params
   const searchQuery = searchParams.get('search') || ''
   const selectedStatus = searchParams.get('status') || 'all'
-  const selectedSort = searchParams.get('sort') || 'order'
+  const selectedSortBy = searchParams.get('sort_by') || 'display_order'
+  const selectedSortOrder = searchParams.get('sort_order') || 'asc'
 
   const selectedStatusLabel = statusMap[selectedStatus] || 'Tất cả'
-  const selectedSortLabel = sortMap[selectedSort] || 'Theo thứ tự'
+  const selectedSortByLabel = sortByMap[selectedSortBy] || 'Thứ tự hiển thị'
+  const selectedSortOrderLabel = sortOrderMap[selectedSortOrder] || 'Tăng dần'
 
   const [localSearchQuery, setLocalSearchQuery] = useState(searchQuery)
 
   // Update URL params when filters change
   const updateFilter = (key: string, value: string) => {
     const params = new URLSearchParams(searchParams.toString())
-    if (value === 'Tất cả' || value === '' || value === 'all' || value === 'order') {
+    const defaultValues: Record<string, string> = {
+      status: 'all',
+      sort_by: 'display_order',
+      sort_order: 'asc',
+    }
+    if (value === '' || value === defaultValues[key]) {
       params.delete(key)
     } else {
       params.set(key, value)
@@ -114,7 +129,7 @@ export function CategoriesFilterToolbar({
           </DropdownMenuContent>
         </DropdownMenu>
 
-        {/* Sort - Disable when reorderMode is active */}
+        {/* Sort By - Disable when reorderMode is active */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
@@ -123,16 +138,45 @@ export function CategoriesFilterToolbar({
               disabled={reorderMode}
               title={reorderMode ? 'Vui lòng tắt chế độ sắp xếp để dùng tính năng này' : undefined}
             >
-              <span className="text-sm">Sắp xếp: {selectedSortLabel}</span>
+              <span className="text-sm">Sắp xếp: {selectedSortByLabel}</span>
               <ChevronDown className="h-3 w-3" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-48">
-            <DropdownMenuItem onClick={() => updateFilter('sort', 'order')}>
-              Theo thứ tự
+            <DropdownMenuItem onClick={() => updateFilter('sort_by', 'display_order')}>
+              Thứ tự hiển thị
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => updateFilter('sort', 'updated')}>
-              Mới cập nhật
+            <DropdownMenuItem onClick={() => updateFilter('sort_by', 'name')}>
+              Tên danh mục
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => updateFilter('sort_by', 'created_at')}>
+              Ngày tạo
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => updateFilter('sort_by', 'updated_at')}>
+              Ngày cập nhật
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        {/* Sort Order - Disable when reorderMode is active */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="outline"
+              className="h-8 gap-1 rounded-lg bg-transparent px-3"
+              disabled={reorderMode}
+              title={reorderMode ? 'Vui lòng tắt chế độ sắp xếp để dùng tính năng này' : undefined}
+            >
+              <span className="text-sm">Thứ tự: {selectedSortOrderLabel}</span>
+              <ChevronDown className="h-3 w-3" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-40">
+            <DropdownMenuItem onClick={() => updateFilter('sort_order', 'asc')}>
+              Tăng dần
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => updateFilter('sort_order', 'desc')}>
+              Giảm dần
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
