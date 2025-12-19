@@ -7,6 +7,9 @@ import type {
   CreateMenuItemPayload,
   UpdateMenuItemPayload,
   MenuItemQueryParams,
+  ExportMenuParams,
+  ImportMenuMode,
+  ImportMenuResult,
 } from '@/types/menu-items'
 import type { MessageResponse } from '@/types/auth'
 
@@ -39,6 +42,27 @@ export const menuItemsApi = {
 
   deleteMenuItem: async (id: string): Promise<MessageResponse> => {
     const { data } = await apiClient.delete<MessageResponse>(`/menu/${id}`)
+    return data
+  },
+
+  // Export menu data as CSV/XLSX
+  exportMenu: async (params: ExportMenuParams): Promise<Blob> => {
+    const { data } = await apiClient.get('/menu/export', {
+      params,
+      responseType: 'blob',
+    })
+    return data
+  },
+
+  // Import menu data from CSV/XLSX file
+  importMenu: async (file: File, mode: ImportMenuMode): Promise<ImportMenuResult> => {
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('mode', mode)
+
+    const { data } = await apiClient.post<ImportMenuResult>('/menu/import', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    })
     return data
   },
 }

@@ -8,8 +8,12 @@ import type {
   CreateMenuItemPayload,
   UpdateMenuItemPayload,
   MenuItemQueryParams,
+  ExportMenuParams,
+  ImportMenuMode,
+  ImportMenuResult,
 } from '@/types/menu-items'
 import type { MessageResponse } from '@/types/auth'
+import { categoriesQueryKeys } from './use-categories-query'
 
 // Query Keys
 export const menuItemsQueryKeys = {
@@ -85,6 +89,39 @@ export const useDeleteMenuItemMutation = () => {
     onSuccess: () => {
       // Invalidate all menu item queries
       queryClient.invalidateQueries({ queryKey: menuItemsQueryKeys.all })
+    },
+  })
+}
+
+// Export Menu Mutation - Downloads file
+export const useExportMenuMutation = () => {
+  return useMutation<void, unknown, ExportMenuParams>({
+    mutationFn: async (params) => {
+      const blob = await menuItemsApi.exportMenu(params)
+      // Trigger file download
+      const url = URL.createObjectURL(blob)
+      const filename = `menu-export-${new Date().toISOString().split('T')[0]}.${params.format || 'csv'}`
+      const a = document.createElement('a')
+      a.href = url
+      a.download = filename
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+    },
+  })
+}
+
+// Import Menu Mutation
+export const useImportMenuMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation<ImportMenuResult, unknown, { file: File; mode: ImportMenuMode }>({
+    mutationFn: ({ file, mode }) => menuItemsApi.importMenu(file, mode),
+    onSuccess: () => {
+      // Invalidate menu items and categories (import may create categories)
+      queryClient.invalidateQueries({ queryKey: menuItemsQueryKeys.all })
+      queryClient.invalidateQueries({ queryKey: categoriesQueryKeys.all })
     },
   })
 }

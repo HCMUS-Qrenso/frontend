@@ -162,3 +162,34 @@ export interface MessageResponse {
     message: string
   }
 }
+
+// Export Menu Parameters
+export interface ExportMenuParams {
+  format?: 'csv' | 'xlsx'
+  scope?: 'all' | 'category'
+  categoryId?: string
+  includeImages?: boolean
+  includeModifiers?: boolean
+  includeHidden?: boolean
+}
+
+// Import Menu Mode
+export type ImportMenuMode = 'create' | 'update' | 'upsert'
+
+// Import Error
+export interface ImportError {
+  row: number
+  field: string
+  message: string
+}
+
+// Import Menu Result
+export interface ImportMenuResult {
+  success: boolean
+  data: {
+    created: number
+    updated: number
+    skipped: number
+    errors: ImportError[]
+  }
+}
