@@ -217,6 +217,7 @@ export function MenuItemsTable() {
                             }
                             alt={item.name}
                             fill
+                            unoptimized
                             className="object-cover"
                           />
                         ) : (

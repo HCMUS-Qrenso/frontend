@@ -33,6 +33,7 @@ import {
 } from '@/hooks/use-menu-items-query'
 import { useCategoriesQuery } from '@/hooks/use-categories-query'
 import { useErrorHandler } from '@/hooks/use-error-handler'
+import { useUploadFiles } from '@/hooks/use-uploads'
 import { toast } from 'sonner'
 import { ModifierGroupSelector } from './menu-item-modifier-groups-selector'
 
@@ -60,8 +61,9 @@ export function MenuItemUpsertModal({ open }: MenuItemUpsertModalProps) {
   // Mutations
   const createMutation = useCreateMenuItemMutation()
   const updateMutation = useUpdateMenuItemMutation()
+  const { uploadFiles, isUploading, progress: uploadProgress } = useUploadFiles()
 
-  const isSubmitting = createMutation.isPending || updateMutation.isPending
+  const isSubmitting = createMutation.isPending || updateMutation.isPending || isUploading
   const [images, setImages] = useState<{ url: string; is_primary: boolean; file?: File }[]>([])
   const [selectedModifierGroupIds, setSelectedModifierGroupIds] = useState<string[]>([])
   const [formData, setFormData] = useState({
@@ -207,8 +209,8 @@ export function MenuItemUpsertModal({ open }: MenuItemUpsertModalProps) {
       payload.allergen_info = formData.allergen_info.trim() || undefined
     }
 
-    // Note: nutritional_info and images are not included in update payload
-    // as they are not allowed by backend DTO
+    // Note: nutritional_info is not included in update payload
+    // Images (image_urls) are handled separately in handleSubmit after S3 upload
 
     return payload
   }
@@ -280,6 +282,21 @@ export function MenuItemUpsertModal({ open }: MenuItemUpsertModalProps) {
     }
 
     try {
+      // Upload new images to S3 first
+      const newFiles = images.filter((img) => img.file).map((img) => img.file!)
+      let uploadedUrls: string[] = []
+
+      if (newFiles.length > 0) {
+        const results = await uploadFiles(newFiles, { group: 'menu-images' })
+        uploadedUrls = results.map((r) => r.url)
+      }
+
+      // Combine existing URLs (non-blob) with newly uploaded URLs
+      const existingUrls = images
+        .filter((img) => !img.file && !img.url.startsWith('blob:'))
+        .map((img) => img.url)
+      const allImageUrls = [...existingUrls, ...uploadedUrls]
+
       if (mode === 'create') {
         const payload = {
           name: formData.name.trim(),
@@ -296,14 +313,38 @@ export function MenuItemUpsertModal({ open }: MenuItemUpsertModalProps) {
             protein: parseFloat(formData.protein) || 0,
             calories: parseFloat(formData.calories) || 0,
           },
-          images: images.map((img) => img.url),
+          images: allImageUrls,
         }
         await createMutation.mutateAsync(payload)
         toast.success('Đã tạo món ăn thành công')
       } else if (mode === 'edit' && itemId) {
+        // Upload new images to S3 first
+        const newFiles = images.filter((img) => img.file).map((img) => img.file!)
+        let uploadedUrls: string[] = []
+
+        if (newFiles.length > 0) {
+          const results = await uploadFiles(newFiles, { group: 'menu-images' })
+          uploadedUrls = results.map((r) => r.url)
+        }
+
+        // Combine existing URLs (non-blob) with newly uploaded URLs
+        const existingUrls = images
+          .filter((img) => !img.file && !img.url.startsWith('blob:'))
+          .map((img) => img.url)
+        const allImageUrls = [...existingUrls, ...uploadedUrls]
+
         const payload = buildUpdatePayload()
 
-        // If no changes, don't send request
+        // Check if images changed and add to payload
+        const originalUrls = originalItemData?.images || []
+        const hasNewFiles = newFiles.length > 0
+        const existingUrlsChanged = JSON.stringify(existingUrls.sort()) !== JSON.stringify(originalUrls.sort())
+        
+        if (hasNewFiles || existingUrlsChanged) {
+          payload.image_urls = allImageUrls
+        }
+
+        // If no changes (including images), don't send request
         if (Object.keys(payload).length === 0) {
           toast.info('Không có thay đổi nào để cập nhật')
           handleClose()
@@ -588,18 +629,12 @@ export function MenuItemUpsertModal({ open }: MenuItemUpsertModalProps) {
                 <div className="flex flex-wrap gap-3">
                   {images.map((image, index) => (
                     <div key={index} className="relative">
-                      <div
-                        className={cn(
-                          'relative h-24 w-24 overflow-hidden rounded-lg border-2',
-                          image.is_primary
-                            ? 'border-emerald-500'
-                            : 'border-slate-200 dark:border-slate-800',
-                        )}
-                      >
+                      <div className="relative h-24 w-24 overflow-hidden rounded-lg border-2 border-slate-200 dark:border-slate-800">
                         <Image
                           src={image.url || '/placeholder.svg'}
                           alt={`Image ${index + 1}`}
                           fill
+                          unoptimized
                           className="object-cover"
                         />
                       </div>
@@ -610,20 +645,6 @@ export function MenuItemUpsertModal({ open }: MenuItemUpsertModalProps) {
                       >
                         <X className="h-3 w-3" />
                       </button>
-                      {!image.is_primary && (
-                        <button
-                          type="button"
-                          onClick={() => handleSetPrimaryImage(index)}
-                          className="absolute right-0 bottom-0 left-0 bg-black/60 py-1 text-xs text-white hover:bg-black/80"
-                        >
-                          Đặt chính
-                        </button>
-                      )}
-                      {image.is_primary && (
-                        <div className="absolute right-0 bottom-0 left-0 bg-emerald-500 py-1 text-center text-xs text-white">
-                          Ảnh chính
-                        </div>
-                      )}
                     </div>
                   ))}
 
@@ -743,7 +764,7 @@ export function MenuItemUpsertModal({ open }: MenuItemUpsertModalProps) {
                   {isSubmitting ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Đang lưu...
+                      {isUploading ? `Đang upload... ${uploadProgress}%` : 'Đang lưu...'}
                     </>
                   ) : (
                     'Lưu'
