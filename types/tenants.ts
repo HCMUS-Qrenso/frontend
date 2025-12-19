@@ -3,6 +3,7 @@ export interface TenantSummary {
   name: string
   slug: string
   address: string | null
+  image: string | null
   status: string
   subscription_tier: string
   settings: Record<string, unknown> | null
