@@ -210,7 +210,11 @@ export function MenuItemsTable() {
                       <div className="relative h-10 w-10 md:h-14 md:w-14 shrink-0 overflow-hidden rounded-lg border border-slate-200 bg-slate-100 dark:border-slate-700 dark:bg-slate-800">
                         {item.images && item.images.length > 0 ? (
                           <Image
-                            src={item.images[0] || '/placeholder.svg'}
+                            src={
+                              typeof item.images[0] === 'string'
+                                ? item.images[0]
+                                : (item.images[0] as any)?.image_url || '/placeholder.svg'
+                            }
                             alt={item.name}
                             fill
                             className="object-cover"

@@ -94,7 +94,7 @@ export function MenuItemUpsertModal({ open }: MenuItemUpsertModalProps) {
       setOriginalItemData(item) // Store original data for comparison
       setFormData({
         name: item.name,
-        category_id: item.category.id,
+        category_id: item.category?.id || '',
         base_price: item.base_price,
         description: item.description || '',
         preparation_time: item.preparation_time.toString(),
@@ -106,7 +106,13 @@ export function MenuItemUpsertModal({ open }: MenuItemUpsertModalProps) {
         protein: item.nutritional_info?.protein?.toString() || '',
         calories: item.nutritional_info?.calories?.toString() || '',
       })
-      setImages(item.images?.map((url) => ({ url, is_primary: false })) || [])
+      // Handle images - support both string[] and object[] formats for backward compatibility
+      setImages(
+        item.images?.map((img: string | { image_url: string }, index: number) => ({
+          url: typeof img === 'string' ? img : img.image_url,
+          is_primary: index === 0,
+        })) || []
+      )
       setSelectedModifierGroupIds(item.modifier_groups?.map((g) => g.id) || [])
     } else if (mode === 'create') {
       setOriginalItemData(null)
@@ -173,7 +179,7 @@ export function MenuItemUpsertModal({ open }: MenuItemUpsertModalProps) {
       payload.name = formData.name.trim()
     }
 
-    if (formData.category_id !== originalItemData.category.id) {
+    if (formData.category_id !== originalItemData.category?.id) {
       payload.category_id = formData.category_id
     }
 
@@ -457,8 +463,9 @@ export function MenuItemUpsertModal({ open }: MenuItemUpsertModalProps) {
                         {formData.category_id ? (
                           <span className="block truncate">
                             {categories.find((c) => c.id === formData.category_id)?.name ||
-                              itemData?.data?.category?.name ||
-                              'Đang tải...'}
+                              (isLoadingCategories
+                                ? 'Đang tải...'
+                                : itemData?.data?.category?.name || 'Không tìm thấy danh mục')}
                           </span>
                         ) : (
                           <SelectValue
