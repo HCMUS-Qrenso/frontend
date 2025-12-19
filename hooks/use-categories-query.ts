@@ -106,7 +106,11 @@ export const useReorderCategoriesMutation = () => {
 export const useToggleCategoryStatusMutation = () => {
   const queryClient = useQueryClient()
 
-  return useMutation<CategoryResponse, unknown, { id: string; payload: ToggleCategoryStatusPayload }>({
+  return useMutation<
+    CategoryResponse,
+    unknown,
+    { id: string; payload: ToggleCategoryStatusPayload }
+  >({
     mutationFn: ({ id, payload }) => categoriesApi.toggleCategoryStatus(id, payload),
     onSuccess: (data, variables) => {
       // Update the specific category in cache

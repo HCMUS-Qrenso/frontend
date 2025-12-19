@@ -18,7 +18,11 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
 import { Loader2 } from 'lucide-react'
-import { useCategoryQuery, useCreateCategoryMutation, useUpdateCategoryMutation } from '@/hooks/use-categories-query'
+import {
+  useCategoryQuery,
+  useCreateCategoryMutation,
+  useUpdateCategoryMutation,
+} from '@/hooks/use-categories-query'
 import { useErrorHandler } from '@/hooks/use-error-handler'
 import { toast } from 'sonner'
 
@@ -44,7 +48,10 @@ export function CategoryUpsertModal({ open }: CategoryUpsertModalProps) {
   })
 
   // Load category data for editing
-  const { data: categoryData, isLoading: isLoadingCategory } = useCategoryQuery(categoryId || null, open && !!categoryId)
+  const { data: categoryData, isLoading: isLoadingCategory } = useCategoryQuery(
+    categoryId || null,
+    open && !!categoryId,
+  )
 
   // Mutations
   const createMutation = useCreateCategoryMutation()
@@ -192,7 +199,12 @@ export function CategoryUpsertModal({ open }: CategoryUpsertModalProps) {
               </div>
 
               <DialogFooter>
-                <Button type="button" variant="outline" onClick={handleClose} disabled={isSubmitting}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleClose}
+                  disabled={isSubmitting}
+                >
                   Hủy
                 </Button>
                 <Button

@@ -14,7 +14,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Plus, Search, Filter, MoreVertical, GripVertical, Eye, EyeOff, Loader2 } from 'lucide-react'
+import {
+  Plus,
+  Search,
+  Filter,
+  MoreVertical,
+  GripVertical,
+  Eye,
+  EyeOff,
+  Loader2,
+} from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { DndContext, closestCenter, type DragEndEvent } from '@dnd-kit/core'
 import {
@@ -356,11 +365,7 @@ function SortableModifierItem({
           {/* Actions Menu */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8"
-              >
+              <Button variant="ghost" size="icon" className="h-8 w-8">
                 <MoreVertical className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>

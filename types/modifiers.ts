@@ -144,4 +144,3 @@ export interface MessageResponse {
     updated_count?: number
   }
 }
-

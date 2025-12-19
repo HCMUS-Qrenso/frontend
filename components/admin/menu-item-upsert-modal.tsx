@@ -113,7 +113,7 @@ export function MenuItemUpsertModal({ open }: MenuItemUpsertModalProps) {
         item.images?.map((img: string | { image_url: string }, index: number) => ({
           url: typeof img === 'string' ? img : img.image_url,
           is_primary: index === 0,
-        })) || []
+        })) || [],
       )
       setSelectedModifierGroupIds(item.modifier_groups?.map((g) => g.id) || [])
     } else if (mode === 'create') {
@@ -338,8 +338,9 @@ export function MenuItemUpsertModal({ open }: MenuItemUpsertModalProps) {
         // Check if images changed and add to payload
         const originalUrls = originalItemData?.images || []
         const hasNewFiles = newFiles.length > 0
-        const existingUrlsChanged = JSON.stringify(existingUrls.sort()) !== JSON.stringify(originalUrls.sort())
-        
+        const existingUrlsChanged =
+          JSON.stringify(existingUrls.sort()) !== JSON.stringify(originalUrls.sort())
+
         if (hasNewFiles || existingUrlsChanged) {
           payload.image_urls = allImageUrls
         }
@@ -470,7 +471,11 @@ export function MenuItemUpsertModal({ open }: MenuItemUpsertModalProps) {
           )}
 
           {/* Show form only when: create mode OR (edit mode with correct data loaded) */}
-          {(mode === 'create' || (mode === 'edit' && itemData?.data && itemData.data.id === itemId && !isLoadingItem)) && (
+          {(mode === 'create' ||
+            (mode === 'edit' &&
+              itemData?.data &&
+              itemData.data.id === itemId &&
+              !isLoadingItem)) && (
             <>
               {/* Section 1: Basic Info */}
               <div className="space-y-4">

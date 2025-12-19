@@ -163,9 +163,9 @@ export function QRManagerContent() {
         force_regenerate: forceRegenerate,
       })
       toast.success(
-        forceRegenerate 
-          ? 'Đã tạo lại QR cho tất cả bàn thành công' 
-          : 'Đã tạo QR cho các bàn thiếu thành công'
+        forceRegenerate
+          ? 'Đã tạo lại QR cho tất cả bàn thành công'
+          : 'Đã tạo QR cho các bàn thiếu thành công',
       )
     } catch (error) {
       handleError(error)

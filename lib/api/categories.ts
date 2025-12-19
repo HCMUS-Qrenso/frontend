@@ -50,7 +50,10 @@ export const categoriesApi = {
     return data
   },
 
-  toggleCategoryStatus: async (id: string, payload: ToggleCategoryStatusPayload): Promise<CategoryResponse> => {
+  toggleCategoryStatus: async (
+    id: string,
+    payload: ToggleCategoryStatusPayload,
+  ): Promise<CategoryResponse> => {
     const { data } = await apiClient.patch<CategoryResponse>(`/categories/${id}/status`, payload)
     return data
   },

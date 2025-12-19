@@ -190,132 +190,132 @@ export function ModifierGroupModal({ open }: ModifierGroupModalProps) {
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-5">
-          {/* Name */}
-          <div className="space-y-2">
-            <Label htmlFor="name">
-              Tên nhóm <span className="text-red-500">*</span>
-            </Label>
-            <Input
-              id="name"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              placeholder="Ví dụ: Kích cỡ, Topping, Độ chín..."
-              disabled={isSubmitting}
-            />
-            {errors.name && <p className="text-xs text-red-600">{errors.name}</p>}
-          </div>
-
-          {/* Type */}
-          <div className="space-y-3">
-            <Label>
-              Loại lựa chọn <span className="text-red-500">*</span>
-            </Label>
-            <RadioGroup
-              value={formData.type}
-              onValueChange={(value) =>
-                setFormData({ ...formData, type: value as 'single_choice' | 'multiple_choice' })
-              }
-              disabled={isSubmitting}
-            >
-              <div className="flex items-center space-x-2 rounded-lg border border-slate-200 p-3 dark:border-slate-700">
-                <RadioGroupItem value="single_choice" id="single" />
-                <Label htmlFor="single" className="flex-1 cursor-pointer font-normal">
-                  <div className="font-medium">Single Choice</div>
-                  <div className="text-xs text-slate-500 dark:text-slate-400">
-                    Chỉ chọn được 1 option (VD: Size)
-                  </div>
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2 rounded-lg border border-slate-200 p-3 dark:border-slate-700">
-                <RadioGroupItem value="multiple_choice" id="multiple" />
-                <Label htmlFor="multiple" className="flex-1 cursor-pointer font-normal">
-                  <div className="font-medium">Multiple Choice</div>
-                  <div className="text-xs text-slate-500 dark:text-slate-400">
-                    Chọn được nhiều option (VD: Topping)
-                  </div>
-                </Label>
-              </div>
-            </RadioGroup>
-          </div>
-
-          {/* Required */}
-          <div className="flex items-center justify-between rounded-lg border border-slate-200 p-4 dark:border-slate-800">
-            <div className="space-y-0.5">
-              <Label htmlFor="is_required" className="text-base">
-                Bắt buộc chọn
+            {/* Name */}
+            <div className="space-y-2">
+              <Label htmlFor="name">
+                Tên nhóm <span className="text-red-500">*</span>
               </Label>
-              <p className="text-sm text-slate-500 dark:text-slate-400">
-                Khách hàng phải chọn ít nhất 1 option
-              </p>
+              <Input
+                id="name"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                placeholder="Ví dụ: Kích cỡ, Topping, Độ chín..."
+                disabled={isSubmitting}
+              />
+              {errors.name && <p className="text-xs text-red-600">{errors.name}</p>}
             </div>
-            <Switch
-              id="is_required"
-              checked={formData.is_required}
-              onCheckedChange={(checked) => setFormData({ ...formData, is_required: checked })}
-              disabled={isSubmitting}
-            />
-          </div>
 
-          {/* Min/Max Selections */}
-          {formData.type === 'multiple_choice' && (
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="min">Số lượng tối thiểu</Label>
-                <Input
-                  id="min"
-                  type="number"
-                  min={0}
-                  value={formData.min_selections}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      min_selections: Number.parseInt(e.target.value) || 0,
-                    })
-                  }
-                  disabled={isSubmitting}
-                />
+            {/* Type */}
+            <div className="space-y-3">
+              <Label>
+                Loại lựa chọn <span className="text-red-500">*</span>
+              </Label>
+              <RadioGroup
+                value={formData.type}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, type: value as 'single_choice' | 'multiple_choice' })
+                }
+                disabled={isSubmitting}
+              >
+                <div className="flex items-center space-x-2 rounded-lg border border-slate-200 p-3 dark:border-slate-700">
+                  <RadioGroupItem value="single_choice" id="single" />
+                  <Label htmlFor="single" className="flex-1 cursor-pointer font-normal">
+                    <div className="font-medium">Single Choice</div>
+                    <div className="text-xs text-slate-500 dark:text-slate-400">
+                      Chỉ chọn được 1 option (VD: Size)
+                    </div>
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-2 rounded-lg border border-slate-200 p-3 dark:border-slate-700">
+                  <RadioGroupItem value="multiple_choice" id="multiple" />
+                  <Label htmlFor="multiple" className="flex-1 cursor-pointer font-normal">
+                    <div className="font-medium">Multiple Choice</div>
+                    <div className="text-xs text-slate-500 dark:text-slate-400">
+                      Chọn được nhiều option (VD: Topping)
+                    </div>
+                  </Label>
+                </div>
+              </RadioGroup>
+            </div>
+
+            {/* Required */}
+            <div className="flex items-center justify-between rounded-lg border border-slate-200 p-4 dark:border-slate-800">
+              <div className="space-y-0.5">
+                <Label htmlFor="is_required" className="text-base">
+                  Bắt buộc chọn
+                </Label>
+                <p className="text-sm text-slate-500 dark:text-slate-400">
+                  Khách hàng phải chọn ít nhất 1 option
+                </p>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="max">Số lượng tối đa</Label>
-                <div className="flex gap-2">
+              <Switch
+                id="is_required"
+                checked={formData.is_required}
+                onCheckedChange={(checked) => setFormData({ ...formData, is_required: checked })}
+                disabled={isSubmitting}
+              />
+            </div>
+
+            {/* Min/Max Selections */}
+            {formData.type === 'multiple_choice' && (
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="min">Số lượng tối thiểu</Label>
                   <Input
-                    id="max"
+                    id="min"
                     type="number"
-                    min={1}
-                    value={formData.max_selections || ''}
-                    onChange={(e) => {
-                      const val = e.target.value ? Number.parseInt(e.target.value) : null
-                      setFormData({ ...formData, max_selections: val })
-                    }}
-                    placeholder="Không giới hạn"
+                    min={0}
+                    value={formData.min_selections}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        min_selections: Number.parseInt(e.target.value) || 0,
+                      })
+                    }
                     disabled={isSubmitting}
                   />
                 </div>
+                <div className="space-y-2">
+                  <Label htmlFor="max">Số lượng tối đa</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="max"
+                      type="number"
+                      min={1}
+                      value={formData.max_selections || ''}
+                      onChange={(e) => {
+                        const val = e.target.value ? Number.parseInt(e.target.value) : null
+                        setFormData({ ...formData, max_selections: val })
+                      }}
+                      placeholder="Không giới hạn"
+                      disabled={isSubmitting}
+                    />
+                  </div>
+                </div>
               </div>
-            </div>
-          )}
-          {errors.selections && <p className="text-xs text-red-600">{errors.selections}</p>}
+            )}
+            {errors.selections && <p className="text-xs text-red-600">{errors.selections}</p>}
 
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={handleClose} disabled={isSubmitting}>
-              Hủy
-            </Button>
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-              className="bg-emerald-600 hover:bg-emerald-700"
-            >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Đang lưu...
-                </>
-              ) : (
-                'Lưu'
-              )}
-            </Button>
-          </DialogFooter>
-        </form>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={handleClose} disabled={isSubmitting}>
+                Hủy
+              </Button>
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="bg-emerald-600 hover:bg-emerald-700"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Đang lưu...
+                  </>
+                ) : (
+                  'Lưu'
+                )}
+              </Button>
+            </DialogFooter>
+          </form>
         )}
       </DialogContent>
     </Dialog>

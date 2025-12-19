@@ -73,7 +73,7 @@ export function ZoneDeleteDialog() {
           <AlertDialogDescription className="text-center text-sm text-slate-500 dark:text-slate-400">
             Bạn có chắc chắn muốn xóa khu vực "{zoneName}" không? Hành động này không thể hoàn tác.
             {zoneName !== 'khu vực này' && (
-              <span className="block mt-1 font-medium text-red-600 dark:text-red-400">
+              <span className="mt-1 block font-medium text-red-600 dark:text-red-400">
                 Lưu ý: Chỉ có thể xóa khu vực không có bàn nào.
               </span>
             )}

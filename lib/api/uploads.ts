@@ -17,13 +17,8 @@ export const uploadsApi = {
    * Get presigned URL for file upload
    * Returns an uploadUrl (for PUT to S3) and a key (object path in bucket)
    */
-  getPresignedUrl: async (
-    request: PresignUploadRequest
-  ): Promise<PresignUploadResponse> => {
-    const { data } = await apiClient.post<PresignUploadResponse>(
-      '/uploads/presign',
-      request
-    )
+  getPresignedUrl: async (request: PresignUploadRequest): Promise<PresignUploadResponse> => {
+    const { data } = await apiClient.post<PresignUploadResponse>('/uploads/presign', request)
     return data
   },
 

@@ -153,25 +153,25 @@ export function MenuItemsTable() {
         <Table>
           <TableHeader>
             <TableRow className="border-b border-slate-100 bg-slate-50/80 hover:bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900">
-              <TableHead className="min-w-[200px] px-2 md:px-4 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+              <TableHead className="min-w-[200px] px-2 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase md:px-4 dark:text-slate-400">
                 Món ăn
               </TableHead>
-              <TableHead className="w-24 md:w-32 px-2 md:px-4 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+              <TableHead className="w-24 px-2 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase md:w-32 md:px-4 dark:text-slate-400">
                 Danh mục
               </TableHead>
-              <TableHead className="w-20 md:w-28 px-2 md:px-4 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+              <TableHead className="w-20 px-2 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase md:w-28 md:px-4 dark:text-slate-400">
                 Giá
               </TableHead>
-              <TableHead className="w-24 md:w-28 px-2 md:px-4 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+              <TableHead className="w-24 px-2 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase md:w-28 md:px-4 dark:text-slate-400">
                 Trạng thái
               </TableHead>
-              <TableHead className="w-16 md:w-20 px-2 md:px-4 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+              <TableHead className="w-16 px-2 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase md:w-20 md:px-4 dark:text-slate-400">
                 Phổ biến
               </TableHead>
-              <TableHead className="w-20 md:w-24 px-2 md:px-4 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+              <TableHead className="w-20 px-2 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase md:w-24 md:px-4 dark:text-slate-400">
                 Cập nhật
               </TableHead>
-              <TableHead className="w-20 px-2 md:px-4 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+              <TableHead className="w-20 px-2 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase md:px-4 dark:text-slate-400">
                 Thao tác
               </TableHead>
             </TableRow>
@@ -179,7 +179,7 @@ export function MenuItemsTable() {
           <TableBody>
             {menuItems.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="px-2 md:px-4 py-12 text-center">
+                <TableCell colSpan={7} className="px-2 py-12 text-center md:px-4">
                   <div className="flex flex-col items-center justify-center gap-3">
                     <div className="text-slate-400">
                       <UtensilsCrossed className="mx-auto h-12 w-12" />
@@ -205,9 +205,9 @@ export function MenuItemsTable() {
                   )}
                   onClick={() => handleEdit(item.id)}
                 >
-                  <TableCell className="px-2 md:px-4 py-3">
+                  <TableCell className="px-2 py-3 md:px-4">
                     <div className="flex items-center gap-3">
-                      <div className="relative h-10 w-10 md:h-14 md:w-14 shrink-0 overflow-hidden rounded-lg border border-slate-200 bg-slate-100 dark:border-slate-700 dark:bg-slate-800">
+                      <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-lg border border-slate-200 bg-slate-100 md:h-14 md:w-14 dark:border-slate-700 dark:bg-slate-800">
                         {item.images && item.images.length > 0 ? (
                           <Image
                             src={
@@ -226,9 +226,9 @@ export function MenuItemsTable() {
                           </div>
                         )}
                       </div>
-                      <div className="flex flex-col gap-1 min-w-0">
+                      <div className="flex min-w-0 flex-col gap-1">
                         <div className="flex items-center gap-2">
-                          <span className="font-medium text-slate-900 dark:text-white text-xs md:text-sm line-clamp-2 break-words">
+                          <span className="line-clamp-2 text-xs font-medium break-words text-slate-900 md:text-sm dark:text-white">
                             {item.name}
                           </span>
                           {item.is_chef_recommendation && (
@@ -244,38 +244,38 @@ export function MenuItemsTable() {
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell className="px-2 md:px-4 py-3">
-                    <span className="text-xs md:text-sm text-slate-600 dark:text-slate-400 break-words">
+                  <TableCell className="px-2 py-3 md:px-4">
+                    <span className="text-xs break-words text-slate-600 md:text-sm dark:text-slate-400">
                       {item.category?.name || 'Chưa phân loại'}
                     </span>
                   </TableCell>
-                  <TableCell className="px-2 md:px-4 py-3 text-right">
-                    <span className="font-medium text-slate-900 dark:text-white text-xs md:text-sm">
+                  <TableCell className="px-2 py-3 text-right md:px-4">
+                    <span className="text-xs font-medium text-slate-900 md:text-sm dark:text-white">
                       {formatPrice(Number(item.base_price))}
                     </span>
                   </TableCell>
-                  <TableCell className="px-2 md:px-4 py-3 text-center">
+                  <TableCell className="px-2 py-3 text-center md:px-4">
                     {getStatusBadge(item.status)}
                   </TableCell>
-                  <TableCell className="px-2 md:px-4 py-3 text-center">
+                  <TableCell className="px-2 py-3 text-center md:px-4">
                     <div className="flex items-center justify-center gap-1">
-                      <span className="text-xs md:text-sm font-medium text-slate-900 dark:text-white">
+                      <span className="text-xs font-medium text-slate-900 md:text-sm dark:text-white">
                         {item.popularity_score}
                       </span>
                       <span className="text-xs text-slate-500">/100</span>
                     </div>
                   </TableCell>
-                  <TableCell className="px-2 md:px-4 py-3">
-                    <span className="text-xs md:text-sm text-slate-600 dark:text-slate-400">
+                  <TableCell className="px-2 py-3 md:px-4">
+                    <span className="text-xs text-slate-600 md:text-sm dark:text-slate-400">
                       {formatDate(item.updated_at)}
                     </span>
                   </TableCell>
-                  <TableCell className="px-2 md:px-4 py-3 text-right">
+                  <TableCell className="px-2 py-3 text-right md:px-4">
                     <div className="flex items-center justify-end gap-0.5">
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-7 w-7 md:h-8 md:w-8 rounded-full"
+                        className="h-7 w-7 rounded-full md:h-8 md:w-8"
                         onClick={(e) => {
                           e.stopPropagation()
                           handleEdit(item.id)
@@ -287,7 +287,7 @@ export function MenuItemsTable() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-7 w-7 md:h-8 md:w-8 rounded-full text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-500"
+                        className="h-7 w-7 rounded-full text-red-600 hover:text-red-700 md:h-8 md:w-8 dark:text-red-400 dark:hover:text-red-500"
                         onClick={(e) => {
                           e.stopPropagation()
                           handleDelete(item.id)

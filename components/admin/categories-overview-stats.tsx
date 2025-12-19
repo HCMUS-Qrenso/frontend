@@ -65,7 +65,12 @@ export function CategoriesOverviewStats() {
   }
 
   return (
-    <div className={cn("grid gap-4 sm:grid-cols-2", stats.length === 4 ? "lg:grid-cols-4" : "lg:grid-cols-3")}>
+    <div
+      className={cn(
+        'grid gap-4 sm:grid-cols-2',
+        stats.length === 4 ? 'lg:grid-cols-4' : 'lg:grid-cols-3',
+      )}
+    >
       {stats.map((stat) => (
         <StatCard
           key={stat.title}

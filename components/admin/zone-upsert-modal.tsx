@@ -54,7 +54,7 @@ export function ZoneUpsertModal({ open }: ZoneUpsertModalProps) {
 
   const createMutation = useCreateZoneMutation()
   const updateMutation = useUpdateZoneMutation()
-  const { handleErrorWithStatus } = useErrorHandler()
+  const { handleError } = useErrorHandler()
 
   const isLoading = createMutation.isPending || updateMutation.isPending
 
@@ -114,7 +114,7 @@ export function ZoneUpsertModal({ open }: ZoneUpsertModalProps) {
 
       handleClose()
     } catch (error: any) {
-      handleErrorWithStatus(error, 'Có lỗi xảy ra khi lưu khu vực')
+      handleError(error, 'Có lỗi xảy ra khi lưu khu vực')
     }
   }
 

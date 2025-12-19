@@ -25,8 +25,7 @@ export function TablesFilterToolbar({ isTrashView = false }: TablesFilterToolbar
   const searchParams = useSearchParams()
   const { data: zonesData } = useZonesSimpleQuery()
   const zones: SimpleZone[] =
-    zonesData?.zones ??
-    ((zonesData as { zones?: SimpleZone[] } | undefined)?.zones || [])
+    zonesData?.zones ?? ((zonesData as { zones?: SimpleZone[] } | undefined)?.zones || [])
 
   // Map backend status to UI labels
   const statusMap: Record<string, string> = {
@@ -104,7 +103,7 @@ export function TablesFilterToolbar({ isTrashView = false }: TablesFilterToolbar
   return (
     <AdminFilterToolbarWrapper>
       {/* Left - Filters */}
-      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center justify-center md:justify-start">
+      <div className="flex flex-col justify-center gap-2 sm:flex-row sm:flex-wrap sm:items-center md:justify-start">
         {/* Search */}
         <div className="relative">
           <Search className="absolute top-1/2 left-3 h-3 w-3 -translate-y-1/2 text-slate-400" />
@@ -201,7 +200,7 @@ export function TablesFilterToolbar({ isTrashView = false }: TablesFilterToolbar
       </div>
 
       {/* Right - Actions */}
-      <div className="flex items-center gap-2 justify-center md:justify-start">
+      <div className="flex items-center justify-center gap-2 md:justify-start">
         {!isTrashView && (
           <>
             <Link href="/admin/tables/layout">

@@ -47,7 +47,7 @@ function StatCard({ title, value, subtext, trend, icon, className }: StatCardPro
             <span className="text-xs text-slate-500 dark:text-slate-400">{subtext}</span>
           </div>
         </div>
-        <div className="flex h-12 w-12 aspect-square items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400">
+        <div className="flex aspect-square h-12 w-12 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400">
           {icon}
         </div>
       </div>

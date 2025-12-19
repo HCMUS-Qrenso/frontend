@@ -256,8 +256,9 @@ export function CategoriesTable({ reorderMode, setReorderMode }: CategoriesTable
   const handleToggleActive = async (categoryId: string) => {
     try {
       // Find category from either localCategories (reorder mode) or categories
-      const category = localCategories.find((c) => c.id === categoryId) || 
-                       categories.find((c) => c.id === categoryId)
+      const category =
+        localCategories.find((c) => c.id === categoryId) ||
+        categories.find((c) => c.id === categoryId)
       if (!category) return
 
       await toggleStatusMutation.mutateAsync({
@@ -347,7 +348,10 @@ export function CategoriesTable({ reorderMode, setReorderMode }: CategoriesTable
         </TableRow>
       </TableHeader>
       {reorderMode ? (
-        <SortableContext items={localCategories.map((c) => c.id)} strategy={verticalListSortingStrategy}>
+        <SortableContext
+          items={localCategories.map((c) => c.id)}
+          strategy={verticalListSortingStrategy}
+        >
           <TableBody>
             {localCategories.map((category) => (
               <SortableCategoryRow

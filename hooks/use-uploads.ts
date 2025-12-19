@@ -14,11 +14,11 @@ interface UseUploadFilesOptions {
 
 /**
  * Hook for uploading files to S3 via presigned URLs
- * 
+ *
  * @example
  * ```tsx
  * const { uploadFiles, isUploading, progress } = useUploadFiles()
- * 
+ *
  * const handleUpload = async (files: File[]) => {
  *   const results = await uploadFiles(files, { group: 'menu-images' })
  *   console.log(results) // [{ key: 'menu-images/abc.jpg', url: 'http://...' }]
@@ -30,10 +30,7 @@ export function useUploadFiles() {
   const [progress, setProgress] = useState(0)
 
   const uploadFiles = useCallback(
-    async (
-      files: File[],
-      options: UseUploadFilesOptions = {}
-    ): Promise<UploadResult[]> => {
+    async (files: File[], options: UseUploadFilesOptions = {}): Promise<UploadResult[]> => {
       const { group = 'uploads', onProgress } = options
 
       if (files.length === 0) return []
@@ -80,7 +77,7 @@ export function useUploadFiles() {
         setProgress(0)
       }
     },
-    []
+    [],
   )
 
   return { uploadFiles, isUploading, progress }

@@ -62,11 +62,7 @@ export function MenuItemDeleteDialog() {
           <Button variant="outline" onClick={handleClose} disabled={deleteMutation.isPending}>
             Hủy
           </Button>
-          <Button
-            variant="destructive"
-            onClick={handleDelete}
-            disabled={deleteMutation.isPending}
-          >
+          <Button variant="destructive" onClick={handleDelete} disabled={deleteMutation.isPending}>
             {deleteMutation.isPending ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />

@@ -70,7 +70,7 @@ export function QRManagerToolbar({
     <>
       <div className="flex flex-col gap-3 rounded-2xl border border-slate-100 bg-white/80 p-4 shadow-sm md:flex-row md:items-center md:justify-between dark:border-slate-800 dark:bg-slate-900/80">
         {/* Search & Filters */}
-        <div className="flex flex-1 flex-wrap flex-col md:justify-start gap-2 sm:flex-row sm:items-center justify-center">
+        <div className="flex flex-1 flex-col flex-wrap justify-center gap-2 sm:flex-row sm:items-center md:justify-start">
           {/* Search */}
           <div className="relative sm:max-w-xs">
             <Search className="absolute top-1/2 left-3 h-3 w-3 -translate-y-1/2 text-slate-400" />
@@ -124,7 +124,7 @@ export function QRManagerToolbar({
         </div>
 
         {/* Actions */}
-        <div className="flex items-center gap-2 flex-wrap md:justify-end justify-center">
+        <div className="flex flex-wrap items-center justify-center gap-2 md:justify-end">
           <Button
             onClick={onSecurityInfo}
             variant="outline"
@@ -142,8 +142,12 @@ export function QRManagerToolbar({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => onDownloadAll('zip')}>Tải xuống ZIP</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onDownloadAll('pdf')}>Tải xuống PDF</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onDownloadAll('zip')}>
+                Tải xuống ZIP
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onDownloadAll('pdf')}>
+                Tải xuống PDF
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
 
@@ -165,7 +169,7 @@ export function QRManagerToolbar({
                 Tạo QR cho bàn thiếu
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 onClick={() => setShowForceWarning(true)}
                 className="text-red-600 focus:text-red-600 dark:text-red-400"
               >
@@ -187,19 +191,18 @@ export function QRManagerToolbar({
             </AlertDialogTitle>
             <AlertDialogDescription className="space-y-2">
               <p>
-                Hành động này sẽ tạo lại <strong>TẤT CẢ</strong> mã QR cho toàn bộ bàn trong hệ thống.
+                Hành động này sẽ tạo lại <strong>TẤT CẢ</strong> mã QR cho toàn bộ bàn trong hệ
+                thống.
               </p>
-              <p className="text-red-500 font-medium">
+              <p className="font-medium text-red-500">
                 ⚠️ Các mã QR cũ đã in hoặc dán tại bàn sẽ KHÔNG còn hoạt động.
               </p>
-              <p>
-                Bạn sẽ cần in lại và thay thế tất cả mã QR tại nhà hàng.
-              </p>
+              <p>Bạn sẽ cần in lại và thay thế tất cả mã QR tại nhà hàng.</p>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Hủy</AlertDialogCancel>
-            <AlertDialogAction 
+            <AlertDialogAction
               onClick={handleForceGenerate}
               className="bg-red-500 hover:bg-red-600"
             >

@@ -12,10 +12,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { AlertCircle, Loader2 } from 'lucide-react'
-import {
-  useDeleteModifierGroupMutation,
-  useModifierGroupQuery,
-} from '@/hooks/use-modifiers-query'
+import { useDeleteModifierGroupMutation, useModifierGroupQuery } from '@/hooks/use-modifiers-query'
 import { useErrorHandler } from '@/hooks/use-error-handler'
 import { toast } from 'sonner'
 

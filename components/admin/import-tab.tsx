@@ -365,7 +365,9 @@ export function ImportTab() {
                         <td className="px-4 py-2">
                           <Badge variant="secondary">{err.field}</Badge>
                         </td>
-                        <td className="px-4 py-2 text-rose-600 dark:text-rose-400">{err.message}</td>
+                        <td className="px-4 py-2 text-rose-600 dark:text-rose-400">
+                          {err.message}
+                        </td>
                       </tr>
                     ))}
                   </tbody>

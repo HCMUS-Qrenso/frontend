@@ -41,11 +41,13 @@ export function FloorPlanToolbar({
   onReset,
 }: FloorPlanToolbarProps) {
   return (
-    <div className="flex flex-col md:flex-row items-center gap-4 justify-between rounded-2xl border border-slate-100 bg-white/80 px-6 py-4 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
+    <div className="flex flex-col items-center justify-between gap-4 rounded-2xl border border-slate-100 bg-white/80 px-6 py-4 shadow-sm md:flex-row dark:border-slate-800 dark:bg-slate-900/80">
       {/* Left: Title & Area selector */}
-      <div className="flex md:flex-row flex-col items-center gap-4 justify-center">
+      <div className="flex flex-col items-center justify-center gap-4 md:flex-row">
         <div className="min-w-25">
-          <h2 className="text-xl font-semibold text-slate-900 dark:text-white md:text-left text-center">Sơ đồ bàn</h2>
+          <h2 className="text-center text-xl font-semibold text-slate-900 md:text-left dark:text-white">
+            Sơ đồ bàn
+          </h2>
           <p className="text-sm text-slate-500 dark:text-slate-400">Sơ đồ mặt bằng & bố trí bàn</p>
         </div>
 
@@ -67,9 +69,9 @@ export function FloorPlanToolbar({
       </div>
 
       {/* Right: Actions */}
-      <div className="flex items-center gap-2 flex-wrap md:justify-end justify-center">
+      <div className="flex flex-wrap items-center justify-center gap-2 md:justify-end">
         {/* Undo/Redo */}
-        <div className="flex items-center gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-full">
+        <div className="flex items-center gap-1 rounded-full bg-slate-100 p-1 dark:bg-slate-800">
           <Button
             variant="ghost"
             size="icon"
@@ -91,9 +93,9 @@ export function FloorPlanToolbar({
             <Redo2 className="h-4 w-4" />
           </Button>
         </div>
-        
+
         {/* Zoom controls */}
-        <div className="flex items-center gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-full">
+        <div className="flex items-center gap-1 rounded-full bg-slate-100 p-1 dark:bg-slate-800">
           <Button
             variant="ghost"
             size="icon"
@@ -129,7 +131,7 @@ export function FloorPlanToolbar({
         </div>
 
         {/* Reset & Save */}
-        <div className="flex items-center gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-full">
+        <div className="flex items-center gap-1 rounded-full bg-slate-100 p-1 dark:bg-slate-800">
           <Button variant="ghost" size="sm" className="rounded-full text-red-600" onClick={onReset}>
             <RotateCcw className="h-4 w-4" />
             Đặt lại

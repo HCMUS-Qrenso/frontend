@@ -35,10 +35,7 @@ export const modifiersApi = {
   /**
    * Get a specific modifier group by ID with its modifiers
    */
-  getModifierGroup: async (
-    id: string,
-    includeModifiers = true,
-  ): Promise<ModifierGroupResponse> => {
+  getModifierGroup: async (id: string, includeModifiers = true): Promise<ModifierGroupResponse> => {
     const { data } = await apiClient.get<ModifierGroupResponse>(`/modifier-groups/${id}`, {
       params: { include_modifiers: includeModifiers },
     })
@@ -62,10 +59,7 @@ export const modifiersApi = {
     id: string,
     payload: UpdateModifierGroupPayload,
   ): Promise<ModifierGroupResponse> => {
-    const { data } = await apiClient.patch<ModifierGroupResponse>(
-      `/modifier-groups/${id}`,
-      payload,
-    )
+    const { data } = await apiClient.patch<ModifierGroupResponse>(`/modifier-groups/${id}`, payload)
     return data
   },
 
@@ -83,7 +77,9 @@ export const modifiersApi = {
   /**
    * Reorder modifier groups display order
    */
-  reorderModifierGroups: async (payload: ReorderModifierGroupsPayload): Promise<MessageResponse> => {
+  reorderModifierGroups: async (
+    payload: ReorderModifierGroupsPayload,
+  ): Promise<MessageResponse> => {
     const { data } = await apiClient.put<MessageResponse>('/modifier-groups/reorder', payload)
     return data
   },
@@ -156,4 +152,3 @@ export const modifiersApi = {
     return data
   },
 }
-
