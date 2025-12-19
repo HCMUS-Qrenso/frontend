@@ -4,16 +4,16 @@ Modern admin dashboard for restaurant management built with **Next.js 16**, **Re
 
 ## Tech Stack
 
-| Category | Technology |
-|----------|------------|
-| **Framework** | Next.js 16 (App Router) |
-| **UI** | React 19, Tailwind CSS 4, Radix UI |
-| **State** | Zustand, TanStack React Query |
-| **API** | Axios with auto-refresh token |
-| **Icons** | Lucide React |
-| **Drag & Drop** | dnd-kit |
-| **Charts** | Recharts |
-| **Styling** | Tailwind CSS + Class Variance Authority |
+| Category        | Technology                              |
+| --------------- | --------------------------------------- |
+| **Framework**   | Next.js 16 (App Router)                 |
+| **UI**          | React 19, Tailwind CSS 4, Radix UI      |
+| **State**       | Zustand, TanStack React Query           |
+| **API**         | Axios with auto-refresh token           |
+| **Icons**       | Lucide React                            |
+| **Drag & Drop** | dnd-kit                                 |
+| **Charts**      | Recharts                                |
+| **Styling**     | Tailwind CSS + Class Variance Authority |
 
 ## Getting Started
 
@@ -84,10 +84,10 @@ The app uses **HTTP-only refresh token cookies** for session persistence:
 
 ### Route Guards
 
-| Component | Purpose |
-|-----------|---------|
-| `ProtectedRoute` | Redirects unauthenticated users to `/auth/login` |
-| `GuestRoute` | Redirects authenticated users to `/admin/dashboard` |
+| Component        | Purpose                                             |
+| ---------------- | --------------------------------------------------- |
+| `ProtectedRoute` | Redirects unauthenticated users to `/auth/login`    |
+| `GuestRoute`     | Redirects authenticated users to `/admin/dashboard` |
 
 ## Available Scripts
 
@@ -103,6 +103,7 @@ pnpm type-check   # TypeScript type checking
 ## Features
 
 ### Admin Dashboard
+
 - 📊 Dashboard with statistics and charts
 - 🍽️ Menu management (items, categories, modifiers)
 - 🪑 Table & zone management with layout editor
@@ -111,6 +112,7 @@ pnpm type-check   # TypeScript type checking
 - ⚙️ Settings and profile
 
 ### Authentication
+
 - 🔐 Login with email/password
 - 📝 Signup for new owners
 - 🔑 Password reset via email
@@ -119,6 +121,7 @@ pnpm type-check   # TypeScript type checking
 - 🌐 Cross-tab logout sync (BroadcastChannel)
 
 ### Multi-tenant Support
+
 - Owners can manage multiple restaurants
 - Admin/staff are bound to specific tenant
 - Tenant selection persisted in localStorage
@@ -134,6 +137,7 @@ pnpm type-check   # TypeScript type checking
 ## API Integration
 
 All API calls go through the configured Axios client with:
+
 - Auto-attach `Authorization` header
 - Auto-attach `x-tenant-id` header
 - Auto-refresh expired access tokens
@@ -150,5 +154,6 @@ pnpm start
 ```
 
 For production deployment, ensure:
+
 - `NEXT_PUBLIC_API_URL` points to production API
 - Backend CORS is configured for frontend domain

@@ -461,7 +461,7 @@ export function CategoriesTable({ reorderMode, setReorderMode }: CategoriesTable
   )
 
   return (
-    <div className="rounded-2xl border border-slate-100 bg-white/80 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
+    <div className="overflow-hidden rounded-2xl border border-slate-100 bg-white/80 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
       {reorderMode ? (
         <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
           {tableContent}
