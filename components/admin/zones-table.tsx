@@ -130,7 +130,7 @@ export function ZonesTable() {
   if (isLoading) {
     return (
       <div className="overflow-x-auto rounded-2xl border border-slate-100 bg-white/80 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
-        <Table className="w-full table-fixed">
+        <Table className="w-full table-fixed min-w-250">
           <TableHeader>
             <TableRow className="border-b border-slate-100 bg-slate-50/80 hover:bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900">
               <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
@@ -193,7 +193,7 @@ export function ZonesTable() {
   return (
     <div className="space-y-4">
       <div className="overflow-x-auto rounded-2xl border border-slate-100 bg-white/80 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
-        <Table className="w-full table-fixed">
+        <Table className="w-full table-fixed  min-w-250">
           <colgroup>
             <col className="w-[28%]" />
             <col className="w-[32%]" />

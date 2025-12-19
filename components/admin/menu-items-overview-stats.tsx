@@ -1,59 +1,8 @@
 'use client'
 
-import React from 'react'
-import { cn } from '@/lib/utils'
 import { UtensilsCrossed, CheckCircle2, XCircle, EyeOff, Award, Loader2 } from 'lucide-react'
 import { useMenuItemsStatsQuery } from '@/hooks/use-menu-items-query'
-
-interface StatCardProps {
-  title: string
-  value: string
-  subtext: string
-  icon: React.ComponentType<{ className?: string }>
-  iconColor?: string
-  iconBgColor?: string
-  className?: string
-}
-
-function StatCard({
-  title,
-  value,
-  subtext,
-  icon: Icon,
-  iconColor,
-  iconBgColor,
-  className,
-}: StatCardProps) {
-  return (
-    <div
-      className={cn(
-        'rounded-2xl border border-slate-100 bg-white/80 p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900/80',
-        className,
-      )}
-    >
-      <div className="flex items-start justify-between">
-        <div>
-          <p className="text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-            {title}
-          </p>
-          <p className="mt-2 text-2xl font-semibold tracking-tight text-slate-900 dark:text-white">
-            {value}
-          </p>
-          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{subtext}</p>
-        </div>
-        <div
-          className={cn(
-            'flex h-12 w-12 items-center justify-center rounded-xl',
-            iconBgColor ||
-              'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400',
-          )}
-        >
-          <Icon className={cn('h-6 w-6', iconColor)} />
-        </div>
-      </div>
-    </div>
-  )
-}
+import { StatCard } from '../ui/stat-card'
 
 export function MenuItemsOverviewStats() {
   const { data, isLoading } = useMenuItemsStatsQuery()
@@ -117,14 +66,14 @@ export function MenuItemsOverviewStats() {
       icon: Award,
       title: "Chef's picks",
       value: String(statsData?.chef_recommendations ?? 0),
-      subtext: 'Recommendation',
+      subtext: 'Picks',
       iconColor: 'text-yellow-600 dark:text-yellow-400',
       iconBgColor: 'bg-yellow-50 dark:bg-yellow-500/10',
     },
   ]
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
       {stats.map((stat) => (
         <StatCard
           key={stat.title}
@@ -134,6 +83,8 @@ export function MenuItemsOverviewStats() {
           icon={stat.icon}
           iconColor={stat.iconColor}
           iconBgColor={stat.iconBgColor}
+          iconSz={5}
+          iconRounded="lg"
         />
       ))}
     </div>

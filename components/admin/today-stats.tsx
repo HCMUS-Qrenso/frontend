@@ -47,7 +47,7 @@ function StatCard({ title, value, subtext, trend, icon, className }: StatCardPro
             <span className="text-xs text-slate-500 dark:text-slate-400">{subtext}</span>
           </div>
         </div>
-        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400">
+        <div className="flex h-12 w-12 aspect-square items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400">
           {icon}
         </div>
       </div>
@@ -101,7 +101,7 @@ function OrderStatusCard() {
 
 export function TodayStats() {
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
       <StatCard
         title="Orders hôm nay"
         value="70"
@@ -122,7 +122,6 @@ export function TodayStats() {
         subtext="8 bàn trống"
         icon={<Users className="h-6 w-6" />}
       />
-      <OrderStatusCard />
       <StatCard
         title="Thời gian phục vụ TB"
         value="18 phút"
@@ -130,6 +129,7 @@ export function TodayStats() {
         trend={{ value: '-2 phút', isPositive: true }}
         icon={<Clock className="h-6 w-6" />}
       />
+      <OrderStatusCard />
     </div>
   )
 }
