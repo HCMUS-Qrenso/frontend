@@ -421,13 +421,15 @@ export function MenuItemUpsertModal({ open }: MenuItemUpsertModalProps) {
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {mode === 'edit' && isLoadingItem && (
+          {/* Loading state for edit mode - wait for both item data AND categories */}
+          {mode === 'edit' && (isLoadingItem || !itemData?.data || itemData.data.id !== itemId) && (
             <div className="flex items-center justify-center py-8">
               <Loader2 className="h-6 w-6 animate-spin text-emerald-600" />
             </div>
           )}
 
-          {(mode === 'create' || !isLoadingItem) && (
+          {/* Show form only when: create mode OR (edit mode with correct data loaded) */}
+          {(mode === 'create' || (mode === 'edit' && itemData?.data && itemData.data.id === itemId && !isLoadingItem)) && (
             <>
               {/* Section 1: Basic Info */}
               <div className="space-y-4">

@@ -50,6 +50,7 @@ const menuItems = [
       { icon: UtensilsCrossed, label: 'Món ăn', href: '/admin/menu/items' },
       { icon: Settings, label: 'Tuỳ chọn', href: '/admin/menu/modifiers' },
       { icon: Upload, label: 'Import/Export', href: '/admin/menu/import-export' },
+      { icon: LayoutGrid, label: 'Templates', href: '/admin/menu/templates' },
     ],
   },
   {

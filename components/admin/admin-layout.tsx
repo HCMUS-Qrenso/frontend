@@ -151,7 +151,14 @@ export function AdminLayout({ children }: AdminLayoutProps) {
     if (path === '/admin/menu/import-export') {
       return {
         title: 'Import / Export Thực đơn',
-        description: 'Nhập dữ liệu từ CSV/Excel, xuất backup, hoặc thiết kế menu in đẹp',
+        description: 'Nhập dữ liệu từ CSV/Excel, xuất backup dữ liệu menu',
+      }
+    }
+
+    if (path === '/admin/menu/templates') {
+      return {
+        title: 'Menu Templates',
+        description: 'Tạo menu đẹp với các template có sẵn, xuất PDF/PNG để in ấn',
       }
     }
 
