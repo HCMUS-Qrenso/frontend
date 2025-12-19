@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import {
   Table,
@@ -192,6 +192,23 @@ export function CategoriesTable({ reorderMode, setReorderMode }: CategoriesTable
   const categories = data?.data.categories || []
   const pagination = data?.data.pagination
 
+  // Local state for reordering - stores temporary order during drag-drop
+  const [localCategories, setLocalCategories] = useState<Category[]>([])
+
+  // Sync local state when API data changes or when entering reorder mode
+  useEffect(() => {
+    if (categories.length > 0) {
+      setLocalCategories(categories)
+    }
+  }, [categories])
+
+  // Reset local state when exiting reorder mode
+  useEffect(() => {
+    if (!reorderMode && categories.length > 0) {
+      setLocalCategories(categories)
+    }
+  }, [reorderMode, categories])
+
   // Mutations
   const reorderMutation = useReorderCategoriesMutation()
   const toggleStatusMutation = useToggleCategoryStatusMutation()
@@ -217,7 +234,9 @@ export function CategoriesTable({ reorderMode, setReorderMode }: CategoriesTable
 
   const handleToggleActive = async (categoryId: string) => {
     try {
-      const category = categories.find((c) => c.id === categoryId)
+      // Find category from either localCategories (reorder mode) or categories
+      const category = localCategories.find((c) => c.id === categoryId) || 
+                       categories.find((c) => c.id === categoryId)
       if (!category) return
 
       await toggleStatusMutation.mutateAsync({
@@ -234,16 +253,19 @@ export function CategoriesTable({ reorderMode, setReorderMode }: CategoriesTable
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event
     if (over && active.id !== over.id) {
-      // For reorder mode, we'll handle the reordering in the backend
-      // The UI will update via query invalidation after the API call
+      setLocalCategories((items) => {
+        const oldIndex = items.findIndex((item) => item.id === active.id)
+        const newIndex = items.findIndex((item) => item.id === over.id)
+        return arrayMove(items, oldIndex, newIndex)
+      })
     }
   }
 
   const handleSaveOrder = async () => {
     try {
-      // Transform categories array to API payload format
+      // Transform localCategories array to API payload format
       const payload = {
-        categories: categories.map((cat, idx) => ({
+        categories: localCategories.map((cat, idx) => ({
           id: cat.id,
           display_order: idx + 1,
         })),
@@ -301,9 +323,9 @@ export function CategoriesTable({ reorderMode, setReorderMode }: CategoriesTable
         </TableRow>
       </TableHeader>
       {reorderMode ? (
-        <SortableContext items={categories.map((c) => c.id)} strategy={verticalListSortingStrategy}>
+        <SortableContext items={localCategories.map((c) => c.id)} strategy={verticalListSortingStrategy}>
           <TableBody>
-            {categories.map((category) => (
+            {localCategories.map((category) => (
               <SortableCategoryRow
                 key={category.id}
                 category={category}
