@@ -38,6 +38,24 @@ interface Category {
   display_order: number
   is_active: boolean
   item_count: number
+  updated_at: string
+}
+
+// Format date to relative time
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString)
+  const now = new Date()
+  const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60))
+
+  if (diffInHours < 1) {
+    return 'Vừa xong'
+  } else if (diffInHours < 24) {
+    return `${diffInHours}h trước`
+  } else if (diffInHours < 48) {
+    return '1 ngày trước'
+  } else {
+    return date.toLocaleDateString('vi-VN')
+  }
 }
 
 interface CategoriesTableProps {
@@ -120,6 +138,9 @@ function SortableCategoryRow({
       </TableCell>
       <TableCell className="px-6 py-4 text-center text-slate-600 dark:text-slate-400">
         {category.item_count}
+      </TableCell>
+      <TableCell className="px-6 py-4 text-slate-600 dark:text-slate-400">
+        {formatDate(category.updated_at)}
       </TableCell>
       <TableCell className="px-6 py-4 text-right">
         <div className="flex items-center justify-end gap-1">
@@ -229,7 +250,7 @@ export function CategoriesTable({ reorderMode, setReorderMode }: CategoriesTable
   }
 
   const handleViewItems = (categoryId: string) => {
-    router.push(`/admin/menu/items?categoryId=${categoryId}`)
+    router.push(`/admin/menu/items?category_id=${categoryId}`)
   }
 
   const handleToggleActive = async (categoryId: string) => {
@@ -317,6 +338,9 @@ export function CategoriesTable({ reorderMode, setReorderMode }: CategoriesTable
           <TableHead className="w-[150px] px-6 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
             # Món ăn
           </TableHead>
+          <TableHead className="w-[120px] px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+            Cập nhật
+          </TableHead>
           <TableHead className="w-[150px] px-6 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
             Thao tác
           </TableHead>
@@ -377,6 +401,9 @@ export function CategoriesTable({ reorderMode, setReorderMode }: CategoriesTable
               </TableCell>
               <TableCell className="px-6 py-4 text-center text-slate-600 dark:text-slate-400">
                 {category.item_count}
+              </TableCell>
+              <TableCell className="px-6 py-4 text-slate-600 dark:text-slate-400">
+                {formatDate(category.updated_at)}
               </TableCell>
               <TableCell className="px-6 py-4 text-right">
                 <div className="flex items-center justify-end gap-1">
