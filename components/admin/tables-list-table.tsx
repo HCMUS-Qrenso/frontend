@@ -239,7 +239,7 @@ export function TablesListTable({ isTrashView = false }: TablesListTableProps) {
     <div className="space-y-4">
       {/* Table */}
       <div className="overflow-x-auto rounded-2xl border border-slate-100 bg-white/80 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
-        <Table className="w-full table-fixed">
+        <Table className="w-full min-w-250 table-fixed">
           <colgroup>
             <col className="w-[18%]" />
             <col className="w-[22%]" />

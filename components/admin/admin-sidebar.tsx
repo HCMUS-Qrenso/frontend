@@ -23,6 +23,7 @@ import {
   LayoutGrid,
   FolderOpen,
   Upload,
+  MapPin,
 } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
@@ -49,6 +50,7 @@ const menuItems = [
       { icon: UtensilsCrossed, label: 'Món ăn', href: '/admin/menu/items' },
       { icon: Settings, label: 'Tuỳ chọn', href: '/admin/menu/modifiers' },
       { icon: Upload, label: 'Import/Export', href: '/admin/menu/import-export' },
+      { icon: LayoutGrid, label: 'Templates', href: '/admin/menu/templates' },
     ],
   },
   {
@@ -59,6 +61,7 @@ const menuItems = [
       { icon: Table, label: 'Danh sách bàn', href: '/admin/tables/list' },
       { icon: LayoutGrid, label: 'Sơ đồ', href: '/admin/tables/layout' },
       { icon: QrCode, label: 'Quản lý QR', href: '/admin/tables/qr' },
+      { icon: MapPin, label: 'Khu vực', href: '/admin/tables/zones' },
     ],
   },
   { icon: Users, label: 'Nhân viên', href: '/admin/staff' },
@@ -177,7 +180,6 @@ export function AdminSidebar({
         className={cn(
           'fixed top-0 left-0 z-50 h-full w-64 border-r border-slate-200 bg-white transition-transform duration-300 lg:translate-x-0 dark:border-slate-800 dark:bg-slate-900',
           sidebarOpen ? 'translate-x-0' : '-translate-x-full',
-          isModalOpen && 'lg:hidden',
         )}
       >
         <div className="flex h-full flex-col">

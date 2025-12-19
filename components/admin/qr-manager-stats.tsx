@@ -1,5 +1,6 @@
 import { QrCode, CheckCircle2, AlertCircle, Clock } from 'lucide-react'
 import type { TableQR } from '@/types/tables'
+import { StatCard } from '../ui/stat-card'
 
 interface QRManagerStatsProps {
   total_active_tables?: number
@@ -18,7 +19,7 @@ export function QRManagerStats({
     ? new Date(latest_qr_update).toLocaleDateString('vi-VN', {
         day: '2-digit',
         month: '2-digit',
-        year: 'numeric',
+        year: '2-digit',
         hour: '2-digit',
         minute: '2-digit',
       })
@@ -69,23 +70,16 @@ export function QRManagerStats({
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {stats.map((stat) => (
-        <div
+        <StatCard
           key={stat.label}
-          className="flex items-start justify-between rounded-2xl border border-slate-100 bg-white/80 p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900/80"
-        >
-          <div>
-            <p className="text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-              {stat.label}
-            </p>
-            <p className="mt-2 text-2xl font-semibold tracking-tight text-slate-900 dark:text-white">
-              {stat.value}
-            </p>
-            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{stat.subtext}</p>
-          </div>
-          <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${stat.bgColor}`}>
-            <stat.icon className={`h-6 w-6 ${stat.color}`} />
-          </div>
-        </div>
+          title={stat.label}
+          value={stat.value}
+          subtext={stat.subtext}
+          icon={stat.icon}
+          iconColor={stat.color}
+          iconBgColor={stat.bgColor}
+          valueSz={stat.label === 'Lần tạo lại cuối' ? 'text-lg' : 'text-2xl'}
+        />
       ))}
     </div>
   )

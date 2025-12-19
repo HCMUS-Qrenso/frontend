@@ -4,8 +4,7 @@ import { Suspense, useState } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ImportTab } from '@/components/admin/import-tab'
 import { ExportDataTab } from '@/components/admin/export-data-tab'
-import { TemplateExportTab } from '@/components/admin/template-export-tab'
-import { Loader2, Upload, Download, FileText } from 'lucide-react'
+import { Loader2, Upload, Download } from 'lucide-react'
 
 function ImportExportContent() {
   const [activeTab, setActiveTab] = useState('import')
@@ -14,7 +13,7 @@ function ImportExportContent() {
     <div className="space-y-6">
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3 lg:inline-grid lg:w-auto">
+        <TabsList className="grid w-full grid-cols-2 lg:inline-grid lg:w-auto">
           <TabsTrigger value="import" className="gap-2">
             <Upload className="h-4 w-4" />
             <span className="hidden sm:inline">Import CSV/Excel</span>
@@ -25,11 +24,6 @@ function ImportExportContent() {
             <span className="hidden sm:inline">Export Data</span>
             <span className="sm:hidden">Export</span>
           </TabsTrigger>
-          <TabsTrigger value="templates" className="gap-2">
-            <FileText className="h-4 w-4" />
-            <span className="hidden sm:inline">Menu Templates</span>
-            <span className="sm:hidden">Templates</span>
-          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="import" className="space-y-6">
@@ -38,10 +32,6 @@ function ImportExportContent() {
 
         <TabsContent value="export" className="space-y-6">
           <ExportDataTab />
-        </TabsContent>
-
-        <TabsContent value="templates" className="space-y-6">
-          <TemplateExportTab />
         </TabsContent>
       </Tabs>
     </div>

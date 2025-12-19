@@ -3,28 +3,55 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { Download, FileSpreadsheet, Clock } from 'lucide-react'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Download, FileSpreadsheet, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useExportMenuMutation } from '@/hooks/use-menu-items-query'
+import { useCategoriesQuery } from '@/hooks/use-categories-query'
+import { toast } from 'sonner'
+import { useErrorHandler } from '@/hooks/use-error-handler'
 
-type ExportScope = 'all' | 'category' | 'available_only'
+type ExportScope = 'all' | 'category'
 type ExportFormat = 'csv' | 'xlsx'
 
 export function ExportDataTab() {
   const [exportScope, setExportScope] = useState<ExportScope>('all')
-  const [format, setFormat] = useState<ExportFormat>('xlsx')
+  const [format, setFormat] = useState<ExportFormat>('csv')
+  const [selectedCategory, setSelectedCategory] = useState<string>('')
   const [includeImages, setIncludeImages] = useState(true)
   const [includeModifiers, setIncludeModifiers] = useState(true)
   const [includeHidden, setIncludeHidden] = useState(false)
-  const [isExporting, setIsExporting] = useState(false)
-  const [lastExport, setLastExport] = useState<string | null>('2024-12-15 14:30')
 
-  const handleExport = () => {
-    setIsExporting(true)
-    setTimeout(() => {
-      setIsExporting(false)
-      setLastExport(new Date().toLocaleString('vi-VN'))
-      // Mock download
-    }, 2000)
+  const { handleErrorWithStatus } = useErrorHandler()
+  const exportMutation = useExportMenuMutation()
+  const { data: categoriesData } = useCategoriesQuery({ limit: 100 })
+  const categories = categoriesData?.data.categories || []
+
+  const handleExport = async () => {
+    if (exportScope === 'category' && !selectedCategory) {
+      toast.error('Vui lòng chọn danh mục')
+      return
+    }
+
+    try {
+      await exportMutation.mutateAsync({
+        format,
+        scope: exportScope,
+        categoryId: exportScope === 'category' ? selectedCategory : undefined,
+        includeImages,
+        includeModifiers,
+        includeHidden,
+      })
+      toast.success('Đã xuất file thành công')
+    } catch (error) {
+      handleErrorWithStatus(error, undefined, 'Không thể xuất file')
+    }
   }
 
   return (
@@ -32,18 +59,17 @@ export function ExportDataTab() {
       {/* Export Scope */}
       <Card className="rounded-2xl border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
         <h3 className="mb-4 font-semibold text-slate-900 dark:text-white">Phạm vi xuất dữ liệu</h3>
-        <div className="grid gap-3 sm:grid-cols-3">
+        <div className="grid gap-3 sm:grid-cols-2">
           {[
             {
               value: 'all',
               label: 'Tất cả',
-              description: 'Toàn bộ categories + items + modifiers',
+              description: 'Toàn bộ menu items',
             },
-            { value: 'category', label: 'Theo danh mục', description: 'Chọn một category cụ thể' },
             {
-              value: 'available_only',
-              label: 'Chỉ đang bán',
-              description: 'Items có status = available',
+              value: 'category',
+              label: 'Theo danh mục',
+              description: 'Chọn một category cụ thể',
             },
           ].map((option) => (
             <button
@@ -63,6 +89,27 @@ export function ExportDataTab() {
             </button>
           ))}
         </div>
+
+        {/* Category Selector */}
+        {exportScope === 'category' && (
+          <div className="mt-4">
+            <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
+              Chọn danh mục
+            </label>
+            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+              <SelectTrigger className="w-full max-w-xs">
+                <SelectValue placeholder="Chọn danh mục..." />
+              </SelectTrigger>
+              <SelectContent>
+                {categories.map((cat) => (
+                  <SelectItem key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
       </Card>
 
       {/* Export Options */}
@@ -92,10 +139,10 @@ export function ExportDataTab() {
             />
             <div>
               <span className="text-sm font-medium text-slate-900 dark:text-white">
-                Include modifier mapping
+                Include modifiers
               </span>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Xuất liên kết item ↔ modifier groups
+                Xuất modifier groups (JSON)
               </p>
             </div>
           </label>
@@ -108,10 +155,10 @@ export function ExportDataTab() {
             />
             <div>
               <span className="text-sm font-medium text-slate-900 dark:text-white">
-                Include hidden categories
+                Include hidden items
               </span>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Xuất cả categories có is_active=false
+                Xuất cả items có status = unavailable
               </p>
             </div>
           </label>
@@ -149,78 +196,38 @@ export function ExportDataTab() {
             <FileSpreadsheet className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
             <div className="text-left">
               <p className="font-medium text-slate-900 dark:text-white">Excel (.xlsx)</p>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Nhiều sheets, format đẹp</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Format đẹp hơn</p>
             </div>
           </button>
         </div>
       </Card>
 
-      {/* Export Actions */}
+      {/* Export Action */}
       <Card className="rounded-2xl border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
         <div className="flex items-center justify-between">
           <div>
             <h3 className="font-semibold text-slate-900 dark:text-white">Sẵn sàng export</h3>
-            {lastExport && (
-              <div className="mt-2 flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
-                <Clock className="h-4 w-4" />
-                <span>Lần cuối: {lastExport}</span>
-              </div>
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+              File sẽ được tải xuống tự động
+            </p>
+          </div>
+          <Button
+            onClick={handleExport}
+            disabled={exportMutation.isPending}
+            className="bg-emerald-600 hover:bg-emerald-700"
+          >
+            {exportMutation.isPending ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Đang export...
+              </>
+            ) : (
+              <>
+                <Download className="mr-2 h-4 w-4" />
+                Export {format.toUpperCase()}
+              </>
             )}
-          </div>
-          <div className="flex gap-3">
-            <Button variant="outline" disabled={isExporting}>
-              Copy link
-            </Button>
-            <Button
-              onClick={handleExport}
-              disabled={isExporting}
-              className="bg-emerald-600 hover:bg-emerald-700"
-            >
-              {isExporting ? (
-                <>
-                  <span className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                  Đang export...
-                </>
-              ) : (
-                <>
-                  <Download className="mr-2 h-4 w-4" />
-                  Export {format.toUpperCase()}
-                </>
-              )}
-            </Button>
-          </div>
-        </div>
-      </Card>
-
-      {/* Export History */}
-      <Card className="rounded-2xl border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
-        <h3 className="mb-4 font-semibold text-slate-900 dark:text-white">
-          Lịch sử export gần đây
-        </h3>
-        <div className="space-y-3">
-          {[
-            { name: 'menu-export-all-20241215.xlsx', date: '15/12/2024 14:30', size: '2.4 MB' },
-            { name: 'categories-20241210.csv', date: '10/12/2024 09:15', size: '156 KB' },
-            { name: 'menu-available-20241208.xlsx', date: '08/12/2024 16:45', size: '1.8 MB' },
-          ].map((file, idx) => (
-            <div
-              key={idx}
-              className="flex items-center justify-between rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-800/50"
-            >
-              <div className="flex items-center gap-3">
-                <FileSpreadsheet className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
-                <div>
-                  <p className="text-sm font-medium text-slate-900 dark:text-white">{file.name}</p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">
-                    {file.date} • {file.size}
-                  </p>
-                </div>
-              </div>
-              <Button variant="ghost" size="sm">
-                <Download className="h-4 w-4" />
-              </Button>
-            </div>
-          ))}
+          </Button>
         </div>
       </Card>
     </div>

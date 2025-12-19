@@ -14,7 +14,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Plus, Search, Filter, MoreVertical, GripVertical, Eye, EyeOff } from 'lucide-react'
+import {
+  Plus,
+  Search,
+  Filter,
+  MoreVertical,
+  GripVertical,
+  Eye,
+  EyeOff,
+  Loader2,
+} from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { DndContext, closestCenter, type DragEndEvent } from '@dnd-kit/core'
 import {
@@ -24,23 +33,48 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import type { ModifierGroup, Modifier } from '@/app/admin/menu/modifiers/page'
+import type { ModifierGroup, Modifier } from '@/types/modifiers'
+import {
+  useModifiersQuery,
+  useReorderModifiersMutation,
+  useToggleModifierAvailabilityMutation,
+} from '@/hooks/use-modifiers-query'
+import { useErrorHandler } from '@/hooks/use-error-handler'
+import { toast } from 'sonner'
 
 interface ModifiersPanelProps {
   selectedGroup: ModifierGroup | null
-  modifiers: Modifier[]
-  onReorderModifiers: (modifiers: Modifier[]) => void
+  selectedGroupId: string | null
 }
 
-export function ModifiersPanel({
-  selectedGroup,
-  modifiers,
-  onReorderModifiers,
-}: ModifiersPanelProps) {
+export function ModifiersPanel({ selectedGroup, selectedGroupId }: ModifiersPanelProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [searchQuery, setSearchQuery] = useState('')
   const [showOnlyAvailable, setShowOnlyAvailable] = useState(false)
+  const { handleErrorWithStatus } = useErrorHandler()
+
+  // Fetch modifiers for the selected group
+  const {
+    data: modifiersData,
+    isLoading: isLoadingModifiers,
+    error: modifiersError,
+  } = useModifiersQuery(selectedGroupId, {
+    include_unavailable: true,
+    sort_by: 'display_order',
+    sort_order: 'asc',
+  })
+
+  // Mutations
+  const reorderMutation = useReorderModifiersMutation()
+  const toggleAvailabilityMutation = useToggleModifierAvailabilityMutation()
+
+  // Handle errors
+  if (modifiersError) {
+    handleErrorWithStatus(modifiersError)
+  }
+
+  const modifiers = modifiersData?.data.modifiers || []
 
   const filteredModifiers = modifiers.filter((mod) => {
     const matchesSearch = mod.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -50,18 +84,27 @@ export function ModifiersPanel({
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event
-    if (over && active.id !== over.id) {
+    if (over && active.id !== over.id && selectedGroupId) {
       const oldIndex = filteredModifiers.findIndex((m) => m.id === active.id)
       const newIndex = filteredModifiers.findIndex((m) => m.id === over.id)
       const reordered = arrayMove(filteredModifiers, oldIndex, newIndex).map((m, idx) => ({
-        ...m,
+        id: m.id,
         display_order: idx + 1,
       }))
 
-      // Update all modifiers
-      const otherModifiers = modifiers.filter((m) => !reordered.find((r) => r.id === m.id))
-      onReorderModifiers([...otherModifiers, ...reordered])
-      // TODO: API call to save order
+      // Call API to save order
+      reorderMutation.mutate(
+        { groupId: selectedGroupId, payload: { modifiers: reordered } },
+        {
+          onSuccess: () => {
+            toast.success('Đã cập nhật thứ tự option')
+          },
+          onError: (error) => {
+            handleErrorWithStatus(error)
+            toast.error('Không thể cập nhật thứ tự')
+          },
+        },
+      )
     }
   }
 
@@ -160,31 +203,42 @@ export function ModifiersPanel({
 
       {/* Modifiers List */}
       <div className="max-h-[600px] overflow-y-auto p-4">
-        <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-          <SortableContext
-            items={filteredModifiers.map((m) => m.id)}
-            strategy={verticalListSortingStrategy}
-          >
-            <div className="space-y-2">
-              {filteredModifiers.map((modifier) => (
-                <SortableModifierItem
-                  key={modifier.id}
-                  modifier={modifier}
-                  formatPrice={formatPrice}
-                />
-              ))}
-            </div>
-          </SortableContext>
-        </DndContext>
-
-        {filteredModifiers.length === 0 && (
-          <div className="py-12 text-center">
-            <p className="text-sm text-slate-500 dark:text-slate-400">
-              {modifiers.length === 0
-                ? 'Chưa có option nào. Thêm mới để bắt đầu.'
-                : 'Không tìm thấy option nào'}
-            </p>
+        {isLoadingModifiers ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="h-6 w-6 animate-spin text-emerald-600" />
           </div>
+        ) : (
+          <>
+            <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+              <SortableContext
+                items={filteredModifiers.map((m) => m.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                <div className="space-y-2">
+                  {filteredModifiers.map((modifier) => (
+                    <SortableModifierItem
+                      key={modifier.id}
+                      modifier={modifier}
+                      formatPrice={formatPrice}
+                      selectedGroupId={selectedGroupId}
+                      toggleAvailabilityMutation={toggleAvailabilityMutation}
+                      handleErrorWithStatus={handleErrorWithStatus}
+                    />
+                  ))}
+                </div>
+              </SortableContext>
+            </DndContext>
+
+            {filteredModifiers.length === 0 && (
+              <div className="py-12 text-center">
+                <p className="text-sm text-slate-500 dark:text-slate-400">
+                  {modifiers.length === 0
+                    ? 'Chưa có option nào. Thêm mới để bắt đầu.'
+                    : 'Không tìm thấy option nào'}
+                </p>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>
@@ -194,9 +248,15 @@ export function ModifiersPanel({
 function SortableModifierItem({
   modifier,
   formatPrice,
+  selectedGroupId,
+  toggleAvailabilityMutation,
+  handleErrorWithStatus,
 }: {
   modifier: Modifier
   formatPrice: (amount: number) => string
+  selectedGroupId: string | null
+  toggleAvailabilityMutation: any
+  handleErrorWithStatus: any
 }) {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -227,8 +287,24 @@ function SortableModifierItem({
 
   const handleToggleAvailability = (e: React.MouseEvent) => {
     e.stopPropagation()
-    // TODO: API call to toggle
-    console.log('Toggle availability', modifier.id)
+    if (!selectedGroupId) return
+
+    toggleAvailabilityMutation.mutate(
+      {
+        id: modifier.id,
+        groupId: selectedGroupId,
+        is_available: !modifier.is_available,
+      },
+      {
+        onSuccess: () => {
+          toast.success(modifier.is_available ? 'Đã ẩn option' : 'Đã hiện option')
+        },
+        onError: (error: any) => {
+          handleErrorWithStatus(error)
+          toast.error('Không thể cập nhật trạng thái')
+        },
+      },
+    )
   }
 
   return (
@@ -289,11 +365,7 @@ function SortableModifierItem({
           {/* Actions Menu */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 opacity-0 group-hover:opacity-100"
-              >
+              <Button variant="ghost" size="icon" className="h-8 w-8">
                 <MoreVertical className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>

@@ -17,6 +17,13 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Loader2 } from 'lucide-react'
+import {
+  useCreateModifierMutation,
+  useUpdateModifierMutation,
+  useModifiersQuery,
+} from '@/hooks/use-modifiers-query'
+import { useErrorHandler } from '@/hooks/use-error-handler'
+import { toast } from 'sonner'
 
 interface ModifierModalProps {
   open: boolean
@@ -28,8 +35,21 @@ export function ModifierModal({ open, selectedGroupId }: ModifierModalProps) {
   const searchParams = useSearchParams()
   const mode = searchParams.get('mode') as 'create' | 'edit'
   const modifierId = searchParams.get('id')
+  const { handleErrorWithStatus } = useErrorHandler()
 
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  // Mutations
+  const createMutation = useCreateModifierMutation()
+  const updateMutation = useUpdateModifierMutation()
+
+  // Fetch modifiers to get data for editing
+  const { data: modifiersData } = useModifiersQuery(
+    selectedGroupId,
+    { include_unavailable: true },
+    open && mode === 'edit' && !!selectedGroupId,
+  )
+
+  const isSubmitting = createMutation.isPending || updateMutation.isPending
+
   const [formData, setFormData] = useState({
     name: '',
     price_adjustment: 0,
@@ -42,21 +62,23 @@ export function ModifierModal({ open, selectedGroupId }: ModifierModalProps) {
 
   // Load data if editing
   useEffect(() => {
-    if (mode === 'edit' && modifierId) {
-      // TODO: Load modifier data
-      setFormData({
-        name: 'Lớn (Large)',
-        price_adjustment: 15000,
-        is_available: true,
-      })
-    } else {
+    if (mode === 'edit' && modifierId && modifiersData?.data.modifiers) {
+      const modifier = modifiersData.data.modifiers.find((m) => m.id === modifierId)
+      if (modifier) {
+        setFormData({
+          name: modifier.name,
+          price_adjustment: modifier.price_adjustment,
+          is_available: modifier.is_available,
+        })
+      }
+    } else if (mode === 'create') {
       setFormData({
         name: '',
         price_adjustment: 0,
         is_available: true,
       })
     }
-  }, [mode, modifierId])
+  }, [mode, modifierId, modifiersData])
 
   const handleClose = () => {
     const params = new URLSearchParams(searchParams.toString())
@@ -82,16 +104,45 @@ export function ModifierModal({ open, selectedGroupId }: ModifierModalProps) {
       return
     }
 
-    setIsSubmitting(true)
+    if (!selectedGroupId) {
+      toast.error('Vui lòng chọn nhóm trước')
+      return
+    }
 
-    try {
-      // TODO: Submit to backend
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-      handleClose()
-    } catch (error) {
-      console.error('Error saving modifier:', error)
-    } finally {
-      setIsSubmitting(false)
+    const payload = {
+      name: formData.name,
+      price_adjustment: formData.price_adjustment,
+      is_available: formData.is_available,
+    }
+
+    if (mode === 'create') {
+      createMutation.mutate(
+        { groupId: selectedGroupId, payload },
+        {
+          onSuccess: () => {
+            toast.success('Đã tạo option')
+            handleClose()
+          },
+          onError: (error) => {
+            handleErrorWithStatus(error)
+            toast.error('Không thể tạo option')
+          },
+        },
+      )
+    } else if (mode === 'edit' && modifierId) {
+      updateMutation.mutate(
+        { id: modifierId, groupId: selectedGroupId, payload },
+        {
+          onSuccess: () => {
+            toast.success('Đã cập nhật option')
+            handleClose()
+          },
+          onError: (error) => {
+            handleErrorWithStatus(error)
+            toast.error('Không thể cập nhật option')
+          },
+        },
+      )
     }
   }
 

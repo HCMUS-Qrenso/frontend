@@ -24,24 +24,29 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import type { ModifierGroup } from '@/app/admin/menu/modifiers/page'
+import type { ModifierGroup } from '@/types/modifiers'
+import { useReorderModifierGroupsMutation } from '@/hooks/use-modifiers-query'
+import { useErrorHandler } from '@/hooks/use-error-handler'
+import { toast } from 'sonner'
 
 interface ModifierGroupsPanelProps {
   groups: ModifierGroup[]
   selectedGroupId: string | null
   onSelectGroup: (id: string) => void
-  onReorderGroups: (groups: ModifierGroup[]) => void
 }
 
 export function ModifierGroupsPanel({
   groups,
   selectedGroupId,
   onSelectGroup,
-  onReorderGroups,
 }: ModifierGroupsPanelProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [searchQuery, setSearchQuery] = useState('')
+  const { handleErrorWithStatus } = useErrorHandler()
+
+  // Mutation for reordering
+  const reorderMutation = useReorderModifierGroupsMutation()
 
   const filteredGroups = groups.filter((group) =>
     group.name.toLowerCase().includes(searchQuery.toLowerCase()),
@@ -53,11 +58,23 @@ export function ModifierGroupsPanel({
       const oldIndex = groups.findIndex((g) => g.id === active.id)
       const newIndex = groups.findIndex((g) => g.id === over.id)
       const reordered = arrayMove(groups, oldIndex, newIndex).map((g, idx) => ({
-        ...g,
+        id: g.id,
         display_order: idx + 1,
       }))
-      onReorderGroups(reordered)
-      // TODO: API call to save order
+
+      // Call API to save order
+      reorderMutation.mutate(
+        { modifier_groups: reordered },
+        {
+          onSuccess: () => {
+            toast.success('Đã cập nhật thứ tự nhóm')
+          },
+          onError: (error) => {
+            handleErrorWithStatus(error)
+            toast.error('Không thể cập nhật thứ tự')
+          },
+        },
+      )
     }
   }
 
@@ -215,11 +232,7 @@ function SortableGroupItem({
           {/* Actions Menu */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 opacity-0 group-hover:opacity-100"
-              >
+              <Button variant="ghost" size="icon" className="h-8 w-8">
                 <MoreVertical className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>

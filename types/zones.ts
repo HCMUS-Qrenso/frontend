@@ -1,69 +1,61 @@
-import type { PaginationMeta } from './tables'
-
-// Zone entity matching backend response
+// Zone Types
 export interface Zone {
   id: string
+  tenant_id: string
   name: string
   description: string | null
   display_order: number
   is_active: boolean
-  table_count?: number
   created_at: string
   updated_at: string
+  table_count?: number
 }
 
-// Zone List Response (paginated)
-export interface ZoneListResponse {
-  data: Zone[]
-  pagination: PaginationMeta
-}
-
-// Single Zone Response
-export interface ZoneResponse {
-  data: Zone
-}
-
-// Create Zone Payload
-export interface CreateZonePayload {
-  name: string
-  description?: string
-  display_order?: number
-  is_active?: boolean
-}
-
-// Update Zone Payload
-export interface UpdateZonePayload {
-  name?: string
-  description?: string
-  display_order?: number
-  is_active?: boolean
-}
-
-// Zone Query Parameters
-export interface ZoneQueryParams {
-  page?: number
-  limit?: number
-  search?: string
-  is_active?: boolean
-}
-
-// Zone Stats Response (structure may vary based on backend)
-export interface ZoneStatsResponse {
-  data: {
-    total_zones: number
-    active_zones: number
-    inactive_zones: number
-    total_tables: number
-    [key: string]: unknown
-  }
-}
-
-// Simple Zone for dropdowns (from /tables/zones)
 export interface SimpleZone {
   id: string
   name: string
 }
 
-export interface ZonesSimpleResponse {
-  data: SimpleZone[]
+// API Query Parameters
+export interface ZoneQueryParams {
+  page?: number
+  limit?: number
+  search?: string
+  is_active?: 'true' | 'false' | 'all'
+  sort_by?: 'name' | 'displayOrder' | 'createdAt' | 'updatedAt'
+  sort_order?: 'asc' | 'desc'
+}
+
+// API Payloads
+export interface CreateZonePayload {
+  name: string
+  description?: string | null
+  display_order: number
+  is_active: boolean
+}
+
+export interface UpdateZonePayload {
+  name?: string
+  description?: string | null
+  display_order?: number
+  is_active?: boolean
+}
+
+// API Responses
+export interface ZoneListResponse {
+  data: Zone[]
+  pagination: {
+    total: number
+    page: number
+    limit: number
+    total_pages: number
+  }
+}
+
+export type ZoneResponse = Zone
+
+export interface ZoneStatsResponse {
+  total: number
+  active: number
+  inactive: number
 }

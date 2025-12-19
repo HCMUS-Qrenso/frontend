@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Search, Plus, LayoutGrid, QrCode, ChevronDown, ArrowUpDown } from 'lucide-react'
 import Link from 'next/link'
+import { AdminFilterToolbarWrapper } from './admin-filter-toolbar-wrapper'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useZonesSimpleQuery } from '@/hooks/use-zones-query'
 import type { SimpleZone } from '@/types/zones'
@@ -23,9 +24,8 @@ export function TablesFilterToolbar({ isTrashView = false }: TablesFilterToolbar
   const router = useRouter()
   const searchParams = useSearchParams()
   const { data: zonesData } = useZonesSimpleQuery()
-  const zones: SimpleZone[] = Array.isArray(zonesData?.data)
-    ? (zonesData?.data as SimpleZone[])
-    : (zonesData?.data as { zones?: SimpleZone[] } | undefined)?.zones || []
+  const zones: SimpleZone[] =
+    zonesData?.zones ?? ((zonesData as { zones?: SimpleZone[] } | undefined)?.zones || [])
 
   // Map backend status to UI labels
   const statusMap: Record<string, string> = {
@@ -101,9 +101,9 @@ export function TablesFilterToolbar({ isTrashView = false }: TablesFilterToolbar
   }
 
   return (
-    <div className="flex flex-col gap-3 rounded-2xl border border-slate-100 bg-white/80 p-4 shadow-sm md:flex-row md:items-center md:justify-between dark:border-slate-800 dark:bg-slate-900/80">
+    <AdminFilterToolbarWrapper>
       {/* Left - Filters */}
-      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
+      <div className="flex flex-col justify-center gap-2 sm:flex-row sm:flex-wrap sm:items-center md:justify-start">
         {/* Search */}
         <div className="relative">
           <Search className="absolute top-1/2 left-3 h-3 w-3 -translate-y-1/2 text-slate-400" />
@@ -200,7 +200,7 @@ export function TablesFilterToolbar({ isTrashView = false }: TablesFilterToolbar
       </div>
 
       {/* Right - Actions */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center justify-center gap-2 md:justify-start">
         {!isTrashView && (
           <>
             <Link href="/admin/tables/layout">
@@ -233,6 +233,6 @@ export function TablesFilterToolbar({ isTrashView = false }: TablesFilterToolbar
           </>
         )}
       </div>
-    </div>
+    </AdminFilterToolbarWrapper>
   )
 }

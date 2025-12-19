@@ -602,7 +602,7 @@ export default function TableLayoutPage() {
       />
 
       {/* Main content: Canvas + Side Panel */}
-      <div className="grid gap-4 lg:grid-cols-[1fr_380px]">
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-[1fr_380px]">
         {/* Canvas */}
         <FloorPlanCanvas
           tables={tables}

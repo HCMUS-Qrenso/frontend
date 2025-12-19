@@ -13,18 +13,29 @@ import {
 import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { AlertTriangle, Loader2 } from 'lucide-react'
+import { useCategoryQuery, useDeleteCategoryMutation } from '@/hooks/use-categories-query'
+import { useErrorHandler } from '@/hooks/use-error-handler'
+import { toast } from 'sonner'
 
 export function CategoryDeleteDialog() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const [isDeleting, setIsDeleting] = useState(false)
+  const { handleErrorWithStatus } = useErrorHandler()
+  const [forceDelete, setForceDelete] = useState(false)
 
   const open = searchParams.get('delete') === 'category'
   const categoryId = searchParams.get('id')
 
-  // Mock: Check if category has items
-  const hasItems = true
-  const itemCount = 8
+  // Fetch category data to check if it has items
+  const { data: categoryData } = useCategoryQuery(categoryId || null, open && !!categoryId)
+  const category = categoryData?.data?.category
+
+  // Check if category has items
+  const hasItems = category ? category.item_count > 0 : false
+  const itemCount = category?.item_count || 0
+
+  // Mutation
+  const deleteMutation = useDeleteCategoryMutation()
 
   const handleClose = () => {
     const params = new URLSearchParams(searchParams.toString())
@@ -34,17 +45,14 @@ export function CategoryDeleteDialog() {
   }
 
   const handleDelete = async () => {
-    setIsDeleting(true)
+    if (!categoryId) return
 
     try {
-      // TODO: Delete category
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
+      await deleteMutation.mutateAsync({ id: categoryId, force: forceDelete })
+      toast.success('Đã xóa danh mục thành công')
       handleClose()
     } catch (error) {
-      console.error('Error deleting category:', error)
-    } finally {
-      setIsDeleting(false)
+      handleErrorWithStatus(error, undefined, 'Không thể xóa danh mục')
     }
   }
 
@@ -52,28 +60,42 @@ export function CategoryDeleteDialog() {
     <AlertDialog open={open} onOpenChange={handleClose}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Xóa danh mục?</AlertDialogTitle>
+          <AlertDialogTitle>Xóa danh mục "{category?.name}"?</AlertDialogTitle>
           <AlertDialogDescription>
             Hành động này không thể hoàn tác. Danh mục sẽ bị xóa vĩnh viễn khỏi hệ thống.
           </AlertDialogDescription>
         </AlertDialogHeader>
 
         {hasItems && (
-          <Alert variant="destructive">
+          <Alert variant={forceDelete ? 'default' : 'destructive'}>
             <AlertTriangle className="h-4 w-4" />
             <AlertDescription>
-              Danh mục đang chứa {itemCount} món ăn. Bạn cần chuyển các món sang danh mục khác trước
-              khi xóa.
+              {forceDelete
+                ? `Danh mục đang chứa ${itemCount} món ăn. Xóa buộc sẽ xóa cả các món ăn này.`
+                : `Danh mục đang chứa ${itemCount} món ăn. Bạn cần chuyển các món sang danh mục khác trước khi xóa.`}
             </AlertDescription>
           </Alert>
         )}
 
-        <AlertDialogFooter>
-          <Button variant="outline" onClick={handleClose} disabled={isDeleting}>
+        <AlertDialogFooter className="flex-col gap-3 sm:flex-row">
+          <Button variant="outline" onClick={handleClose} disabled={deleteMutation.isPending}>
             Hủy
           </Button>
-          <Button variant="destructive" onClick={handleDelete} disabled={isDeleting || hasItems}>
-            {isDeleting ? (
+          {hasItems && !forceDelete && (
+            <Button
+              variant="destructive"
+              onClick={() => setForceDelete(true)}
+              disabled={deleteMutation.isPending}
+            >
+              Xóa buộc
+            </Button>
+          )}
+          <Button
+            variant="destructive"
+            onClick={handleDelete}
+            disabled={deleteMutation.isPending || (hasItems && !forceDelete)}
+          >
+            {deleteMutation.isPending ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Đang xóa...

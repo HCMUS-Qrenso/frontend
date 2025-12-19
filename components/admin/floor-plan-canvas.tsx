@@ -254,33 +254,31 @@ function FloorPlanCanvasComponent({
   return (
     <div className="rounded-2xl border border-slate-100 bg-white/80 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
       {/* Header */}
-      <div className="border-b border-slate-100 px-6 py-4 dark:border-slate-800">
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="font-semibold text-slate-900 dark:text-white">{selectedArea}</h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              Canvas không giới hạn - Kéo thả để di chuyển
-            </p>
-          </div>
+      <div className="flex flex-col items-center justify-between gap-4 border-b border-slate-100 px-6 py-4 md:flex-row dark:border-slate-800">
+        <div className="text-center md:text-left">
+          <h3 className="font-semibold text-slate-900 dark:text-white">{selectedArea}</h3>
+          <p className="text-xs text-slate-500 dark:text-slate-400">
+            Canvas không giới hạn - Kéo thả để di chuyển
+          </p>
+        </div>
 
-          {/* Legend */}
-          <div className="flex items-center gap-4 text-xs">
-            <div className="flex items-center gap-1.5">
-              <div className="h-3 w-3 rounded border-2 border-emerald-500" />
-              <span className="text-slate-600 dark:text-slate-400">Có sẵn</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <div className="h-3 w-3 rounded border-2 border-amber-500" />
-              <span className="text-slate-600 dark:text-slate-400">Đang sử dụng</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <div className="h-3 w-3 rounded border-2 border-violet-500" />
-              <span className="text-slate-600 dark:text-slate-400">Chờ thanh toán</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <div className="h-3 w-3 rounded border-2 border-slate-400" />
-              <span className="text-slate-600 dark:text-slate-400">Vô hiệu</span>
-            </div>
+        {/* Legend */}
+        <div className="flex items-center gap-4 text-xs">
+          <div className="flex items-center gap-1.5">
+            <div className="h-3 w-3 rounded border-2 border-emerald-500" />
+            <span className="text-slate-600 dark:text-slate-400">Có sẵn</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="h-3 w-3 rounded border-2 border-amber-500" />
+            <span className="text-slate-600 dark:text-slate-400">Đang sử dụng</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="h-3 w-3 rounded border-2 border-violet-500" />
+            <span className="text-slate-600 dark:text-slate-400">Chờ thanh toán</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="h-3 w-3 rounded border-2 border-slate-400" />
+            <span className="text-slate-600 dark:text-slate-400">Vô hiệu</span>
           </div>
         </div>
       </div>

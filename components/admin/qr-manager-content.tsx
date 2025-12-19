@@ -110,9 +110,9 @@ export function QRManagerContent() {
 
   const { handleError } = useErrorHandler()
   const { data: zonesData } = useZonesSimpleQuery()
-  const zones = Array.isArray(zonesData?.data)
-    ? zonesData.data
-    : (zonesData?.data as { zones?: Array<{ id: string; name: string }> } | undefined)?.zones || []
+  const zones =
+    zonesData?.zones ??
+    ((zonesData as { zones?: Array<{ id: string; name: string }> } | undefined)?.zones || [])
 
   const {
     data: qrData,
@@ -150,7 +150,7 @@ export function QRManagerContent() {
     }
   }
 
-  const handleGenerateAll = async () => {
+  const handleGenerateAll = async (forceRegenerate: boolean) => {
     if (tableQRs.length === 0) {
       toast.info('Không có bàn nào để tạo QR')
       return
@@ -160,9 +160,13 @@ export function QRManagerContent() {
       const allTableIds = tableQRs.map((t) => t.id)
       await batchGenerateMutation.mutateAsync({
         table_ids: allTableIds,
-        force_regenerate: false,
+        force_regenerate: forceRegenerate,
       })
-      toast.success('Đã tạo QR cho tất cả bàn thành công')
+      toast.success(
+        forceRegenerate
+          ? 'Đã tạo lại QR cho tất cả bàn thành công'
+          : 'Đã tạo QR cho các bàn thiếu thành công',
+      )
     } catch (error) {
       handleError(error)
     }

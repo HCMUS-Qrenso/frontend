@@ -10,6 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { AdminFilterToolbarWrapper } from './admin-filter-toolbar-wrapper'
 import { Plus, ArrowUpDown, Search, ChevronDown } from 'lucide-react'
 
 interface CategoriesFilterToolbarProps {
@@ -28,29 +29,44 @@ export function CategoriesFilterToolbar({
   const statusMap: Record<string, string> = {
     all: 'Tất cả',
     active: 'Đang hiển thị',
-    hidden: 'Đang ẩn',
+    inactive: 'Đang ẩn',
   }
 
-  // Map sort values to UI labels
-  const sortMap: Record<string, string> = {
-    order: 'Theo thứ tự',
-    updated: 'Mới cập nhật',
+  // Map sort_by values to UI labels
+  const sortByMap: Record<string, string> = {
+    display_order: 'Thứ tự hiển thị',
+    name: 'Tên danh mục',
+    created_at: 'Ngày tạo',
+    updated_at: 'Ngày cập nhật',
+  }
+
+  // Map sort_order values to UI labels
+  const sortOrderMap: Record<string, string> = {
+    asc: 'Tăng dần',
+    desc: 'Giảm dần',
   }
 
   // Get filter values from URL params
   const searchQuery = searchParams.get('search') || ''
-  const selectedStatus = searchParams.get('status') || searchParams.get('is_active') || 'all'
-  const selectedSort = searchParams.get('sort') || searchParams.get('order_by') || 'order'
+  const selectedStatus = searchParams.get('status') || 'all'
+  const selectedSortBy = searchParams.get('sort_by') || 'display_order'
+  const selectedSortOrder = searchParams.get('sort_order') || 'asc'
 
   const selectedStatusLabel = statusMap[selectedStatus] || 'Tất cả'
-  const selectedSortLabel = sortMap[selectedSort] || 'Theo thứ tự'
+  const selectedSortByLabel = sortByMap[selectedSortBy] || 'Thứ tự hiển thị'
+  const selectedSortOrderLabel = sortOrderMap[selectedSortOrder] || 'Tăng dần'
 
   const [localSearchQuery, setLocalSearchQuery] = useState(searchQuery)
 
   // Update URL params when filters change
   const updateFilter = (key: string, value: string) => {
     const params = new URLSearchParams(searchParams.toString())
-    if (value === 'Tất cả' || value === '' || value === 'all' || value === 'order') {
+    const defaultValues: Record<string, string> = {
+      status: 'all',
+      sort_by: 'display_order',
+      sort_order: 'asc',
+    }
+    if (value === '' || value === defaultValues[key]) {
       params.delete(key)
     } else {
       params.set(key, value)
@@ -78,26 +94,26 @@ export function CategoriesFilterToolbar({
   }
 
   return (
-    <div className="flex flex-col gap-3 rounded-2xl border border-slate-100 bg-white/80 p-4 shadow-sm md:flex-row md:items-center md:justify-between dark:border-slate-800 dark:bg-slate-900/80">
+    <AdminFilterToolbarWrapper>
       {/* Left: Search and Filters */}
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
         {/* Search */}
         <div className="relative">
-          <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400" />
+          <Search className="absolute top-1/2 left-3 h-3 w-3 -translate-y-1/2 text-slate-400" />
           <Input
             placeholder="Tìm theo tên danh mục..."
             value={localSearchQuery}
             onChange={(e) => setLocalSearchQuery(e.target.value)}
-            className="h-10 w-full rounded-full border-slate-200 bg-slate-50 pr-4 pl-9 text-sm focus:bg-white sm:w-64 dark:border-slate-700 dark:bg-slate-800 dark:focus:bg-slate-900"
+            className="h-8 w-full rounded-lg border-slate-200 bg-slate-50 pr-4 pl-9 text-sm focus:bg-white sm:w-64 dark:border-slate-700 dark:bg-slate-800 dark:focus:bg-slate-900"
           />
         </div>
 
         {/* Status Filter */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="h-10 gap-2 rounded-full bg-transparent">
+            <Button variant="outline" className="h-8 gap-1 rounded-lg bg-transparent px-3">
               <span className="text-sm">Trạng thái: {selectedStatusLabel}</span>
-              <ChevronDown className="h-4 w-4" />
+              <ChevronDown className="h-3 w-3" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-48">
@@ -107,31 +123,60 @@ export function CategoriesFilterToolbar({
             <DropdownMenuItem onClick={() => updateFilter('status', 'active')}>
               Đang hiển thị
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => updateFilter('status', 'hidden')}>
+            <DropdownMenuItem onClick={() => updateFilter('status', 'inactive')}>
               Đang ẩn
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
 
-        {/* Sort - Disable when reorderMode is active */}
+        {/* Sort By - Disable when reorderMode is active */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
               variant="outline"
-              className="h-10 gap-2 rounded-full bg-transparent"
+              className="h-8 gap-1 rounded-lg bg-transparent px-3"
               disabled={reorderMode}
               title={reorderMode ? 'Vui lòng tắt chế độ sắp xếp để dùng tính năng này' : undefined}
             >
-              <span className="text-sm">Sắp xếp: {selectedSortLabel}</span>
-              <ChevronDown className="h-4 w-4" />
+              <span className="text-sm">Sắp xếp: {selectedSortByLabel}</span>
+              <ChevronDown className="h-3 w-3" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-48">
-            <DropdownMenuItem onClick={() => updateFilter('sort', 'order')}>
-              Theo thứ tự
+            <DropdownMenuItem onClick={() => updateFilter('sort_by', 'display_order')}>
+              Thứ tự hiển thị
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => updateFilter('sort', 'updated')}>
-              Mới cập nhật
+            <DropdownMenuItem onClick={() => updateFilter('sort_by', 'name')}>
+              Tên danh mục
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => updateFilter('sort_by', 'created_at')}>
+              Ngày tạo
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => updateFilter('sort_by', 'updated_at')}>
+              Ngày cập nhật
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        {/* Sort Order - Disable when reorderMode is active */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="outline"
+              className="h-8 gap-1 rounded-lg bg-transparent px-3"
+              disabled={reorderMode}
+              title={reorderMode ? 'Vui lòng tắt chế độ sắp xếp để dùng tính năng này' : undefined}
+            >
+              <span className="text-sm">Thứ tự: {selectedSortOrderLabel}</span>
+              <ChevronDown className="h-3 w-3" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-40">
+            <DropdownMenuItem onClick={() => updateFilter('sort_order', 'asc')}>
+              Tăng dần
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => updateFilter('sort_order', 'desc')}>
+              Giảm dần
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -142,19 +187,19 @@ export function CategoriesFilterToolbar({
         <Button
           variant="outline"
           onClick={() => setReorderMode(!reorderMode)}
-          className="h-10 gap-2 rounded-full bg-transparent"
+          className="h-8 gap-1 rounded-lg bg-transparent px-3"
         >
-          <ArrowUpDown className="h-4 w-4" />
-          {reorderMode ? 'Hủy sắp xếp' : 'Sắp xếp'}
+          <ArrowUpDown className="h-3 w-3" />
+          <span className="text-sm">{reorderMode ? 'Hủy sắp xếp' : 'Sắp xếp'}</span>
         </Button>
         <Button
           onClick={handleAddCategory}
-          className="h-10 gap-2 rounded-full bg-emerald-600 px-4 hover:bg-emerald-700"
+          className="h-8 gap-1 rounded-lg bg-emerald-600 px-3 hover:bg-emerald-700"
         >
-          <Plus className="h-4 w-4" />
-          <span className="hidden sm:inline">Thêm danh mục</span>
+          <Plus className="h-3 w-3" />
+          <span className="hidden text-sm sm:inline">Thêm danh mục</span>
         </Button>
       </div>
-    </div>
+    </AdminFilterToolbarWrapper>
   )
 }
