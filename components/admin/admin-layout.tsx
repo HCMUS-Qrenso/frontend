@@ -170,6 +170,14 @@ export function AdminLayout({ children }: AdminLayoutProps) {
       }
     }
 
+    // Staff
+    if (path === '/admin/staff' || path.startsWith('/admin/staff/')) {
+      return {
+        title: 'Nhân viên',
+        description: 'Quản lý tài khoản phục vụ & bếp theo nhà hàng',
+      }
+    }
+
     // Dashboard
     if (path === '/admin/dashboard' || path === '/admin') {
       return {
