@@ -19,7 +19,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -49,7 +56,7 @@ export function StaffRowActions({ user, onUpdate }: StaffRowActionsProps) {
   const [lockDialogOpen, setLockDialogOpen] = useState(false)
   const [unlockDialogOpen, setUnlockDialogOpen] = useState(false)
   const [resetPasswordDialogOpen, setResetPasswordDialogOpen] = useState(false)
-  const [editSheetOpen, setEditSheetOpen] = useState(false)
+  const [editDialogOpen, setEditDialogOpen] = useState(false)
 
   // Edit form state
   const [fullName, setFullName] = useState(user.full_name)
@@ -80,7 +87,7 @@ export function StaffRowActions({ user, onUpdate }: StaffRowActionsProps) {
       status,
       updated_at: new Date().toISOString(),
     })
-    setEditSheetOpen(false)
+    setEditDialogOpen(false)
   }
 
   return (
@@ -92,7 +99,7 @@ export function StaffRowActions({ user, onUpdate }: StaffRowActionsProps) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={() => setEditSheetOpen(true)}>
+          <DropdownMenuItem onClick={() => setEditDialogOpen(true)}>
             <Pencil className="mr-2 h-4 w-4" />
             Chỉnh sửa
           </DropdownMenuItem>
@@ -171,15 +178,15 @@ export function StaffRowActions({ user, onUpdate }: StaffRowActionsProps) {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Edit Sheet */}
-      <Sheet open={editSheetOpen} onOpenChange={setEditSheetOpen}>
-        <SheetContent className="sm:max-w-md">
-          <SheetHeader>
-            <SheetTitle>Chỉnh sửa nhân viên</SheetTitle>
-            <SheetDescription>Cập nhật thông tin nhân viên. Email không thể thay đổi.</SheetDescription>
-          </SheetHeader>
+      {/* Edit Dialog */}
+      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Chỉnh sửa nhân viên</DialogTitle>
+            <DialogDescription>Cập nhật thông tin nhân viên. Email không thể thay đổi.</DialogDescription>
+          </DialogHeader>
 
-          <div className="mt-6 space-y-4">
+          <div className="space-y-4 py-4">
             <div className="space-y-2">
               <Label htmlFor="full_name">Họ và tên</Label>
               <Input id="full_name" value={fullName} onChange={(e) => setFullName(e.target.value)} />
@@ -201,10 +208,10 @@ export function StaffRowActions({ user, onUpdate }: StaffRowActionsProps) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="role">Role</Label>
+              <Label htmlFor="role">Vai trò</Label>
               <Input
                 id="role"
-                value={user.role === "waiter" ? "Waiter" : "Kitchen Staff"}
+                value={user.role === "waiter" ? "Phục vụ" : "Nhân viên bếp"}
                 disabled
                 className="bg-slate-50 dark:bg-slate-900"
               />
@@ -217,24 +224,24 @@ export function StaffRowActions({ user, onUpdate }: StaffRowActionsProps) {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="inactive">Inactive</SelectItem>
-                  <SelectItem value="suspended">Suspended</SelectItem>
+                  <SelectItem value="active">Hoạt động</SelectItem>
+                  <SelectItem value="inactive">Không hoạt động</SelectItem>
+                  <SelectItem value="suspended">Đình chỉ</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
 
-          <div className="mt-6 flex justify-end gap-3">
-            <Button variant="outline" onClick={() => setEditSheetOpen(false)}>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditDialogOpen(false)}>
               Hủy
             </Button>
             <Button onClick={handleSaveEdit} className="bg-emerald-600 hover:bg-emerald-700">
               Lưu thay đổi
             </Button>
-          </div>
-        </SheetContent>
-      </Sheet>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   )
 }
