@@ -10,10 +10,10 @@ export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const navItems = [
-    { label: 'Tính năng', href: '#features' },
-    { label: 'Cách hoạt động', href: '#how-it-works' },
-    { label: 'Bảng giá', href: '#pricing' },
-    { label: 'FAQ', href: '#faq' },
+    { label: 'Tính năng', href: '/#features' },
+    { label: 'Cách hoạt động', href: '/#how-it-works' },
+    { label: 'Bảng giá', href: '/#pricing' },
+    { label: 'FAQ', href: '/#faq' },
     { label: 'Liên hệ', href: '/contact' },
   ]
 

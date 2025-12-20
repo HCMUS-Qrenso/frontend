@@ -46,7 +46,7 @@ export function HowItWorks() {
             {steps.map((step, index) => (
               <div
                 key={index}
-                className="group relative flex gap-6 rounded-2xl border border-slate-200 bg-slate-50 p-6 transition-all hover:border-emerald-500/50 dark:border-slate-800 dark:bg-slate-900/50"
+                className="group relative flex gap-6 rounded-2xl border border-slate-200 bg-slate-50 p-6 transition-all hover:border-emerald-500/50 hover:scale-105 hover:outline-2 hover:outline-emerald-500/30 dark:border-slate-800 dark:bg-slate-900/50"
               >
                 {/* Number */}
                 <div className="flex-shrink-0">

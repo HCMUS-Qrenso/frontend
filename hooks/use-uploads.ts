@@ -40,7 +40,6 @@ export function useUploadFiles() {
 
       try {
         const s3Endpoint = process.env.NEXT_PUBLIC_S3_PUBLIC_URL || 'http://localhost:9000'
-        const bucketName = process.env.NEXT_PUBLIC_S3_BUCKET_NAME || 'uploads'
 
         // Upload all files in parallel
         const uploadPromises = files.map(async (file, index) => {
@@ -56,7 +55,7 @@ export function useUploadFiles() {
           await uploadsApi.uploadToS3(uploadUrl, file)
 
           // 3. Construct public URL
-          const publicUrl = `${s3Endpoint}/${bucketName}/${key}`
+          const publicUrl = `${s3Endpoint}/${key}`
 
           return { key, url: publicUrl }
         })
