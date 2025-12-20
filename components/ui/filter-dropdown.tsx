@@ -48,7 +48,7 @@ export interface FilterDropdownProps {
 /**
  * Reusable filter dropdown component for admin toolbars
  * Supports both static options and dynamic options from API
- * 
+ *
  * @example Static options
  * ```tsx
  * const STATUS_OPTIONS = [
@@ -57,7 +57,7 @@ export interface FilterDropdownProps {
  * ]
  * <FilterDropdown options={STATUS_OPTIONS} ... />
  * ```
- * 
+ *
  * @example Dynamic options from API
  * ```tsx
  * const { data, isLoading } = useZonesQuery()
@@ -91,10 +91,7 @@ export function FilterDropdown({
       <DropdownMenuTrigger asChild>
         <Button
           variant="outline"
-          className={cn(
-            'h-8 gap-1 rounded-lg bg-transparent px-3',
-            className
-          )}
+          className={cn('h-8 gap-1 rounded-lg bg-transparent px-3', className)}
           disabled={disabled || isLoading}
           title={disabled ? disabledTooltip : undefined}
         >
@@ -115,15 +112,10 @@ export function FilterDropdown({
             <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
           </div>
         ) : options.length === 0 ? (
-          <div className="px-2 py-4 text-center text-sm text-slate-500">
-            {emptyMessage}
-          </div>
+          <div className="px-2 py-4 text-center text-sm text-slate-500">{emptyMessage}</div>
         ) : (
           options.map((option) => (
-            <DropdownMenuItem
-              key={option.value}
-              onClick={() => onChange(option.value)}
-            >
+            <DropdownMenuItem key={option.value} onClick={() => onChange(option.value)}>
               {option.label}
             </DropdownMenuItem>
           ))
@@ -132,4 +124,3 @@ export function FilterDropdown({
     </DropdownMenu>
   )
 }
-

@@ -1,9 +1,9 @@
-"use client"
+'use client'
 
-import type React from "react"
+import type React from 'react'
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
+import { useState } from 'react'
+import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
@@ -11,23 +11,29 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Loader2 } from "lucide-react"
+} from '@/components/ui/dialog'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { Textarea } from '@/components/ui/textarea'
+import { Label } from '@/components/ui/label'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Loader2 } from 'lucide-react'
 
 const ORDER_STATUSES = [
-  { value: "pending", label: "Chờ xử lý" },
-  { value: "accepted", label: "Đã nhận" },
-  { value: "in_progress", label: "Đang xử lý" },
-  { value: "preparing", label: "Đang chuẩn bị" },
-  { value: "ready", label: "Sẵn sàng" },
-  { value: "served", label: "Đã phục vụ" },
-  { value: "completed", label: "Hoàn thành" },
-  { value: "rejected", label: "Từ chối" },
-  { value: "cancelled", label: "Đã hủy" },
+  { value: 'pending', label: 'Chờ xử lý' },
+  { value: 'accepted', label: 'Đã nhận' },
+  { value: 'in_progress', label: 'Đang xử lý' },
+  { value: 'preparing', label: 'Đang chuẩn bị' },
+  { value: 'ready', label: 'Sẵn sàng' },
+  { value: 'served', label: 'Đã phục vụ' },
+  { value: 'completed', label: 'Hoàn thành' },
+  { value: 'rejected', label: 'Từ chối' },
+  { value: 'cancelled', label: 'Đã hủy' },
 ]
 
 interface OverrideStatusModalProps {
@@ -37,9 +43,14 @@ interface OverrideStatusModalProps {
   onOpenChange: (open: boolean) => void
 }
 
-export function OverrideStatusModal({ orderId, currentStatus, open, onOpenChange }: OverrideStatusModalProps) {
-  const [newStatus, setNewStatus] = useState("")
-  const [reason, setReason] = useState("")
+export function OverrideStatusModal({
+  orderId,
+  currentStatus,
+  open,
+  onOpenChange,
+}: OverrideStatusModalProps) {
+  const [newStatus, setNewStatus] = useState('')
+  const [reason, setReason] = useState('')
   const [notifyStaff, setNotifyStaff] = useState(false)
   const [loading, setLoading] = useState(false)
 
@@ -47,12 +58,12 @@ export function OverrideStatusModal({ orderId, currentStatus, open, onOpenChange
     e.preventDefault()
 
     if (!newStatus || !reason.trim()) {
-      alert("Vui lòng chọn trạng thái mới và nhập lý do")
+      alert('Vui lòng chọn trạng thái mới và nhập lý do')
       return
     }
 
     setLoading(true)
-    console.log("[v0] Override status:", { orderId, currentStatus, newStatus, reason, notifyStaff })
+    console.log('[v0] Override status:', { orderId, currentStatus, newStatus, reason, notifyStaff })
 
     // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 1000))
@@ -61,12 +72,12 @@ export function OverrideStatusModal({ orderId, currentStatus, open, onOpenChange
     onOpenChange(false)
 
     // Reset form
-    setNewStatus("")
-    setReason("")
+    setNewStatus('')
+    setReason('')
     setNotifyStaff(false)
 
     // Show success toast (would use toast library in real app)
-    alert("Đã cập nhật trạng thái thành công!")
+    alert('Đã cập nhật trạng thái thành công!')
   }
 
   return (
@@ -85,7 +96,9 @@ export function OverrideStatusModal({ orderId, currentStatus, open, onOpenChange
             <div className="space-y-2">
               <Label>Trạng thái hiện tại</Label>
               <div className="rounded-lg bg-slate-100 px-3 py-2 dark:bg-slate-800">
-                <p className="text-sm font-medium capitalize text-slate-900 dark:text-white">{currentStatus}</p>
+                <p className="text-sm font-medium text-slate-900 capitalize dark:text-white">
+                  {currentStatus}
+                </p>
               </div>
             </div>
 
@@ -128,7 +141,7 @@ export function OverrideStatusModal({ orderId, currentStatus, open, onOpenChange
               />
               <label
                 htmlFor="notify"
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
               >
                 Thông báo cho nhân viên
               </label>
@@ -136,10 +149,19 @@ export function OverrideStatusModal({ orderId, currentStatus, open, onOpenChange
           </div>
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={loading}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+              disabled={loading}
+            >
               Hủy
             </Button>
-            <Button type="submit" disabled={loading} className="bg-emerald-600 hover:bg-emerald-700">
+            <Button
+              type="submit"
+              disabled={loading}
+              className="bg-emerald-600 hover:bg-emerald-700"
+            >
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Xác nhận
             </Button>

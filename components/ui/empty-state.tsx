@@ -24,7 +24,7 @@ export interface EmptyStateProps {
 /**
  * Reusable empty state component for tables and lists
  * Provides consistent styling for "no data" states
- * 
+ *
  * @example Simple usage
  * ```tsx
  * <EmptyState
@@ -32,7 +32,7 @@ export interface EmptyStateProps {
  *   description="Hãy tạo khu vực đầu tiên"
  * />
  * ```
- * 
+ *
  * @example With icon
  * ```tsx
  * <EmptyState
@@ -41,7 +41,7 @@ export interface EmptyStateProps {
  *   description="Bắt đầu bằng cách thêm món đầu tiên"
  * />
  * ```
- * 
+ *
  * @example With action button
  * ```tsx
  * <EmptyState
@@ -56,40 +56,22 @@ export interface EmptyStateProps {
  * />
  * ```
  */
-export function EmptyState({
-  icon: Icon,
-  title,
-  description,
-  action,
-  className,
-}: EmptyStateProps) {
+export function EmptyState({ icon: Icon, title, description, action, className }: EmptyStateProps) {
   return (
-    <div className={cn(
-      "flex flex-col items-center justify-center gap-3 py-12",
-      className
-    )}>
+    <div className={cn('flex flex-col items-center justify-center gap-3 py-12', className)}>
       {Icon && (
         <div className="text-slate-400 dark:text-slate-500">
           <Icon className="mx-auto h-12 w-12" />
         </div>
       )}
       <div className="text-center">
-        <p className="text-sm font-medium text-slate-600 dark:text-slate-400">
-          {title}
-        </p>
+        <p className="text-sm font-medium text-slate-600 dark:text-slate-400">{title}</p>
         {description && (
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-500">
-            {description}
-          </p>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-500">{description}</p>
         )}
       </div>
       {action && (
-        <Button
-          variant="outline"
-          size="sm"
-          className="mt-2"
-          onClick={action.onClick}
-        >
+        <Button variant="outline" size="sm" className="mt-2" onClick={action.onClick}>
           {action.icon && <action.icon className="mr-2 h-4 w-4" />}
           {action.label}
         </Button>
@@ -110,7 +92,5 @@ export interface TableEmptyStateProps extends EmptyStateProps {
 export function TableEmptyState({ colSpan, ...props }: TableEmptyStateProps) {
   // Note: This returns JSX that should be placed inside TableBody
   // Import TableRow & TableCell at usage site
-  return (
-    <EmptyState {...props} className={cn("px-6", props.className)} />
-  )
+  return <EmptyState {...props} className={cn('px-6', props.className)} />
 }

@@ -1,46 +1,95 @@
-"use client"
+'use client'
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { ArrowLeft, Copy, Printer, FileDown, MoreVertical, AlertTriangle, Check } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { formatDistanceToNow } from "date-fns"
-import { vi } from "date-fns/locale"
-import { OverrideStatusModal } from "./override-status-modal"
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import {
+  ArrowLeft,
+  Copy,
+  Printer,
+  FileDown,
+  MoreVertical,
+  AlertTriangle,
+  Check,
+} from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { formatDistanceToNow } from 'date-fns'
+import { vi } from 'date-fns/locale'
+import { OverrideStatusModal } from './override-status-modal'
 
 // Mock data
 const MOCK_ORDER = {
-  id: "ORD-1024",
-  order_number: "ORD-1024",
-  table_id: "5",
-  tableName: "Bàn 5",
-  floor: "Tầng 1",
-  status: "preparing",
-  priority: "normal",
+  id: 'ORD-1024',
+  order_number: 'ORD-1024',
+  table_id: '5',
+  tableName: 'Bàn 5',
+  floor: 'Tầng 1',
+  status: 'preparing',
+  priority: 'normal',
   created_at: new Date(Date.now() - 18 * 60 * 1000),
   total_amount: 285000,
 }
 
 const STATUS_CONFIG = {
-  pending: { label: "Chờ xử lý", color: "bg-slate-100 text-slate-700 dark:bg-slate-500/10 dark:text-slate-400" },
-  accepted: { label: "Đã nhận", color: "bg-purple-100 text-purple-700 dark:bg-purple-500/10 dark:text-purple-400" },
-  in_progress: { label: "Đang xử lý", color: "bg-blue-100 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400" },
-  preparing: { label: "Đang chuẩn bị", color: "bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400" },
-  ready: { label: "Sẵn sàng", color: "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400" },
-  served: { label: "Đã phục vụ", color: "bg-teal-100 text-teal-700 dark:bg-teal-500/10 dark:text-teal-400" },
-  completed: { label: "Hoàn thành", color: "bg-slate-100 text-slate-700 dark:bg-slate-500/10 dark:text-slate-400" },
-  rejected: { label: "Từ chối", color: "bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400" },
-  cancelled: { label: "Đã hủy", color: "bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400" },
+  pending: {
+    label: 'Chờ xử lý',
+    color: 'bg-slate-100 text-slate-700 dark:bg-slate-500/10 dark:text-slate-400',
+  },
+  accepted: {
+    label: 'Đã nhận',
+    color: 'bg-purple-100 text-purple-700 dark:bg-purple-500/10 dark:text-purple-400',
+  },
+  in_progress: {
+    label: 'Đang xử lý',
+    color: 'bg-blue-100 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400',
+  },
+  preparing: {
+    label: 'Đang chuẩn bị',
+    color: 'bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400',
+  },
+  ready: {
+    label: 'Sẵn sàng',
+    color: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400',
+  },
+  served: {
+    label: 'Đã phục vụ',
+    color: 'bg-teal-100 text-teal-700 dark:bg-teal-500/10 dark:text-teal-400',
+  },
+  completed: {
+    label: 'Hoàn thành',
+    color: 'bg-slate-100 text-slate-700 dark:bg-slate-500/10 dark:text-slate-400',
+  },
+  rejected: {
+    label: 'Từ chối',
+    color: 'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400',
+  },
+  cancelled: {
+    label: 'Đã hủy',
+    color: 'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400',
+  },
 }
 
 const PRIORITY_CONFIG = {
-  normal: { label: "Bình thường", color: "bg-slate-100 text-slate-600 dark:bg-slate-500/10 dark:text-slate-400" },
-  high: { label: "Cao", color: "bg-orange-100 text-orange-700 dark:bg-orange-500/10 dark:text-orange-400" },
-  urgent: { label: "Gấp", color: "bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400" },
-  vip: { label: "VIP", color: "bg-purple-100 text-purple-700 dark:bg-purple-500/10 dark:text-purple-400" },
+  normal: {
+    label: 'Bình thường',
+    color: 'bg-slate-100 text-slate-600 dark:bg-slate-500/10 dark:text-slate-400',
+  },
+  high: {
+    label: 'Cao',
+    color: 'bg-orange-100 text-orange-700 dark:bg-orange-500/10 dark:text-orange-400',
+  },
+  urgent: { label: 'Gấp', color: 'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400' },
+  vip: {
+    label: 'VIP',
+    color: 'bg-purple-100 text-purple-700 dark:bg-purple-500/10 dark:text-purple-400',
+  },
 }
 
 interface OrderSummaryHeaderProps {
@@ -61,10 +110,10 @@ export function OrderSummaryHeader({ orderId }: OrderSummaryHeaderProps) {
   }
 
   const handlePrint = () => {
-    window.open(`/admin/orders/${orderId}/print`, "_blank")
+    window.open(`/admin/orders/${orderId}/print`, '_blank')
   }
 
-  const handleExport = (format: "json" | "pdf") => {
+  const handleExport = (format: 'json' | 'pdf') => {
     console.log(`[v0] Exporting order ${orderId} as ${format}`)
     // API call to generate export
   }
@@ -73,7 +122,7 @@ export function OrderSummaryHeader({ orderId }: OrderSummaryHeaderProps) {
     <>
       <div className="space-y-4">
         {/* Back Button */}
-        <Button variant="ghost" onClick={() => router.push("/admin/orders")} className="gap-2">
+        <Button variant="ghost" onClick={() => router.push('/admin/orders')} className="gap-2">
           <ArrowLeft className="h-4 w-4" />
           Đơn hàng
         </Button>
@@ -89,7 +138,11 @@ export function OrderSummaryHeader({ orderId }: OrderSummaryHeaderProps) {
                   Đơn hàng #{order.order_number}
                 </h1>
                 <Button variant="ghost" size="sm" onClick={handleCopy} className="gap-2">
-                  {copied ? <Check className="h-4 w-4 text-emerald-600" /> : <Copy className="h-4 w-4" />}
+                  {copied ? (
+                    <Check className="h-4 w-4 text-emerald-600" />
+                  ) : (
+                    <Copy className="h-4 w-4" />
+                  )}
                 </Button>
               </div>
 
@@ -102,12 +155,22 @@ export function OrderSummaryHeader({ orderId }: OrderSummaryHeaderProps) {
 
               {/* Meta Chips */}
               <div className="flex flex-wrap items-center gap-2">
-                <Badge className={cn("text-xs font-medium", STATUS_CONFIG[order.status]?.color)}>
-                  {STATUS_CONFIG[order.status]?.label}
+                <Badge
+                  className={cn(
+                    'text-xs font-medium',
+                    STATUS_CONFIG[order.status as keyof typeof STATUS_CONFIG]?.color,
+                  )}
+                >
+                  {STATUS_CONFIG[order.status as keyof typeof STATUS_CONFIG]?.label}
                 </Badge>
 
-                <Badge className={cn("text-xs font-medium", PRIORITY_CONFIG[order.priority]?.color)}>
-                  {PRIORITY_CONFIG[order.priority]?.label}
+                <Badge
+                  className={cn(
+                    'text-xs font-medium',
+                    PRIORITY_CONFIG[order.priority as keyof typeof PRIORITY_CONFIG]?.color,
+                  )}
+                >
+                  {PRIORITY_CONFIG[order.priority as keyof typeof PRIORITY_CONFIG]?.label}
                 </Badge>
 
                 <span className="text-sm text-slate-500 dark:text-slate-400">
@@ -131,8 +194,10 @@ export function OrderSummaryHeader({ orderId }: OrderSummaryHeaderProps) {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => handleExport("json")}>Xuất JSON</DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleExport("pdf")}>Xuất PDF</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleExport('json')}>
+                    Xuất JSON
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleExport('pdf')}>Xuất PDF</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
 

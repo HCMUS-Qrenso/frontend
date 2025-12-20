@@ -115,4 +115,3 @@ export function ZonesFilterToolbar() {
     </div>
   )
 }
-

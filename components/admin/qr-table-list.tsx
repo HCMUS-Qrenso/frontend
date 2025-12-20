@@ -249,10 +249,7 @@ export function QRTableList({
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-48">
-                        <DropdownMenuItem
-                          onClick={() => onPreview(table)}
-                          disabled={!table.qrUrl}
-                        >
+                        <DropdownMenuItem onClick={() => onPreview(table)} disabled={!table.qrUrl}>
                           <Eye className="mr-2 h-4 w-4" />
                           Xem trước
                         </DropdownMenuItem>

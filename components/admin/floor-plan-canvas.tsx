@@ -145,7 +145,7 @@ function FloorPlanCanvasComponent({
     (e: WheelEvent) => {
       // Only handle zoom when hovering over canvas
       if (!isHovering) return
-      
+
       e.preventDefault()
       e.stopPropagation()
 

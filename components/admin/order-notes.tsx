@@ -1,10 +1,10 @@
-"use client"
+'use client'
 
-import { AlertCircle, StickyNote } from "lucide-react"
+import { AlertCircle, StickyNote } from 'lucide-react'
 
 // Mock data
 const MOCK_ORDER_NOTES = {
-  special_instructions: "Không hành, ít muối",
+  special_instructions: 'Không hành, ít muối',
   rejection_reason: null,
 }
 
@@ -29,8 +29,12 @@ export function OrderNotes({ orderId }: OrderNotesProps) {
               <StickyNote className="h-5 w-5 text-blue-600 dark:text-blue-400" />
             </div>
             <div className="flex-1">
-              <h3 className="mb-1 font-semibold text-slate-900 dark:text-white">Ghi chú đơn hàng</h3>
-              <p className="text-sm text-slate-600 dark:text-slate-400">{notes.special_instructions}</p>
+              <h3 className="mb-1 font-semibold text-slate-900 dark:text-white">
+                Ghi chú đơn hàng
+              </h3>
+              <p className="text-sm text-slate-600 dark:text-slate-400">
+                {notes.special_instructions}
+              </p>
             </div>
           </div>
         </div>

@@ -1,8 +1,8 @@
-"use client"
+'use client'
 
-import type React from "react"
+import type React from 'react'
 
-import { useState, useEffect } from "react"
+import { useState, useEffect } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -10,39 +10,39 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Badge } from "@/components/ui/badge"
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Badge } from '@/components/ui/badge'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { Loader2 } from "lucide-react"
+} from '@/components/ui/select'
+import { Loader2 } from 'lucide-react'
 
 interface InviteStaffSheetProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  defaultRole: "waiter" | "kitchen_staff"
+  defaultRole: 'waiter' | 'kitchen_staff'
 }
 
 export function InviteStaffSheet({ open, onOpenChange, defaultRole }: InviteStaffSheetProps) {
-  const [fullName, setFullName] = useState("")
-  const [email, setEmail] = useState("")
-  const [phone, setPhone] = useState("")
-  const [role, setRole] = useState<"waiter" | "kitchen_staff">(defaultRole)
+  const [fullName, setFullName] = useState('')
+  const [email, setEmail] = useState('')
+  const [phone, setPhone] = useState('')
+  const [role, setRole] = useState<'waiter' | 'kitchen_staff'>(defaultRole)
   const [isLoading, setIsLoading] = useState(false)
 
   // Reset form when dialog closes
   useEffect(() => {
     if (!open) {
-      setFullName("")
-      setEmail("")
-      setPhone("")
+      setFullName('')
+      setEmail('')
+      setPhone('')
       setRole(defaultRole)
       setIsLoading(false)
     }
@@ -59,19 +59,19 @@ export function InviteStaffSheet({ open, onOpenChange, defaultRole }: InviteStaf
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(email)) {
-      alert("Vui lòng nhập email hợp lệ")
+      alert('Vui lòng nhập email hợp lệ')
       return
     }
 
     setIsLoading(true)
 
     // TODO: Call API to create/invite staff
-    console.log("Inviting staff:", {
+    console.log('Inviting staff:', {
       full_name: fullName,
       email,
       phone: phone || null,
       role,
-      status: "active",
+      status: 'active',
     })
 
     // Simulate API call
@@ -81,7 +81,7 @@ export function InviteStaffSheet({ open, onOpenChange, defaultRole }: InviteStaf
     onOpenChange(false)
 
     // Show success toast (would use toast library in real app)
-    alert("Đã gửi lời mời thành công!")
+    alert('Đã gửi lời mời thành công!')
   }
 
   return (
@@ -143,7 +143,11 @@ export function InviteStaffSheet({ open, onOpenChange, defaultRole }: InviteStaf
             {/* Role Select */}
             <div className="space-y-2">
               <Label htmlFor="role">Vai trò</Label>
-              <Select value={role} onValueChange={(value) => setRole(value as "waiter" | "kitchen_staff")} disabled={isLoading}>
+              <Select
+                value={role}
+                onValueChange={(value) => setRole(value as 'waiter' | 'kitchen_staff')}
+                disabled={isLoading}
+              >
                 <SelectTrigger id="role">
                   <SelectValue placeholder="Chọn vai trò" />
                 </SelectTrigger>
@@ -167,10 +171,19 @@ export function InviteStaffSheet({ open, onOpenChange, defaultRole }: InviteStaf
           </div>
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+              disabled={isLoading}
+            >
               Hủy
             </Button>
-            <Button type="submit" disabled={isLoading} className="bg-emerald-600 hover:bg-emerald-700">
+            <Button
+              type="submit"
+              disabled={isLoading}
+              className="bg-emerald-600 hover:bg-emerald-700"
+            >
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Gửi lời mời
             </Button>

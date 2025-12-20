@@ -454,7 +454,7 @@ export function MenuItemUpsertModal({ open }: MenuItemUpsertModalProps) {
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-h-[90vh] sm:max-w-[700px] flex flex-col">
+      <DialogContent className="flex max-h-[90vh] flex-col sm:max-w-[700px]">
         <DialogHeader>
           <DialogTitle>{mode === 'create' ? 'Thêm món mới' : 'Chỉnh sửa món'}</DialogTitle>
           <DialogDescription>
@@ -463,14 +463,15 @@ export function MenuItemUpsertModal({ open }: MenuItemUpsertModalProps) {
         </DialogHeader>
 
         {/* Scrollable content area - header and footer stay fixed */}
-        <div className="overflow-y-auto px-6 py-4 flex-1 min-h-0">
+        <div className="min-h-0 flex-1 overflow-y-auto px-6 py-4">
           <form id="menu-item-upsert-form" onSubmit={handleSubmit} className="space-y-6">
             {/* Loading state for edit mode - wait for both item data AND categories */}
-            {mode === 'edit' && (isLoadingItem || !itemData?.data || itemData.data.id !== itemId) && (
-              <div className="flex items-center justify-center py-8">
-                <Loader2 className="h-6 w-6 animate-spin text-emerald-600" />
-              </div>
-            )}
+            {mode === 'edit' &&
+              (isLoadingItem || !itemData?.data || itemData.data.id !== itemId) && (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="h-6 w-6 animate-spin text-emerald-600" />
+                </div>
+              )}
 
             {/* Show form only when: create mode OR (edit mode with correct data loaded) */}
             {(mode === 'create' ||
@@ -753,7 +754,6 @@ export function MenuItemUpsertModal({ open }: MenuItemUpsertModalProps) {
                     </div>
                   </div>
                 </div>
-
               </>
             )}
           </form>
@@ -762,12 +762,7 @@ export function MenuItemUpsertModal({ open }: MenuItemUpsertModalProps) {
         {/* Fixed footer */}
         <div className="px-6 pb-6">
           <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleClose}
-              disabled={isSubmitting}
-            >
+            <Button type="button" variant="outline" onClick={handleClose} disabled={isSubmitting}>
               Hủy
             </Button>
             <Button

@@ -14,22 +14,18 @@ export interface LoadingStateProps {
 
 /**
  * Simple loading spinner component
- * 
+ *
  * @example Basic usage
  * ```tsx
  * <LoadingState />
  * ```
- * 
+ *
  * @example With custom text
  * ```tsx
  * <LoadingState text="Đang tải dữ liệu..." size="lg" />
  * ```
  */
-export function LoadingState({
-  text,
-  size = 'md',
-  className,
-}: LoadingStateProps) {
+export function LoadingState({ text, size = 'md', className }: LoadingStateProps) {
   const sizeClasses = {
     sm: 'h-4 w-4',
     md: 'h-8 w-8',
@@ -37,14 +33,9 @@ export function LoadingState({
   }
 
   return (
-    <div className={cn(
-      "flex flex-col items-center justify-center gap-3 py-12",
-      className
-    )}>
-      <Loader2 className={cn("animate-spin text-emerald-600", sizeClasses[size])} />
-      {text && (
-        <p className="text-sm text-slate-500 dark:text-slate-400">{text}</p>
-      )}
+    <div className={cn('flex flex-col items-center justify-center gap-3 py-12', className)}>
+      <Loader2 className={cn('animate-spin text-emerald-600', sizeClasses[size])} />
+      {text && <p className="text-sm text-slate-500 dark:text-slate-400">{text}</p>}
     </div>
   )
 }
@@ -58,10 +49,7 @@ export interface ContainerLoadingStateProps extends LoadingStateProps {
   withCard?: boolean
 }
 
-export function ContainerLoadingState({
-  withCard = true,
-  ...props
-}: ContainerLoadingStateProps) {
+export function ContainerLoadingState({ withCard = true, ...props }: ContainerLoadingStateProps) {
   if (withCard) {
     return (
       <div className="rounded-2xl border border-slate-100 bg-white/80 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
@@ -84,15 +72,11 @@ export interface TableLoadingRowsProps {
   className?: string
 }
 
-export function TableLoadingRows({
-  columns,
-  rows = 5,
-  className,
-}: TableLoadingRowsProps) {
+export function TableLoadingRows({ columns, rows = 5, className }: TableLoadingRowsProps) {
   return (
     <>
       {Array.from({ length: rows }).map((_, i) => (
-        <tr key={i} className={cn("border-b border-slate-100 dark:border-slate-800", className)}>
+        <tr key={i} className={cn('border-b border-slate-100 dark:border-slate-800', className)}>
           {Array.from({ length: columns }).map((_, j) => (
             <td key={j} className="px-6 py-4">
               <div className="h-4 w-full animate-pulse rounded bg-slate-200 dark:bg-slate-700" />
@@ -125,17 +109,10 @@ export function ErrorState({
   className,
 }: ErrorStateProps) {
   return (
-    <div className={cn(
-      "flex flex-col items-center justify-center gap-3 py-12",
-      className
-    )}>
+    <div className={cn('flex flex-col items-center justify-center gap-3 py-12', className)}>
       <div className="text-center">
-        <p className="text-sm font-medium text-red-600 dark:text-red-400">
-          {title}
-        </p>
-        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-          {description}
-        </p>
+        <p className="text-sm font-medium text-red-600 dark:text-red-400">{title}</p>
+        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{description}</p>
       </div>
       {onRetry && (
         <button
@@ -154,7 +131,7 @@ export function ErrorState({
  */
 export function ContainerErrorState(props: ErrorStateProps & { withCard?: boolean }) {
   const { withCard = true, ...errorProps } = props
-  
+
   if (withCard) {
     return (
       <div className="rounded-2xl border border-slate-100 bg-white/80 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">

@@ -1,11 +1,11 @@
-"use client"
+'use client'
 
-import { Suspense } from "react"
-import { OrdersOverviewStats } from "@/components/admin/orders-overview-stats"
-import { OrdersFilterToolbar } from "@/components/admin/orders-filter-toolbar"
-import { OrdersTable } from "@/components/admin/orders-table"
-import { useSearchParams } from "next/navigation"
-import { Loader2 } from "lucide-react"
+import { Suspense } from 'react'
+import { OrdersOverviewStats } from '@/components/admin/orders-overview-stats'
+import { OrdersFilterToolbar } from '@/components/admin/orders-filter-toolbar'
+import { OrdersTable } from '@/components/admin/orders-table'
+import { useSearchParams } from 'next/navigation'
+import { Loader2 } from 'lucide-react'
 
 function OrdersContent() {
   const searchParams = useSearchParams()

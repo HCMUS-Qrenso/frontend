@@ -41,7 +41,7 @@ export interface ConfirmDeleteDialogProps {
 /**
  * Reusable confirm delete dialog component with centered layout
  * Provides consistent styling and behavior for delete confirmations
- * 
+ *
  * @example Simple usage
  * ```tsx
  * <ConfirmDeleteDialog
@@ -54,7 +54,7 @@ export interface ConfirmDeleteDialogProps {
  *   isLoading={isDeleting}
  * />
  * ```
- * 
+ *
  * @example With warning
  * ```tsx
  * <ConfirmDeleteDialog
@@ -105,10 +105,13 @@ export function ConfirmDeleteDialog({
           <AlertDialogDescription className="text-center text-sm text-slate-500 dark:text-slate-400">
             {itemName ? (
               <>
-                {description.includes('{itemName}') 
-                  ? description.replace('{itemName}', `"${itemName}"`)
-                  : <>Bạn có chắc chắn muốn xóa &quot;{itemName}&quot; không? {description}</>
-                }
+                {description.includes('{itemName}') ? (
+                  description.replace('{itemName}', `"${itemName}"`)
+                ) : (
+                  <>
+                    Bạn có chắc chắn muốn xóa &quot;{itemName}&quot; không? {description}
+                  </>
+                )}
               </>
             ) : (
               description
@@ -116,17 +119,10 @@ export function ConfirmDeleteDialog({
           </AlertDialogDescription>
         </AlertDialogHeader>
 
-        {warningContent && (
-          <div className="mt-2">
-            {warningContent}
-          </div>
-        )}
+        {warningContent && <div className="mt-2">{warningContent}</div>}
 
         <AlertDialogFooter className="flex-row justify-end gap-3 sm:flex-row">
-          <AlertDialogCancel
-            disabled={isLoading}
-            className="m-0 rounded-lg"
-          >
+          <AlertDialogCancel disabled={isLoading} className="m-0 rounded-lg">
             {cancelText}
           </AlertDialogCancel>
           <AlertDialogAction
@@ -143,4 +139,3 @@ export function ConfirmDeleteDialog({
     </AlertDialog>
   )
 }
-

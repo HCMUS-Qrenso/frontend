@@ -168,4 +168,3 @@ export function TablesFilterToolbar({ isTrashView = false }: TablesFilterToolbar
     </AdminFilterToolbarWrapper>
   )
 }
-

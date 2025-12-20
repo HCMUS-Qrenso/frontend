@@ -1,42 +1,42 @@
-"use client"
+'use client'
 
-import { useState } from "react"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
-import { Clock, Check, XCircle, AlertCircle } from "lucide-react"
-import { format } from "date-fns"
-import { vi } from "date-fns/locale"
+import { useState } from 'react'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
+import { Clock, Check, XCircle, AlertCircle } from 'lucide-react'
+import { format } from 'date-fns'
+import { vi } from 'date-fns/locale'
 
 // Mock data
 const MOCK_ITEMS = [
   {
-    id: "item-1",
-    menu_item_id: "mi-1",
-    menu_item_name: "Phở bò",
+    id: 'item-1',
+    menu_item_id: 'mi-1',
+    menu_item_name: 'Phở bò',
     quantity: 2,
     unit_price: 85000,
     modifiers: [
-      { modifier_name: "Thêm thịt", price_adjustment: 20000 },
-      { modifier_name: "Ít hành", price_adjustment: 0 },
+      { modifier_name: 'Thêm thịt', price_adjustment: 20000 },
+      { modifier_name: 'Ít hành', price_adjustment: 0 },
     ],
     modifiers_total: 40000,
     subtotal: 210000,
-    status: "preparing",
-    special_instructions: "Không hành",
+    status: 'preparing',
+    special_instructions: 'Không hành',
     preparation_started_at: new Date(Date.now() - 5 * 60 * 1000),
     estimated_prep_time: 15,
   },
   {
-    id: "item-2",
-    menu_item_id: "mi-2",
-    menu_item_name: "Bánh xèo",
+    id: 'item-2',
+    menu_item_id: 'mi-2',
+    menu_item_name: 'Bánh xèo',
     quantity: 1,
     unit_price: 45000,
     modifiers: [],
     modifiers_total: 0,
     subtotal: 45000,
-    status: "ready",
+    status: 'ready',
     special_instructions: null,
     preparation_started_at: new Date(Date.now() - 12 * 60 * 1000),
     preparation_completed_at: new Date(Date.now() - 2 * 60 * 1000),
@@ -44,15 +44,15 @@ const MOCK_ITEMS = [
     actual_prep_time: 10,
   },
   {
-    id: "item-3",
-    menu_item_id: "mi-3",
-    menu_item_name: "Cà phê sữa",
+    id: 'item-3',
+    menu_item_id: 'mi-3',
+    menu_item_name: 'Cà phê sữa',
     quantity: 2,
     unit_price: 25000,
-    modifiers: [{ modifier_name: "Ít đá", price_adjustment: 0 }],
+    modifiers: [{ modifier_name: 'Ít đá', price_adjustment: 0 }],
     modifiers_total: 0,
     subtotal: 50000,
-    status: "served",
+    status: 'served',
     special_instructions: null,
     preparation_started_at: new Date(Date.now() - 15 * 60 * 1000),
     preparation_completed_at: new Date(Date.now() - 10 * 60 * 1000),
@@ -64,34 +64,38 @@ const MOCK_ITEMS = [
 
 const ITEM_STATUS_CONFIG = {
   pending: {
-    label: "Chờ xử lý",
-    color: "bg-slate-100 text-slate-700 dark:bg-slate-500/10 dark:text-slate-400",
+    label: 'Chờ xử lý',
+    color: 'bg-slate-100 text-slate-700 dark:bg-slate-500/10 dark:text-slate-400',
     icon: Clock,
   },
   accepted: {
-    label: "Đã nhận",
-    color: "bg-purple-100 text-purple-700 dark:bg-purple-500/10 dark:text-purple-400",
+    label: 'Đã nhận',
+    color: 'bg-purple-100 text-purple-700 dark:bg-purple-500/10 dark:text-purple-400',
     icon: Check,
   },
   preparing: {
-    label: "Đang chuẩn bị",
-    color: "bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400",
+    label: 'Đang chuẩn bị',
+    color: 'bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400',
     icon: Clock,
   },
   ready: {
-    label: "Sẵn sàng",
-    color: "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400",
+    label: 'Sẵn sàng',
+    color: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400',
     icon: Check,
   },
-  served: { label: "Đã phục vụ", color: "bg-teal-100 text-teal-700 dark:bg-teal-500/10 dark:text-teal-400", icon: Check },
+  served: {
+    label: 'Đã phục vụ',
+    color: 'bg-teal-100 text-teal-700 dark:bg-teal-500/10 dark:text-teal-400',
+    icon: Check,
+  },
   cancelled: {
-    label: "Đã hủy",
-    color: "bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400",
+    label: 'Đã hủy',
+    color: 'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400',
     icon: XCircle,
   },
   returned: {
-    label: "Trả lại",
-    color: "bg-orange-100 text-orange-700 dark:bg-orange-500/10 dark:text-orange-400",
+    label: 'Trả lại',
+    color: 'bg-orange-100 text-orange-700 dark:bg-orange-500/10 dark:text-orange-400',
     icon: AlertCircle,
   },
 }
@@ -104,11 +108,15 @@ export function OrderItemsList({ orderId }: OrderItemsListProps) {
   const [items, setItems] = useState(MOCK_ITEMS)
 
   const handleMarkReady = (itemId: string) => {
-    setItems((prev) => prev.map((item) => (item.id === itemId ? { ...item, status: "ready" } : item)))
+    setItems((prev) =>
+      prev.map((item) => (item.id === itemId ? { ...item, status: 'ready' } : item)),
+    )
   }
 
   const handleMarkServed = (itemId: string) => {
-    setItems((prev) => prev.map((item) => (item.id === itemId ? { ...item, status: "served" } : item)))
+    setItems((prev) =>
+      prev.map((item) => (item.id === itemId ? { ...item, status: 'served' } : item)),
+    )
   }
 
   return (
@@ -117,7 +125,8 @@ export function OrderItemsList({ orderId }: OrderItemsListProps) {
 
       <div className="space-y-4">
         {items.map((item) => {
-          const StatusIcon = ITEM_STATUS_CONFIG[item.status]?.icon
+          const StatusIcon =
+            ITEM_STATUS_CONFIG[item.status as keyof typeof ITEM_STATUS_CONFIG]?.icon
 
           return (
             <div
@@ -132,7 +141,9 @@ export function OrderItemsList({ orderId }: OrderItemsListProps) {
                     <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-100 text-sm font-bold text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400">
                       {item.quantity}x
                     </span>
-                    <h3 className="text-base font-semibold text-slate-900 dark:text-white">{item.menu_item_name}</h3>
+                    <h3 className="text-base font-semibold text-slate-900 dark:text-white">
+                      {item.menu_item_name}
+                    </h3>
                   </div>
 
                   {/* Modifiers */}
@@ -143,7 +154,7 @@ export function OrderItemsList({ orderId }: OrderItemsListProps) {
                           + {mod.modifier_name}
                           {mod.price_adjustment > 0 && (
                             <span className="ml-2 font-medium text-emerald-600 dark:text-emerald-400">
-                              +{mod.price_adjustment.toLocaleString("vi-VN")}₫
+                              +{mod.price_adjustment.toLocaleString('vi-VN')}₫
                             </span>
                           )}
                         </p>
@@ -155,19 +166,27 @@ export function OrderItemsList({ orderId }: OrderItemsListProps) {
                   {item.special_instructions && (
                     <div className="ml-11 flex items-start gap-2 rounded-lg bg-amber-50 p-2 dark:bg-amber-500/10">
                       <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
-                      <p className="text-sm text-amber-700 dark:text-amber-300">{item.special_instructions}</p>
+                      <p className="text-sm text-amber-700 dark:text-amber-300">
+                        {item.special_instructions}
+                      </p>
                     </div>
                   )}
 
                   {/* Timeline */}
                   <div className="ml-11 flex flex-wrap items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
                     {item.preparation_started_at && (
-                      <span>Bắt đầu: {format(item.preparation_started_at, "HH:mm", { locale: vi })}</span>
+                      <span>
+                        Bắt đầu: {format(item.preparation_started_at, 'HH:mm', { locale: vi })}
+                      </span>
                     )}
                     {item.preparation_completed_at && (
-                      <span>Xong: {format(item.preparation_completed_at, "HH:mm", { locale: vi })}</span>
+                      <span>
+                        Xong: {format(item.preparation_completed_at, 'HH:mm', { locale: vi })}
+                      </span>
                     )}
-                    {item.served_at && <span>Phục vụ: {format(item.served_at, "HH:mm", { locale: vi })}</span>}
+                    {item.served_at && (
+                      <span>Phục vụ: {format(item.served_at, 'HH:mm', { locale: vi })}</span>
+                    )}
                   </div>
                 </div>
 
@@ -176,32 +195,37 @@ export function OrderItemsList({ orderId }: OrderItemsListProps) {
                   {/* Price */}
                   <div className="text-right">
                     <p className="text-xs text-slate-500 dark:text-slate-400">
-                      {item.unit_price.toLocaleString("vi-VN")}₫ × {item.quantity}
+                      {item.unit_price.toLocaleString('vi-VN')}₫ × {item.quantity}
                     </p>
                     {item.modifiers_total > 0 && (
                       <p className="text-xs text-slate-500 dark:text-slate-400">
-                        +{item.modifiers_total.toLocaleString("vi-VN")}₫
+                        +{item.modifiers_total.toLocaleString('vi-VN')}₫
                       </p>
                     )}
                     <p className="mt-1 text-base font-semibold text-slate-900 dark:text-white">
-                      {item.subtotal.toLocaleString("vi-VN")}₫
+                      {item.subtotal.toLocaleString('vi-VN')}₫
                     </p>
                   </div>
 
                   {/* Status Badge */}
-                  <Badge className={cn("gap-1 text-xs font-medium", ITEM_STATUS_CONFIG[item.status]?.color)}>
+                  <Badge
+                    className={cn(
+                      'gap-1 text-xs font-medium',
+                      ITEM_STATUS_CONFIG[item.status as keyof typeof ITEM_STATUS_CONFIG]?.color,
+                    )}
+                  >
                     {StatusIcon && <StatusIcon className="h-3 w-3" />}
-                    {ITEM_STATUS_CONFIG[item.status]?.label}
+                    {ITEM_STATUS_CONFIG[item.status as keyof typeof ITEM_STATUS_CONFIG]?.label}
                   </Badge>
 
                   {/* Actions */}
                   <div className="flex gap-2">
-                    {item.status === "preparing" && (
+                    {item.status === 'preparing' && (
                       <Button size="sm" variant="outline" onClick={() => handleMarkReady(item.id)}>
                         Sẵn sàng
                       </Button>
                     )}
-                    {item.status === "ready" && (
+                    {item.status === 'ready' && (
                       <Button
                         size="sm"
                         variant="default"

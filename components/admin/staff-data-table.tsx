@@ -1,14 +1,21 @@
-"use client"
+'use client'
 
-import { useState, useMemo, useEffect } from "react"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { StatusBadge, USER_STATUS_CONFIG, USER_ROLE_CONFIG } from "@/components/ui/status-badge"
-import { StaffRowActions } from "@/components/admin/staff-row-actions"
-import { LoadingState } from "@/components/ui/loading-state"
-import { EmptyState } from "@/components/ui/empty-state"
-import { CheckCircle2, XCircle, Users } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { useState, useMemo, useEffect } from 'react'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { StatusBadge, USER_STATUS_CONFIG, USER_ROLE_CONFIG } from '@/components/ui/status-badge'
+import { StaffRowActions } from '@/components/admin/staff-row-actions'
+import { LoadingState } from '@/components/ui/loading-state'
+import { EmptyState } from '@/components/ui/empty-state'
+import { CheckCircle2, XCircle, Users } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 interface User {
   id: string
@@ -16,110 +23,108 @@ interface User {
   full_name: string
   phone: string | null
   avatar_url: string | null
-  role: "waiter" | "kitchen_staff"
+  role: 'waiter' | 'kitchen_staff'
   tenant_id: string
   email_verified: boolean
-  status: "active" | "inactive" | "suspended"
+  status: 'active' | 'inactive' | 'suspended'
   last_login_at: string | null
   created_at: string
   updated_at: string
 }
 
-
-
 // Mock data
 const mockWaiters: User[] = [
   {
-    id: "1",
-    email: "nguyen.van.a@restaurant.com",
-    full_name: "Nguyễn Văn A",
-    phone: "+84 912 345 678",
+    id: '1',
+    email: 'nguyen.van.a@restaurant.com',
+    full_name: 'Nguyễn Văn A',
+    phone: '+84 912 345 678',
     avatar_url: null,
-    role: "waiter",
-    tenant_id: "tenant-1",
+    role: 'waiter',
+    tenant_id: 'tenant-1',
     email_verified: true,
-    status: "active",
-    last_login_at: "2024-01-15T10:30:00Z",
-    created_at: "2023-11-01T08:00:00Z",
-    updated_at: "2024-01-15T10:30:00Z",
+    status: 'active',
+    last_login_at: '2024-01-15T10:30:00Z',
+    created_at: '2023-11-01T08:00:00Z',
+    updated_at: '2024-01-15T10:30:00Z',
   },
   {
-    id: "2",
-    email: "tran.thi.b@restaurant.com",
-    full_name: "Trần Thị B",
-    phone: "+84 923 456 789",
+    id: '2',
+    email: 'tran.thi.b@restaurant.com',
+    full_name: 'Trần Thị B',
+    phone: '+84 923 456 789',
     avatar_url: null,
-    role: "waiter",
-    tenant_id: "tenant-1",
+    role: 'waiter',
+    tenant_id: 'tenant-1',
     email_verified: true,
-    status: "active",
-    last_login_at: "2024-01-15T09:15:00Z",
-    created_at: "2023-11-15T08:00:00Z",
-    updated_at: "2024-01-15T09:15:00Z",
+    status: 'active',
+    last_login_at: '2024-01-15T09:15:00Z',
+    created_at: '2023-11-15T08:00:00Z',
+    updated_at: '2024-01-15T09:15:00Z',
   },
   {
-    id: "3",
-    email: "le.van.c@restaurant.com",
-    full_name: "Lê Văn C",
-    phone: "+84 934 567 890",
+    id: '3',
+    email: 'le.van.c@restaurant.com',
+    full_name: 'Lê Văn C',
+    phone: '+84 934 567 890',
     avatar_url: null,
-    role: "waiter",
-    tenant_id: "tenant-1",
+    role: 'waiter',
+    tenant_id: 'tenant-1',
     email_verified: false,
-    status: "inactive",
+    status: 'inactive',
     last_login_at: null,
-    created_at: "2024-01-10T08:00:00Z",
-    updated_at: "2024-01-10T08:00:00Z",
+    created_at: '2024-01-10T08:00:00Z',
+    updated_at: '2024-01-10T08:00:00Z',
   },
 ]
 
 const mockKitchenStaff: User[] = [
   {
-    id: "4",
-    email: "pham.van.d@restaurant.com",
-    full_name: "Phạm Văn D",
-    phone: "+84 945 678 901",
+    id: '4',
+    email: 'pham.van.d@restaurant.com',
+    full_name: 'Phạm Văn D',
+    phone: '+84 945 678 901',
     avatar_url: null,
-    role: "kitchen_staff",
-    tenant_id: "tenant-1",
+    role: 'kitchen_staff',
+    tenant_id: 'tenant-1',
     email_verified: true,
-    status: "active",
-    last_login_at: "2024-01-15T07:00:00Z",
-    created_at: "2023-10-01T08:00:00Z",
-    updated_at: "2024-01-15T07:00:00Z",
+    status: 'active',
+    last_login_at: '2024-01-15T07:00:00Z',
+    created_at: '2023-10-01T08:00:00Z',
+    updated_at: '2024-01-15T07:00:00Z',
   },
   {
-    id: "5",
-    email: "hoang.thi.e@restaurant.com",
-    full_name: "Hoàng Thị E",
-    phone: "+84 956 789 012",
+    id: '5',
+    email: 'hoang.thi.e@restaurant.com',
+    full_name: 'Hoàng Thị E',
+    phone: '+84 956 789 012',
     avatar_url: null,
-    role: "kitchen_staff",
-    tenant_id: "tenant-1",
+    role: 'kitchen_staff',
+    tenant_id: 'tenant-1',
     email_verified: true,
-    status: "active",
-    last_login_at: "2024-01-15T06:45:00Z",
-    created_at: "2023-10-15T08:00:00Z",
-    updated_at: "2024-01-15T06:45:00Z",
+    status: 'active',
+    last_login_at: '2024-01-15T06:45:00Z',
+    created_at: '2023-10-15T08:00:00Z',
+    updated_at: '2024-01-15T06:45:00Z',
   },
   {
-    id: "6",
-    email: "vu.van.f@restaurant.com",
-    full_name: "Vũ Văn F",
-    phone: "+84 967 890 123",
+    id: '6',
+    email: 'vu.van.f@restaurant.com',
+    full_name: 'Vũ Văn F',
+    phone: '+84 967 890 123',
     avatar_url: null,
-    role: "kitchen_staff",
-    tenant_id: "tenant-1",
+    role: 'kitchen_staff',
+    tenant_id: 'tenant-1',
     email_verified: true,
-    status: "suspended",
-    last_login_at: "2024-01-10T08:00:00Z",
-    created_at: "2023-12-01T08:00:00Z",
-    updated_at: "2024-01-12T08:00:00Z",
+    status: 'suspended',
+    last_login_at: '2024-01-10T08:00:00Z',
+    created_at: '2023-12-01T08:00:00Z',
+    updated_at: '2024-01-12T08:00:00Z',
   },
 ]
 
 interface StaffDataTableProps {
-  role: "waiter" | "kitchen_staff"
+  role: 'waiter' | 'kitchen_staff'
   searchQuery?: string
   statusFilter?: string
   verifiedFilter?: string
@@ -128,18 +133,18 @@ interface StaffDataTableProps {
 
 export function StaffDataTable({
   role,
-  searchQuery = "",
-  statusFilter = "all",
-  verifiedFilter = "all",
-  sortBy = "created_at",
+  searchQuery = '',
+  statusFilter = 'all',
+  verifiedFilter = 'all',
+  sortBy = 'created_at',
 }: StaffDataTableProps) {
-  const rawData = role === "waiter" ? mockWaiters : mockKitchenStaff
+  const rawData = role === 'waiter' ? mockWaiters : mockKitchenStaff
   const [data, setData] = useState<User[]>(rawData)
   const [isLoading, setIsLoading] = useState(false)
 
   // Update data when role changes
   useEffect(() => {
-    setData(role === "waiter" ? mockWaiters : mockKitchenStaff)
+    setData(role === 'waiter' ? mockWaiters : mockKitchenStaff)
   }, [role])
 
   // Filter and sort data
@@ -158,23 +163,23 @@ export function StaffDataTable({
     }
 
     // Status filter
-    if (statusFilter !== "all") {
+    if (statusFilter !== 'all') {
       result = result.filter((user) => user.status === statusFilter)
     }
 
     // Verified filter
-    if (verifiedFilter !== "all") {
-      const isVerified = verifiedFilter === "verified"
+    if (verifiedFilter !== 'all') {
+      const isVerified = verifiedFilter === 'verified'
       result = result.filter((user) => user.email_verified === isVerified)
     }
 
     // Sort
     result.sort((a, b) => {
-      if (sortBy === "full_name") {
+      if (sortBy === 'full_name') {
         return a.full_name.localeCompare(b.full_name)
-      } else if (sortBy === "created_at") {
+      } else if (sortBy === 'created_at') {
         return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-      } else if (sortBy === "last_login_at") {
+      } else if (sortBy === 'last_login_at') {
         const aTime = a.last_login_at ? new Date(a.last_login_at).getTime() : 0
         const bTime = b.last_login_at ? new Date(b.last_login_at).getTime() : 0
         return bTime - aTime
@@ -186,29 +191,29 @@ export function StaffDataTable({
   }, [data, searchQuery, statusFilter, verifiedFilter, sortBy])
 
   const formatDate = (date: string | null) => {
-    if (!date) return "—"
-    return new Date(date).toLocaleDateString("vi-VN", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
+    if (!date) return '—'
+    return new Date(date).toLocaleDateString('vi-VN', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
     })
   }
 
   const formatDateTime = (date: string | null) => {
-    if (!date) return "—"
-    return new Date(date).toLocaleString("vi-VN", {
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
+    if (!date) return '—'
+    return new Date(date).toLocaleString('vi-VN', {
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
     })
   }
 
   const getInitials = (name: string) => {
     return name
-      .split(" ")
+      .split(' ')
       .map((n) => n[0])
-      .join("")
+      .join('')
       .toUpperCase()
       .slice(0, 2)
   }
@@ -254,7 +259,11 @@ export function StaffDataTable({
                 <TableCell colSpan={7} className="px-6 py-0">
                   <EmptyState
                     icon={Users}
-                    title={role === "waiter" ? "Chưa có nhân viên phục vụ nào" : "Chưa có nhân viên bếp nào"}
+                    title={
+                      role === 'waiter'
+                        ? 'Chưa có nhân viên phục vụ nào'
+                        : 'Chưa có nhân viên bếp nào'
+                    }
                     description="Nhấn 'Mời nhân viên' để thêm nhân viên mới"
                   />
                 </TableCell>
@@ -264,8 +273,8 @@ export function StaffDataTable({
                 <TableRow
                   key={user.id}
                   className={cn(
-                    "border-b border-slate-100 transition-colors hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800",
-                    index === filteredData.length - 1 && "border-b-0",
+                    'border-b border-slate-100 transition-colors hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800',
+                    index === filteredData.length - 1 && 'border-b-0',
                   )}
                 >
                   {/* Staff Info */}
@@ -278,7 +287,9 @@ export function StaffDataTable({
                         </AvatarFallback>
                       </Avatar>
                       <div>
-                        <p className="text-sm font-medium text-slate-900 dark:text-white">{user.full_name}</p>
+                        <p className="text-sm font-medium text-slate-900 dark:text-white">
+                          {user.full_name}
+                        </p>
                         <p className="text-xs text-slate-500 dark:text-slate-400">
                           Tham gia {formatDate(user.created_at)}
                         </p>
@@ -290,7 +301,9 @@ export function StaffDataTable({
                   <TableCell className="px-6 py-4">
                     <div>
                       <p className="text-sm text-slate-700 dark:text-slate-300">{user.email}</p>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">{user.phone || "—"}</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">
+                        {user.phone || '—'}
+                      </p>
                     </div>
                   </TableCell>
 
@@ -326,7 +339,9 @@ export function StaffDataTable({
                       <StaffRowActions
                         user={user}
                         onUpdate={(updatedUser) => {
-                          setData((prev) => prev.map((u) => (u.id === updatedUser.id ? updatedUser : u)))
+                          setData((prev) =>
+                            prev.map((u) => (u.id === updatedUser.id ? updatedUser : u)),
+                          )
                         }}
                       />
                     </div>

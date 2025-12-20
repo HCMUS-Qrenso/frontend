@@ -224,10 +224,7 @@ export function ZonesTable() {
             {zones.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={5} className="px-6 py-0">
-                  <EmptyState
-                    title="Chưa có khu vực nào"
-                    description="Hãy tạo khu vực đầu tiên"
-                  />
+                  <EmptyState title="Chưa có khu vực nào" description="Hãy tạo khu vực đầu tiên" />
                 </TableCell>
               </TableRow>
             ) : (
@@ -278,7 +275,9 @@ export function ZonesTable() {
                           <Edit2 className="mr-2 h-4 w-4" />
                           Chỉnh sửa
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleToggleActive(zone.id, zone.is_active)}>
+                        <DropdownMenuItem
+                          onClick={() => handleToggleActive(zone.id, zone.is_active)}
+                        >
                           {zone.is_active ? (
                             <>
                               <EyeOff className="mr-2 h-4 w-4" />

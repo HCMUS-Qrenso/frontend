@@ -1,15 +1,15 @@
-"use client"
+'use client'
 
-import { useState, useMemo } from "react"
-import { Button } from "@/components/ui/button"
-import { StaffDataTable } from "@/components/admin/staff-data-table"
-import { InviteStaffSheet } from "@/components/admin/invite-staff-sheet"
-import { AdminFilterToolbarWrapper } from "@/components/admin/admin-filter-toolbar-wrapper"
-import { SearchInput } from "@/components/ui/search-input"
-import { FilterDropdown, type FilterOption } from "@/components/ui/filter-dropdown"
-import { Download, UserPlus, Users, UserCheck, UserX, UserMinus } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { StatCard } from "@/components/ui/stat-card"
+import { useState, useMemo } from 'react'
+import { Button } from '@/components/ui/button'
+import { StaffDataTable } from '@/components/admin/staff-data-table'
+import { InviteStaffSheet } from '@/components/admin/invite-staff-sheet'
+import { AdminFilterToolbarWrapper } from '@/components/admin/admin-filter-toolbar-wrapper'
+import { SearchInput } from '@/components/ui/search-input'
+import { FilterDropdown, type FilterOption } from '@/components/ui/filter-dropdown'
+import { Download, UserPlus, Users, UserCheck, UserX, UserMinus } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { StatCard } from '@/components/ui/stat-card'
 
 // Mock stats
 const MOCK_STATS = {
@@ -18,40 +18,40 @@ const MOCK_STATS = {
 }
 
 const STATUS_OPTIONS: FilterOption[] = [
-  { value: "all", label: "Tất cả trạng thái" },
-  { value: "active", label: "Hoạt động" },
-  { value: "inactive", label: "Không hoạt động" },
-  { value: "suspended", label: "Đình chỉ" },
+  { value: 'all', label: 'Tất cả trạng thái' },
+  { value: 'active', label: 'Hoạt động' },
+  { value: 'inactive', label: 'Không hoạt động' },
+  { value: 'suspended', label: 'Đình chỉ' },
 ]
 
 const VERIFIED_OPTIONS: FilterOption[] = [
-  { value: "all", label: "Tất cả" },
-  { value: "verified", label: "Đã xác thực" },
-  { value: "unverified", label: "Chưa xác thực" },
+  { value: 'all', label: 'Tất cả' },
+  { value: 'verified', label: 'Đã xác thực' },
+  { value: 'unverified', label: 'Chưa xác thực' },
 ]
 
 const SORT_OPTIONS: FilterOption[] = [
-  { value: "created_at", label: "Mới tạo" },
-  { value: "full_name", label: "Tên A-Z" },
-  { value: "last_login_at", label: "Đăng nhập gần đây" },
+  { value: 'created_at', label: 'Mới tạo' },
+  { value: 'full_name', label: 'Tên A-Z' },
+  { value: 'last_login_at', label: 'Đăng nhập gần đây' },
 ]
 
 export function StaffTabs() {
-  const [activeRole, setActiveRole] = useState<"waiter" | "kitchen_staff">("waiter")
+  const [activeRole, setActiveRole] = useState<'waiter' | 'kitchen_staff'>('waiter')
   const [inviteSheetOpen, setInviteSheetOpen] = useState(false)
 
   // Filters state (shared for the toolbar)
-  const [search, setSearch] = useState("")
-  const [statusFilter, setStatusFilter] = useState("all")
-  const [verifiedFilter, setVerifiedFilter] = useState("all")
-  const [sortBy, setSortBy] = useState("created_at")
+  const [search, setSearch] = useState('')
+  const [statusFilter, setStatusFilter] = useState('all')
+  const [verifiedFilter, setVerifiedFilter] = useState('all')
+  const [sortBy, setSortBy] = useState('created_at')
 
   // Stats for current role
   const stats = MOCK_STATS[activeRole]
   const totalAll = MOCK_STATS.waiter.total + MOCK_STATS.kitchen_staff.total
 
   const handleExportCSV = () => {
-    console.log("Exporting CSV for", activeRole)
+    console.log('Exporting CSV for', activeRole)
   }
 
   return (
@@ -95,23 +95,23 @@ export function StaffTabs() {
       {/* Role Toggle Buttons */}
       <div className="flex gap-2">
         <button
-          onClick={() => setActiveRole("waiter")}
+          onClick={() => setActiveRole('waiter')}
           className={cn(
-            "rounded-lg px-4 py-2 text-sm font-medium transition-colors",
-            activeRole === "waiter"
-              ? "bg-emerald-500 text-white dark:bg-emerald-600"
-              : "bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700",
+            'rounded-lg px-4 py-2 text-sm font-medium transition-colors',
+            activeRole === 'waiter'
+              ? 'bg-emerald-500 text-white dark:bg-emerald-600'
+              : 'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700',
           )}
         >
           Phục vụ ({MOCK_STATS.waiter.total})
         </button>
         <button
-          onClick={() => setActiveRole("kitchen_staff")}
+          onClick={() => setActiveRole('kitchen_staff')}
           className={cn(
-            "rounded-lg px-4 py-2 text-sm font-medium transition-colors",
-            activeRole === "kitchen_staff"
-              ? "bg-emerald-500 text-white dark:bg-emerald-600"
-              : "bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700",
+            'rounded-lg px-4 py-2 text-sm font-medium transition-colors',
+            activeRole === 'kitchen_staff'
+              ? 'bg-emerald-500 text-white dark:bg-emerald-600'
+              : 'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700',
           )}
         >
           Bếp ({MOCK_STATS.kitchen_staff.total})
@@ -153,12 +153,16 @@ export function StaffTabs() {
 
         {/* Right: Action Buttons */}
         <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={handleExportCSV} className="h-8 gap-1 rounded-lg bg-transparent px-3">
+          <Button
+            variant="outline"
+            onClick={handleExportCSV}
+            className="h-8 gap-1 rounded-lg bg-transparent px-3"
+          >
             <Download className="h-3 w-3" />
             <span className="hidden text-sm sm:inline">Xuất CSV</span>
           </Button>
-          <Button 
-            onClick={() => setInviteSheetOpen(true)} 
+          <Button
+            onClick={() => setInviteSheetOpen(true)}
             className="h-8 gap-1 rounded-lg bg-emerald-600 px-3 hover:bg-emerald-700"
           >
             <UserPlus className="h-3 w-3" />
@@ -168,8 +172,8 @@ export function StaffTabs() {
       </AdminFilterToolbarWrapper>
 
       {/* Data Table */}
-      <StaffDataTable 
-        role={activeRole} 
+      <StaffDataTable
+        role={activeRole}
         searchQuery={search}
         statusFilter={statusFilter}
         verifiedFilter={verifiedFilter}
@@ -177,7 +181,11 @@ export function StaffTabs() {
       />
 
       {/* Invite Staff Sheet */}
-      <InviteStaffSheet open={inviteSheetOpen} onOpenChange={setInviteSheetOpen} defaultRole={activeRole} />
+      <InviteStaffSheet
+        open={inviteSheetOpen}
+        onOpenChange={setInviteSheetOpen}
+        defaultRole={activeRole}
+      />
     </div>
   )
 }

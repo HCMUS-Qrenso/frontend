@@ -91,8 +91,6 @@ export function MenuItemsTable() {
     router.push(`/admin/menu/items?${params.toString()}`)
   }
 
-
-
   // Loading state
   if (isLoading) {
     return <ContainerLoadingState />

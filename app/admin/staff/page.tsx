@@ -1,8 +1,8 @@
-"use client"
+'use client'
 
-import { Suspense } from "react"
-import { StaffTabs } from "@/components/admin/staff-tabs"
-import { Loader2 } from "lucide-react"
+import { Suspense } from 'react'
+import { StaffTabs } from '@/components/admin/staff-tabs'
+import { Loader2 } from 'lucide-react'
 
 function StaffContent() {
   return (
@@ -28,4 +28,3 @@ export default function StaffPage() {
     </Suspense>
   )
 }
-

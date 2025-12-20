@@ -1,12 +1,12 @@
-"use client"
+'use client'
 
-import { Suspense } from "react"
-import { OrderSummaryHeader } from "@/components/admin/order-summary-header"
-import { OrderItemsList } from "@/components/admin/order-items-list"
-import { OrderNotes } from "@/components/admin/order-notes"
-import { OrderStatusTimeline } from "@/components/admin/order-status-timeline"
-import { PaymentCard } from "@/components/admin/payment-card"
-import { Loader2 } from "lucide-react"
+import { Suspense } from 'react'
+import { OrderSummaryHeader } from '@/components/admin/order-summary-header'
+import { OrderItemsList } from '@/components/admin/order-items-list'
+import { OrderNotes } from '@/components/admin/order-notes'
+import { OrderStatusTimeline } from '@/components/admin/order-status-timeline'
+import { PaymentCard } from '@/components/admin/payment-card'
+import { Loader2 } from 'lucide-react'
 
 function OrderDetailContent({ orderId }: { orderId: string }) {
   return (
@@ -47,4 +47,3 @@ export default function OrderDetailPage({ params }: { params: { orderId: string 
     </Suspense>
   )
 }
-

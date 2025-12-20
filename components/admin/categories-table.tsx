@@ -49,7 +49,6 @@ interface Category {
   updated_at: string
 }
 
-
 interface CategoriesTableProps {
   reorderMode: boolean
   setReorderMode: (value: boolean) => void
@@ -116,7 +115,10 @@ function SortableCategoryRow({
         {category.display_order}
       </TableCell>
       <TableCell className="px-6 py-4 text-center">
-        <StatusBadge status={category.is_active ? 'active' : 'hidden'} config={CATEGORY_ACTIVE_CONFIG} />
+        <StatusBadge
+          status={category.is_active ? 'active' : 'hidden'}
+          config={CATEGORY_ACTIVE_CONFIG}
+        />
       </TableCell>
       <TableCell className="px-6 py-4 text-center text-slate-600 dark:text-slate-400">
         {category.item_count}
@@ -154,9 +156,15 @@ function SortableCategoryRow({
                 }}
               >
                 {category.is_active ? (
-                  <><EyeOff className="mr-2 h-4 w-4" />Ẩn danh mục</>
+                  <>
+                    <EyeOff className="mr-2 h-4 w-4" />
+                    Ẩn danh mục
+                  </>
                 ) : (
-                  <><Eye className="mr-2 h-4 w-4" />Hiện danh mục</>
+                  <>
+                    <Eye className="mr-2 h-4 w-4" />
+                    Hiện danh mục
+                  </>
                 )}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
@@ -383,7 +391,10 @@ export function CategoriesTable({ reorderMode, setReorderMode }: CategoriesTable
                 {category.display_order}
               </TableCell>
               <TableCell className="px-6 py-4 text-center">
-                <StatusBadge status={category.is_active ? 'active' : 'hidden'} config={CATEGORY_ACTIVE_CONFIG} />
+                <StatusBadge
+                  status={category.is_active ? 'active' : 'hidden'}
+                  config={CATEGORY_ACTIVE_CONFIG}
+                />
               </TableCell>
               <TableCell className="px-6 py-4 text-center text-slate-600 dark:text-slate-400">
                 {category.item_count}
@@ -421,9 +432,15 @@ export function CategoriesTable({ reorderMode, setReorderMode }: CategoriesTable
                         }}
                       >
                         {category.is_active ? (
-                          <><EyeOff className="mr-2 h-4 w-4" />Ẩn danh mục</>
+                          <>
+                            <EyeOff className="mr-2 h-4 w-4" />
+                            Ẩn danh mục
+                          </>
                         ) : (
-                          <><Eye className="mr-2 h-4 w-4" />Hiện danh mục</>
+                          <>
+                            <Eye className="mr-2 h-4 w-4" />
+                            Hiện danh mục
+                          </>
                         )}
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />

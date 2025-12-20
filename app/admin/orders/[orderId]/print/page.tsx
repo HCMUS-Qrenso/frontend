@@ -1,25 +1,25 @@
-"use client"
+'use client'
 
-import { useEffect } from "react"
-import { format } from "date-fns"
-import { vi } from "date-fns/locale"
+import { useEffect } from 'react'
+import { format } from 'date-fns'
+import { vi } from 'date-fns/locale'
 
 // Mock data
 const MOCK_ORDER = {
-  order_number: "ORD-1024",
-  table_name: "Bàn 5",
-  floor: "Tầng 1",
+  order_number: 'ORD-1024',
+  table_name: 'Bàn 5',
+  floor: 'Tầng 1',
   created_at: new Date(),
   items: [
-    { name: "Phở bò", quantity: 2, unit_price: 85000, modifiers_total: 40000, subtotal: 210000 },
-    { name: "Bánh xèo", quantity: 1, unit_price: 45000, modifiers_total: 0, subtotal: 45000 },
-    { name: "Cà phê sữa", quantity: 2, unit_price: 25000, modifiers_total: 0, subtotal: 50000 },
+    { name: 'Phở bò', quantity: 2, unit_price: 85000, modifiers_total: 40000, subtotal: 210000 },
+    { name: 'Bánh xèo', quantity: 1, unit_price: 45000, modifiers_total: 0, subtotal: 45000 },
+    { name: 'Cà phê sữa', quantity: 2, unit_price: 25000, modifiers_total: 0, subtotal: 50000 },
   ],
   subtotal: 285000,
   tax_amount: 28500,
   discount_amount: 0,
   total_amount: 313500,
-  payment_status: "completed",
+  payment_status: 'completed',
 }
 
 export default function PrintOrderPage({ params }: { params: { orderId: string } }) {
@@ -51,7 +51,8 @@ export default function PrintOrderPage({ params }: { params: { orderId: string }
               <span className="font-medium">Bàn:</span> {order.table_name} ({order.floor})
             </div>
             <div className="col-span-2">
-              <span className="font-medium">Ngày:</span> {format(order.created_at, "HH:mm, dd/MM/yyyy", { locale: vi })}
+              <span className="font-medium">Ngày:</span>{' '}
+              {format(order.created_at, 'HH:mm, dd/MM/yyyy', { locale: vi })}
             </div>
           </div>
         </div>
@@ -72,8 +73,8 @@ export default function PrintOrderPage({ params }: { params: { orderId: string }
                 <tr key={idx} className="border-b border-slate-200">
                   <td className="py-2">{item.name}</td>
                   <td className="py-2 text-center">{item.quantity}</td>
-                  <td className="py-2 text-right">{item.unit_price.toLocaleString("vi-VN")}₫</td>
-                  <td className="py-2 text-right">{item.subtotal.toLocaleString("vi-VN")}₫</td>
+                  <td className="py-2 text-right">{item.unit_price.toLocaleString('vi-VN')}₫</td>
+                  <td className="py-2 text-right">{item.subtotal.toLocaleString('vi-VN')}₫</td>
                 </tr>
               ))}
             </tbody>
@@ -84,21 +85,21 @@ export default function PrintOrderPage({ params }: { params: { orderId: string }
         <div className="space-y-2 border-t border-slate-300 pt-4">
           <div className="flex justify-between text-sm">
             <span>Tạm tính:</span>
-            <span>{order.subtotal.toLocaleString("vi-VN")}₫</span>
+            <span>{order.subtotal.toLocaleString('vi-VN')}₫</span>
           </div>
           <div className="flex justify-between text-sm">
             <span>Thuế (10%):</span>
-            <span>{order.tax_amount.toLocaleString("vi-VN")}₫</span>
+            <span>{order.tax_amount.toLocaleString('vi-VN')}₫</span>
           </div>
           {order.discount_amount > 0 && (
             <div className="flex justify-between text-sm text-red-600">
               <span>Giảm giá:</span>
-              <span>-{order.discount_amount.toLocaleString("vi-VN")}₫</span>
+              <span>-{order.discount_amount.toLocaleString('vi-VN')}₫</span>
             </div>
           )}
           <div className="flex justify-between border-t border-slate-300 pt-2 text-lg font-bold">
             <span>Tổng cộng:</span>
-            <span>{order.total_amount.toLocaleString("vi-VN")}₫</span>
+            <span>{order.total_amount.toLocaleString('vi-VN')}₫</span>
           </div>
         </div>
 

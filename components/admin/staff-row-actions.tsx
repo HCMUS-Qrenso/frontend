@@ -1,14 +1,14 @@
-"use client"
+'use client'
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
+import { useState } from 'react'
+import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from '@/components/ui/dropdown-menu'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,7 +18,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
+} from '@/components/ui/alert-dialog'
 import {
   Dialog,
   DialogContent,
@@ -26,11 +26,17 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { MoreVertical, Pencil, Lock, Unlock, Key } from "lucide-react"
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { MoreVertical, Pencil, Lock, Unlock, Key } from 'lucide-react'
 
 interface User {
   id: string
@@ -38,10 +44,10 @@ interface User {
   full_name: string
   phone: string | null
   avatar_url: string | null
-  role: "waiter" | "kitchen_staff"
+  role: 'waiter' | 'kitchen_staff'
   tenant_id: string
   email_verified: boolean
-  status: "active" | "inactive" | "suspended"
+  status: 'active' | 'inactive' | 'suspended'
   last_login_at: string | null
   created_at: string
   updated_at: string
@@ -60,22 +66,22 @@ export function StaffRowActions({ user, onUpdate }: StaffRowActionsProps) {
 
   // Edit form state
   const [fullName, setFullName] = useState(user.full_name)
-  const [phone, setPhone] = useState(user.phone || "")
+  const [phone, setPhone] = useState(user.phone || '')
   const [status, setStatus] = useState(user.status)
 
   const handleLock = () => {
-    onUpdate({ ...user, status: "suspended" })
+    onUpdate({ ...user, status: 'suspended' })
     setLockDialogOpen(false)
   }
 
   const handleUnlock = () => {
-    onUpdate({ ...user, status: "active" })
+    onUpdate({ ...user, status: 'active' })
     setUnlockDialogOpen(false)
   }
 
   const handleResetPassword = () => {
     // TODO: Call API to reset password
-    console.log("Reset password for", user.email)
+    console.log('Reset password for', user.email)
     setResetPasswordDialogOpen(false)
   }
 
@@ -108,8 +114,11 @@ export function StaffRowActions({ user, onUpdate }: StaffRowActionsProps) {
             Reset mật khẩu
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          {user.status === "suspended" ? (
-            <DropdownMenuItem onClick={() => setUnlockDialogOpen(true)} className="text-emerald-600">
+          {user.status === 'suspended' ? (
+            <DropdownMenuItem
+              onClick={() => setUnlockDialogOpen(true)}
+              className="text-emerald-600"
+            >
               <Unlock className="mr-2 h-4 w-4" />
               Mở khóa
             </DropdownMenuItem>
@@ -128,8 +137,8 @@ export function StaffRowActions({ user, onUpdate }: StaffRowActionsProps) {
           <AlertDialogHeader>
             <AlertDialogTitle>Khóa tài khoản?</AlertDialogTitle>
             <AlertDialogDescription>
-              Bạn có chắc chắn muốn khóa tài khoản <strong>{user.full_name}</strong>? Họ sẽ không thể đăng nhập cho đến
-              khi được mở khóa.
+              Bạn có chắc chắn muốn khóa tài khoản <strong>{user.full_name}</strong>? Họ sẽ không
+              thể đăng nhập cho đến khi được mở khóa.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -147,12 +156,16 @@ export function StaffRowActions({ user, onUpdate }: StaffRowActionsProps) {
           <AlertDialogHeader>
             <AlertDialogTitle>Mở khóa tài khoản?</AlertDialogTitle>
             <AlertDialogDescription>
-              Bạn có chắc chắn muốn mở khóa tài khoản <strong>{user.full_name}</strong>? Họ sẽ có thể đăng nhập trở lại.
+              Bạn có chắc chắn muốn mở khóa tài khoản <strong>{user.full_name}</strong>? Họ sẽ có
+              thể đăng nhập trở lại.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Hủy</AlertDialogCancel>
-            <AlertDialogAction onClick={handleUnlock} className="bg-emerald-600 hover:bg-emerald-700">
+            <AlertDialogAction
+              onClick={handleUnlock}
+              className="bg-emerald-600 hover:bg-emerald-700"
+            >
               Mở khóa
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -165,13 +178,16 @@ export function StaffRowActions({ user, onUpdate }: StaffRowActionsProps) {
           <AlertDialogHeader>
             <AlertDialogTitle>Reset mật khẩu?</AlertDialogTitle>
             <AlertDialogDescription>
-              Gửi email reset mật khẩu đến <strong>{user.email}</strong>? Nhân viên sẽ nhận được link để tạo mật khẩu
-              mới.
+              Gửi email reset mật khẩu đến <strong>{user.email}</strong>? Nhân viên sẽ nhận được
+              link để tạo mật khẩu mới.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Hủy</AlertDialogCancel>
-            <AlertDialogAction onClick={handleResetPassword} className="bg-emerald-600 hover:bg-emerald-700">
+            <AlertDialogAction
+              onClick={handleResetPassword}
+              className="bg-emerald-600 hover:bg-emerald-700"
+            >
               Gửi email
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -183,18 +199,29 @@ export function StaffRowActions({ user, onUpdate }: StaffRowActionsProps) {
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
             <DialogTitle>Chỉnh sửa nhân viên</DialogTitle>
-            <DialogDescription>Cập nhật thông tin nhân viên. Email không thể thay đổi.</DialogDescription>
+            <DialogDescription>
+              Cập nhật thông tin nhân viên. Email không thể thay đổi.
+            </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <Label htmlFor="full_name">Họ và tên</Label>
-              <Input id="full_name" value={fullName} onChange={(e) => setFullName(e.target.value)} />
+              <Input
+                id="full_name"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+              />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" value={user.email} disabled className="bg-slate-50 dark:bg-slate-900" />
+              <Input
+                id="email"
+                value={user.email}
+                disabled
+                className="bg-slate-50 dark:bg-slate-900"
+              />
             </div>
 
             <div className="space-y-2">
@@ -211,7 +238,7 @@ export function StaffRowActions({ user, onUpdate }: StaffRowActionsProps) {
               <Label htmlFor="role">Vai trò</Label>
               <Input
                 id="role"
-                value={user.role === "waiter" ? "Phục vụ" : "Nhân viên bếp"}
+                value={user.role === 'waiter' ? 'Phục vụ' : 'Nhân viên bếp'}
                 disabled
                 className="bg-slate-50 dark:bg-slate-900"
               />

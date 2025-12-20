@@ -39,7 +39,6 @@ import {
   TableRow,
 } from '@/components/ui/table'
 
-
 interface TablesListTableProps {
   isTrashView?: boolean
 }

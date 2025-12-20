@@ -42,7 +42,7 @@ export function SearchInput({
         className={cn(
           'h-8 w-full rounded-lg border-slate-200 bg-slate-50 pr-4 pl-9 text-sm focus:bg-white dark:border-slate-700 dark:bg-slate-800 dark:focus:bg-slate-900',
           width,
-          className
+          className,
         )}
       />
     </div>
