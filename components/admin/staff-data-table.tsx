@@ -3,6 +3,7 @@
 import { useState, useMemo, useEffect } from "react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { StatusBadge, USER_STATUS_CONFIG, USER_ROLE_CONFIG } from "@/components/ui/status-badge"
 import { StaffRowActions } from "@/components/admin/staff-row-actions"
 import { CheckCircle2, XCircle, Loader2 } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -22,63 +23,7 @@ interface User {
   updated_at: string
 }
 
-// Status badge component
-function getStatusBadge(status: User["status"]) {
-  const config = {
-    active: {
-      label: "Hoạt động",
-      className: "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20",
-    },
-    inactive: {
-      label: "Không hoạt động",
-      className: "bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-500/10 dark:text-slate-400 dark:border-slate-500/20",
-    },
-    suspended: {
-      label: "Đình chỉ",
-      className: "bg-red-50 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20",
-    },
-  }
 
-  const statusConfig = config[status]
-
-  return (
-    <span
-      className={cn(
-        "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium",
-        statusConfig.className,
-      )}
-    >
-      {statusConfig.label}
-    </span>
-  )
-}
-
-// Role badge component
-function getRoleBadge(role: User["role"]) {
-  const config = {
-    waiter: {
-      label: "Phục vụ",
-      className: "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20",
-    },
-    kitchen_staff: {
-      label: "Bếp",
-      className: "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20",
-    },
-  }
-
-  const roleConfig = config[role]
-
-  return (
-    <span
-      className={cn(
-        "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium",
-        roleConfig.className,
-      )}
-    >
-      {roleConfig.label}
-    </span>
-  )
-}
 
 // Mock data
 const mockWaiters: User[] = [
@@ -355,10 +300,14 @@ export function StaffDataTable({
                   </TableCell>
 
                   {/* Role */}
-                  <TableCell className="px-6 py-4">{getRoleBadge(user.role)}</TableCell>
+                  <TableCell className="px-6 py-4">
+                    <StatusBadge status={user.role} config={USER_ROLE_CONFIG} />
+                  </TableCell>
 
                   {/* Status */}
-                  <TableCell className="px-6 py-4">{getStatusBadge(user.status)}</TableCell>
+                  <TableCell className="px-6 py-4">
+                    <StatusBadge status={user.status} config={USER_STATUS_CONFIG} />
+                  </TableCell>
 
                   {/* Email Verified */}
                   <TableCell className="px-6 py-4 text-center">

@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
+import { StatusBadge, TABLE_STATUS_CONFIG } from '@/components/ui/status-badge'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -44,43 +45,6 @@ import {
   TableRow,
 } from '@/components/ui/table'
 
-function getStatusBadge(status: TableStatus) {
-  const config = {
-    available: {
-      label: 'Trống',
-      className:
-        'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20',
-    },
-    occupied: {
-      label: 'Đang sử dụng',
-      className:
-        'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20',
-    },
-    waiting_for_payment: {
-      label: 'Chờ thanh toán',
-      className:
-        'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20',
-    },
-    maintenance: {
-      label: 'Bảo trì',
-      className:
-        'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/20',
-    },
-  }
-
-  const statusConfig = config[status]
-
-  return (
-    <span
-      className={cn(
-        'inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium',
-        statusConfig.className,
-      )}
-    >
-      {statusConfig.label}
-    </span>
-  )
-}
 
 interface TablesListTableProps {
   isTrashView?: boolean
@@ -306,7 +270,9 @@ export function TablesListTable({ isTrashView = false }: TablesListTableProps) {
                   <TableCell className="px-6 py-4">
                     <p className="text-sm text-slate-700 dark:text-slate-300">{table.capacity}</p>
                   </TableCell>
-                  <TableCell className="px-6 py-4">{getStatusBadge(table.status)}</TableCell>
+                  <TableCell className="px-6 py-4">
+                    <StatusBadge status={table.status} config={TABLE_STATUS_CONFIG} />
+                  </TableCell>
                   <TableCell className="px-6 py-4">
                     {table.current_order ? (
                       <p className="max-w-[180px] truncate text-sm font-medium text-emerald-600 dark:text-emerald-400">

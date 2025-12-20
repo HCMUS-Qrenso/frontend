@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Eye, MoreVertical, Printer, ChevronRight, AlertCircle, Loader2 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { StatusBadge, type StatusConfig } from "@/components/ui/status-badge"
 import { formatDistanceToNow } from "date-fns"
 import { vi } from "date-fns/locale"
 
@@ -143,20 +144,20 @@ const MOCK_ORDERS = [
   },
 ]
 
-const STATUS_CONFIG = {
-  new: { label: "Mới", color: "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20" },
-  accepted: { label: "Đã nhận", color: "bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-500/10 dark:text-purple-400 dark:border-purple-500/20" },
-  preparing: { label: "Đang chuẩn bị", color: "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20" },
-  ready: { label: "Sẵn sàng", color: "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20" },
-  served: { label: "Đã phục vụ", color: "bg-teal-50 text-teal-700 border-teal-200 dark:bg-teal-500/10 dark:text-teal-400 dark:border-teal-500/20" },
-  completed: { label: "Hoàn thành", color: "bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-500/10 dark:text-slate-400 dark:border-slate-500/20" },
-  cancelled: { label: "Đã hủy", color: "bg-red-50 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20" },
+const STATUS_CONFIG: Record<string, StatusConfig> = {
+  new: { label: "Mới", className: "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20" },
+  accepted: { label: "Đã nhận", className: "bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-500/10 dark:text-purple-400 dark:border-purple-500/20" },
+  preparing: { label: "Đang chuẩn bị", className: "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20" },
+  ready: { label: "Sẵn sàng", className: "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20" },
+  served: { label: "Đã phục vụ", className: "bg-teal-50 text-teal-700 border-teal-200 dark:bg-teal-500/10 dark:text-teal-400 dark:border-teal-500/20" },
+  completed: { label: "Hoàn thành", className: "bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-500/10 dark:text-slate-400 dark:border-slate-500/20" },
+  cancelled: { label: "Đã hủy", className: "bg-red-50 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20" },
 }
 
-const PAYMENT_STATUS_CONFIG = {
-  unpaid: { label: "Chưa TT", color: "bg-red-50 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20" },
-  paid: { label: "Đã TT", color: "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20" },
-  refunded: { label: "Hoàn tiền", color: "bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-500/10 dark:text-slate-400 dark:border-slate-500/20" },
+const PAYMENT_STATUS_CONFIG: Record<string, StatusConfig> = {
+  unpaid: { label: "Chưa TT", className: "bg-red-50 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20" },
+  paid: { label: "Đã TT", className: "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20" },
+  refunded: { label: "Hoàn tiền", className: "bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-500/10 dark:text-slate-400 dark:border-slate-500/20" },
 }
 
 const NEXT_STATUS_MAP: Record<string, string> = {
@@ -198,35 +199,6 @@ export function OrdersTable() {
     return getAgingMinutes(createdAt) > 20
   }
 
-  const getStatusBadge = (status: string) => {
-    const config = STATUS_CONFIG[status as keyof typeof STATUS_CONFIG]
-    if (!config) return null
-    return (
-      <span
-        className={cn(
-          "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium",
-          config.color,
-        )}
-      >
-        {config.label}
-      </span>
-    )
-  }
-
-  const getPaymentBadge = (paymentStatus: string) => {
-    const config = PAYMENT_STATUS_CONFIG[paymentStatus as keyof typeof PAYMENT_STATUS_CONFIG]
-    if (!config) return null
-    return (
-      <span
-        className={cn(
-          "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium",
-          config.color,
-        )}
-      >
-        {config.label}
-      </span>
-    )
-  }
 
   // Loading state
   if (isLoading) {
@@ -332,10 +304,10 @@ export function OrdersTable() {
                       </div>
                     </TableCell>
                     <TableCell className="px-4 py-4">
-                      {getStatusBadge(order.status)}
+                      <StatusBadge status={order.status} config={STATUS_CONFIG} />
                     </TableCell>
                     <TableCell className="px-4 py-4">
-                      {getPaymentBadge(order.paymentStatus)}
+                      <StatusBadge status={order.paymentStatus} config={PAYMENT_STATUS_CONFIG} />
                     </TableCell>
                     <TableCell className="px-4 py-4 text-right">
                       <p className="font-semibold text-slate-900 dark:text-white">{order.total.toLocaleString("vi-VN")}₫</p>

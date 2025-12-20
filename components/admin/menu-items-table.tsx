@@ -21,6 +21,8 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Pencil, Trash2, Award, Clock, Loader2, MoreVertical } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { formatRelativeDate, formatPrice } from '@/lib/utils/format'
+import { StatusBadge, MENU_ITEM_STATUS_CONFIG } from '@/components/ui/status-badge'
 import Image from 'next/image'
 import { useMenuItemsQuery } from '@/hooks/use-menu-items-query'
 import { useErrorHandler } from '@/hooks/use-error-handler'
@@ -87,51 +89,7 @@ export function MenuItemsTable() {
     router.push(`/admin/menu/items?${params.toString()}`)
   }
 
-  const getStatusBadge = (status: MenuItem['status']) => {
-    const variants = {
-      available: {
-        label: 'Đang bán',
-        className: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400',
-      },
-      sold_out: {
-        label: 'Hết hàng',
-        className: 'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400',
-      },
-      unavailable: {
-        label: 'Tạm ẩn',
-        className: 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400',
-      },
-    }
 
-    const variant = variants[status]
-    return (
-      <Badge variant="secondary" className={cn('font-medium', variant.className)}>
-        {variant.label}
-      </Badge>
-    )
-  }
-
-  const formatPrice = (price: string | number) => {
-    const numPrice = typeof price === 'string' ? parseFloat(price) : price
-    return new Intl.NumberFormat('vi-VN', {
-      style: 'currency',
-      currency: 'VND',
-    }).format(numPrice)
-  }
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
-    const now = new Date()
-    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60))
-
-    if (diffInHours < 24) {
-      return `${diffInHours}h trước`
-    } else if (diffInHours < 48) {
-      return '1 ngày trước'
-    } else {
-      return date.toLocaleDateString('vi-VN')
-    }
-  }
 
   // Loading state
   if (isLoading) {
@@ -262,7 +220,7 @@ export function MenuItemsTable() {
                     </span>
                   </TableCell>
                   <TableCell className="px-2 py-3 text-center md:px-4">
-                    {getStatusBadge(item.status)}
+                    <StatusBadge status={item.status} config={MENU_ITEM_STATUS_CONFIG} />
                   </TableCell>
                   <TableCell className="px-2 py-3 text-center md:px-4">
                     <div className="flex items-center justify-center gap-1">
@@ -274,7 +232,7 @@ export function MenuItemsTable() {
                   </TableCell>
                   <TableCell className="px-2 py-3 md:px-4">
                     <span className="text-xs text-slate-600 md:text-sm dark:text-slate-400">
-                      {formatDate(item.updated_at)}
+                      {formatRelativeDate(item.updated_at)}
                     </span>
                   </TableCell>
                   <TableCell className="px-2 py-3 text-right md:px-4">
