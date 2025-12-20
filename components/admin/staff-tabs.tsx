@@ -2,17 +2,12 @@
 
 import { useState, useMemo } from "react"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { StaffDataTable } from "@/components/admin/staff-data-table"
 import { InviteStaffSheet } from "@/components/admin/invite-staff-sheet"
 import { AdminFilterToolbarWrapper } from "@/components/admin/admin-filter-toolbar-wrapper"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Download, UserPlus, Search, ChevronDown, Users, UserCheck, UserX, UserMinus } from "lucide-react"
+import { SearchInput } from "@/components/ui/search-input"
+import { FilterDropdown, type FilterOption } from "@/components/ui/filter-dropdown"
+import { Download, UserPlus, Users, UserCheck, UserX, UserMinus } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { StatCard } from "@/components/ui/stat-card"
 
@@ -22,20 +17,20 @@ const MOCK_STATS = {
   kitchen_staff: { total: 3, active: 2, inactive: 0, suspended: 1 },
 }
 
-const STATUS_OPTIONS = [
+const STATUS_OPTIONS: FilterOption[] = [
   { value: "all", label: "Tất cả trạng thái" },
   { value: "active", label: "Hoạt động" },
   { value: "inactive", label: "Không hoạt động" },
   { value: "suspended", label: "Đình chỉ" },
 ]
 
-const VERIFIED_OPTIONS = [
+const VERIFIED_OPTIONS: FilterOption[] = [
   { value: "all", label: "Tất cả" },
   { value: "verified", label: "Đã xác thực" },
   { value: "unverified", label: "Chưa xác thực" },
 ]
 
-const SORT_OPTIONS = [
+const SORT_OPTIONS: FilterOption[] = [
   { value: "created_at", label: "Mới tạo" },
   { value: "full_name", label: "Tên A-Z" },
   { value: "last_login_at", label: "Đăng nhập gần đây" },
@@ -50,11 +45,6 @@ export function StaffTabs() {
   const [statusFilter, setStatusFilter] = useState("all")
   const [verifiedFilter, setVerifiedFilter] = useState("all")
   const [sortBy, setSortBy] = useState("created_at")
-
-  // Get display labels
-  const selectedStatusLabel = STATUS_OPTIONS.find((o) => o.value === statusFilter)?.label || "Tất cả trạng thái"
-  const selectedVerifiedLabel = VERIFIED_OPTIONS.find((o) => o.value === verifiedFilter)?.label || "Tất cả"
-  const selectedSortLabel = SORT_OPTIONS.find((o) => o.value === sortBy)?.label || "Mới tạo"
 
   // Stats for current role
   const stats = MOCK_STATS[activeRole]
@@ -132,67 +122,33 @@ export function StaffTabs() {
       <AdminFilterToolbarWrapper>
         {/* Left: Filters + Sort */}
         <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
-          {/* Search */}
-          <div className="relative">
-            <Search className="absolute top-1/2 left-3 h-3 w-3 -translate-y-1/2 text-slate-400" />
-            <Input
-              placeholder="Tìm theo tên, email, SĐT..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="h-8 w-full rounded-lg border-slate-200 bg-slate-50 pr-4 pl-9 text-sm focus:bg-white sm:w-56 dark:border-slate-700 dark:bg-slate-800 dark:focus:bg-slate-900"
-            />
-          </div>
+          <SearchInput
+            placeholder="Tìm theo tên, email, SĐT..."
+            value={search}
+            onChange={setSearch}
+            width="sm:w-56"
+          />
 
-          {/* Status Filter */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="h-8 gap-1 rounded-lg bg-transparent px-3">
-                <span className="text-sm">Trạng thái: {selectedStatusLabel}</span>
-                <ChevronDown className="h-3 w-3" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-48">
-              {STATUS_OPTIONS.map((option) => (
-                <DropdownMenuItem key={option.value} onClick={() => setStatusFilter(option.value)}>
-                  {option.label}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <FilterDropdown
+            label="Trạng thái:"
+            value={statusFilter}
+            options={STATUS_OPTIONS}
+            onChange={setStatusFilter}
+          />
 
-          {/* Verified Filter */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="h-8 gap-1 rounded-lg bg-transparent px-3">
-                <span className="text-sm">Xác thực: {selectedVerifiedLabel}</span>
-                <ChevronDown className="h-3 w-3" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-48">
-              {VERIFIED_OPTIONS.map((option) => (
-                <DropdownMenuItem key={option.value} onClick={() => setVerifiedFilter(option.value)}>
-                  {option.label}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <FilterDropdown
+            label="Xác thực:"
+            value={verifiedFilter}
+            options={VERIFIED_OPTIONS}
+            onChange={setVerifiedFilter}
+          />
 
-          {/* Sort - Now on left side */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="h-8 gap-1 rounded-lg bg-transparent px-3">
-                <span className="text-sm">Sắp xếp: {selectedSortLabel}</span>
-                <ChevronDown className="h-3 w-3" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-48">
-              {SORT_OPTIONS.map((option) => (
-                <DropdownMenuItem key={option.value} onClick={() => setSortBy(option.value)}>
-                  {option.label}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <FilterDropdown
+            label="Sắp xếp:"
+            value={sortBy}
+            options={SORT_OPTIONS}
+            onChange={setSortBy}
+          />
         </div>
 
         {/* Right: Action Buttons */}

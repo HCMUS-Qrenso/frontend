@@ -62,7 +62,7 @@ export const ORDER_STATUS_CONFIG: Record<string, StatusConfig> = {
 export const TABLE_STATUS_CONFIG: Record<string, StatusConfig> = {
   available: { label: "Trống", className: "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20" },
   occupied: { label: "Đang sử dụng", className: "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20" },
-  waiting_for_payment: { label: "Chờ thanh toán", className: "bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-500/10 dark:text-violet-400 dark:border-violet-500/20" },
+  reserved: { label: "Đã đặt trước", className: "bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-500/10 dark:text-violet-400 dark:border-violet-500/20" },
   maintenance: { label: "Bảo trì", className: "bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-500/10 dark:text-slate-400 dark:border-slate-500/20" },
 }
 
@@ -93,4 +93,10 @@ export const CATEGORY_ACTIVE_CONFIG: Record<string, StatusConfig> = {
   active: { label: "Hoạt động", className: "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20" },
   hidden: { label: "Đang ẩn", className: "bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-500/10 dark:text-slate-400 dark:border-slate-500/20" },
 }
+
+export const ZONE_ACTIVE_CONFIG: Record<string, StatusConfig> = {
+  active: { label: "Hoạt động", className: "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20" },
+  inactive: { label: "Tạm ẩn", className: "bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-500/10 dark:text-slate-400 dark:border-slate-500/20" },
+}
+
 

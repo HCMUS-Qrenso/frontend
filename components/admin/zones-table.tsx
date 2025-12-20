@@ -13,7 +13,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import { Badge } from '@/components/ui/badge'
+import { StatusBadge, ZONE_ACTIVE_CONFIG } from '@/components/ui/status-badge'
 import {
   Edit2,
   Trash2,
@@ -50,6 +50,7 @@ export function ZonesTable() {
   const page = Number.parseInt(searchParams.get('page') || '1')
   const limit = Number.parseInt(searchParams.get('limit') || '10')
   const search = searchParams.get('search') || undefined
+  const isActive = searchParams.get('is_active') as 'true' | 'false' | undefined
   const sortBy =
     (searchParams.get('sort_by') as 'name' | 'displayOrder' | 'createdAt' | 'updatedAt') ||
     'displayOrder'
@@ -59,6 +60,7 @@ export function ZonesTable() {
     page,
     limit,
     search,
+    is_active: isActive,
     sort_by: sortBy,
     sort_order: sortOrder,
   })
@@ -253,17 +255,10 @@ export function ZonesTable() {
                     {zone.display_order}
                   </TableCell>
                   <TableCell className="px-6 py-4 text-center">
-                    <Badge
-                      variant={zone.is_active ? 'default' : 'secondary'}
-                      className={cn(
-                        'font-medium',
-                        zone.is_active
-                          ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400'
-                          : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400',
-                      )}
-                    >
-                      {zone.is_active ? 'Hoạt động' : 'Tạm ẩn'}
-                    </Badge>
+                    <StatusBadge
+                      status={zone.is_active ? 'active' : 'inactive'}
+                      config={ZONE_ACTIVE_CONFIG}
+                    />
                   </TableCell>
                   <TableCell className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end gap-1">

@@ -2,15 +2,10 @@
 
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Switch } from "@/components/ui/switch"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Search, Download, ChevronDown } from "lucide-react"
+import { SearchInput } from "@/components/ui/search-input"
+import { FilterDropdown, type FilterOption } from "@/components/ui/filter-dropdown"
+import { Download } from "lucide-react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { AdminFilterToolbarWrapper } from "./admin-filter-toolbar-wrapper"
 import { cn } from "@/lib/utils"
@@ -26,21 +21,22 @@ const STATUS_OPTIONS = [
   { value: "cancelled", label: "Đã hủy" },
 ]
 
-const TIME_RANGE_OPTIONS = [
+const TIME_RANGE_OPTIONS: FilterOption[] = [
   { value: "today", label: "Hôm nay" },
   { value: "last24h", label: "24h qua" },
   { value: "last7d", label: "7 ngày qua" },
   { value: "custom", label: "Tùy chỉnh" },
 ]
 
-const MOCK_TABLES = [
-  { id: "all", name: "Tất cả" },
-  { id: "1", name: "Bàn 1" },
-  { id: "2", name: "Bàn 2" },
-  { id: "3", name: "Bàn 3" },
-  { id: "5", name: "Bàn 5" },
-  { id: "7", name: "Bàn 7" },
-  { id: "12", name: "Bàn 12" },
+// Table options - currently mock data, will be from API later
+const TABLE_OPTIONS: FilterOption[] = [
+  { value: "all", label: "Tất cả" },
+  { value: "1", label: "Bàn 1" },
+  { value: "2", label: "Bàn 2" },
+  { value: "3", label: "Bàn 3" },
+  { value: "5", label: "Bàn 5" },
+  { value: "7", label: "Bàn 7" },
+  { value: "12", label: "Bàn 12" },
 ]
 
 export function OrdersFilterToolbar() {
@@ -54,14 +50,9 @@ export function OrdersFilterToolbar() {
   const [autoRefresh, setAutoRefresh] = useState(true)
   const [isConnected, setIsConnected] = useState(true)
 
-  // Get display labels
-  const selectedTableLabel = MOCK_TABLES.find((t) => t.id === tableId)?.name || "Tất cả"
-  const selectedTimeRangeLabel = TIME_RANGE_OPTIONS.find((t) => t.value === timeRange)?.label || "Hôm nay"
-
   // Update URL params when filters change
   const updateFilter = (key: string, value: string) => {
     const params = new URLSearchParams(searchParams.toString())
-    // Handle default values - remove from URL if default
     const isDefaultValue =
       value === "" ||
       value === "all" ||
@@ -80,7 +71,6 @@ export function OrdersFilterToolbar() {
     const timer = setTimeout(() => {
       updateFilter("q", search)
     }, 500)
-
     return () => clearTimeout(timer)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search])
@@ -124,50 +114,26 @@ export function OrdersFilterToolbar() {
       <AdminFilterToolbarWrapper>
         {/* Left: Filters */}
         <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
-          {/* Search */}
-          <div className="relative">
-            <Search className="absolute top-1/2 left-3 h-3 w-3 -translate-y-1/2 text-slate-400" />
-            <Input
-              placeholder="Tìm theo Order ID / khách / ghi chú..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="h-8 w-full rounded-lg border-slate-200 bg-slate-50 pr-4 pl-9 text-sm focus:bg-white sm:w-64 dark:border-slate-700 dark:bg-slate-800 dark:focus:bg-slate-900"
-            />
-          </div>
+          <SearchInput
+            placeholder="Tìm theo Order ID / khách / ghi chú..."
+            value={search}
+            onChange={setSearch}
+          />
 
-          {/* Table Filter */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="h-8 gap-1 rounded-lg bg-transparent px-3">
-                <span className="text-sm">Bàn: {selectedTableLabel}</span>
-                <ChevronDown className="h-3 w-3" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-48">
-              {MOCK_TABLES.map((table) => (
-                <DropdownMenuItem key={table.id} onClick={() => handleTableChange(table.id)}>
-                  {table.name}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <FilterDropdown
+            label="Bàn:"
+            value={tableId}
+            options={TABLE_OPTIONS}
+            onChange={handleTableChange}
+            placeholder="Tất cả"
+          />
 
-          {/* Time Range Filter */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="h-8 gap-1 rounded-lg bg-transparent px-3">
-                <span className="text-sm">Thời gian: {selectedTimeRangeLabel}</span>
-                <ChevronDown className="h-3 w-3" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-48">
-              {TIME_RANGE_OPTIONS.map((option) => (
-                <DropdownMenuItem key={option.value} onClick={() => handleTimeRangeChange(option.value)}>
-                  {option.label}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <FilterDropdown
+            label="Thời gian:"
+            value={timeRange}
+            options={TIME_RANGE_OPTIONS}
+            onChange={handleTimeRangeChange}
+          />
         </div>
 
         {/* Right: Actions */}
@@ -202,3 +168,4 @@ export function OrdersFilterToolbar() {
     </div>
   )
 }
+
