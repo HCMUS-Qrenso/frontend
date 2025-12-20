@@ -12,7 +12,14 @@ import {
 } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { GripVertical, Pencil, Trash2, Eye, EyeOff, Loader2 } from 'lucide-react'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { GripVertical, Pencil, Trash2, Eye, EyeOff, Loader2, MoreVertical } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { DndContext, closestCenter, type DragEndEvent } from '@dnd-kit/core'
 import {
@@ -143,43 +150,53 @@ function SortableCategoryRow({
         {formatDate(category.updated_at)}
       </TableCell>
       <TableCell className="px-6 py-4 text-right">
-        <div className="flex items-center justify-end gap-1">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 rounded-full"
-            onClick={(e) => {
-              e.stopPropagation()
-              onEdit(category.id)
-            }}
-            title="Chỉnh sửa"
-          >
-            <Pencil className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 rounded-full"
-            onClick={(e) => {
-              e.stopPropagation()
-              onToggleActive(category.id)
-            }}
-            title={category.is_active ? 'Ẩn danh mục' : 'Hiện danh mục'}
-          >
-            {category.is_active ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 rounded-full text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-500"
-            onClick={(e) => {
-              e.stopPropagation()
-              onDelete(category.id)
-            }}
-            title="Xóa"
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
+        <div className="flex items-center justify-end">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 rounded-full"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <MoreVertical className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onEdit(category.id)
+                }}
+              >
+                <Pencil className="mr-2 h-4 w-4" />
+                Chỉnh sửa
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onToggleActive(category.id)
+                }}
+              >
+                {category.is_active ? (
+                  <><EyeOff className="mr-2 h-4 w-4" />Ẩn danh mục</>
+                ) : (
+                  <><Eye className="mr-2 h-4 w-4" />Hiện danh mục</>
+                )}
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onDelete(category.id)
+                }}
+                className="text-red-600 focus:text-red-600 dark:text-red-400"
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                Xóa danh mục
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </TableCell>
     </TableRow>
@@ -410,47 +427,53 @@ export function CategoriesTable({ reorderMode, setReorderMode }: CategoriesTable
                 {formatDate(category.updated_at)}
               </TableCell>
               <TableCell className="px-6 py-4 text-right">
-                <div className="flex items-center justify-end gap-1">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 rounded-full"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      handleEdit(category.id)
-                    }}
-                    title="Chỉnh sửa"
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 rounded-full"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      handleToggleActive(category.id)
-                    }}
-                    title={category.is_active ? 'Ẩn danh mục' : 'Hiện danh mục'}
-                  >
-                    {category.is_active ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 rounded-full text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-500"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      handleDelete(category.id)
-                    }}
-                    title="Xóa"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                <div className="flex items-center justify-end">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 rounded-full"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-48">
+                      <DropdownMenuItem
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleEdit(category.id)
+                        }}
+                      >
+                        <Pencil className="mr-2 h-4 w-4" />
+                        Chỉnh sửa
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleToggleActive(category.id)
+                        }}
+                      >
+                        {category.is_active ? (
+                          <><EyeOff className="mr-2 h-4 w-4" />Ẩn danh mục</>
+                        ) : (
+                          <><Eye className="mr-2 h-4 w-4" />Hiện danh mục</>
+                        )}
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleDelete(category.id)
+                        }}
+                        className="text-red-600 focus:text-red-600 dark:text-red-400"
+                      >
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        Xóa danh mục
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               </TableCell>
             </TableRow>

@@ -19,7 +19,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import { Edit2, MapPin, Trash2, Loader2, AlertTriangle, RotateCcw } from 'lucide-react'
+import { Edit2, MapPin, Trash2, Loader2, AlertTriangle, RotateCcw, MoreVertical } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import {
   useTablesQuery,
@@ -317,7 +317,7 @@ export function TablesListTable({ isTrashView = false }: TablesListTableProps) {
                     )}
                   </TableCell>
                   <TableCell className="px-6 py-4">
-                    <div className="flex items-center justify-end gap-2">
+                    <div className="flex items-center justify-end">
                       {isTrashView ? (
                         <Button
                           variant="ghost"
@@ -330,35 +330,30 @@ export function TablesListTable({ isTrashView = false }: TablesListTableProps) {
                           <RotateCcw className="h-4 w-4" />
                         </Button>
                       ) : (
-                        <div className="flex items-center gap-1">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 rounded-full"
-                            onClick={() => handleEdit(table.id)}
-                            title="Chỉnh sửa bàn"
-                          >
-                            <Edit2 className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 rounded-full"
-                            onClick={() => handleViewOnLayout(table)}
-                            title="Xem trên sơ đồ"
-                          >
-                            <MapPin className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 rounded-full text-red-600 hover:text-red-700"
-                            onClick={() => handleDeleteClick(table)}
-                            title="Xóa bàn"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-48">
+                            <DropdownMenuItem onClick={() => handleEdit(table.id)}>
+                              <Edit2 className="mr-2 h-4 w-4" />
+                              Chỉnh sửa
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleViewOnLayout(table)}>
+                              <MapPin className="mr-2 h-4 w-4" />
+                              Xem trên sơ đồ
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => handleDeleteClick(table)}
+                              className="text-red-600 focus:text-red-600 dark:text-red-400"
+                            >
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              Xóa bàn
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       )}
                     </div>
                   </TableCell>

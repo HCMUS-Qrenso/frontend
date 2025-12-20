@@ -12,7 +12,14 @@ import {
 } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Pencil, Trash2, Award, Clock, Loader2 } from 'lucide-react'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { Pencil, Trash2, Award, Clock, Loader2, MoreVertical } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import Image from 'next/image'
 import { useMenuItemsQuery } from '@/hooks/use-menu-items-query'
@@ -271,31 +278,41 @@ export function MenuItemsTable() {
                     </span>
                   </TableCell>
                   <TableCell className="px-2 py-3 text-right md:px-4">
-                    <div className="flex items-center justify-end gap-0.5">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-7 w-7 rounded-full md:h-8 md:w-8"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleEdit(item.id)
-                        }}
-                        title="Chỉnh sửa"
-                      >
-                        <Pencil className="h-3 w-3 md:h-4 md:w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-7 w-7 rounded-full text-red-600 hover:text-red-700 md:h-8 md:w-8 dark:text-red-400 dark:hover:text-red-500"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleDelete(item.id)
-                        }}
-                        title="Xóa"
-                      >
-                        <Trash2 className="h-3 w-3 md:h-4 md:w-4" />
-                      </Button>
+                    <div className="flex items-center justify-end">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 rounded-full md:h-8 md:w-8"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <MoreVertical className="h-3 w-3 md:h-4 md:w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-48">
+                          <DropdownMenuItem
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleEdit(item.id)
+                            }}
+                          >
+                            <Pencil className="mr-2 h-4 w-4" />
+                            Chỉnh sửa
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleDelete(item.id)
+                            }}
+                            className="text-red-600 focus:text-red-600 dark:text-red-400"
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Xóa món ăn
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
                   </TableCell>
                 </TableRow>
