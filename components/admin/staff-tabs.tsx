@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Download, UserPlus, Search, ChevronDown, Users, UserCheck, UserX, UserMinus } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { StatCard } from "@/components/ui/stat-card"
 
 // Mock stats
 const MOCK_STATS = {
@@ -67,53 +68,38 @@ export function StaffTabs() {
     <div className="space-y-6">
       {/* Stat Cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-2xl border border-slate-100 bg-white/80 p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-100 dark:bg-blue-500/10">
-              <Users className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-            </div>
-            <div>
-              <p className="text-sm text-slate-500 dark:text-slate-400">Tổng nhân viên</p>
-              <p className="text-2xl font-bold text-slate-900 dark:text-white">{totalAll}</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="rounded-2xl border border-slate-100 bg-white/80 p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 dark:bg-emerald-500/10">
-              <UserCheck className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
-            </div>
-            <div>
-              <p className="text-sm text-slate-500 dark:text-slate-400">Đang hoạt động</p>
-              <p className="text-2xl font-bold text-slate-900 dark:text-white">{stats.active}</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="rounded-2xl border border-slate-100 bg-white/80 p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-500/10">
-              <UserX className="h-5 w-5 text-slate-600 dark:text-slate-400" />
-            </div>
-            <div>
-              <p className="text-sm text-slate-500 dark:text-slate-400">Không hoạt động</p>
-              <p className="text-2xl font-bold text-slate-900 dark:text-white">{stats.inactive}</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="rounded-2xl border border-slate-100 bg-white/80 p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-100 dark:bg-red-500/10">
-              <UserMinus className="h-5 w-5 text-red-600 dark:text-red-400" />
-            </div>
-            <div>
-              <p className="text-sm text-slate-500 dark:text-slate-400">Đình chỉ</p>
-              <p className="text-2xl font-bold text-slate-900 dark:text-white">{stats.suspended}</p>
-            </div>
-          </div>
-        </div>
+        <StatCard
+          title="Tổng nhân viên"
+          value={totalAll.toString()}
+          subtext="Tất cả nhân viên"
+          icon={Users}
+          iconColor="text-blue-600 dark:text-blue-400"
+          iconBgColor="bg-blue-100 dark:bg-blue-500/10"
+        />
+        <StatCard
+          title="Đang hoạt động"
+          value={stats.active.toString()}
+          subtext="Active"
+          icon={UserCheck}
+          iconColor="text-emerald-600 dark:text-emerald-400"
+          iconBgColor="bg-emerald-100 dark:bg-emerald-500/10"
+        />
+        <StatCard
+          title="Không hoạt động"
+          value={stats.inactive.toString()}
+          subtext="Inactive"
+          icon={UserX}
+          iconColor="text-slate-600 dark:text-slate-400"
+          iconBgColor="bg-slate-100 dark:bg-slate-500/10"
+        />
+        <StatCard
+          title="Đình chỉ"
+          value={stats.suspended.toString()}
+          subtext="Suspended"
+          icon={UserMinus}
+          iconColor="text-red-600 dark:text-red-400"
+          iconBgColor="bg-red-100 dark:bg-red-500/10"
+        />
       </div>
 
       {/* Role Toggle Buttons */}

@@ -7,7 +7,7 @@ import { TablesListTable } from '@/components/admin/tables-list-table'
 import { TableUpsertDrawer } from '@/components/admin/table-upsert-drawer'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { Loader2 } from 'lucide-react'
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
+import { cn } from '@/lib/utils'
 
 function TablesListContent() {
   const searchParams = useSearchParams()
@@ -35,29 +35,37 @@ function TablesListContent() {
       {/* KPI Cards - Overview stats - Only show for active tables */}
       <TablesOverviewStats />
 
-      {/* Tabs */}
-      <Tabs value={currentTab} onValueChange={handleTabChange}>
-        <TabsList className="self-center lg:self-auto">
-          <TabsTrigger value="active">Danh sách bàn</TabsTrigger>
-          <TabsTrigger value="trash">Lịch sử xóa bàn</TabsTrigger>
-        </TabsList>
+      {/* Toggle Buttons - Like Staff Page */}
+      <div className="flex gap-2">
+        <button
+          onClick={() => handleTabChange('active')}
+          className={cn(
+            "rounded-lg px-4 py-2 text-sm font-medium transition-colors",
+            currentTab === "active"
+              ? "bg-emerald-500 text-white dark:bg-emerald-600"
+              : "bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700",
+          )}
+        >
+          Danh sách bàn
+        </button>
+        <button
+          onClick={() => handleTabChange('trash')}
+          className={cn(
+            "rounded-lg px-4 py-2 text-sm font-medium transition-colors",
+            currentTab === "trash"
+              ? "bg-emerald-500 text-white dark:bg-emerald-600"
+              : "bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700",
+          )}
+        >
+          Lịch sử xóa bàn
+        </button>
+      </div>
 
-        <TabsContent value="active" className="mt-6 space-y-6">
-          {/* Filter Toolbar */}
-          <TablesFilterToolbar isTrashView={false} />
+      {/* Filter Toolbar */}
+      <TablesFilterToolbar isTrashView={isTrashView} />
 
-          {/* Tables List Table */}
-          <TablesListTable isTrashView={false} />
-        </TabsContent>
-
-        <TabsContent value="trash" className="mt-6 space-y-6">
-          {/* Filter Toolbar */}
-          <TablesFilterToolbar isTrashView={true} />
-
-          {/* Tables List Table */}
-          <TablesListTable isTrashView={true} />
-        </TabsContent>
-      </Tabs>
+      {/* Tables List Table */}
+      <TablesListTable isTrashView={isTrashView} />
 
       {/* Modal for Create/Edit */}
       <TableUpsertDrawer open={modalOpen} />

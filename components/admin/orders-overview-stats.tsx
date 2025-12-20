@@ -1,47 +1,66 @@
 "use client"
 
-import type React from "react"
-import { cn } from "@/lib/utils"
 import { ClipboardList, Clock, ChefHat, CheckCircle2, CreditCard } from "lucide-react"
-
-interface StatCardProps {
-  title: string
-  value: string
-  subtext: string
-  icon: React.ReactNode
-  className?: string
-}
-
-function StatCard({ title, value, subtext, icon, className }: StatCardProps) {
-  return (
-    <div
-      className={cn(
-        "rounded-2xl border border-slate-100 bg-white/80 p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900/80",
-        className,
-      )}
-    >
-      <div className="flex items-start justify-between">
-        <div>
-          <p className="text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">{title}</p>
-          <p className="mt-2 text-2xl font-semibold tracking-tight text-slate-900 dark:text-white">{value}</p>
-          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{subtext}</p>
-        </div>
-        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400">
-          {icon}
-        </div>
-      </div>
-    </div>
-  )
-}
+import { StatCard } from "../ui/stat-card"
 
 export function OrdersOverviewStats() {
+  const stats = [
+    {
+      icon: ClipboardList,
+      title: "Đơn đang mở",
+      value: "24",
+      subtext: "Tổng đơn active",
+      iconColor: "text-slate-600 dark:text-slate-400",
+      iconBgColor: "bg-slate-50 dark:bg-slate-800",
+    },
+    {
+      icon: Clock,
+      title: "Chờ xác nhận",
+      value: "6",
+      subtext: "New/Pending",
+      iconColor: "text-amber-600 dark:text-amber-400",
+      iconBgColor: "bg-amber-50 dark:bg-amber-500/10",
+    },
+    {
+      icon: ChefHat,
+      title: "Đang chuẩn bị",
+      value: "12",
+      subtext: "In progress",
+      iconColor: "text-blue-600 dark:text-blue-400",
+      iconBgColor: "bg-blue-50 dark:bg-blue-500/10",
+    },
+    {
+      icon: CheckCircle2,
+      title: "Sẵn sàng",
+      value: "6",
+      subtext: "Ready to serve",
+      iconColor: "text-emerald-600 dark:text-emerald-400",
+      iconBgColor: "bg-emerald-50 dark:bg-emerald-500/10",
+    },
+    {
+      icon: CreditCard,
+      title: "Chưa thanh toán",
+      value: "18",
+      subtext: "Unpaid orders",
+      iconColor: "text-rose-600 dark:text-rose-400",
+      iconBgColor: "bg-rose-50 dark:bg-rose-500/10",
+    },
+  ]
+
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-      <StatCard title="Đơn đang mở" value="24" subtext="Tổng đơn active" icon={<ClipboardList className="h-6 w-6" />} />
-      <StatCard title="Chờ xác nhận" value="6" subtext="New/Pending" icon={<Clock className="h-6 w-6" />} />
-      <StatCard title="Đang chuẩn bị" value="12" subtext="In progress" icon={<ChefHat className="h-6 w-6" />} />
-      <StatCard title="Sẵn sàng" value="6" subtext="Ready to serve" icon={<CheckCircle2 className="h-6 w-6" />} />
-      <StatCard title="Chưa thanh toán" value="18" subtext="Unpaid orders" icon={<CreditCard className="h-6 w-6" />} />
+      {stats.map((stat) => (
+        <StatCard
+          key={stat.title}
+          title={stat.title}
+          value={stat.value}
+          subtext={stat.subtext}
+          icon={stat.icon}
+          iconColor={stat.iconColor}
+          iconBgColor={stat.iconBgColor}
+        />
+      ))}
     </div>
   )
 }
+
