@@ -11,7 +11,10 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { ConfirmDeleteDialog } from '@/components/ui/confirm-delete-dialog'
-import { Edit2, MapPin, Trash2, Loader2, RotateCcw, MoreVertical } from 'lucide-react'
+import { LoadingState } from '@/components/ui/loading-state'
+import { ContainerErrorState } from '@/components/ui/loading-state'
+import { EmptyState } from '@/components/ui/empty-state'
+import { Edit2, MapPin, Trash2, RotateCcw, MoreVertical, TableProperties } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import {
   useTablesQuery,
@@ -173,20 +176,15 @@ export function TablesListTable({ isTrashView = false }: TablesListTableProps) {
   }
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
-      </div>
-    )
+    return <LoadingState />
   }
 
   if (error) {
     return (
-      <div className="rounded-2xl border border-red-200 bg-red-50 p-6 dark:border-red-800 dark:bg-red-500/10">
-        <p className="text-sm text-red-600 dark:text-red-400">
-          Có lỗi xảy ra khi tải danh sách bàn. Vui lòng thử lại.
-        </p>
-      </div>
+      <ContainerErrorState
+        title="Có lỗi xảy ra"
+        description="Không thể tải danh sách bàn. Vui lòng thử lại."
+      />
     )
   }
 
@@ -228,10 +226,12 @@ export function TablesListTable({ isTrashView = false }: TablesListTableProps) {
           <TableBody>
             {tables.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="px-6 py-12 text-center">
-                  <p className="text-sm text-slate-500 dark:text-slate-400">
-                    Không có bàn nào được tìm thấy.
-                  </p>
+                <TableCell colSpan={6} className="px-6 py-0">
+                  <EmptyState
+                    icon={TableProperties}
+                    title="Không có bàn nào"
+                    description="Hãy tạo bàn đầu tiên hoặc thử tìm kiếm khác"
+                  />
                 </TableCell>
               </TableRow>
             ) : (

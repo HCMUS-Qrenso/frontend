@@ -19,10 +19,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Pencil, Trash2, Award, Clock, Loader2, MoreVertical } from 'lucide-react'
+import { Pencil, Trash2, Award, Clock, MoreVertical, UtensilsCrossed } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { formatRelativeDate, formatPrice } from '@/lib/utils/format'
 import { StatusBadge, MENU_ITEM_STATUS_CONFIG } from '@/components/ui/status-badge'
+import { ContainerLoadingState, ContainerErrorState } from '@/components/ui/loading-state'
+import { EmptyState } from '@/components/ui/empty-state'
 import Image from 'next/image'
 import { useMenuItemsQuery } from '@/hooks/use-menu-items-query'
 import { useErrorHandler } from '@/hooks/use-error-handler'
@@ -93,22 +95,16 @@ export function MenuItemsTable() {
 
   // Loading state
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center rounded-2xl border border-slate-100 bg-white/80 py-12 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
-        <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
-      </div>
-    )
+    return <ContainerLoadingState />
   }
 
   // Error state
   if (error) {
     return (
-      <div className="flex items-center justify-center rounded-2xl border border-slate-100 bg-white/80 py-12 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
-        <div className="text-center">
-          <p className="text-red-600 dark:text-red-400">Không thể tải danh sách món ăn</p>
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Vui lòng thử lại sau</p>
-        </div>
-      </div>
+      <ContainerErrorState
+        title="Không thể tải danh sách món ăn"
+        description="Vui lòng thử lại sau"
+      />
     )
   }
 
@@ -144,20 +140,12 @@ export function MenuItemsTable() {
           <TableBody>
             {menuItems.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="px-2 py-12 text-center md:px-4">
-                  <div className="flex flex-col items-center justify-center gap-3">
-                    <div className="text-slate-400">
-                      <UtensilsCrossed className="mx-auto h-12 w-12" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-slate-600 dark:text-slate-400">
-                        Chưa có món ăn nào
-                      </p>
-                      <p className="text-sm text-slate-500 dark:text-slate-500">
-                        Bắt đầu bằng cách thêm món đầu tiên
-                      </p>
-                    </div>
-                  </div>
+                <TableCell colSpan={7} className="px-2 py-0 md:px-4">
+                  <EmptyState
+                    icon={UtensilsCrossed}
+                    title="Chưa có món ăn nào"
+                    description="Bắt đầu bằng cách thêm món đầu tiên"
+                  />
                 </TableCell>
               </TableRow>
             ) : (
@@ -325,25 +313,5 @@ export function MenuItemsTable() {
         </div>
       )}
     </div>
-  )
-}
-
-function UtensilsCrossed({ className }: { className?: string }) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-    >
-      <path d="m16 2-2.3 2.3a3 3 0 0 0 0 4.2l1.8 1.8a3 3 0 0 0 4.2 0L22 8" />
-      <path d="M15 15 3.3 3.3a4.2 4.2 0 0 0 0 6l7.3 7.3c.7.7 2 .7 2.8 0L15 15Zm0 0 7 7" />
-      <path d="m2.1 21.8 6.4-6.3" />
-      <path d="m19 5-7 7" />
-    </svg>
   )
 }

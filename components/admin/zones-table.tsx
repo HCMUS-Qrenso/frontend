@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { ConfirmDeleteDialog } from '@/components/ui/confirm-delete-dialog'
 import { StatusBadge, ZONE_ACTIVE_CONFIG } from '@/components/ui/status-badge'
+import { EmptyState } from '@/components/ui/empty-state'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -222,8 +223,11 @@ export function ZonesTable() {
           <TableBody>
             {zones.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="px-6 py-12 text-center text-slate-500">
-                  Chưa có khu vực nào. Hãy tạo khu vực đầu tiên.
+                <TableCell colSpan={5} className="px-6 py-0">
+                  <EmptyState
+                    title="Chưa có khu vực nào"
+                    description="Hãy tạo khu vực đầu tiên"
+                  />
                 </TableCell>
               </TableRow>
             ) : (

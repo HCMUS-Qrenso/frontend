@@ -5,7 +5,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { StatusBadge, USER_STATUS_CONFIG, USER_ROLE_CONFIG } from "@/components/ui/status-badge"
 import { StaffRowActions } from "@/components/admin/staff-row-actions"
-import { CheckCircle2, XCircle, Loader2 } from "lucide-react"
+import { LoadingState } from "@/components/ui/loading-state"
+import { EmptyState } from "@/components/ui/empty-state"
+import { CheckCircle2, XCircle, Users } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface User {
@@ -213,11 +215,7 @@ export function StaffDataTable({
 
   // Loading state
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
-      </div>
-    )
+    return <LoadingState />
   }
 
   return (
@@ -253,15 +251,12 @@ export function StaffDataTable({
           <TableBody>
             {filteredData.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="px-6 py-12 text-center">
-                  <div className="flex flex-col items-center justify-center gap-2">
-                    <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
-                      {role === "waiter" ? "Chưa có nhân viên phục vụ nào" : "Chưa có nhân viên bếp nào"}
-                    </p>
-                    <p className="text-xs text-slate-400 dark:text-slate-500">
-                      Nhấn "Mời nhân viên" để thêm nhân viên mới
-                    </p>
-                  </div>
+                <TableCell colSpan={7} className="px-6 py-0">
+                  <EmptyState
+                    icon={Users}
+                    title={role === "waiter" ? "Chưa có nhân viên phục vụ nào" : "Chưa có nhân viên bếp nào"}
+                    description="Nhấn 'Mời nhân viên' để thêm nhân viên mới"
+                  />
                 </TableCell>
               </TableRow>
             ) : (

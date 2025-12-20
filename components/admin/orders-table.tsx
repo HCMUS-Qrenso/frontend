@@ -19,9 +19,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Eye, MoreVertical, Printer, ChevronRight, AlertCircle, Loader2 } from "lucide-react"
+import { Eye, MoreVertical, Printer, ChevronRight, AlertCircle, ClipboardList } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { StatusBadge, type StatusConfig } from "@/components/ui/status-badge"
+import { ContainerLoadingState } from "@/components/ui/loading-state"
+import { EmptyState } from "@/components/ui/empty-state"
 import { formatDistanceToNow } from "date-fns"
 import { vi } from "date-fns/locale"
 
@@ -202,11 +204,7 @@ export function OrdersTable() {
 
   // Loading state
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center rounded-2xl border border-slate-100 bg-white/80 py-12 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
-        <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
-      </div>
-    )
+    return <ContainerLoadingState />
   }
 
   return (
@@ -245,13 +243,12 @@ export function OrdersTable() {
           <TableBody>
             {orders.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={8} className="px-4 py-12 text-center">
-                  <div className="flex flex-col items-center justify-center gap-3">
-                    <p className="text-sm text-slate-500 dark:text-slate-400">Chưa có đơn nào</p>
-                    <p className="text-xs text-slate-400 dark:text-slate-500">
-                      Thử Reset filter hoặc chọn khoảng thời gian khác
-                    </p>
-                  </div>
+                <TableCell colSpan={8} className="px-4 py-0">
+                  <EmptyState
+                    icon={ClipboardList}
+                    title="Chưa có đơn nào"
+                    description="Thử Reset filter hoặc chọn khoảng thời gian khác"
+                  />
                 </TableCell>
               </TableRow>
             ) : (
