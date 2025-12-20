@@ -84,6 +84,7 @@ function FloorPlanCanvasComponent({
   const [isPanning, setIsPanning] = useState(false)
   const [panStart, setPanStart] = useState({ x: 0, y: 0 })
   const [canvasSize, setCanvasSize] = useState({ width: 800, height: 600 })
+  const [isHovering, setIsHovering] = useState(false)
 
   // Update canvas size when container resizes
   useEffect(() => {
@@ -141,8 +142,12 @@ function FloorPlanCanvasComponent({
 
   // Zoom handler with zoom-to-cursor functionality
   const handleWheel = useCallback(
-    (e: React.WheelEvent) => {
+    (e: WheelEvent) => {
+      // Only handle zoom when hovering over canvas
+      if (!isHovering) return
+      
       e.preventDefault()
+      e.stopPropagation()
 
       const rect = canvasRef.current?.getBoundingClientRect()
       if (!rect) return
@@ -161,8 +166,19 @@ function FloorPlanCanvasComponent({
       setPanOffset({ x: newPanX, y: newPanY })
       onZoomChange(newZoom)
     },
-    [zoom, panOffset, onZoomChange],
+    [zoom, panOffset, onZoomChange, isHovering],
   )
+
+  // Register wheel listener with passive: false to properly prevent page scroll
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+
+    canvas.addEventListener('wheel', handleWheel, { passive: false })
+    return () => {
+      canvas.removeEventListener('wheel', handleWheel)
+    }
+  }, [handleWheel])
 
   // Set up global pan handlers
   useEffect(() => {
@@ -298,7 +314,8 @@ function FloorPlanCanvasComponent({
               }
             }}
             onPointerDown={handlePanStart}
-            onWheel={handleWheel}
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
             style={{
               width: '100%',
               height: '600px',

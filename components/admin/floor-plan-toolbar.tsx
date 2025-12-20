@@ -53,12 +53,12 @@ export function FloorPlanToolbar({
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="gap-2 rounded-full bg-transparent">
-              {selectedArea}
-              <ChevronDown className="h-4 w-4" />
+            <Button variant="outline" className="h-8 gap-1 rounded-lg bg-transparent px-3">
+              <span className="text-sm">Khu vực: {selectedArea}</span>
+              <ChevronDown className="h-3 w-3" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent>
+          <DropdownMenuContent align="start" className="w-48">
             {areas.map((area) => (
               <DropdownMenuItem key={area} onClick={() => onAreaChange(area)}>
                 {area}
