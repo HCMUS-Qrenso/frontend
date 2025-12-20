@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import {
   AlertDialog,
@@ -31,11 +31,23 @@ export function MenuItemDeleteDialog() {
   const deleteMutation = useDeleteMenuItemMutation()
 
   const handleClose = () => {
+    // Just close the dialog
     const params = new URLSearchParams(searchParams.toString())
     params.delete('delete')
-    params.delete('id')
-    router.push(`?${params.toString()}`)
+    router.push(`?${params.toString()}`, { scroll: false })
   }
+
+  // Clean data after closing
+  useEffect(() => {
+    if (!open) {
+      const timer = setTimeout(() => {
+        const params = new URLSearchParams(searchParams.toString())
+        params.delete('id')
+        router.push(`?${params.toString()}`, { scroll: false })
+      }, 200)
+      return () => clearTimeout(timer)
+    }
+  }, [open])
 
   const handleDelete = async () => {
     if (!itemId) return
@@ -50,7 +62,7 @@ export function MenuItemDeleteDialog() {
   }
 
   return (
-    <AlertDialog open={open} onOpenChange={handleClose}>
+    <AlertDialog open={open && !!item} onOpenChange={handleClose}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Xóa món "{item?.name}"?</AlertDialogTitle>

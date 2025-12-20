@@ -11,7 +11,6 @@ import { Loader2 } from 'lucide-react'
 
 function MenuItemsContent() {
   const searchParams = useSearchParams()
-  const modalOpen = searchParams.get('modal') === 'item'
 
   return (
     <div className="space-y-6">
@@ -25,7 +24,7 @@ function MenuItemsContent() {
       <MenuItemsTable />
 
       {/* Modal for Create/Edit */}
-      <MenuItemUpsertModal open={modalOpen} />
+      <MenuItemUpsertModal />
 
       {/* Delete Confirmation Dialog */}
       <MenuItemDeleteDialog />

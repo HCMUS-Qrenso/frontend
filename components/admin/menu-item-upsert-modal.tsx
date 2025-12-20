@@ -37,16 +37,13 @@ import { useUploadFiles } from '@/hooks/use-uploads'
 import { toast } from 'sonner'
 import { ModifierGroupSelector } from './menu-item-modifier-groups-selector'
 
-interface MenuItemUpsertModalProps {
-  open: boolean
-}
-
-export function MenuItemUpsertModal({ open }: MenuItemUpsertModalProps) {
+export function MenuItemUpsertModal() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const mode = searchParams.get('mode') as 'create' | 'edit'
   const itemId = searchParams.get('id')
   const { handleErrorWithStatus } = useErrorHandler()
+  const open = searchParams.get('modal') === 'item'
 
   // Fetch categories for dropdown
   const { data: categoriesData, isLoading: isLoadingCategories } = useCategoriesQuery()
@@ -116,7 +113,7 @@ export function MenuItemUpsertModal({ open }: MenuItemUpsertModalProps) {
         })) || [],
       )
       setSelectedModifierGroupIds(item.modifier_groups?.map((g) => g.id) || [])
-    } else if (mode === 'create') {
+    } else if (mode === 'create' && !isLoadingItem) {
       setOriginalItemData(null)
       setFormData({
         name: '',
@@ -135,7 +132,7 @@ export function MenuItemUpsertModal({ open }: MenuItemUpsertModalProps) {
       setImages([])
       setSelectedModifierGroupIds([])
     }
-  }, [mode, itemData])
+  }, [mode, itemData, isLoadingItem])
 
   const handleClose = () => {
     // Clean up object URLs
@@ -145,30 +142,46 @@ export function MenuItemUpsertModal({ open }: MenuItemUpsertModalProps) {
       }
     })
 
+    // Just close the dialog
     const params = new URLSearchParams(searchParams.toString())
     params.delete('modal')
-    params.delete('mode')
-    params.delete('id')
-    router.push(`?${params.toString()}`)
-    setFormData({
-      name: '',
-      category_id: '',
-      base_price: '',
-      description: '',
-      preparation_time: '',
-      status: 'available',
-      is_chef_recommendation: false,
-      allergen_info: '',
-      fat: '',
-      carbs: '',
-      protein: '',
-      calories: '',
-    })
-    setImages([])
-    setSelectedModifierGroupIds([])
-    setErrors({ name: '', base_price: '' })
-    setOriginalItemData(null) // Reset original data
+    router.push(`?${params.toString()}`, { scroll: false })
   }
+
+  // Clean data here
+  useEffect(() => {
+    if (!open) {
+      const timer = setTimeout(() => {
+        setFormData({
+          name: '',
+          category_id: '',
+          base_price: '',
+          description: '',
+          preparation_time: '',
+          status: 'available',
+          is_chef_recommendation: false,
+          allergen_info: '',
+          fat: '',
+          carbs: '',
+          protein: '',
+          calories: '',
+        })
+        setImages([])
+        setSelectedModifierGroupIds([])
+        setErrors({ name: '', base_price: '' })
+        setOriginalItemData(null)
+
+        const params = new URLSearchParams(searchParams.toString())
+        params.delete('mode')
+        params.delete('id')
+        router.push(`?${params.toString()}`, { scroll: false })
+      }, 200) 
+
+      return () => clearTimeout(timer)
+    }
+  }, [open])
+
+
 
   // Helper function to build payload with only changed fields
   const buildUpdatePayload = () => {
@@ -453,8 +466,8 @@ export function MenuItemUpsertModal({ open }: MenuItemUpsertModalProps) {
   }
 
   return (
-    <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-h-[90vh] sm:max-w-[700px] flex flex-col">
+    <Dialog open={open} onOpenChange={handleClose} >
+      <DialogContent className="max-h-[90vh] sm:max-w-[700px] flex flex-col" onOpenAutoFocus={(e) => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle>{mode === 'create' ? 'Thêm món mới' : 'Chỉnh sửa món'}</DialogTitle>
           <DialogDescription>
@@ -466,18 +479,14 @@ export function MenuItemUpsertModal({ open }: MenuItemUpsertModalProps) {
         <div className="overflow-y-auto px-6 py-4 flex-1 min-h-0">
           <form id="menu-item-upsert-form" onSubmit={handleSubmit} className="space-y-6">
             {/* Loading state for edit mode - wait for both item data AND categories */}
-            {mode === 'edit' && (isLoadingItem || !itemData?.data || itemData.data.id !== itemId) && (
+            {(isLoadingItem || isLoadingCategories) && (
               <div className="flex items-center justify-center py-8">
                 <Loader2 className="h-6 w-6 animate-spin text-emerald-600" />
               </div>
             )}
 
             {/* Show form only when: create mode OR (edit mode with correct data loaded) */}
-            {(mode === 'create' ||
-              (mode === 'edit' &&
-                itemData?.data &&
-                itemData.data.id === itemId &&
-                !isLoadingItem)) && (
+            {!isLoadingItem && !isLoadingCategories && (
               <>
                 {/* Section 1: Basic Info */}
                 <div className="space-y-4">
@@ -504,24 +513,18 @@ export function MenuItemUpsertModal({ open }: MenuItemUpsertModalProps) {
                       <Label htmlFor="category">Danh mục</Label>
                       <Select
                         value={formData.category_id}
-                        onValueChange={(value) => setFormData({ ...formData, category_id: value })}
+                        onValueChange={(value) => {
+                          if (!value) return
+                          setFormData((prev) => ({ ...prev, category_id: value }))
+                        }}
                         disabled={
                           isSubmitting || isLoadingCategories || (mode === 'edit' && isLoadingItem)
                         }
                       >
                         <SelectTrigger id="category">
-                          {formData.category_id ? (
-                            <span className="block truncate">
-                              {categories.find((c) => c.id === formData.category_id)?.name ||
-                                (isLoadingCategories
-                                  ? 'Đang tải...'
-                                  : itemData?.data?.category?.name || 'Không tìm thấy danh mục')}
-                            </span>
-                          ) : (
                             <SelectValue
                               placeholder={isLoadingCategories ? 'Đang tải...' : 'Chọn danh mục'}
                             />
-                          )}
                         </SelectTrigger>
                         <SelectContent>
                           {categories.map((category) => (
