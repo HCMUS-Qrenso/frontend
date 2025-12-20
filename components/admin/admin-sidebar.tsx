@@ -21,6 +21,9 @@ import {
   LogOut,
   Table,
   LayoutGrid,
+  FolderOpen,
+  Upload,
+  MapPin,
 } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
@@ -38,7 +41,18 @@ import { getInitials, getRoleLabel } from './admin-utils'
 const menuItems = [
   { icon: LayoutDashboard, label: 'Tổng quan', href: '/admin/dashboard' },
   { icon: ClipboardList, label: 'Đơn hàng', href: '/admin/orders' },
-  { icon: UtensilsCrossed, label: 'Thực đơn', href: '/admin/menu' },
+  {
+    icon: UtensilsCrossed,
+    label: 'Thực đơn',
+    href: '/admin/menu',
+    subItems: [
+      { icon: FolderOpen, label: 'Danh mục', href: '/admin/menu/categories' },
+      { icon: UtensilsCrossed, label: 'Món ăn', href: '/admin/menu/items' },
+      { icon: Settings, label: 'Tuỳ chọn', href: '/admin/menu/modifiers' },
+      { icon: Upload, label: 'Import/Export', href: '/admin/menu/import-export' },
+      { icon: LayoutGrid, label: 'Templates', href: '/admin/menu/templates' },
+    ],
+  },
   {
     icon: QrCode,
     label: 'Bàn & QR',
@@ -47,6 +61,7 @@ const menuItems = [
       { icon: Table, label: 'Danh sách bàn', href: '/admin/tables/list' },
       { icon: LayoutGrid, label: 'Sơ đồ', href: '/admin/tables/layout' },
       { icon: QrCode, label: 'Quản lý QR', href: '/admin/tables/qr' },
+      { icon: MapPin, label: 'Khu vực', href: '/admin/tables/zones' },
     ],
   },
   { icon: Users, label: 'Nhân viên', href: '/admin/staff' },
@@ -85,11 +100,8 @@ export function AdminSidebar({
 
   // Use controlled state if provided, otherwise use internal state
   const logoutDialogOpen =
-    controlledLogoutDialogOpen !== undefined
-      ? controlledLogoutDialogOpen
-      : internalLogoutDialogOpen
-  const setLogoutDialogOpen =
-    onLogoutDialogOpenChange || setInternalLogoutDialogOpen
+    controlledLogoutDialogOpen !== undefined ? controlledLogoutDialogOpen : internalLogoutDialogOpen
+  const setLogoutDialogOpen = onLogoutDialogOpenChange || setInternalLogoutDialogOpen
 
   // Initialize openSubmenus based on current pathname to avoid jank
   const initialOpenSubmenus = useMemo(() => {
@@ -168,17 +180,16 @@ export function AdminSidebar({
         className={cn(
           'fixed top-0 left-0 z-50 h-full w-64 border-r border-slate-200 bg-white transition-transform duration-300 lg:translate-x-0 dark:border-slate-800 dark:bg-slate-900',
           sidebarOpen ? 'translate-x-0' : '-translate-x-full',
-          isModalOpen && 'lg:hidden',
         )}
       >
         <div className="flex h-full flex-col">
           {/* Logo */}
           <div className="flex items-center gap-3 border-b border-slate-200 px-6 py-5 dark:border-slate-800">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl overflow-hidden">
+            <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl">
               <img src="/logo.png" alt="Logo" className="h-full w-full object-contain" />
             </div>
             <div>
-              <h1 className="font-semibold text-slate-900 dark:text-white">Smart Restaurant</h1>
+              <h1 className="font-semibold text-slate-900 dark:text-white">Qrenso</h1>
               <p className="text-xs text-slate-500 dark:text-slate-400">Bảng điều khiển quản trị</p>
             </div>
             <Button
@@ -339,4 +350,3 @@ export function AdminSidebar({
     </>
   )
 }
-

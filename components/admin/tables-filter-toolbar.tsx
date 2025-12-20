@@ -9,8 +9,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Search, Plus, LayoutGrid, QrCode, ChevronDown } from 'lucide-react'
+import { Search, Plus, LayoutGrid, QrCode, ChevronDown, ArrowUpDown } from 'lucide-react'
 import Link from 'next/link'
+import { AdminFilterToolbarWrapper } from './admin-filter-toolbar-wrapper'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useZonesSimpleQuery } from '@/hooks/use-zones-query'
 import type { SimpleZone } from '@/types/zones'
@@ -23,9 +24,8 @@ export function TablesFilterToolbar({ isTrashView = false }: TablesFilterToolbar
   const router = useRouter()
   const searchParams = useSearchParams()
   const { data: zonesData } = useZonesSimpleQuery()
-  const zones: SimpleZone[] = Array.isArray(zonesData?.data)
-    ? (zonesData?.data as SimpleZone[])
-    : (zonesData?.data as { zones?: SimpleZone[] } | undefined)?.zones || []
+  const zones: SimpleZone[] =
+    zonesData?.zones ?? ((zonesData as { zones?: SimpleZone[] } | undefined)?.zones || [])
 
   // Map backend status to UI labels
   const statusMap: Record<string, string> = {
@@ -39,6 +39,22 @@ export function TablesFilterToolbar({ isTrashView = false }: TablesFilterToolbar
   const searchQuery = searchParams.get('search') || ''
   const selectedZoneId = searchParams.get('zone_id') || 'Tất cả'
   const selectedStatusKey = searchParams.get('status') || ''
+  const sortBy =
+    (searchParams.get('sort_by') as 'tableNumber' | 'status' | 'createdAt' | 'updatedAt') ||
+    'tableNumber'
+  const sortOrder = (searchParams.get('sort_order') as 'asc' | 'desc') || 'asc'
+
+  const sortByLabels: Record<string, string> = {
+    tableNumber: 'Số bàn',
+    status: 'Trạng thái',
+    createdAt: 'Ngày tạo',
+    updatedAt: 'Ngày cập nhật',
+  }
+
+  const sortOrderLabels: Record<string, string> = {
+    asc: 'Tăng dần',
+    desc: 'Giảm dần',
+  }
 
   // Map backend status key to frontend label for display
   const selectedStatusLabel = selectedStatusKey
@@ -85,26 +101,26 @@ export function TablesFilterToolbar({ isTrashView = false }: TablesFilterToolbar
   }
 
   return (
-    <div className="flex flex-col gap-3 rounded-2xl border border-slate-100 bg-white/80 p-4 shadow-sm md:flex-row md:items-center md:justify-between dark:border-slate-800 dark:bg-slate-900/80">
+    <AdminFilterToolbarWrapper>
       {/* Left - Filters */}
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+      <div className="flex flex-col justify-center gap-2 sm:flex-row sm:flex-wrap sm:items-center md:justify-start">
         {/* Search */}
         <div className="relative">
-          <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400" />
+          <Search className="absolute top-1/2 left-3 h-3 w-3 -translate-y-1/2 text-slate-400" />
           <Input
             placeholder="Tìm theo số bàn, tên khu vực..."
             value={localSearchQuery}
             onChange={(e) => setLocalSearchQuery(e.target.value)}
-            className="h-10 w-full rounded-full border-slate-200 bg-slate-50 pr-4 pl-9 text-sm focus:bg-white sm:w-64 dark:border-slate-700 dark:bg-slate-800 dark:focus:bg-slate-900"
+            className="h-8 w-full rounded-lg border-slate-200 bg-slate-50 pr-4 pl-9 text-sm focus:bg-white sm:w-64 dark:border-slate-700 dark:bg-slate-800 dark:focus:bg-slate-900"
           />
         </div>
 
         {/* Zone Filter */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="h-10 gap-2 rounded-full bg-transparent">
+            <Button variant="outline" className="h-8 gap-1 rounded-lg bg-transparent px-3">
               <span className="text-sm">Khu vực: {selectedZoneName}</span>
-              <ChevronDown className="h-4 w-4" />
+              <ChevronDown className="h-3 w-3" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-48">
@@ -122,9 +138,9 @@ export function TablesFilterToolbar({ isTrashView = false }: TablesFilterToolbar
         {/* Status Filter */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="h-10 gap-2 rounded-full bg-transparent">
+            <Button variant="outline" className="h-8 gap-1 rounded-lg bg-transparent px-3">
               <span className="text-sm">Trạng thái: {selectedStatusLabel}</span>
-              <ChevronDown className="h-4 w-4" />
+              <ChevronDown className="h-3 w-3" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-48">
@@ -138,42 +154,85 @@ export function TablesFilterToolbar({ isTrashView = false }: TablesFilterToolbar
             ))}
           </DropdownMenuContent>
         </DropdownMenu>
+
+        {/* Sort By */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="h-8 gap-1 rounded-lg bg-transparent px-3">
+              <ArrowUpDown className="h-3 w-3" />
+              <span className="text-sm">Sắp xếp: {sortByLabels[sortBy] ?? 'Số bàn'}</span>
+              <ChevronDown className="h-3 w-3" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-56">
+            <DropdownMenuItem onClick={() => updateFilter('sort_by', 'tableNumber')}>
+              Số bàn
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => updateFilter('sort_by', 'status')}>
+              Trạng thái
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => updateFilter('sort_by', 'createdAt')}>
+              Ngày tạo
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => updateFilter('sort_by', 'updatedAt')}>
+              Ngày cập nhật
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        {/* Sort Order */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="h-8 gap-1 rounded-lg bg-transparent px-3">
+              <span className="text-sm">{sortOrderLabels[sortOrder] ?? 'Tăng'}</span>
+              <ChevronDown className="h-3 w-3" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-40">
+            <DropdownMenuItem onClick={() => updateFilter('sort_order', 'asc')}>
+              Tăng dần
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => updateFilter('sort_order', 'desc')}>
+              Giảm dần
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       {/* Right - Actions */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center justify-center gap-2 md:justify-start">
         {!isTrashView && (
           <>
             <Link href="/admin/tables/layout">
               <Button
                 variant="outline"
                 size="icon"
-                className="h-10 w-10 rounded-full bg-transparent"
+                className="h-8 w-8 rounded-lg bg-transparent"
                 title="Xem sơ đồ"
               >
-                <LayoutGrid className="h-4 w-4" />
+                <LayoutGrid className="h-3 w-3" />
               </Button>
             </Link>
             <Link href="/admin/tables/qr">
               <Button
                 variant="outline"
                 size="icon"
-                className="h-10 w-10 rounded-full bg-transparent"
+                className="h-8 w-8 rounded-lg bg-transparent"
                 title="Quản lý QR"
               >
-                <QrCode className="h-4 w-4" />
+                <QrCode className="h-3 w-3" />
               </Button>
             </Link>
             <Button
               onClick={handleAddTable}
-              className="h-10 gap-2 rounded-full bg-emerald-600 px-4 hover:bg-emerald-700"
+              className="h-8 gap-1 rounded-lg bg-emerald-600 px-3 hover:bg-emerald-700"
             >
-              <Plus className="h-4 w-4" />
-              <span className="hidden sm:inline">Thêm bàn</span>
+              <Plus className="h-3 w-3" />
+              <span className="hidden text-sm md:inline">Thêm bàn</span>
             </Button>
           </>
         )}
       </div>
-    </div>
+    </AdminFilterToolbarWrapper>
   )
 }

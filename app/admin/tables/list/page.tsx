@@ -34,9 +34,10 @@ function TablesListContent() {
     <div className="space-y-6">
       {/* KPI Cards - Overview stats - Only show for active tables */}
       <TablesOverviewStats />
+
       {/* Tabs */}
       <Tabs value={currentTab} onValueChange={handleTabChange}>
-        <TabsList>
+        <TabsList className="self-center lg:self-auto">
           <TabsTrigger value="active">Danh sách bàn</TabsTrigger>
           <TabsTrigger value="trash">Lịch sử xóa bàn</TabsTrigger>
         </TabsList>

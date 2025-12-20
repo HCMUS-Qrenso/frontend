@@ -6,4 +6,3 @@
 export function formatRotation(rotation: number): number {
   return Math.round(rotation * 100) / 100
 }
-

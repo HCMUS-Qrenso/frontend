@@ -2,6 +2,10 @@
 export type TableStatus = 'available' | 'occupied' | 'waiting_for_payment' | 'maintenance'
 export type TableShape = 'circle' | 'rectangle' | 'oval'
 
+// Table sorting types
+export type TableSortBy = 'tableNumber' | 'status' | 'createdAt' | 'updatedAt'
+export type TableSortOrder = 'asc' | 'desc'
+
 // Position interface
 export interface TablePosition {
   x: number
@@ -76,6 +80,12 @@ export interface TableStatsResponse {
   data: TableStats
 }
 
+// QR Stats Response
+export interface QrStatsResponse {
+  success: boolean
+  data: QrStats
+}
+
 // Single Table Response
 export interface TableResponse {
   success: boolean
@@ -120,6 +130,8 @@ export interface TableQueryParams {
   floor?: string
   status?: TableStatus
   is_active?: boolean
+  sort_by?: TableSortBy
+  sort_order?: TableSortOrder
 }
 
 // QR Code Generation Response
@@ -443,4 +455,11 @@ export interface TableQR {
   updatedAt: string
 
   seats: number
+}
+
+export interface QrStats {
+  total_active_tables: number
+  tables_with_qr: number
+  tables_without_qr: number
+  latest_qr_update: string | null
 }

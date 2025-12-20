@@ -14,7 +14,7 @@ export function AuthContainer({ children }: AuthContainerProps) {
           {/* Logo & Brand */}
           <div>
             <div className="mb-8 flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm overflow-hidden">
+              <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl bg-white/20 backdrop-blur-sm">
                 <img src="/logo.png" alt="Logo" className="h-full w-full object-contain" />
               </div>
               <div>

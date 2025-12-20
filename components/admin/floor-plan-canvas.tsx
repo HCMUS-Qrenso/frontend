@@ -5,6 +5,7 @@ import { formatRotation } from '@/lib/utils/table-utils'
 import { useRef, useState, useEffect, useMemo, useCallback, memo } from 'react'
 import { RotateCw } from 'lucide-react'
 import type { TableItem } from '@/app/admin/tables/layout/page'
+import type React from 'react'
 import {
   DndContext,
   type DragEndEvent,
@@ -22,6 +23,7 @@ interface FloorPlanCanvasProps {
   onTableUpdate: (id: string, updates: Partial<TableItem>) => void
   onTableRemove: (id: string) => void
   zoom: number
+  onZoomChange: (zoom: number) => void
   showGrid: boolean
   selectedArea: string
 }
@@ -66,17 +68,36 @@ function calculateRotationFromMouse(
   return ((cssAngle % 360) + 360) % 360
 }
 
-export function FloorPlanCanvas({
+function FloorPlanCanvasComponent({
   tables,
   selectedTableId,
   onTableSelect,
   onTableUpdate,
   onTableRemove,
   zoom,
+  onZoomChange,
   showGrid,
   selectedArea,
 }: FloorPlanCanvasProps) {
   const canvasRef = useRef<HTMLDivElement>(null)
+  const [panOffset, setPanOffset] = useState({ x: 0, y: 0 })
+  const [isPanning, setIsPanning] = useState(false)
+  const [panStart, setPanStart] = useState({ x: 0, y: 0 })
+  const [canvasSize, setCanvasSize] = useState({ width: 800, height: 600 })
+
+  // Update canvas size when container resizes
+  useEffect(() => {
+    const updateCanvasSize = () => {
+      if (canvasRef.current) {
+        const rect = canvasRef.current.getBoundingClientRect()
+        setCanvasSize({ width: rect.width, height: rect.height })
+      }
+    }
+
+    updateCanvasSize()
+    window.addEventListener('resize', updateCanvasSize)
+    return () => window.removeEventListener('resize', updateCanvasSize)
+  }, [])
 
   // Setup sensors with activation constraint to avoid conflict with click
   const sensors = useSensors(
@@ -89,6 +110,75 @@ export function FloorPlanCanvas({
     }),
   )
 
+  // Pan handlers - only pan when clicking on empty canvas
+  const handlePanStart = useCallback(
+    (e: React.PointerEvent) => {
+      // Only pan if clicking directly on the canvas background, not on draggable elements
+      if (e.target === e.currentTarget && (e.button === 1 || e.button === 0)) {
+        e.preventDefault()
+        setIsPanning(true)
+        setPanStart({ x: e.clientX - panOffset.x, y: e.clientY - panOffset.y })
+      }
+    },
+    [panOffset],
+  )
+
+  const handlePanMove = useCallback(
+    (e: PointerEvent) => {
+      if (!isPanning) return
+      e.preventDefault()
+      setPanOffset({
+        x: e.clientX - panStart.x,
+        y: e.clientY - panStart.y,
+      })
+    },
+    [isPanning, panStart],
+  )
+
+  const handlePanEnd = useCallback(() => {
+    setIsPanning(false)
+  }, [])
+
+  // Zoom handler with zoom-to-cursor functionality
+  const handleWheel = useCallback(
+    (e: React.WheelEvent) => {
+      e.preventDefault()
+
+      const rect = canvasRef.current?.getBoundingClientRect()
+      if (!rect) return
+
+      const mouseX = e.clientX - rect.left
+      const mouseY = e.clientY - rect.top
+
+      const delta = e.deltaY > 0 ? -0.1 : 0.1
+      const newZoom = Math.max(0.1, Math.min(3, zoom + delta))
+
+      // Zoom towards mouse cursor
+      const zoomFactor = newZoom / zoom
+      const newPanX = mouseX - (mouseX - panOffset.x) * zoomFactor
+      const newPanY = mouseY - (mouseY - panOffset.y) * zoomFactor
+
+      setPanOffset({ x: newPanX, y: newPanY })
+      onZoomChange(newZoom)
+    },
+    [zoom, panOffset, onZoomChange],
+  )
+
+  // Set up global pan handlers
+  useEffect(() => {
+    if (!isPanning) return
+
+    window.addEventListener('pointermove', handlePanMove)
+    window.addEventListener('pointerup', handlePanEnd)
+    window.addEventListener('pointercancel', handlePanEnd)
+
+    return () => {
+      window.removeEventListener('pointermove', handlePanMove)
+      window.removeEventListener('pointerup', handlePanEnd)
+      window.removeEventListener('pointercancel', handlePanEnd)
+    }
+  }, [isPanning, handlePanMove, handlePanEnd])
+
   // Memoize filtered tables to avoid recalculating on every render
   const filteredTables = useMemo(
     () =>
@@ -97,16 +187,6 @@ export function FloorPlanCanvas({
       ),
     [tables, selectedArea],
   )
-
-  // Memoize canvas height calculation
-  const canvasHeight = useMemo(() => {
-    const contentBottom =
-      filteredTables.length > 0
-        ? Math.max(...filteredTables.map((t) => t.position.y + t.size.height)) + 200
-        : 600
-    // Multiply by zoom so when zoomed in, the grid extends further down to cover scaled tables
-    return Math.max(600, contentBottom * zoom)
-  }, [filteredTables, zoom])
 
   // Memoize rotate update handler
   const handleRotateUpdate = useCallback(
@@ -158,33 +238,14 @@ export function FloorPlanCanvas({
         const snappedX = Math.round(newX / GRID_SIZE) * GRID_SIZE
         const snappedY = Math.round(newY / GRID_SIZE) * GRID_SIZE
 
-        // Restrict bounds
-        const canvas = canvasRef.current
-        if (canvas && table) {
-          const canvasRect = canvas.getBoundingClientRect()
-          const maxX = canvasRect.width / zoom - table.size.width
-          const maxY = canvasRect.height / zoom - table.size.height
-
-          const finalX = Math.max(0, Math.min(snappedX, maxX))
-          const finalY = Math.max(0, Math.min(snappedY, maxY))
-
-          onTableUpdate(table.id, {
-            position: {
-              x: finalX,
-              y: finalY,
-              rotation: table.position.rotation ?? table.rotation ?? 0,
-            },
-          })
-        } else {
-          // Fallback if canvas ref is not available
-          onTableUpdate(table.id, {
-            position: {
-              x: Math.max(0, snappedX),
-              y: Math.max(0, snappedY),
-              rotation: table.position.rotation ?? table.rotation ?? 0,
-            },
-          })
-        }
+        // Allow unlimited placement - no bounds restrictions
+        onTableUpdate(table.id, {
+          position: {
+            x: snappedX,
+            y: snappedY,
+            rotation: table.position.rotation ?? table.rotation ?? 0,
+          },
+        })
       }
     },
     [tables, zoom, onTableUpdate],
@@ -193,31 +254,31 @@ export function FloorPlanCanvas({
   return (
     <div className="rounded-2xl border border-slate-100 bg-white/80 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
       {/* Header */}
-      <div className="border-b border-slate-100 px-6 py-4 dark:border-slate-800">
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="font-semibold text-slate-900 dark:text-white">{selectedArea}</h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400">30m x 20m</p>
-          </div>
+      <div className="flex flex-col items-center justify-between gap-4 border-b border-slate-100 px-6 py-4 md:flex-row dark:border-slate-800">
+        <div className="text-center md:text-left">
+          <h3 className="font-semibold text-slate-900 dark:text-white">{selectedArea}</h3>
+          <p className="text-xs text-slate-500 dark:text-slate-400">
+            Canvas không giới hạn - Kéo thả để di chuyển
+          </p>
+        </div>
 
-          {/* Legend */}
-          <div className="flex items-center gap-4 text-xs">
-            <div className="flex items-center gap-1.5">
-              <div className="h-3 w-3 rounded border-2 border-emerald-500" />
-              <span className="text-slate-600 dark:text-slate-400">Có sẵn</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <div className="h-3 w-3 rounded border-2 border-amber-500" />
-              <span className="text-slate-600 dark:text-slate-400">Đang sử dụng</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <div className="h-3 w-3 rounded border-2 border-violet-500" />
-              <span className="text-slate-600 dark:text-slate-400">Chờ thanh toán</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <div className="h-3 w-3 rounded border-2 border-slate-400" />
-              <span className="text-slate-600 dark:text-slate-400">Vô hiệu</span>
-            </div>
+        {/* Legend */}
+        <div className="flex items-center gap-4 text-xs">
+          <div className="flex items-center gap-1.5">
+            <div className="h-3 w-3 rounded border-2 border-emerald-500" />
+            <span className="text-slate-600 dark:text-slate-400">Có sẵn</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="h-3 w-3 rounded border-2 border-amber-500" />
+            <span className="text-slate-600 dark:text-slate-400">Đang sử dụng</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="h-3 w-3 rounded border-2 border-violet-500" />
+            <span className="text-slate-600 dark:text-slate-400">Chờ thanh toán</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="h-3 w-3 rounded border-2 border-slate-400" />
+            <span className="text-slate-600 dark:text-slate-400">Vô hiệu</span>
           </div>
         </div>
       </div>
@@ -228,32 +289,34 @@ export function FloorPlanCanvas({
           <div
             ref={canvasRef}
             className={cn(
-              'relative w-full overflow-auto rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800/50',
+              'relative overflow-hidden rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800/50',
+              isPanning ? 'cursor-grabbing' : 'cursor-grab',
             )}
             onClick={(e) => {
               if (e.target === e.currentTarget) {
                 onTableSelect(null)
               }
             }}
-            style={{ height: canvasHeight }}
+            onPointerDown={handlePanStart}
+            onWheel={handleWheel}
+            style={{
+              width: '100%',
+              height: '600px',
+              cursor: isPanning ? 'grabbing' : 'grab',
+              // Grid background on the canvas itself, adjusted for pan and zoom
+              backgroundImage: showGrid
+                ? 'linear-gradient(to right, rgb(226 232 240 / 0.3) 1px, transparent 1px), linear-gradient(to bottom, rgb(226 232 240 / 0.3) 1px, transparent 1px)'
+                : undefined,
+              backgroundSize: showGrid ? `${GRID_SIZE * zoom}px ${GRID_SIZE * zoom}px` : undefined,
+              backgroundPosition: showGrid ? `${panOffset.x}px ${panOffset.y}px` : undefined,
+            }}
           >
-            {/* Grid background fills entire visible canvas and reacts to zoom */}
-            {showGrid && (
-              <div
-                className="pointer-events-none absolute inset-0"
-                style={{
-                  backgroundImage:
-                    'linear-gradient(to right, rgb(226 232 240 / 0.3) 1px, transparent 1px), linear-gradient(to bottom, rgb(226 232 240 / 0.3) 1px, transparent 1px)',
-                  // Scale spacing with zoom so grid density feels consistent
-                  backgroundSize: `${GRID_SIZE * zoom}px ${GRID_SIZE * zoom}px`,
-                }}
-              />
-            )}
+            {/* Content layer - transformed for pan and zoom */}
             <div
-              className="relative h-full w-full"
+              className="relative"
               style={{
-                transform: `scale(${zoom})`,
-                transformOrigin: 'top left',
+                transform: `translate(${panOffset.x}px, ${panOffset.y}px) scale(${zoom})`,
+                transformOrigin: '0 0',
                 // Disable transition during drag to prevent lag
                 transition: 'none',
               }}
@@ -503,3 +566,46 @@ const DraggableTable = memo(function DraggableTable({
     </div>
   )
 })
+
+// Custom comparison function for React.memo
+const areEqual = (prevProps: FloorPlanCanvasProps, nextProps: FloorPlanCanvasProps): boolean => {
+  // Compare primitive props
+  if (
+    prevProps.selectedTableId !== nextProps.selectedTableId ||
+    prevProps.zoom !== nextProps.zoom ||
+    prevProps.showGrid !== nextProps.showGrid ||
+    prevProps.selectedArea !== nextProps.selectedArea
+  ) {
+    return false
+  }
+
+  // Compare tables array length
+  if (prevProps.tables.length !== nextProps.tables.length) {
+    return false
+  }
+
+  // Deep compare tables - only check relevant properties that affect rendering
+  for (let i = 0; i < prevProps.tables.length; i++) {
+    const prevTable = prevProps.tables[i]
+    const nextTable = nextProps.tables[i]
+
+    if (
+      prevTable.id !== nextTable.id ||
+      prevTable.position.x !== nextTable.position.x ||
+      prevTable.position.y !== nextTable.position.y ||
+      prevTable.position.rotation !== nextTable.position.rotation ||
+      prevTable.status !== nextTable.status ||
+      prevTable.name !== nextTable.name ||
+      prevTable.seats !== nextTable.seats ||
+      prevTable.type !== nextTable.type ||
+      prevTable.area !== nextTable.area
+    ) {
+      return false
+    }
+  }
+
+  // Callbacks are compared by reference - they should be memoized in parent
+  return true
+}
+
+export const FloorPlanCanvas = memo(FloorPlanCanvasComponent, areEqual)

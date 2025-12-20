@@ -100,9 +100,7 @@ export function TableUpsertDrawer({ open }: TableUpsertDrawerProps) {
     mode === 'edit' && open,
   )
   const { data: zonesData } = useZonesSimpleQuery()
-  const zones: SimpleZone[] = Array.isArray(zonesData?.data)
-    ? (zonesData?.data as SimpleZone[])
-    : (zonesData?.data as { zones?: SimpleZone[] } | undefined)?.zones || []
+  const zones: SimpleZone[] = zonesData?.zones || []
 
   useEffect(() => {
     if (mode === 'edit' && tableData?.data && open) {

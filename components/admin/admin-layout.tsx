@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Menu, Store, ChevronDown, User, Settings, LogOut } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, usePathname } from 'next/navigation'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { useAuth } from '@/hooks/use-auth'
 import { useUserProfileQuery } from '@/hooks/use-users-query'
@@ -32,6 +32,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [logoutDialogOpen, setLogoutDialogOpen] = useState(false)
   const searchParams = useSearchParams()
+  const pathname = usePathname()
   const { logout, logoutPending, isAuthenticated, isHydrated } = useAuth()
   const userProfileQuery = useUserProfileQuery(isAuthenticated && isHydrated)
   const userProfile = userProfileQuery.data
@@ -122,6 +123,101 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   // Check if any modal is open
   const isModalOpen = searchParams.get('modal') !== null || searchParams.get('delete') !== null
 
+  // Helper: resolve page header (title + description) based on current pathname.
+  // Để thêm header cho trang mới /admin/xxx, chỉ cần thêm case mới vào hàm này.
+  const getPageHeader = (path: string): { title: string; description: string } => {
+    // Exact matches for menu pages
+    if (path === '/admin/menu/categories') {
+      return {
+        title: 'Thực đơn / Danh mục',
+        description: 'Quản lý danh mục để nhóm món ăn; thay đổi sẽ ảnh hưởng filter ở trang Món ăn',
+      }
+    }
+
+    if (path === '/admin/menu/items') {
+      return {
+        title: 'Thực đơn / Món ăn',
+        description: 'Quản lý món, trạng thái bán, ảnh và tuỳ chọn (modifiers)',
+      }
+    }
+
+    if (path === '/admin/menu/modifiers') {
+      return {
+        title: 'Thực đơn / Nhóm tuỳ chọn (Modifiers)',
+        description: 'Quản lý các nhóm tuỳ chọn (Size, Topping...) và các option trong từng nhóm',
+      }
+    }
+
+    if (path === '/admin/menu/import-export') {
+      return {
+        title: 'Import / Export Thực đơn',
+        description: 'Nhập dữ liệu từ CSV/Excel, xuất backup dữ liệu menu',
+      }
+    }
+
+    if (path === '/admin/menu/templates') {
+      return {
+        title: 'Menu Templates',
+        description: 'Tạo menu đẹp với các template có sẵn, xuất PDF/PNG để in ấn',
+      }
+    }
+
+    // Dashboard
+    if (path === '/admin/dashboard' || path === '/admin') {
+      return {
+        title: 'Bảng điều khiển',
+        description: 'Tổng quan hôm nay',
+      }
+    }
+
+    // Tables area (list, layout, qr, zones under tables)
+    if (path.startsWith('/admin/tables')) {
+      // More specific sub-routes
+      if (path.startsWith('/admin/tables/list')) {
+        return {
+          title: 'Bàn / Danh sách',
+          description: 'Xem và quản lý danh sách bàn theo dạng bảng, thuận tiện cho thao tác nhanh',
+        }
+      }
+
+      if (path.startsWith('/admin/tables/layout')) {
+        return {
+          title: 'Bàn / Sơ đồ',
+          description:
+            'Quản lý sơ đồ bàn theo mặt bằng nhà hàng, kéo thả và sắp xếp vị trí trực quan',
+        }
+      }
+
+      if (path.startsWith('/admin/tables/qr')) {
+        return {
+          title: 'Bàn / QR Code',
+          description: 'Tạo và tải QR Code cho từng bàn để khách gọi món trực tiếp',
+        }
+      }
+
+      if (path.startsWith('/admin/tables/zones')) {
+        return {
+          title: 'Khu vực / Danh sách',
+          description: 'Quản lý các khu vực (Zone) trong nhà hàng để nhóm và phân chia bàn',
+        }
+      }
+
+      // Generic tables fallback
+      return {
+        title: 'Bàn / Quản lý',
+        description: 'Quản lý bàn, sơ đồ và QR Code cho nhà hàng của bạn',
+      }
+    }
+
+    // Fallback: dashboard-style default
+    return {
+      title: 'Bảng điều khiển',
+      description: 'Tổng quan hôm nay',
+    }
+  }
+
+  const currentPageHeader = useMemo(() => getPageHeader(pathname), [pathname])
+
   // Wrapper to ensure logout returns Promise<void>
   const handleLogout = async () => {
     await logout()
@@ -157,9 +253,11 @@ export function AdminLayout({ children }: AdminLayoutProps) {
               </Button>
               <div>
                 <h2 className="text-xl font-semibold text-slate-900 lg:text-2xl dark:text-white">
-                  Bảng điều khiển
+                  {currentPageHeader.title}
                 </h2>
-                <p className="text-sm text-slate-500 dark:text-slate-400">Tổng quan hôm nay</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">
+                  {currentPageHeader.description}
+                </p>
               </div>
             </div>
 

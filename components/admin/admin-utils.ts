@@ -18,6 +18,3 @@ export const getRoleLabel = (role: string): string => {
   }
   return roleMap[role.toLowerCase()] || role
 }
-
-
-

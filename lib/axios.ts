@@ -10,6 +10,11 @@ const baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
 let accessToken: string | null = null
 let tenantId: string | null = null
 let refreshPromise: Promise<string | null> | null = null
+let failedRequestsQueue: Array<{
+  resolve: (value?: any) => void
+  reject: (error?: any) => void
+  config: InternalAxiosRequestConfig & { _retry?: boolean }
+}> = []
 
 export const setAccessToken = (token: string | null) => {
   accessToken = token
@@ -58,18 +63,55 @@ apiClient.interceptors.request.use((config: TenantAwareRequestConfig) => {
   return config
 })
 
+const processFailedRequestsQueue = (error: any, token: string | null = null) => {
+  failedRequestsQueue.forEach(({ resolve, reject, config }) => {
+    if (error || !token) {
+      reject(error)
+    } else {
+      // Update token in headers and retry
+      if (!config.headers) {
+        config.headers = {} as AxiosRequestHeaders
+      }
+      ;(config.headers as AxiosRequestHeaders).Authorization = `Bearer ${token}`
+      resolve(apiClient(config))
+    }
+  })
+
+  failedRequestsQueue = []
+}
+
 const refreshAccessToken = async (): Promise<string | null> => {
-  if (refreshPromise) return refreshPromise
+  if (refreshPromise) {
+    // Nếu đang refresh, thêm vào queue và đợi
+    return new Promise((resolve, reject) => {
+      failedRequestsQueue.push({ resolve, reject, config: {} as any })
+    })
+  }
 
   refreshPromise = rawClient
     .post('/auth/refresh')
     .then((res) => {
       const newToken = res.data?.accessToken as string | null
       setAccessToken(newToken ?? null)
+      processFailedRequestsQueue(null, newToken)
       return newToken ?? null
     })
     .catch((error) => {
       setAccessToken(null)
+      processFailedRequestsQueue(error, null)
+
+      // Clear auth state khi refresh thất bại
+      if (typeof window !== 'undefined') {
+        try {
+          // Import dynamically to avoid circular dependency
+          import('@/store/auth-store').then(({ useAuthStore }) => {
+            useAuthStore.getState().clearAuth()
+          })
+        } catch (e) {
+          console.warn('Failed to clear auth state after refresh failure')
+        }
+      }
+
       return Promise.reject(error)
     })
     .finally(() => {
@@ -107,19 +149,14 @@ apiClient.interceptors.response.use(
       !isAuthEndpoint
     ) {
       originalConfig._retry = true
-      try {
-        const newToken = await refreshAccessToken()
-        if (newToken) {
-          // Đảm bảo headers tồn tại và là AxiosRequestHeaders, sau đó chỉ mutate thay vì gán object mới
-          if (!originalConfig.headers) {
-            originalConfig.headers = {} as AxiosRequestHeaders
-          }
-          ;(originalConfig.headers as AxiosRequestHeaders).Authorization = `Bearer ${newToken}`
-          return apiClient(originalConfig)
-        }
-      } catch (refreshError) {
-        return Promise.reject(refreshError)
-      }
+
+      // Thêm request vào queue và đợi refresh hoàn tất
+      return new Promise((resolve, reject) => {
+        failedRequestsQueue.push({ resolve, reject, config: originalConfig })
+        refreshAccessToken().catch(() => {
+          // Queue đã được xử lý trong refreshAccessToken, không cần làm gì thêm
+        })
+      })
     }
 
     return Promise.reject(error)

@@ -3,6 +3,7 @@ import type {
   Table,
   TableListResponse,
   TableStatsResponse,
+  QrStatsResponse,
   TableResponse,
   CreateTablePayload,
   UpdateTablePayload,
@@ -21,6 +22,7 @@ import type {
   QRCodeListResponse,
   BatchGenerateQRPayload,
   BatchGenerateQRResponse,
+  QrStats,
 } from '@/types/tables'
 import type { MessageResponse } from '@/types/auth'
 
@@ -77,7 +79,10 @@ export const tablesApi = {
   },
 
   batchGenerateQR: async (payload: BatchGenerateQRPayload): Promise<BatchGenerateQRResponse> => {
-    const { data } = await apiClient.post<BatchGenerateQRResponse>('/tables/qr/batch-generate', payload)
+    const { data } = await apiClient.post<BatchGenerateQRResponse>(
+      '/tables/qr/batch-generate',
+      payload,
+    )
     return data
   },
 
@@ -121,7 +126,6 @@ export const tablesApi = {
     throw new Error('getFloorLayout is deprecated. Use getZoneLayout instead.')
   },
 
-
   getZones: async (): Promise<ZonesResponse> => {
     const { data } = await apiClient.get<ZonesResponse>('/tables/zones')
     return data
@@ -142,6 +146,11 @@ export const tablesApi = {
       '/tables/layout/batch-update',
       payload,
     )
+    return data
+  },
+
+  getQrStats: async (): Promise<QrStatsResponse> => {
+    const { data } = await apiClient.get<QrStatsResponse>('/tables/qr/stats')
     return data
   },
 }

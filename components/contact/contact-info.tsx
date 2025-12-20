@@ -1,33 +1,33 @@
-import { Check, Clock, Mail, MapPin, Phone } from "lucide-react"
+import { Check, Clock, Mail, MapPin, Phone } from 'lucide-react'
 
 export function ContactInfo() {
   const benefits = [
-    "Demo trực tiếp hệ thống trong 15 phút",
-    "Tư vấn miễn phí về quy trình vận hành",
-    "Báo giá chi tiết cho nhà hàng của bạn",
-    "Hỗ trợ triển khai và đào tạo nhân viên",
+    'Demo trực tiếp hệ thống trong 15 phút',
+    'Tư vấn miễn phí về quy trình vận hành',
+    'Báo giá chi tiết cho nhà hàng của bạn',
+    'Hỗ trợ triển khai và đào tạo nhân viên',
   ]
 
   const contactMethods = [
     {
       icon: Phone,
-      label: "Hotline",
-      value: "1900 xxxx",
+      label: 'Hotline',
+      value: '1900 xxxx',
     },
     {
       icon: Mail,
-      label: "Email",
-      value: "hello@qrenso.vn",
+      label: 'Email',
+      value: 'hello@qrenso.vn',
     },
     {
       icon: MapPin,
-      label: "Văn phòng",
-      value: "TP. Hồ Chí Minh, Việt Nam",
+      label: 'Văn phòng',
+      value: 'TP. Hồ Chí Minh, Việt Nam',
     },
     {
       icon: Clock,
-      label: "Giờ làm việc",
-      value: "T2 - T6: 8h30 - 18h00",
+      label: 'Giờ làm việc',
+      value: 'T2 - T6: 8h30 - 18h00',
     },
   ]
 

@@ -1,8 +1,8 @@
-"use client"
+'use client'
 
-import { Button } from "@/components/ui/button"
-import { ArrowLeft } from "lucide-react"
-import Link from "next/link"
+import { Button } from '@/components/ui/button'
+import { ArrowLeft } from 'lucide-react'
+import Link from 'next/link'
 
 export function ContactHeader() {
   return (
@@ -10,14 +10,18 @@ export function ContactHeader() {
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl overflow-hidden">
+          <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl">
             <img src="/logo.png" alt="Logo" className="h-full w-full object-contain" />
           </div>
           <span className="text-xl font-bold text-white">Qrenso</span>
         </Link>
 
         {/* Back to Home */}
-        <Button variant="outline" className="border-slate-700 bg-transparent text-white hover:bg-slate-800" asChild>
+        <Button
+          variant="outline"
+          className="border-slate-700 bg-transparent text-white hover:bg-slate-800"
+          asChild
+        >
           <Link href="/">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Quay về trang chủ

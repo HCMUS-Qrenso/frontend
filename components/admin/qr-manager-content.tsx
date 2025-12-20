@@ -11,6 +11,7 @@ import {
   useQRCodesQuery,
   useBatchGenerateQRMutation,
   useGenerateQRMutation,
+  useQrStatsQuery,
 } from '@/hooks/use-tables-query'
 import { useZonesSimpleQuery } from '@/hooks/use-zones-query'
 import { tablesApi } from '@/lib/api/tables'
@@ -18,7 +19,7 @@ import { downloadBlobWithHeaders } from '@/lib/utils/download'
 import { toast } from 'sonner'
 import { useErrorHandler } from '@/hooks/use-error-handler'
 import { Loader2 } from 'lucide-react'
-import type { QRStatus, TableQR } from '@/types/tables'
+import { QrStats, type QRStatus, type TableQR } from '@/types/tables'
 
 // Helper function to map backend QR status to UI status
 // API returns title case: "Missing", "Ready", "Outdated"
@@ -79,7 +80,7 @@ function transformQRToTableQR(qr: {
 function transformSingleQRDetail(qr: {
   id: string
   table_number: string
-  table_zone?: string | null
+  tableZone?: string | null
   seats?: number | null
   qr_code_url: string | null
   ordering_url: string | null
@@ -89,7 +90,7 @@ function transformSingleQRDetail(qr: {
   return {
     id: qr.id,
     tableNumber: qr.table_number,
-    tableArea: qr.table_zone || '—',
+    tableArea: qr.tableZone || '—',
     qrUrl: qr.qr_code_url || '',
     qrLink: qr.ordering_url || '',
     status: mapQRStatus(qr.status),
@@ -109,11 +110,15 @@ export function QRManagerContent() {
 
   const { handleError } = useErrorHandler()
   const { data: zonesData } = useZonesSimpleQuery()
-  const zones = Array.isArray(zonesData?.data)
-    ? zonesData.data
-    : (zonesData?.data as { zones?: Array<{ id: string; name: string }> } | undefined)?.zones || []
+  const zones =
+    zonesData?.zones ??
+    ((zonesData as { zones?: Array<{ id: string; name: string }> } | undefined)?.zones || [])
 
-  const { data: qrData, isLoading, error } = useQRCodesQuery(
+  const {
+    data: qrData,
+    isLoading,
+    error,
+  } = useQRCodesQuery(
     {
       status: statusFilter,
       zone_id: zoneFilter,
@@ -123,6 +128,8 @@ export function QRManagerContent() {
 
   const batchGenerateMutation = useBatchGenerateQRMutation()
   const generateMutation = useGenerateQRMutation()
+
+  const { data: qrStatsData } = useQrStatsQuery()
 
   const tableQRs = useMemo(() => {
     if (!qrData?.data.tables) return []
@@ -143,7 +150,7 @@ export function QRManagerContent() {
     }
   }
 
-  const handleGenerateAll = async () => {
+  const handleGenerateAll = async (forceRegenerate: boolean) => {
     if (tableQRs.length === 0) {
       toast.info('Không có bàn nào để tạo QR')
       return
@@ -153,9 +160,13 @@ export function QRManagerContent() {
       const allTableIds = tableQRs.map((t) => t.id)
       await batchGenerateMutation.mutateAsync({
         table_ids: allTableIds,
-        force_regenerate: false,
+        force_regenerate: forceRegenerate,
       })
-      toast.success('Đã tạo QR cho tất cả bàn thành công')
+      toast.success(
+        forceRegenerate
+          ? 'Đã tạo lại QR cho tất cả bàn thành công'
+          : 'Đã tạo QR cho các bàn thiếu thành công',
+      )
     } catch (error) {
       handleError(error)
     }
@@ -213,14 +224,6 @@ export function QRManagerContent() {
     }
   }
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
-      </div>
-    )
-  }
-
   if (error) {
     return (
       <div className="rounded-2xl border border-red-200 bg-red-50 p-6 dark:border-red-800 dark:bg-red-500/10">
@@ -234,7 +237,7 @@ export function QRManagerContent() {
   return (
     <div className="space-y-6">
       {/* Stats */}
-      <QRManagerStats tables={tableQRs} />
+      <QRManagerStats {...(qrStatsData?.data || {})} />
 
       {/* Main content grid */}
       <div className="space-y-4">
@@ -271,6 +274,7 @@ export function QRManagerContent() {
             Promise.all(selectedTables.map((id) => handleDownloadQR(id, format)))
           }}
           isLoading={generateMutation.isPending || batchGenerateMutation.isPending}
+          isDataLoading={isLoading}
         />
       </div>
 

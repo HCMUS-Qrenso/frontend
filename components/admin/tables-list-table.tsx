@@ -27,8 +27,22 @@ import {
   useUpdateTableMutation,
 } from '@/hooks/use-tables-query'
 import { toast } from 'sonner'
-import type { Table, TableStatus, TablePosition } from '@/types/tables'
+import type {
+  Table as TableType,
+  TableStatus,
+  TablePosition,
+  TableSortBy,
+  TableSortOrder,
+} from '@/types/tables'
 import { useErrorHandler } from '@/hooks/use-error-handler'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 
 function getStatusBadge(status: TableStatus) {
   const config = {
@@ -78,7 +92,7 @@ export function TablesListTable({ isTrashView = false }: TablesListTableProps) {
 
   // State for delete dialog
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
-  const [tableToDelete, setTableToDelete] = useState<Table | null>(null)
+  const [tableToDelete, setTableToDelete] = useState<TableType | null>(null)
 
   // Get query params
   const page = Number.parseInt(searchParams.get('page') || '1')
@@ -86,6 +100,10 @@ export function TablesListTable({ isTrashView = false }: TablesListTableProps) {
   const search = searchParams.get('search') || undefined
   const zone_id = searchParams.get('zone_id') || undefined
   const status = (searchParams.get('status') as TableStatus | null) || undefined
+  const sort_by =
+    (searchParams.get('sort_by') as TableSortBy | null) || ('tableNumber' as TableSortBy)
+  const sort_order =
+    (searchParams.get('sort_order') as TableSortOrder | null) || ('asc' as TableSortOrder)
 
   // Set is_active filter based on trash view
   // If trash view: show inactive tables (is_active = false)
@@ -99,6 +117,8 @@ export function TablesListTable({ isTrashView = false }: TablesListTableProps) {
     zone_id,
     status,
     is_active: isActive,
+    sort_by,
+    sort_order,
   })
 
   const tables = data?.data.tables || []
@@ -115,7 +135,7 @@ export function TablesListTable({ isTrashView = false }: TablesListTableProps) {
     router.push(`/admin/tables/list?${params.toString()}`)
   }
 
-  const handleDeleteClick = (table: Table) => {
+  const handleDeleteClick = (table: TableType) => {
     setTableToDelete(table)
     setDeleteDialogOpen(true)
   }
@@ -147,13 +167,13 @@ export function TablesListTable({ isTrashView = false }: TablesListTableProps) {
   }
 
   // Format table info for display
-  const getTableDisplayInfo = (table: Table | null): string => {
+  const getTableDisplayInfo = (table: TableType | null): string => {
     if (!table) return ''
     const zoneName = table.zone_name || table.floor || 'Chưa xác định'
     return `${zoneName} - Bàn #${table.table_number} - ${table.capacity} ghế`
   }
 
-  const handleViewOnLayout = (table: Table) => {
+  const handleViewOnLayout = (table: TableType) => {
     // Ưu tiên zone_id từ nested zone object hoặc zone_id field
     const zoneId = table.zone?.id || table.zone_id
     // Chỉ fallback về zone_name/floor nếu không có zone_id
@@ -161,7 +181,7 @@ export function TablesListTable({ isTrashView = false }: TablesListTableProps) {
     router.push(`/admin/tables/layout?zone=${encodeURIComponent(zoneParam)}&tableId=${table.id}`)
   }
 
-  const handleRestore = async (table: Table) => {
+  const handleRestore = async (table: TableType) => {
     try {
       // Parse position from JSON string if exists
       let position: TablePosition | undefined = undefined
@@ -219,48 +239,56 @@ export function TablesListTable({ isTrashView = false }: TablesListTableProps) {
     <div className="space-y-4">
       {/* Table */}
       <div className="overflow-x-auto rounded-2xl border border-slate-100 bg-white/80 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-slate-100 bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900">
-              <th className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+        <Table className="w-full min-w-250 table-fixed">
+          <colgroup>
+            <col className="w-[18%]" />
+            <col className="w-[22%]" />
+            <col className="w-[10%]" />
+            <col className="w-[18%]" />
+            <col className="w-[18%]" />
+            <col className="w-[14%]" />
+          </colgroup>
+          <TableHeader>
+            <TableRow className="border-b border-slate-100 bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900">
+              <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
                 Bàn
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+              </TableHead>
+              <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
                 Khu vực / Tầng
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+              </TableHead>
+              <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
                 Sức chứa
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+              </TableHead>
+              <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
                 Trạng thái
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+              </TableHead>
+              <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
                 Đơn hàng hiện tại
-              </th>
-              <th className="px-6 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+              </TableHead>
+              <TableHead className="px-6 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
                 Thao tác
-              </th>
-            </tr>
-          </thead>
-          <tbody>
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {tables.length === 0 ? (
-              <tr>
-                <td colSpan={6} className="px-6 py-12 text-center">
+              <TableRow>
+                <TableCell colSpan={6} className="px-6 py-12 text-center">
                   <p className="text-sm text-slate-500 dark:text-slate-400">
                     Không có bàn nào được tìm thấy.
                   </p>
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ) : (
               tables.map((table, index) => (
-                <tr
+                <TableRow
                   key={table.id}
                   className={cn(
                     'border-b border-slate-100 transition-colors hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800',
                     index === tables.length - 1 && 'border-b-0',
                   )}
                 >
-                  <td className="px-6 py-4">
+                  <TableCell className="px-6 py-4">
                     <div>
                       <p className="text-sm font-medium text-slate-900 dark:text-white">
                         Số {table.table_number}
@@ -269,26 +297,26 @@ export function TablesListTable({ isTrashView = false }: TablesListTableProps) {
                         {table.capacity} chỗ ngồi
                       </p>
                     </div>
-                  </td>
-                  <td className="px-6 py-4">
+                  </TableCell>
+                  <TableCell className="px-6 py-4">
                     <p className="text-sm text-slate-700 dark:text-slate-300">
                       {table.zone?.name || '—'}
                     </p>
-                  </td>
-                  <td className="px-6 py-4">
+                  </TableCell>
+                  <TableCell className="px-6 py-4">
                     <p className="text-sm text-slate-700 dark:text-slate-300">{table.capacity}</p>
-                  </td>
-                  <td className="px-6 py-4">{getStatusBadge(table.status)}</td>
-                  <td className="px-6 py-4">
+                  </TableCell>
+                  <TableCell className="px-6 py-4">{getStatusBadge(table.status)}</TableCell>
+                  <TableCell className="px-6 py-4">
                     {table.current_order ? (
-                      <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400">
+                      <p className="max-w-[180px] truncate text-sm font-medium text-emerald-600 dark:text-emerald-400">
                         {table.current_order}
                       </p>
                     ) : (
                       <span className="text-sm text-slate-400">—</span>
                     )}
-                  </td>
-                  <td className="px-6 py-4">
+                  </TableCell>
+                  <TableCell className="px-6 py-4">
                     <div className="flex items-center justify-end gap-2">
                       {isTrashView ? (
                         <Button
@@ -333,12 +361,12 @@ export function TablesListTable({ isTrashView = false }: TablesListTableProps) {
                         </div>
                       )}
                     </div>
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ))
             )}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
 
       {/* Pagination */}

@@ -3,7 +3,7 @@ import { ArrowRight, MessageCircle } from 'lucide-react'
 
 export function FinalCTA() {
   return (
-    <section className="border-b border-slate-200 bg-gradient-to-b from-slate-50 to-white py-20 dark:border-slate-800/50 dark:from-slate-900/50 dark:to-slate-950 md:py-32">
+    <section className="border-b border-slate-200 bg-gradient-to-b from-slate-50 to-white py-20 md:py-32 dark:border-slate-800/50 dark:from-slate-900/50 dark:to-slate-950">
       <div className="container mx-auto px-4">
         <div className="mx-auto max-w-4xl text-center">
           {/* Headline */}
