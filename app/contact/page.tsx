@@ -1,4 +1,3 @@
-import { ContactHeader } from '@/components/contact/contact-header'
 import { ContactContent } from '@/components/contact/contact-content'
 import { Footer } from '@/components/landing/footer'
 import type { Metadata } from 'next'
