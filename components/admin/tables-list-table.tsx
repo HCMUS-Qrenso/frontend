@@ -10,17 +10,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
-import { Edit2, MapPin, Trash2, Loader2, AlertTriangle, RotateCcw, MoreVertical } from 'lucide-react'
+import { ConfirmDeleteDialog } from '@/components/ui/confirm-delete-dialog'
+import { Edit2, MapPin, Trash2, Loader2, RotateCcw, MoreVertical } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import {
   useTablesQuery,
@@ -379,45 +370,19 @@ export function TablesListTable({ isTrashView = false }: TablesListTableProps) {
 
       {/* Delete Confirmation Dialog - Only show for active view */}
       {!isTrashView && (
-        <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-          <AlertDialogContent className="rounded-2xl">
-            <AlertDialogHeader>
-              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-50 dark:bg-red-500/10">
-                <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-400" />
-              </div>
-              <AlertDialogTitle className="text-center text-lg font-semibold text-slate-900 dark:text-white">
-                Xóa bàn này?
-              </AlertDialogTitle>
-              <AlertDialogDescription className="text-center text-sm text-slate-500 dark:text-slate-400">
-                Bạn có chắc chắn muốn xóa{' '}
-                <span className="font-medium text-slate-900 dark:text-white">
-                  {getTableDisplayInfo(tableToDelete)}
-                </span>
-                ? Hành động này không thể hoàn tác.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter className="flex-row justify-end gap-3 sm:flex-row">
-              <AlertDialogCancel
-                disabled={deleteMutation.isPending}
-                className="m-0 rounded-full"
-                onClick={() => {
-                  setDeleteDialogOpen(false)
-                  setTableToDelete(null)
-                }}
-              >
-                Hủy
-              </AlertDialogCancel>
-              <AlertDialogAction
-                onClick={handleConfirmDelete}
-                disabled={deleteMutation.isPending}
-                className="m-0 gap-2 rounded-full bg-red-600 hover:bg-red-700"
-              >
-                {deleteMutation.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
-                {deleteMutation.isPending ? 'Đang xóa...' : 'Xóa bàn'}
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+        <ConfirmDeleteDialog
+          open={deleteDialogOpen}
+          onOpenChange={(open) => {
+            setDeleteDialogOpen(open)
+            if (!open) setTableToDelete(null)
+          }}
+          title="Xóa bàn này?"
+          description="Hành động này không thể hoàn tác."
+          itemName={getTableDisplayInfo(tableToDelete)}
+          onConfirm={handleConfirmDelete}
+          isLoading={deleteMutation.isPending}
+          confirmText="Xóa bàn"
+        />
       )}
     </div>
   )
