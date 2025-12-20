@@ -74,13 +74,13 @@ export function Pricing() {
           </div>
 
           {/* Pricing Cards */}
-          <div className="grid gap-8 lg:grid-cols-3">
+          <div className="grid gap-10 lg:grid-cols-3">
             {plans.map((plan, index) => (
               <div
                 key={index}
-                className={`rounded-2xl border p-8 ${
+                className={`rounded-2xl border p-8 transition-all duration-100 hover:scale-105 ${
                   plan.highlighted
-                    ? 'border-emerald-500 bg-emerald-500/5 shadow-lg shadow-emerald-500/20'
+                    ? 'border-emerald-500 bg-emerald-500/5 shadow-lg shadow-emerald-500/20 scale-105 hover:scale-110'
                     : 'border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900/50'
                 }`}
               >
