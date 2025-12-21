@@ -2,14 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { Search, Plus, LayoutGrid, QrCode, ChevronDown, ArrowUpDown } from 'lucide-react'
+import { SearchInput } from '@/components/ui/search-input'
+import { FilterDropdown, type FilterOption } from '@/components/ui/filter-dropdown'
+import { Plus, LayoutGrid, QrCode, ArrowUpDown } from 'lucide-react'
 import Link from 'next/link'
 import { AdminFilterToolbarWrapper } from './admin-filter-toolbar-wrapper'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -20,64 +15,57 @@ interface TablesFilterToolbarProps {
   isTrashView?: boolean
 }
 
+const STATUS_OPTIONS: FilterOption[] = [
+  { value: '', label: 'Tất cả' },
+  { value: 'available', label: 'Trống' },
+  { value: 'occupied', label: 'Đang sử dụng' },
+  { value: 'reserved', label: 'Đã đặt trước' },
+  { value: 'maintenance', label: 'Bảo trì' },
+]
+
+const SORT_BY_OPTIONS: FilterOption[] = [
+  { value: 'tableNumber', label: 'Số bàn' },
+  { value: 'status', label: 'Trạng thái' },
+  { value: 'createdAt', label: 'Ngày tạo' },
+  { value: 'updatedAt', label: 'Ngày cập nhật' },
+]
+
+const SORT_ORDER_OPTIONS: FilterOption[] = [
+  { value: 'asc', label: 'Tăng dần' },
+  { value: 'desc', label: 'Giảm dần' },
+]
+
 export function TablesFilterToolbar({ isTrashView = false }: TablesFilterToolbarProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const { data: zonesData } = useZonesSimpleQuery()
+  const { data: zonesData, isLoading: isLoadingZones } = useZonesSimpleQuery()
   const zones: SimpleZone[] =
     zonesData?.zones ?? ((zonesData as { zones?: SimpleZone[] } | undefined)?.zones || [])
 
-  // Map backend status to UI labels
-  const statusMap: Record<string, string> = {
-    available: 'Trống',
-    occupied: 'Đang sử dụng',
-    waiting_for_payment: 'Chờ thanh toán',
-    maintenance: 'Bảo trì',
-  }
+  // Build dynamic zone options from API data
+  const zoneOptions: FilterOption[] = [
+    { value: '', label: 'Tất cả' },
+    ...zones.map((zone) => ({ value: zone.id, label: zone.name })),
+  ]
 
   // Get filter values from URL params
   const searchQuery = searchParams.get('search') || ''
-  const selectedZoneId = searchParams.get('zone_id') || 'Tất cả'
-  const selectedStatusKey = searchParams.get('status') || ''
-  const sortBy =
-    (searchParams.get('sort_by') as 'tableNumber' | 'status' | 'createdAt' | 'updatedAt') ||
-    'tableNumber'
-  const sortOrder = (searchParams.get('sort_order') as 'asc' | 'desc') || 'asc'
-
-  const sortByLabels: Record<string, string> = {
-    tableNumber: 'Số bàn',
-    status: 'Trạng thái',
-    createdAt: 'Ngày tạo',
-    updatedAt: 'Ngày cập nhật',
-  }
-
-  const sortOrderLabels: Record<string, string> = {
-    asc: 'Tăng dần',
-    desc: 'Giảm dần',
-  }
-
-  // Map backend status key to frontend label for display
-  const selectedStatusLabel = selectedStatusKey
-    ? statusMap[selectedStatusKey] || selectedStatusKey
-    : 'Tất cả'
-
-  // Get selected zone name for display
-  const selectedZoneName =
-    selectedZoneId === 'Tất cả'
-      ? 'Tất cả'
-      : zones.find((z: SimpleZone) => z.id === selectedZoneId)?.name || 'Tất cả'
+  const selectedZoneId = searchParams.get('zone_id') || ''
+  const selectedStatus = searchParams.get('status') || ''
+  const sortBy = searchParams.get('sort_by') || 'tableNumber'
+  const sortOrder = searchParams.get('sort_order') || 'asc'
 
   const [localSearchQuery, setLocalSearchQuery] = useState(searchQuery)
 
   // Update URL params when filters change
   const updateFilter = (key: string, value: string) => {
     const params = new URLSearchParams(searchParams.toString())
-    if (value === 'Tất cả' || value === '') {
+    if (value === '' || value === 'all') {
       params.delete(key)
     } else {
       params.set(key, value)
     }
-    params.set('page', '1') // Reset to first page when filtering
+    params.set('page', '1')
     router.push(`/admin/tables/list?${params.toString()}`)
   }
 
@@ -86,14 +74,12 @@ export function TablesFilterToolbar({ isTrashView = false }: TablesFilterToolbar
     const timer = setTimeout(() => {
       updateFilter('search', localSearchQuery)
     }, 500)
-
     return () => clearTimeout(timer)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [localSearchQuery])
 
   const handleAddTable = () => {
     const params = new URLSearchParams(searchParams.toString())
-    // Remove id param if exists (for edit mode)
     params.delete('id')
     params.set('modal', 'table')
     params.set('mode', 'create')
@@ -104,99 +90,45 @@ export function TablesFilterToolbar({ isTrashView = false }: TablesFilterToolbar
     <AdminFilterToolbarWrapper>
       {/* Left - Filters */}
       <div className="flex flex-col justify-center gap-2 sm:flex-row sm:flex-wrap sm:items-center md:justify-start">
-        {/* Search */}
-        <div className="relative">
-          <Search className="absolute top-1/2 left-3 h-3 w-3 -translate-y-1/2 text-slate-400" />
-          <Input
-            placeholder="Tìm theo số bàn, tên khu vực..."
-            value={localSearchQuery}
-            onChange={(e) => setLocalSearchQuery(e.target.value)}
-            className="h-8 w-full rounded-lg border-slate-200 bg-slate-50 pr-4 pl-9 text-sm focus:bg-white sm:w-64 dark:border-slate-700 dark:bg-slate-800 dark:focus:bg-slate-900"
-          />
-        </div>
+        <SearchInput
+          placeholder="Tìm theo số bàn, tên khu vực..."
+          value={localSearchQuery}
+          onChange={setLocalSearchQuery}
+        />
 
-        {/* Zone Filter */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="h-8 gap-1 rounded-lg bg-transparent px-3">
-              <span className="text-sm">Khu vực: {selectedZoneName}</span>
-              <ChevronDown className="h-3 w-3" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-48">
-            <DropdownMenuItem onClick={() => updateFilter('zone_id', 'Tất cả')}>
-              Tất cả
-            </DropdownMenuItem>
-            {zones.map((zone: SimpleZone) => (
-              <DropdownMenuItem key={zone.id} onClick={() => updateFilter('zone_id', zone.id)}>
-                {zone.name}
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <FilterDropdown
+          label="Khu vực:"
+          value={selectedZoneId}
+          options={zoneOptions}
+          onChange={(value) => updateFilter('zone_id', value)}
+          isLoading={isLoadingZones}
+          placeholder="Tất cả"
+          emptyMessage="Chưa có khu vực"
+        />
 
-        {/* Status Filter */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="h-8 gap-1 rounded-lg bg-transparent px-3">
-              <span className="text-sm">Trạng thái: {selectedStatusLabel}</span>
-              <ChevronDown className="h-3 w-3" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-48">
-            <DropdownMenuItem onClick={() => updateFilter('status', 'Tất cả')}>
-              Tất cả
-            </DropdownMenuItem>
-            {Object.entries(statusMap).map(([key, label]) => (
-              <DropdownMenuItem key={key} onClick={() => updateFilter('status', key)}>
-                {label}
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <FilterDropdown
+          label="Trạng thái:"
+          value={selectedStatus}
+          options={STATUS_OPTIONS}
+          onChange={(value) => updateFilter('status', value)}
+        />
 
-        {/* Sort By */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="h-8 gap-1 rounded-lg bg-transparent px-3">
-              <ArrowUpDown className="h-3 w-3" />
-              <span className="text-sm">Sắp xếp: {sortByLabels[sortBy] ?? 'Số bàn'}</span>
-              <ChevronDown className="h-3 w-3" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-56">
-            <DropdownMenuItem onClick={() => updateFilter('sort_by', 'tableNumber')}>
-              Số bàn
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => updateFilter('sort_by', 'status')}>
-              Trạng thái
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => updateFilter('sort_by', 'createdAt')}>
-              Ngày tạo
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => updateFilter('sort_by', 'updatedAt')}>
-              Ngày cập nhật
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <FilterDropdown
+          label="Sắp xếp:"
+          value={sortBy}
+          options={SORT_BY_OPTIONS}
+          onChange={(value) => updateFilter('sort_by', value)}
+          icon={ArrowUpDown}
+          menuWidth="w-56"
+        />
 
-        {/* Sort Order */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="h-8 gap-1 rounded-lg bg-transparent px-3">
-              <span className="text-sm">{sortOrderLabels[sortOrder] ?? 'Tăng'}</span>
-              <ChevronDown className="h-3 w-3" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-40">
-            <DropdownMenuItem onClick={() => updateFilter('sort_order', 'asc')}>
-              Tăng dần
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => updateFilter('sort_order', 'desc')}>
-              Giảm dần
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <FilterDropdown
+          label=""
+          value={sortOrder}
+          options={SORT_ORDER_OPTIONS}
+          onChange={(value) => updateFilter('sort_order', value)}
+          menuWidth="w-40"
+        />
       </div>
 
       {/* Right - Actions */}

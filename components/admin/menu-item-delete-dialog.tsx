@@ -2,16 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
-import { Button } from '@/components/ui/button'
-import { Loader2 } from 'lucide-react'
+import { ConfirmDeleteDialog } from '@/components/ui/confirm-delete-dialog'
 import { useMenuItemQuery, useDeleteMenuItemMutation } from '@/hooks/use-menu-items-query'
 import { useErrorHandler } from '@/hooks/use-error-handler'
 import { toast } from 'sonner'
@@ -62,30 +53,15 @@ export function MenuItemDeleteDialog() {
   }
 
   return (
-    <AlertDialog open={open && !!item} onOpenChange={handleClose}>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Xóa món "{item?.name}"?</AlertDialogTitle>
-          <AlertDialogDescription>
-            Hành động này không thể hoàn tác. Món ăn sẽ bị xóa vĩnh viễn khỏi menu.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <Button variant="outline" onClick={handleClose} disabled={deleteMutation.isPending}>
-            Hủy
-          </Button>
-          <Button variant="destructive" onClick={handleDelete} disabled={deleteMutation.isPending}>
-            {deleteMutation.isPending ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Đang xóa...
-              </>
-            ) : (
-              'Xóa món ăn'
-            )}
-          </Button>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+    <ConfirmDeleteDialog
+      open={open}
+      onOpenChange={handleClose}
+      title="Xóa món"
+      description="Hành động này không thể hoàn tác. Món ăn sẽ bị xóa vĩnh viễn khỏi menu."
+      itemName={item?.name}
+      onConfirm={handleDelete}
+      isLoading={deleteMutation.isPending}
+      confirmText="Xóa món ăn"
+    />
   )
 }

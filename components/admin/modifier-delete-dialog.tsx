@@ -1,16 +1,7 @@
 'use client'
 
 import { useRouter, useSearchParams } from 'next/navigation'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
+import { ConfirmDeleteDialog } from '@/components/ui/confirm-delete-dialog'
 import { Loader2 } from 'lucide-react'
 import { useDeleteModifierMutation, useModifiersQuery } from '@/hooks/use-modifiers-query'
 import { useErrorHandler } from '@/hooks/use-error-handler'
@@ -66,47 +57,31 @@ export function ModifierDeleteDialog({ selectedGroupId }: ModifierDeleteDialogPr
     )
   }
 
+  // Show loading while fetching modifier data
+  if (isLoadingModifiers && open) {
+    return (
+      <ConfirmDeleteDialog
+        open={open}
+        onOpenChange={handleClose}
+        title="Đang tải..."
+        description=""
+        onConfirm={() => {}}
+        isLoading={true}
+        confirmDisabled={true}
+      />
+    )
+  }
+
   return (
-    <AlertDialog open={open} onOpenChange={handleClose}>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>
-            {isLoadingModifiers ? 'Đang tải...' : 'Xác nhận xoá option'}
-          </AlertDialogTitle>
-          {isLoadingModifiers ? (
-            <div className="flex items-center justify-center py-8">
-              <Loader2 className="h-6 w-6 animate-spin text-emerald-600" />
-            </div>
-          ) : (
-            <>
-              <AlertDialogDescription>
-                Bạn có chắc muốn xoá option{' '}
-                <span className="font-semibold text-slate-900 dark:text-white">
-                  &quot;{modifierName}&quot;
-                </span>
-                ? Hành động này không thể hoàn tác.
-              </AlertDialogDescription>
-              <AlertDialogFooter>
-                <AlertDialogCancel disabled={isDeleting}>Hủy</AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={handleDelete}
-                  disabled={isDeleting}
-                  className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
-                >
-                  {isDeleting ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Đang xoá...
-                    </>
-                  ) : (
-                    'Xoá option'
-                  )}
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </>
-          )}
-        </AlertDialogHeader>
-      </AlertDialogContent>
-    </AlertDialog>
+    <ConfirmDeleteDialog
+      open={open}
+      onOpenChange={handleClose}
+      title="Xác nhận xoá option"
+      description="Hành động này không thể hoàn tác."
+      itemName={modifierName}
+      onConfirm={handleDelete}
+      isLoading={isDeleting}
+      confirmText="Xoá option"
+    />
   )
 }

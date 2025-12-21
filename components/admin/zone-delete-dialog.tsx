@@ -1,17 +1,7 @@
 'use client'
 
 import { useRouter, useSearchParams } from 'next/navigation'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
-import { Loader2, AlertTriangle } from 'lucide-react'
+import { ConfirmDeleteDialog } from '@/components/ui/confirm-delete-dialog'
 import { useDeleteZoneMutation } from '@/hooks/use-zones-query'
 import { useErrorHandler } from '@/hooks/use-error-handler'
 import { toast } from 'sonner'
@@ -61,42 +51,15 @@ export function ZoneDeleteDialog() {
   }
 
   return (
-    <AlertDialog open={open} onOpenChange={handleClose}>
-      <AlertDialogContent className="rounded-2xl">
-        <AlertDialogHeader>
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-50 dark:bg-red-500/10">
-            <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-400" />
-          </div>
-          <AlertDialogTitle className="text-center text-lg font-semibold text-slate-900 dark:text-white">
-            Xóa khu vực?
-          </AlertDialogTitle>
-          <AlertDialogDescription className="text-center text-sm text-slate-500 dark:text-slate-400">
-            Bạn có chắc chắn muốn xóa khu vực "{zoneName}" không? Hành động này không thể hoàn tác.
-            {zoneName !== 'khu vực này' && (
-              <span className="mt-1 block font-medium text-red-600 dark:text-red-400">
-                Lưu ý: Chỉ có thể xóa khu vực không có bàn nào.
-              </span>
-            )}
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter className="flex-row justify-end gap-3 sm:flex-row">
-          <AlertDialogCancel
-            disabled={isDeleting}
-            className="m-0 rounded-full"
-            onClick={handleClose}
-          >
-            Hủy
-          </AlertDialogCancel>
-          <AlertDialogAction
-            onClick={handleConfirmDelete}
-            disabled={isDeleting}
-            className="m-0 gap-2 rounded-full bg-red-600 hover:bg-red-700"
-          >
-            {isDeleting && <Loader2 className="h-4 w-4 animate-spin" />}
-            {isDeleting ? 'Đang xóa...' : 'Xóa khu vực'}
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+    <ConfirmDeleteDialog
+      open={open}
+      onOpenChange={handleClose}
+      title="Xóa khu vực?"
+      description="Hành động này không thể hoàn tác. Lưu ý: Chỉ có thể xóa khu vực không có bàn nào."
+      itemName={zoneName !== 'khu vực này' ? zoneName : undefined}
+      onConfirm={handleConfirmDelete}
+      isLoading={isDeleting}
+      confirmText="Xóa khu vực"
+    />
   )
 }

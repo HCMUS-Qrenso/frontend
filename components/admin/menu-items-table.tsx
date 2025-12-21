@@ -12,8 +12,19 @@ import {
 } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Pencil, Trash2, Award, Clock, Loader2 } from 'lucide-react'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { Pencil, Trash2, Award, Clock, MoreVertical, UtensilsCrossed } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { formatRelativeDate, formatPrice } from '@/lib/utils/format'
+import { StatusBadge, MENU_ITEM_STATUS_CONFIG } from '@/components/ui/status-badge'
+import { ContainerLoadingState, ContainerErrorState } from '@/components/ui/loading-state'
+import { EmptyState } from '@/components/ui/empty-state'
 import Image from 'next/image'
 import { useMenuItemsQuery } from '@/hooks/use-menu-items-query'
 import { useErrorHandler } from '@/hooks/use-error-handler'
@@ -85,70 +96,18 @@ export function MenuItemsTable() {
     router.push(`/admin/menu/items?${params.toString()}`, { scroll: false })
   }
 
-  const getStatusBadge = (status: MenuItem['status']) => {
-    const variants = {
-      available: {
-        label: 'Đang bán',
-        className: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400',
-      },
-      sold_out: {
-        label: 'Hết hàng',
-        className: 'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400',
-      },
-      unavailable: {
-        label: 'Tạm ẩn',
-        className: 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400',
-      },
-    }
-
-    const variant = variants[status]
-    return (
-      <Badge variant="secondary" className={cn('font-medium', variant.className)}>
-        {variant.label}
-      </Badge>
-    )
-  }
-
-  const formatPrice = (price: string | number) => {
-    const numPrice = typeof price === 'string' ? parseFloat(price) : price
-    return new Intl.NumberFormat('vi-VN', {
-      style: 'currency',
-      currency: 'VND',
-    }).format(numPrice)
-  }
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
-    const now = new Date()
-    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60))
-
-    if (diffInHours < 24) {
-      return `${diffInHours}h trước`
-    } else if (diffInHours < 48) {
-      return '1 ngày trước'
-    } else {
-      return date.toLocaleDateString('vi-VN')
-    }
-  }
-
   // Loading state
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center rounded-2xl border border-slate-100 bg-white/80 py-12 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
-        <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
-      </div>
-    )
+    return <ContainerLoadingState />
   }
 
   // Error state
   if (error) {
     return (
-      <div className="flex items-center justify-center rounded-2xl border border-slate-100 bg-white/80 py-12 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
-        <div className="text-center">
-          <p className="text-red-600 dark:text-red-400">Không thể tải danh sách món ăn</p>
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Vui lòng thử lại sau</p>
-        </div>
-      </div>
+      <ContainerErrorState
+        title="Không thể tải danh sách món ăn"
+        description="Vui lòng thử lại sau"
+      />
     )
   }
 
@@ -184,20 +143,12 @@ export function MenuItemsTable() {
           <TableBody>
             {menuItems.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="px-2 py-12 text-center md:px-4">
-                  <div className="flex flex-col items-center justify-center gap-3">
-                    <div className="text-slate-400">
-                      <UtensilsCrossed className="mx-auto h-12 w-12" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-slate-600 dark:text-slate-400">
-                        Chưa có món ăn nào
-                      </p>
-                      <p className="text-sm text-slate-500 dark:text-slate-500">
-                        Bắt đầu bằng cách thêm món đầu tiên
-                      </p>
-                    </div>
-                  </div>
+                <TableCell colSpan={7} className="px-2 py-0 md:px-4">
+                  <EmptyState
+                    icon={UtensilsCrossed}
+                    title="Chưa có món ăn nào"
+                    description="Bắt đầu bằng cách thêm món đầu tiên"
+                  />
                 </TableCell>
               </TableRow>
             ) : (
@@ -260,7 +211,7 @@ export function MenuItemsTable() {
                     </span>
                   </TableCell>
                   <TableCell className="px-2 py-3 text-center md:px-4">
-                    {getStatusBadge(item.status)}
+                    <StatusBadge status={item.status} config={MENU_ITEM_STATUS_CONFIG} />
                   </TableCell>
                   <TableCell className="px-2 py-3 text-center md:px-4">
                     <div className="flex items-center justify-center gap-1">
@@ -272,35 +223,45 @@ export function MenuItemsTable() {
                   </TableCell>
                   <TableCell className="px-2 py-3 md:px-4">
                     <span className="text-xs text-slate-600 md:text-sm dark:text-slate-400">
-                      {formatDate(item.updated_at)}
+                      {formatRelativeDate(item.updated_at)}
                     </span>
                   </TableCell>
                   <TableCell className="px-2 py-3 text-right md:px-4">
-                    <div className="flex items-center justify-end gap-0.5">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-7 w-7 rounded-full md:h-8 md:w-8"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleEdit(item.id)
-                        }}
-                        title="Chỉnh sửa"
-                      >
-                        <Pencil className="h-3 w-3 md:h-4 md:w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-7 w-7 rounded-full text-red-600 hover:text-red-700 md:h-8 md:w-8 dark:text-red-400 dark:hover:text-red-500"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleDelete(item.id)
-                        }}
-                        title="Xóa"
-                      >
-                        <Trash2 className="h-3 w-3 md:h-4 md:w-4" />
-                      </Button>
+                    <div className="flex items-center justify-end">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 rounded-full md:h-8 md:w-8"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <MoreVertical className="h-3 w-3 md:h-4 md:w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-48">
+                          <DropdownMenuItem
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleEdit(item.id)
+                            }}
+                          >
+                            <Pencil className="mr-2 h-4 w-4" />
+                            Chỉnh sửa
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleDelete(item.id)
+                            }}
+                            className="text-red-600 focus:text-red-600 dark:text-red-400"
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Xóa món ăn
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -355,25 +316,5 @@ export function MenuItemsTable() {
         </div>
       )}
     </div>
-  )
-}
-
-function UtensilsCrossed({ className }: { className?: string }) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-    >
-      <path d="m16 2-2.3 2.3a3 3 0 0 0 0 4.2l1.8 1.8a3 3 0 0 0 4.2 0L22 8" />
-      <path d="M15 15 3.3 3.3a4.2 4.2 0 0 0 0 6l7.3 7.3c.7.7 2 .7 2.8 0L15 15Zm0 0 7 7" />
-      <path d="m2.1 21.8 6.4-6.3" />
-      <path d="m19 5-7 7" />
-    </svg>
   )
 }

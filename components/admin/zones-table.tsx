@@ -3,26 +3,24 @@
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
+import { ConfirmDeleteDialog } from '@/components/ui/confirm-delete-dialog'
+import { StatusBadge, ZONE_ACTIVE_CONFIG } from '@/components/ui/status-badge'
+import { EmptyState } from '@/components/ui/empty-state'
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
-import { Badge } from '@/components/ui/badge'
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import {
   Edit2,
   Trash2,
   Loader2,
-  AlertTriangle,
   ChevronLeft,
   ChevronRight,
   Eye,
   EyeOff,
+  MoreVertical,
 } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import {
@@ -50,6 +48,7 @@ export function ZonesTable() {
   const page = Number.parseInt(searchParams.get('page') || '1')
   const limit = Number.parseInt(searchParams.get('limit') || '10')
   const search = searchParams.get('search') || undefined
+  const isActive = searchParams.get('is_active') as 'true' | 'false' | undefined
   const sortBy =
     (searchParams.get('sort_by') as 'name' | 'displayOrder' | 'createdAt' | 'updatedAt') ||
     'displayOrder'
@@ -59,6 +58,7 @@ export function ZonesTable() {
     page,
     limit,
     search,
+    is_active: isActive,
     sort_by: sortBy,
     sort_order: sortOrder,
   })
@@ -223,8 +223,8 @@ export function ZonesTable() {
           <TableBody>
             {zones.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="px-6 py-12 text-center text-slate-500">
-                  Chưa có khu vực nào. Hãy tạo khu vực đầu tiên.
+                <TableCell colSpan={5} className="px-6 py-0">
+                  <EmptyState title="Chưa có khu vực nào" description="Hãy tạo khu vực đầu tiên" />
                 </TableCell>
               </TableRow>
             ) : (
@@ -253,64 +253,52 @@ export function ZonesTable() {
                     {zone.display_order}
                   </TableCell>
                   <TableCell className="px-6 py-4 text-center">
-                    <Badge
-                      variant={zone.is_active ? 'default' : 'secondary'}
-                      className={cn(
-                        'font-medium',
-                        zone.is_active
-                          ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400'
-                          : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400',
-                      )}
-                    >
-                      {zone.is_active ? 'Hoạt động' : 'Tạm ẩn'}
-                    </Badge>
+                    <StatusBadge
+                      status={zone.is_active ? 'active' : 'inactive'}
+                      config={ZONE_ACTIVE_CONFIG}
+                    />
                   </TableCell>
                   <TableCell className="px-6 py-4 text-right">
-                    <div className="flex items-center justify-end gap-1">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 rounded-full"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleEdit(zone.id)
-                        }}
-                        title="Chỉnh sửa"
-                        disabled={updateMutation.isPending || deleteMutation.isPending}
-                      >
-                        <Edit2 className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 rounded-full"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleToggleActive(zone.id, zone.is_active)
-                        }}
-                        title={zone.is_active ? 'Ẩn khu vực' : 'Hiện khu vực'}
-                        disabled={updateMutation.isPending || deleteMutation.isPending}
-                      >
-                        {zone.is_active ? (
-                          <Eye className="h-4 w-4" />
-                        ) : (
-                          <EyeOff className="h-4 w-4" />
-                        )}
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 rounded-full text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-500"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleDeleteClick(zone)
-                        }}
-                        title="Xóa"
-                        disabled={updateMutation.isPending || deleteMutation.isPending}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 rounded-full"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-48">
+                        <DropdownMenuItem onClick={() => handleEdit(zone.id)}>
+                          <Edit2 className="mr-2 h-4 w-4" />
+                          Chỉnh sửa
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => handleToggleActive(zone.id, zone.is_active)}
+                        >
+                          {zone.is_active ? (
+                            <>
+                              <EyeOff className="mr-2 h-4 w-4" />
+                              Ẩn khu vực
+                            </>
+                          ) : (
+                            <>
+                              <Eye className="mr-2 h-4 w-4" />
+                              Hiện khu vực
+                            </>
+                          )}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => handleDeleteClick(zone)}
+                          className="text-red-600 focus:text-red-600 dark:text-red-400"
+                        >
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          Xóa khu vực
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </TableCell>
                 </TableRow>
               ))
@@ -320,37 +308,16 @@ export function ZonesTable() {
       </div>
 
       {/* Delete Confirmation Dialog */}
-      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent className="rounded-2xl">
-          <AlertDialogHeader>
-            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-50 dark:bg-red-500/10">
-              <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-400" />
-            </div>
-            <AlertDialogTitle className="text-center text-lg font-semibold text-slate-900 dark:text-white">
-              Xóa khu vực?
-            </AlertDialogTitle>
-            <AlertDialogDescription className="text-center text-sm text-slate-500 dark:text-slate-400">
-              Bạn có chắc chắn muốn xóa khu vực "{zoneToDelete?.name}" không? Hành động này không
-              thể hoàn tác.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className="flex-row justify-end gap-3 sm:flex-row">
-            <AlertDialogCancel
-              className="m-0 rounded-full"
-              onClick={() => setDeleteDialogOpen(false)}
-            >
-              Hủy
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleConfirmDelete}
-              className="m-0 gap-2 rounded-full bg-red-600 hover:bg-red-700"
-            >
-              <Trash2 className="h-4 w-4" />
-              Xóa khu vực
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ConfirmDeleteDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        title="Xóa khu vực?"
+        description="Hành động này không thể hoàn tác."
+        itemName={zoneToDelete?.name}
+        onConfirm={handleConfirmDelete}
+        isLoading={deleteMutation.isPending}
+        confirmText="Xóa khu vực"
+      />
 
       {/* Pagination */}
       {pagination && pagination.total_pages > 1 && (

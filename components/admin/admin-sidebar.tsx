@@ -24,6 +24,7 @@ import {
   FolderOpen,
   Upload,
   MapPin,
+  Construction,
 } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
@@ -39,8 +40,8 @@ import {
 import { getInitials, getRoleLabel } from './admin-utils'
 
 const menuItems = [
-  { icon: LayoutDashboard, label: 'Tổng quan', href: '/admin/dashboard' },
-  { icon: ClipboardList, label: 'Đơn hàng', href: '/admin/orders' },
+  { icon: LayoutDashboard, label: 'Tổng quan', href: '/admin/dashboard', wip: true },
+  { icon: ClipboardList, label: 'Đơn hàng', href: '/admin/orders', wip: true },
   {
     icon: UtensilsCrossed,
     label: 'Thực đơn',
@@ -64,9 +65,9 @@ const menuItems = [
       { icon: MapPin, label: 'Khu vực', href: '/admin/tables/zones' },
     ],
   },
-  { icon: Users, label: 'Nhân viên', href: '/admin/staff' },
-  { icon: BarChart3, label: 'Báo cáo', href: '/admin/reports' },
-  { icon: Settings, label: 'Cài đặt', href: '/admin/settings' },
+  { icon: Users, label: 'Nhân viên', href: '/admin/staff', wip: true },
+  { icon: BarChart3, label: 'Báo cáo', href: '/admin/reports', wip: true },
+  { icon: Settings, label: 'Cài đặt', href: '/admin/settings', wip: true },
 ]
 
 interface AdminSidebarProps {
@@ -250,6 +251,11 @@ export function AdminSidebar({
                     >
                       <item.icon className="h-5 w-5" />
                       {item.label}
+                      {item.wip && (
+                        <span title="Đang phát triển">
+                          <Construction className="ml-auto h-4 w-4 text-amber-500" />
+                        </span>
+                      )}
                     </Link>
                   )}
 

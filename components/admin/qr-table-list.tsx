@@ -8,7 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Eye, Download, Printer, RefreshCw, Copy, Check, Loader2 } from 'lucide-react'
+import { Eye, Download, Printer, RefreshCw, Copy, Check, Loader2, MoreVertical } from 'lucide-react'
 import Image from 'next/image'
 import { useState } from 'react'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -241,50 +241,47 @@ export function QRTableList({
                   <p className="text-sm text-slate-600 dark:text-slate-400">{table.updatedAt}</p>
                 </TableCell>
                 <TableCell className="px-6 py-4">
-                  <div className="flex items-center justify-end gap-1">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 rounded-full"
-                      onClick={() => onPreview(table)}
-                      disabled={!table.qrUrl}
-                    >
-                      <Eye className="h-4 w-4" />
-                    </Button>
-                    {onDownload && (
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 rounded-full"
-                            disabled={!table.qrUrl || isLoading}
+                  <div className="flex items-center justify-end">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-48">
+                        <DropdownMenuItem onClick={() => onPreview(table)} disabled={!table.qrUrl}>
+                          <Eye className="mr-2 h-4 w-4" />
+                          Xem trước
+                        </DropdownMenuItem>
+                        {onDownload && (
+                          <>
+                            <DropdownMenuItem
+                              onClick={() => onDownload(table.id, 'png')}
+                              disabled={!table.qrUrl || isLoading}
+                            >
+                              <Download className="mr-2 h-4 w-4" />
+                              Tải xuống PNG
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => onDownload(table.id, 'pdf')}
+                              disabled={!table.qrUrl || isLoading}
+                            >
+                              <Download className="mr-2 h-4 w-4" />
+                              Tải xuống PDF
+                            </DropdownMenuItem>
+                          </>
+                        )}
+                        {onGenerate && (
+                          <DropdownMenuItem
+                            onClick={() => onGenerate(table.id, !!table.qrUrl)}
+                            disabled={isLoading}
                           >
-                            <Download className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => onDownload(table.id, 'png')}>
-                            Tải xuống PNG
+                            <RefreshCw className="mr-2 h-4 w-4" />
+                            {table.qrUrl ? 'Tạo lại QR' : 'Tạo QR'}
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => onDownload(table.id, 'pdf')}>
-                            Tải xuống PDF
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    )}
-                    {onGenerate && (
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 rounded-full"
-                        onClick={() => onGenerate(table.id, !!table.qrUrl)}
-                        disabled={isLoading}
-                        title={table.qrUrl ? 'Tạo lại QR' : 'Tạo QR'}
-                      >
-                        <RefreshCw className="h-4 w-4" />
-                      </Button>
-                    )}
+                        )}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                 </TableCell>
               </TableRow>

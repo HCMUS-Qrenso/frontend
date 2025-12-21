@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { formatRelativeDate } from '@/lib/utils/format'
 import {
   Table,
   TableBody,
@@ -11,8 +12,15 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { GripVertical, Pencil, Trash2, Eye, EyeOff, Loader2 } from 'lucide-react'
+import { StatusBadge, CATEGORY_ACTIVE_CONFIG } from '@/components/ui/status-badge'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { GripVertical, Pencil, Trash2, Eye, EyeOff, Loader2, MoreVertical } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { DndContext, closestCenter, type DragEndEvent } from '@dnd-kit/core'
 import {
@@ -39,23 +47,6 @@ interface Category {
   is_active: boolean
   item_count: number
   updated_at: string
-}
-
-// Format date to relative time
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString)
-  const now = new Date()
-  const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60))
-
-  if (diffInHours < 1) {
-    return 'Vừa xong'
-  } else if (diffInHours < 24) {
-    return `${diffInHours}h trước`
-  } else if (diffInHours < 48) {
-    return '1 ngày trước'
-  } else {
-    return date.toLocaleDateString('vi-VN')
-  }
 }
 
 interface CategoriesTableProps {
@@ -124,62 +115,71 @@ function SortableCategoryRow({
         {category.display_order}
       </TableCell>
       <TableCell className="px-6 py-4 text-center">
-        <Badge
-          variant={category.is_active ? 'default' : 'secondary'}
-          className={cn(
-            'font-medium',
-            category.is_active
-              ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400'
-              : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400',
-          )}
-        >
-          {category.is_active ? 'Active' : 'Hidden'}
-        </Badge>
+        <StatusBadge
+          status={category.is_active ? 'active' : 'hidden'}
+          config={CATEGORY_ACTIVE_CONFIG}
+        />
       </TableCell>
       <TableCell className="px-6 py-4 text-center text-slate-600 dark:text-slate-400">
         {category.item_count}
       </TableCell>
       <TableCell className="px-6 py-4 text-slate-600 dark:text-slate-400">
-        {formatDate(category.updated_at)}
+        {formatRelativeDate(category.updated_at)}
       </TableCell>
       <TableCell className="px-6 py-4 text-right">
-        <div className="flex items-center justify-end gap-1">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 rounded-full"
-            onClick={(e) => {
-              e.stopPropagation()
-              onEdit(category.id)
-            }}
-            title="Chỉnh sửa"
-          >
-            <Pencil className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 rounded-full"
-            onClick={(e) => {
-              e.stopPropagation()
-              onToggleActive(category.id)
-            }}
-            title={category.is_active ? 'Ẩn danh mục' : 'Hiện danh mục'}
-          >
-            {category.is_active ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 rounded-full text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-500"
-            onClick={(e) => {
-              e.stopPropagation()
-              onDelete(category.id)
-            }}
-            title="Xóa"
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
+        <div className="flex items-center justify-end">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 rounded-full"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <MoreVertical className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onEdit(category.id)
+                }}
+              >
+                <Pencil className="mr-2 h-4 w-4" />
+                Chỉnh sửa
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onToggleActive(category.id)
+                }}
+              >
+                {category.is_active ? (
+                  <>
+                    <EyeOff className="mr-2 h-4 w-4" />
+                    Ẩn danh mục
+                  </>
+                ) : (
+                  <>
+                    <Eye className="mr-2 h-4 w-4" />
+                    Hiện danh mục
+                  </>
+                )}
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onDelete(category.id)
+                }}
+                className="text-red-600 focus:text-red-600 dark:text-red-400"
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                Xóa danh mục
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </TableCell>
     </TableRow>
@@ -391,66 +391,71 @@ export function CategoriesTable({ reorderMode, setReorderMode }: CategoriesTable
                 {category.display_order}
               </TableCell>
               <TableCell className="px-6 py-4 text-center">
-                <Badge
-                  variant={category.is_active ? 'default' : 'secondary'}
-                  className={cn(
-                    'font-medium',
-                    category.is_active
-                      ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400'
-                      : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400',
-                  )}
-                >
-                  {category.is_active ? 'Active' : 'Hidden'}
-                </Badge>
+                <StatusBadge
+                  status={category.is_active ? 'active' : 'hidden'}
+                  config={CATEGORY_ACTIVE_CONFIG}
+                />
               </TableCell>
               <TableCell className="px-6 py-4 text-center text-slate-600 dark:text-slate-400">
                 {category.item_count}
               </TableCell>
               <TableCell className="px-6 py-4 text-slate-600 dark:text-slate-400">
-                {formatDate(category.updated_at)}
+                {formatRelativeDate(category.updated_at)}
               </TableCell>
               <TableCell className="px-6 py-4 text-right">
-                <div className="flex items-center justify-end gap-1">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 rounded-full"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      handleEdit(category.id)
-                    }}
-                    title="Chỉnh sửa"
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 rounded-full"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      handleToggleActive(category.id)
-                    }}
-                    title={category.is_active ? 'Ẩn danh mục' : 'Hiện danh mục'}
-                  >
-                    {category.is_active ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 rounded-full text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-500"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      handleDelete(category.id)
-                    }}
-                    title="Xóa"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                <div className="flex items-center justify-end">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 rounded-full"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-48">
+                      <DropdownMenuItem
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleEdit(category.id)
+                        }}
+                      >
+                        <Pencil className="mr-2 h-4 w-4" />
+                        Chỉnh sửa
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleToggleActive(category.id)
+                        }}
+                      >
+                        {category.is_active ? (
+                          <>
+                            <EyeOff className="mr-2 h-4 w-4" />
+                            Ẩn danh mục
+                          </>
+                        ) : (
+                          <>
+                            <Eye className="mr-2 h-4 w-4" />
+                            Hiện danh mục
+                          </>
+                        )}
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleDelete(category.id)
+                        }}
+                        className="text-red-600 focus:text-red-600 dark:text-red-400"
+                      >
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        Xóa danh mục
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               </TableCell>
             </TableRow>

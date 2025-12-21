@@ -162,6 +162,22 @@ export function AdminLayout({ children }: AdminLayoutProps) {
       }
     }
 
+    // Orders
+    if (path === '/admin/orders' || path.startsWith('/admin/orders/')) {
+      return {
+        title: 'Đơn hàng',
+        description: 'Theo dõi và xử lý đơn theo thời gian thực',
+      }
+    }
+
+    // Staff
+    if (path === '/admin/staff' || path.startsWith('/admin/staff/')) {
+      return {
+        title: 'Nhân viên',
+        description: 'Quản lý tài khoản phục vụ & bếp theo nhà hàng',
+      }
+    }
+
     // Dashboard
     if (path === '/admin/dashboard' || path === '/admin') {
       return {
