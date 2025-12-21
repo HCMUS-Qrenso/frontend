@@ -83,7 +83,7 @@ export function MenuItemsFilterToolbar() {
     const params = new URLSearchParams(searchParams.toString())
     params.set('modal', 'item')
     params.set('mode', 'create')
-    router.push(`/admin/menu/items?${params.toString()}`)
+    router.push(`/admin/menu/items?${params.toString()}`, { scroll: false })
   }
 
   const handleImportExport = () => {

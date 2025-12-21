@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { ConfirmDeleteDialog } from '@/components/ui/confirm-delete-dialog'
 import { useMenuItemQuery, useDeleteMenuItemMutation } from '@/hooks/use-menu-items-query'
@@ -21,11 +22,23 @@ export function MenuItemDeleteDialog() {
   const deleteMutation = useDeleteMenuItemMutation()
 
   const handleClose = () => {
+    // Just close the dialog
     const params = new URLSearchParams(searchParams.toString())
     params.delete('delete')
-    params.delete('id')
-    router.push(`?${params.toString()}`)
+    router.push(`?${params.toString()}`, { scroll: false })
   }
+
+  // Clean data after closing
+  useEffect(() => {
+    if (!open) {
+      const timer = setTimeout(() => {
+        const params = new URLSearchParams(searchParams.toString())
+        params.delete('id')
+        router.push(`?${params.toString()}`, { scroll: false })
+      }, 200)
+      return () => clearTimeout(timer)
+    }
+  }, [open])
 
   const handleDelete = async () => {
     if (!itemId) return

@@ -306,7 +306,7 @@ export function TableUpsertDrawer({ open }: TableUpsertDrawerProps) {
   if (mode === 'edit' && isLoadingTable) {
     return (
       <>
-        <div className="fixed inset-0 z-60 bg-black/60 backdrop-blur-sm" aria-hidden="true" />
+        <div className="fixed inset-0 z-60 bg-black/60 backdrop-blur-sm m-0" aria-hidden="true" />
         <div className="fixed top-1/2 left-1/2 z-70 flex max-h-[90vh] w-full max-w-xl -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-700 dark:bg-slate-900">
           <div className="flex items-center justify-center p-12">
             <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
@@ -320,7 +320,7 @@ export function TableUpsertDrawer({ open }: TableUpsertDrawerProps) {
     <>
       {/* Overlay - Click to close only when not loading */}
       <div
-        className="fixed inset-0 z-60 bg-black/60 backdrop-blur-sm"
+        className="fixed inset-0 z-60 bg-black/60 backdrop-blur-sm m-0"
         onClick={() => !isLoading && closeDrawer()}
         aria-hidden="true"
       />

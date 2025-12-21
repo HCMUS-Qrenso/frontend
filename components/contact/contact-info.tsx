@@ -34,32 +34,32 @@ export function ContactInfo() {
   return (
     <div className="space-y-8">
       {/* Benefits Section */}
-      <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-6 md:p-8">
-        <h2 className="mb-6 text-2xl font-bold text-white">Bạn sẽ nhận được gì?</h2>
+      <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6 md:p-8 dark:border-slate-800 dark:bg-slate-900/50">
+        <h2 className="mb-6 text-2xl font-bold text-black dark:text-white">Bạn sẽ nhận được gì?</h2>
         <ul className="space-y-4">
           {benefits.map((benefit, index) => (
             <li key={index} className="flex items-start gap-3">
-              <div className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-emerald-500/10">
+              <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-500/10">
                 <Check className="h-3.5 w-3.5 text-emerald-500" />
               </div>
-              <span className="text-slate-300">{benefit}</span>
+              <span className="text-slate-600 dark:text-slate-300">{benefit}</span>
             </li>
           ))}
         </ul>
       </div>
 
       {/* Contact Methods */}
-      <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-6 md:p-8">
-        <h2 className="mb-6 text-2xl font-bold text-white">Thông tin liên hệ</h2>
+      <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6 md:p-8 dark:border-slate-800 dark:bg-slate-900/50">
+        <h2 className="mb-6 text-2xl font-bold text-black dark:text-white">Thông tin liên hệ</h2>
         <div className="space-y-5">
           {contactMethods.map((method, index) => (
             <div key={index} className="flex items-start gap-4">
-              <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-emerald-500/10">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10">
                 <method.icon className="h-5 w-5 text-emerald-500" />
               </div>
               <div>
-                <div className="text-sm text-slate-400">{method.label}</div>
-                <div className="font-medium text-white">{method.value}</div>
+                <div className="text-sm text-slate-500 dark:text-slate-400">{method.label}</div>
+                <div className="font-medium text-black dark:text-white">{method.value}</div>
               </div>
             </div>
           ))}

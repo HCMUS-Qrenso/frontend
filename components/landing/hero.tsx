@@ -3,7 +3,7 @@ import { ArrowRight, Play } from 'lucide-react'
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden border-b border-slate-200 bg-gradient-to-b from-slate-50 via-white to-slate-50 dark:border-slate-800/50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
+    <section className="relative overflow-hidden border-b border-slate-200 bg-linear-to-b from-slate-50 via-white to-slate-50 dark:border-slate-800/50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
       {/* Background decoration */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#10b98120_1px,transparent_1px),linear-gradient(to_bottom,#10b98120_1px,transparent_1px)] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_0%,#000_70%,transparent_110%)] bg-[size:4rem_4rem]" />
 
@@ -12,7 +12,7 @@ export function Hero() {
           {/* Headline */}
           <h1 className="text-4xl leading-tight font-bold text-balance text-slate-900 md:text-5xl lg:text-6xl dark:text-white">
             Tăng tốc phục vụ, giảm sai sót với{' '}
-            <span className="bg-gradient-to-r from-emerald-400 to-teal-500 bg-clip-text text-transparent">
+            <span className="bg-linear-to-r from-emerald-400 to-teal-500 bg-clip-text text-transparent">
               QR Ordering
             </span>{' '}
             và quản lý realtime

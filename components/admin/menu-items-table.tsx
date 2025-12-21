@@ -28,7 +28,7 @@ import { EmptyState } from '@/components/ui/empty-state'
 import Image from 'next/image'
 import { useMenuItemsQuery } from '@/hooks/use-menu-items-query'
 import { useErrorHandler } from '@/hooks/use-error-handler'
-import type { MenuItemSortBy, MenuItemSortOrder } from '@/types/menu-items'
+import type { MenuItemSortBy, MenuItemSortOrder, MenuItemStatus } from '@/types/menu-items'
 import { toast } from 'sonner'
 
 // Import the MenuItem type from the types file
@@ -50,11 +50,16 @@ export function MenuItemsTable() {
   const sort_order: MenuItemSortOrder =
     (searchParams.get('sort_order') as MenuItemSortOrder) || 'desc'
 
+  // Validate status parameter
+  const statusParam = searchParams.get('status')
+  const status: MenuItemStatus | undefined = statusParam && ['available', 'unavailable', 'sold_out'].includes(statusParam) ? statusParam as MenuItemStatus : undefined
+
   // Fetch menu items from API (status is not sent to API)
   const { data, isLoading, error } = useMenuItemsQuery({
     page,
     limit,
     search,
+    status,
     category_id: category_id === 'all' ? undefined : category_id || undefined,
     sort_by,
     sort_order,
@@ -81,14 +86,14 @@ export function MenuItemsTable() {
     params.set('modal', 'item')
     params.set('mode', 'edit')
     params.set('id', itemId)
-    router.push(`/admin/menu/items?${params.toString()}`)
+    router.push(`/admin/menu/items?${params.toString()}`, { scroll: false })
   }
 
   const handleDelete = (itemId: string) => {
     const params = new URLSearchParams(searchParams.toString())
     params.set('delete', 'item')
     params.set('id', itemId)
-    router.push(`/admin/menu/items?${params.toString()}`)
+    router.push(`/admin/menu/items?${params.toString()}`, { scroll: false })
   }
 
   // Loading state
