@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import {
   Table,
@@ -11,7 +10,6 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,17 +25,16 @@ import { ContainerLoadingState, ContainerErrorState } from '@/components/ui/load
 import { EmptyState } from '@/components/ui/empty-state'
 import Image from 'next/image'
 import { useMenuItemsQuery } from '@/hooks/use-menu-items-query'
-import { useErrorHandler } from '@/hooks/use-error-handler'
 import type { MenuItemSortBy, MenuItemSortOrder, MenuItemStatus } from '@/types/menu-items'
-import { toast } from 'sonner'
 
-// Import the MenuItem type from the types file
-import type { MenuItem } from '@/types/menu-items'
+interface MenuItemsTableProps {
+  onEditClick: (item: any) => void
+  onDeleteClick: (item: any) => void
+}
 
-export function MenuItemsTable() {
+export function MenuItemsTable({ onEditClick, onDeleteClick }: MenuItemsTableProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const { handleErrorWithStatus } = useErrorHandler()
 
   // Get query params from URL
   const page = Number.parseInt(searchParams.get('page') || '1')
@@ -81,21 +78,6 @@ export function MenuItemsTable() {
     router.push(`/admin/menu/items?${params.toString()}`)
   }
 
-  const handleEdit = (itemId: string) => {
-    const params = new URLSearchParams(searchParams.toString())
-    params.set('modal', 'item')
-    params.set('mode', 'edit')
-    params.set('id', itemId)
-    router.push(`/admin/menu/items?${params.toString()}`, { scroll: false })
-  }
-
-  const handleDelete = (itemId: string) => {
-    const params = new URLSearchParams(searchParams.toString())
-    params.set('delete', 'item')
-    params.set('id', itemId)
-    router.push(`/admin/menu/items?${params.toString()}`, { scroll: false })
-  }
-
   // Loading state
   if (isLoading) {
     return <ContainerLoadingState />
@@ -117,7 +99,7 @@ export function MenuItemsTable() {
         <Table>
           <TableHeader>
             <TableRow className="border-b border-slate-100 bg-slate-50/80 hover:bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900">
-              <TableHead className="min-w-[200px] px-2 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase md:px-4 dark:text-slate-400">
+              <TableHead className="min-w-50 px-2 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase md:px-4 dark:text-slate-400">
                 Món ăn
               </TableHead>
               <TableHead className="w-24 px-2 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase md:w-32 md:px-4 dark:text-slate-400">
@@ -159,7 +141,7 @@ export function MenuItemsTable() {
                     'cursor-pointer border-b border-slate-100 transition-colors hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800',
                     index === menuItems.length - 1 && 'border-b-0',
                   )}
-                  onClick={() => handleEdit(item.id)}
+                  onClick={() => onEditClick(item)}
                 >
                   <TableCell className="px-2 py-3 md:px-4">
                     <div className="flex items-center gap-3">
@@ -184,7 +166,7 @@ export function MenuItemsTable() {
                       </div>
                       <div className="flex min-w-0 flex-col gap-1">
                         <div className="flex items-center gap-2">
-                          <span className="line-clamp-2 text-xs font-medium break-words text-slate-900 md:text-sm dark:text-white">
+                          <span className="line-clamp-2 text-xs font-medium wrap-break-word text-slate-900 md:text-sm dark:text-white">
                             {item.name}
                           </span>
                           {item.is_chef_recommendation && (
@@ -201,7 +183,7 @@ export function MenuItemsTable() {
                     </div>
                   </TableCell>
                   <TableCell className="px-2 py-3 md:px-4">
-                    <span className="text-xs break-words text-slate-600 md:text-sm dark:text-slate-400">
+                    <span className="text-xs wrap-break-word text-slate-600 md:text-sm dark:text-slate-400">
                       {item.category?.name || 'Chưa phân loại'}
                     </span>
                   </TableCell>
@@ -243,7 +225,7 @@ export function MenuItemsTable() {
                           <DropdownMenuItem
                             onClick={(e) => {
                               e.stopPropagation()
-                              handleEdit(item.id)
+                              onEditClick(item)
                             }}
                           >
                             <Pencil className="mr-2 h-4 w-4" />
@@ -253,7 +235,7 @@ export function MenuItemsTable() {
                           <DropdownMenuItem
                             onClick={(e) => {
                               e.stopPropagation()
-                              handleDelete(item.id)
+                              onDeleteClick(item)
                             }}
                             className="text-red-600 focus:text-red-600 dark:text-red-400"
                           >

@@ -7,7 +7,7 @@ import { SearchInput } from '@/components/ui/search-input'
 import { FilterDropdown, type FilterOption } from '@/components/ui/filter-dropdown'
 import { Plus, Download, ArrowUpDown } from 'lucide-react'
 import { AdminFilterToolbarWrapper } from './admin-filter-toolbar-wrapper'
-import { useCategoriesQuery } from '@/hooks/use-categories-query'
+import { Category } from '@/types/categories'
 
 const STATUS_OPTIONS: FilterOption[] = [
   { value: 'all', label: 'Tất cả' },
@@ -28,18 +28,19 @@ const SORT_ORDER_OPTIONS: FilterOption[] = [
   { value: 'desc', label: 'Giảm dần' },
 ]
 
-export function MenuItemsFilterToolbar() {
+interface MenuItemsFilterToolbarProps {
+  categories: Category[] | undefined
+  onCreateClick: () => void
+}
+
+export function MenuItemsFilterToolbar({ categories, onCreateClick }: MenuItemsFilterToolbarProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
-
-  // Fetch categories from API
-  const { data: categoriesData, isLoading: isLoadingCategories } = useCategoriesQuery()
-  const categories = categoriesData?.data.categories || []
 
   // Build dynamic category options from API data
   const categoryOptions: FilterOption[] = [
     { value: 'all', label: 'Tất cả danh mục' },
-    ...categories.map((c) => ({ value: c.id, label: c.name })),
+    ...(categories ? categories.map((c) => ({ value: c.id, label: c.name })) : []),
   ]
 
   // Get filter values from URL params
@@ -79,13 +80,6 @@ export function MenuItemsFilterToolbar() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [localSearchQuery])
 
-  const handleCreateItem = () => {
-    const params = new URLSearchParams(searchParams.toString())
-    params.set('modal', 'item')
-    params.set('mode', 'create')
-    router.push(`/admin/menu/items?${params.toString()}`, { scroll: false })
-  }
-
   const handleImportExport = () => {
     router.push('/admin/menu/import-export')
   }
@@ -105,7 +99,7 @@ export function MenuItemsFilterToolbar() {
           value={selectedCategoryId}
           options={categoryOptions}
           onChange={(value) => updateFilter('category_id', value)}
-          isLoading={isLoadingCategories}
+          isLoading={!categories}
           placeholder="Tất cả danh mục"
           emptyMessage="Chưa có danh mục"
         />
@@ -145,7 +139,7 @@ export function MenuItemsFilterToolbar() {
           <span className="hidden text-sm sm:inline">Import/Export</span>
         </Button>
         <Button
-          onClick={handleCreateItem}
+          onClick={onCreateClick}
           className="h-8 gap-1 rounded-lg bg-emerald-600 px-3 hover:bg-emerald-700"
         >
           <Plus className="h-3 w-3" />

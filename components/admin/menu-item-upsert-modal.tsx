@@ -2,7 +2,6 @@
 
 import type React from 'react'
 import { useEffect, useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
 import {
   Dialog,
   DialogContent,
@@ -23,37 +22,29 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Loader2, Upload, X, LinkIcon } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { Loader2, Upload, X } from 'lucide-react'
 import Image from 'next/image'
 import {
-  useMenuItemQuery,
   useCreateMenuItemMutation,
   useUpdateMenuItemMutation,
 } from '@/hooks/use-menu-items-query'
-import { useCategoriesQuery } from '@/hooks/use-categories-query'
 import { useErrorHandler } from '@/hooks/use-error-handler'
 import { useUploadFiles } from '@/hooks/use-uploads'
 import { toast } from 'sonner'
 import { ModifierGroupSelector } from './menu-item-modifier-groups-selector'
+import { MenuItem } from '@/types/menu-items'
+import { Category } from '@/types/categories'
 
-export function MenuItemUpsertModal() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const mode = searchParams.get('mode') as 'create' | 'edit'
-  const itemId = searchParams.get('id')
+interface MenuItemUpsertModalProps {
+  open: boolean
+  item: MenuItem | null
+  categories: Category[]
+  onOpenChange: (open: boolean) => void
+  mode: 'create' | 'edit'
+}
+
+export function MenuItemUpsertModal({ open, item, categories, onOpenChange, mode }: MenuItemUpsertModalProps) {
   const { handleErrorWithStatus } = useErrorHandler()
-  const open = searchParams.get('modal') === 'item'
-
-  // Fetch categories for dropdown
-  const { data: categoriesData, isLoading: isLoadingCategories } = useCategoriesQuery()
-  const categories = categoriesData?.data.categories || []
-
-  // Fetch menu item data for editing
-  const { data: itemData, isLoading: isLoadingItem } = useMenuItemQuery(
-    itemId || null,
-    open && !!itemId,
-  )
 
   // Mutations
   const createMutation = useCreateMenuItemMutation()
@@ -88,9 +79,9 @@ export function MenuItemUpsertModal() {
 
   // Load data if editing
   useEffect(() => {
-    if (mode === 'edit' && itemData?.data) {
-      const item = itemData.data
+    if (mode === 'edit' && item) {
       setOriginalItemData(item) // Store original data for comparison
+      
       setFormData({
         name: item.name,
         category_id: item.category?.id || '',
@@ -105,6 +96,7 @@ export function MenuItemUpsertModal() {
         protein: item.nutritional_info?.protein?.toString() || '',
         calories: item.nutritional_info?.calories?.toString() || '',
       })
+      
       // Handle images - support both string[] and object[] formats for backward compatibility
       setImages(
         item.images?.map((img: string | { image_url: string }, index: number) => ({
@@ -112,9 +104,11 @@ export function MenuItemUpsertModal() {
           is_primary: index === 0,
         })) || [],
       )
+      
       setSelectedModifierGroupIds(item.modifier_groups?.map((g) => g.id) || [])
-    } else if (mode === 'create' && !isLoadingItem) {
+    } else if (mode === 'create') {
       setOriginalItemData(null)
+      
       setFormData({
         name: '',
         category_id: '',
@@ -129,58 +123,44 @@ export function MenuItemUpsertModal() {
         protein: '',
         calories: '',
       })
+      
       setImages([])
+      
       setSelectedModifierGroupIds([])
     }
-  }, [mode, itemData, isLoadingItem])
+  }, [mode, item, categories])
 
-  const handleClose = () => {
-    // Clean up object URLs
-    images.forEach((img) => {
-      if (img.url.startsWith('blob:')) {
-        URL.revokeObjectURL(img.url)
-      }
-    })
 
-    // Just close the dialog
-    const params = new URLSearchParams(searchParams.toString())
-    params.delete('modal')
-    router.push(`?${params.toString()}`, { scroll: false })
-  }
+  // // Clean data here
+  // useEffect(() => {
+  //   if (!open) {
+  //     images.forEach((img) => {
+  //       if (img.url.startsWith('blob:')) {
+  //         URL.revokeObjectURL(img.url)
+  //       }
+  //     })
 
-  // Clean data here
-  useEffect(() => {
-    if (!open) {
-      const timer = setTimeout(() => {
-        setFormData({
-          name: '',
-          category_id: '',
-          base_price: '',
-          description: '',
-          preparation_time: '',
-          status: 'available',
-          is_chef_recommendation: false,
-          allergen_info: '',
-          fat: '',
-          carbs: '',
-          protein: '',
-          calories: '',
-        })
-        setImages([])
-        setSelectedModifierGroupIds([])
-        setErrors({ name: '', base_price: '' })
-        setOriginalItemData(null)
+  //     setFormData({
+  //       name: '',
+  //       category_id: '',
+  //       base_price: '',
+  //       description: '',
+  //       preparation_time: '',
+  //       status: 'available',
+  //       is_chef_recommendation: false,
+  //       allergen_info: '',
+  //       fat: '',
+  //       carbs: '',
+  //       protein: '',
+  //       calories: '',
+  //     })
 
-        const params = new URLSearchParams(searchParams.toString())
-        params.delete('mode')
-        params.delete('id')
-        router.push(`?${params.toString()}`, { scroll: false })
-      }, 200) 
-
-      return () => clearTimeout(timer)
-    }
-  }, [open])
-
+  //     setImages([])
+  //     setSelectedModifierGroupIds([])
+  //     setErrors({ name: '', base_price: '' })
+  //     setOriginalItemData(null)
+  //   }
+  // }, [open])
 
 
   // Helper function to build payload with only changed fields
@@ -222,7 +202,26 @@ export function MenuItemUpsertModal() {
       payload.allergen_info = formData.allergen_info.trim() || undefined
     }
 
-    // Note: nutritional_info is not included in update payload
+    if ((formData.fat || '') !== (originalItemData.nutritional_info?.fat?.toString() || '')) {
+      payload.nutritional_info = payload.nutritional_info || {}
+      payload.nutritional_info.fat = parseFloat(formData.fat) || 0
+    }
+
+    if ((formData.carbs || '') !== (originalItemData.nutritional_info?.carbs?.toString() || '')) {
+      payload.nutritional_info = payload.nutritional_info || {}
+      payload.nutritional_info.carbs = parseFloat(formData.carbs) || 0
+    }
+
+    if ((formData.protein || '') !== (originalItemData.nutritional_info?.protein?.toString() || '')) {
+      payload.nutritional_info = payload.nutritional_info || {}
+      payload.nutritional_info.protein = parseFloat(formData.protein) || 0
+    }
+
+    if ((formData.calories || '') !== (originalItemData.nutritional_info?.calories?.toString() || '')) {
+      payload.nutritional_info = payload.nutritional_info || {}
+      payload.nutritional_info.calories = parseFloat(formData.calories) || 0
+    }
+
     // Images (image_urls) are handled separately in handleSubmit after S3 upload
 
     return payload
@@ -330,29 +329,14 @@ export function MenuItemUpsertModal() {
         }
         await createMutation.mutateAsync(payload)
         toast.success('Đã tạo món ăn thành công')
-      } else if (mode === 'edit' && itemId) {
-        // Upload new images to S3 first
-        const newFiles = images.filter((img) => img.file).map((img) => img.file!)
-        let uploadedUrls: string[] = []
-
-        if (newFiles.length > 0) {
-          const results = await uploadFiles(newFiles, { group: 'menu-images' })
-          uploadedUrls = results.map((r) => r.url)
-        }
-
-        // Combine existing URLs (non-blob) with newly uploaded URLs
-        const existingUrls = images
-          .filter((img) => !img.file && !img.url.startsWith('blob:'))
-          .map((img) => img.url)
-        const allImageUrls = [...existingUrls, ...uploadedUrls]
-
+      } else if (mode === 'edit' && item) {
         const payload = buildUpdatePayload()
 
         // Check if images changed and add to payload
-        const originalUrls = originalItemData?.images || []
+        const originalUrls = (originalItemData?.images || []).map((img: string | { image_url: string }) => typeof img === 'string' ? img : img.image_url).sort()
         const hasNewFiles = newFiles.length > 0
         const existingUrlsChanged =
-          JSON.stringify(existingUrls.sort()) !== JSON.stringify(originalUrls.sort())
+          JSON.stringify(existingUrls.sort()) !== JSON.stringify(originalUrls)
 
         if (hasNewFiles || existingUrlsChanged) {
           payload.image_urls = allImageUrls
@@ -361,19 +345,19 @@ export function MenuItemUpsertModal() {
         // If no changes (including images), don't send request
         if (Object.keys(payload).length === 0) {
           toast.info('Không có thay đổi nào để cập nhật')
-          handleClose()
+          onOpenChange(false)
           return
         }
 
         await updateMutation.mutateAsync({
-          id: itemId,
+          id: item.id,
           payload,
         })
         toast.success('Đã cập nhật món ăn thành công')
       }
 
       // Success - close modal
-      handleClose()
+      onOpenChange(false)
     } catch (error) {
       handleErrorWithStatus(error, undefined, 'Không thể lưu món ăn')
     }
@@ -461,13 +445,9 @@ export function MenuItemUpsertModal() {
     )
   }
 
-  const handleModifiersLink = () => {
-    router.push('/admin/menu/modifiers')
-  }
-
   return (
-    <Dialog open={open} onOpenChange={handleClose} >
-      <DialogContent className="max-h-[90vh] sm:max-w-[700px] flex flex-col" onOpenAutoFocus={(e) => e.preventDefault()}>
+    <Dialog open={open} onOpenChange={onOpenChange} >
+      <DialogContent className="max-h-[90vh] sm:max-w-175 flex flex-col" >
         <DialogHeader>
           <DialogTitle>{mode === 'create' ? 'Thêm món mới' : 'Chỉnh sửa món'}</DialogTitle>
           <DialogDescription>
@@ -478,17 +458,6 @@ export function MenuItemUpsertModal() {
         {/* Scrollable content area - header and footer stay fixed */}
         <div className="min-h-0 flex-1 overflow-y-auto px-6 py-4">
           <form id="menu-item-upsert-form" onSubmit={handleSubmit} className="space-y-6">
-            {/* Loading state for edit mode - wait for both item data AND categories */}
-            {(isLoadingItem || isLoadingCategories) && (
-              <div className="flex items-center justify-center py-8">
-                <Loader2 className="h-6 w-6 animate-spin text-emerald-600" />
-              </div>
-            )}
-
-            {/* Show form only when: create mode OR (edit mode with correct data loaded) */}
-            {!isLoadingItem && !isLoadingCategories && (
-              <>
-                {/* Section 1: Basic Info */}
                 <div className="space-y-4">
                   <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
                     Thông tin cơ bản
@@ -504,7 +473,7 @@ export function MenuItemUpsertModal() {
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                         placeholder="Ví dụ: Phở Bò Tái"
-                        disabled={isSubmitting || (mode === 'edit' && isLoadingItem)}
+                        disabled={isSubmitting}
                       />
                       {errors.name && <p className="text-xs text-red-600">{errors.name}</p>}
                     </div>
@@ -517,13 +486,11 @@ export function MenuItemUpsertModal() {
                           if (!value) return
                           setFormData((prev) => ({ ...prev, category_id: value }))
                         }}
-                        disabled={
-                          isSubmitting || isLoadingCategories || (mode === 'edit' && isLoadingItem)
-                        }
+                        disabled={isSubmitting}
                       >
                         <SelectTrigger id="category">
                             <SelectValue
-                              placeholder={isLoadingCategories ? 'Đang tải...' : 'Chọn danh mục'}
+                              placeholder={'Chọn danh mục'}
                             />
                         </SelectTrigger>
                         <SelectContent>
@@ -548,7 +515,7 @@ export function MenuItemUpsertModal() {
                         value={formData.base_price}
                         onChange={(e) => setFormData({ ...formData, base_price: e.target.value })}
                         placeholder="85000"
-                        disabled={isSubmitting || (mode === 'edit' && isLoadingItem)}
+                        disabled={isSubmitting}
                       />
                       {errors.base_price && (
                         <p className="text-xs text-red-600">{errors.base_price}</p>
@@ -565,7 +532,7 @@ export function MenuItemUpsertModal() {
                           setFormData({ ...formData, preparation_time: e.target.value })
                         }
                         placeholder="15"
-                        disabled={isSubmitting || (mode === 'edit' && isLoadingItem)}
+                        disabled={isSubmitting}
                       />
                     </div>
                   </div>
@@ -684,7 +651,7 @@ export function MenuItemUpsertModal() {
                   <ModifierGroupSelector
                     selectedGroupIds={selectedModifierGroupIds}
                     onChange={setSelectedModifierGroupIds}
-                    disabled={isSubmitting || (mode === 'edit' && isLoadingItem)}
+                    disabled={isSubmitting}
                   />
                 </div>
 
@@ -718,7 +685,7 @@ export function MenuItemUpsertModal() {
                         value={formData.fat}
                         onChange={(e) => setFormData({ ...formData, fat: e.target.value })}
                         placeholder="0"
-                        disabled={isSubmitting || (mode === 'edit' && isLoadingItem)}
+                        disabled={isSubmitting}
                       />
                     </div>
                     <div className="space-y-2">
@@ -729,7 +696,7 @@ export function MenuItemUpsertModal() {
                         value={formData.carbs}
                         onChange={(e) => setFormData({ ...formData, carbs: e.target.value })}
                         placeholder="0"
-                        disabled={isSubmitting || (mode === 'edit' && isLoadingItem)}
+                        disabled={isSubmitting}
                       />
                     </div>
                     <div className="space-y-2">
@@ -740,7 +707,7 @@ export function MenuItemUpsertModal() {
                         value={formData.protein}
                         onChange={(e) => setFormData({ ...formData, protein: e.target.value })}
                         placeholder="0"
-                        disabled={isSubmitting || (mode === 'edit' && isLoadingItem)}
+                        disabled={isSubmitting}
                       />
                     </div>
                     <div className="space-y-2">
@@ -751,20 +718,18 @@ export function MenuItemUpsertModal() {
                         value={formData.calories}
                         onChange={(e) => setFormData({ ...formData, calories: e.target.value })}
                         placeholder="0"
-                        disabled={isSubmitting || (mode === 'edit' && isLoadingItem)}
+                        disabled={isSubmitting}
                       />
                     </div>
                   </div>
                 </div>
-              </>
-            )}
           </form>
         </div>
 
         {/* Fixed footer */}
         <div className="px-6 pb-6">
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={handleClose} disabled={isSubmitting}>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isSubmitting}>
               Hủy
             </Button>
             <Button
