@@ -73,7 +73,7 @@ export function MenuItemUpsertModal({
   })
 
   // Store original item data for comparison
-  const [originalItemData, setOriginalItemData] = useState<any>(null)
+  const [originalItemData, setOriginalItemData] = useState<MenuItem | null>(null)
 
   const [errors, setErrors] = useState({
     name: '',

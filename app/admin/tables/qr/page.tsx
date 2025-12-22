@@ -20,6 +20,7 @@ import { downloadBlobWithHeaders } from '@/lib/utils/download'
 import { toast } from 'sonner'
 import { useErrorHandler } from '@/hooks/use-error-handler'
 import { QrStats, type QRStatus, type TableQR } from '@/types/tables'
+import { Loader2 } from 'lucide-react'
 
 // Helper function to map backend QR status to UI status
 // API returns title case: "Missing", "Ready", "Outdated"
