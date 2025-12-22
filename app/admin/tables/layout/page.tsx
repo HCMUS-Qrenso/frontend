@@ -572,16 +572,6 @@ export default function TableLayoutPage() {
     [handleTableUpdate],
   )
 
-  if (isLoadingLayout) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <div className="text-center">
-          <p className="text-sm text-slate-500 dark:text-slate-400">Đang tải sơ đồ...</p>
-        </div>
-      </div>
-    )
-  }
-
   return (
     <div className="space-y-4">
       {/* Toolbar */}
@@ -599,6 +589,7 @@ export default function TableLayoutPage() {
         onRedo={handleRedo}
         onSave={handleSave}
         onReset={handleReset}
+        isLoading={isLoadingLayout}
       />
 
       {/* Main content: Canvas + Side Panel */}
@@ -614,6 +605,7 @@ export default function TableLayoutPage() {
           showGrid={showGrid}
           selectedArea={currentZoneName}
           onTableRemove={handleTableRemove}
+          isLoading={isLoadingLayout}
         />
 
         {/* Side Panel */}

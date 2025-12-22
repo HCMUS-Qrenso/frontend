@@ -1,41 +1,32 @@
 'use client'
 
-import { useRouter, useSearchParams } from 'next/navigation'
 import { ConfirmDeleteDialog } from '@/components/ui/confirm-delete-dialog'
 import { useDeleteZoneMutation } from '@/hooks/use-zones-query'
 import { useErrorHandler } from '@/hooks/use-error-handler'
 import { toast } from 'sonner'
+import { Zone } from '@/types/zones'
 
-export function ZoneDeleteDialog() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
+interface ZoneDeleteModalProps {
+  open: boolean
+  zone: Zone | null
+  onOpenChange: (open: boolean) => void
+}
 
-  const deleteType = searchParams.get('delete')
-  const zoneId = searchParams.get('id')
-  const zoneName = searchParams.get('name') || 'khu vực này'
-
-  const open = deleteType === 'zone' && !!zoneId
+export function ZoneDeleteModal({ open, zone, onOpenChange }: ZoneDeleteModalProps) {
+  const zoneName = zone?.name || 'khu vực này'
 
   const deleteMutation = useDeleteZoneMutation()
   const { handleErrorWithStatus } = useErrorHandler()
 
   const isDeleting = deleteMutation.isPending
 
-  const handleClose = () => {
-    const params = new URLSearchParams(searchParams.toString())
-    params.delete('delete')
-    params.delete('id')
-    params.delete('name')
-    router.push(`/admin/tables/zones?${params.toString()}`)
-  }
-
   const handleConfirmDelete = async () => {
-    if (!zoneId) return
+    if (!zone) return
 
     try {
-      await deleteMutation.mutateAsync(zoneId)
+      await deleteMutation.mutateAsync(zone.id)
       toast.success('Khu vực đã được xóa thành công')
-      handleClose()
+      onOpenChange(false)
     } catch (error: any) {
       const status = error?.response?.status
       if (status === 409) {
@@ -53,7 +44,7 @@ export function ZoneDeleteDialog() {
   return (
     <ConfirmDeleteDialog
       open={open}
-      onOpenChange={handleClose}
+      onOpenChange={onOpenChange}
       title="Xóa khu vực?"
       description="Hành động này không thể hoàn tác. Lưu ý: Chỉ có thể xóa khu vực không có bàn nào."
       itemName={zoneName !== 'khu vực này' ? zoneName : undefined}

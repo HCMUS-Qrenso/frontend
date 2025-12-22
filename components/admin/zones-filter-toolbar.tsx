@@ -25,7 +25,11 @@ const SORT_ORDER_OPTIONS: FilterOption[] = [
   { value: 'desc', label: 'Giảm dần' },
 ]
 
-export function ZonesFilterToolbar() {
+interface ZonesFilterToolbarProps {
+  onCreateZone: () => void
+}
+
+export function ZonesFilterToolbar({ onCreateZone }: ZonesFilterToolbarProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
 
@@ -58,14 +62,6 @@ export function ZonesFilterToolbar() {
     return () => clearTimeout(timer)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [localSearchQuery])
-
-  const handleAddZone = () => {
-    const params = new URLSearchParams(searchParams.toString())
-    params.delete('id')
-    params.set('modal', 'zone')
-    params.set('mode', 'create')
-    router.push(`/admin/tables/zones?${params.toString()}`)
-  }
 
   return (
     <div className="flex flex-col gap-3 rounded-2xl border border-slate-100 bg-white/80 p-4 shadow-sm md:flex-row md:items-center md:justify-between dark:border-slate-800 dark:bg-slate-900/80">
@@ -105,7 +101,7 @@ export function ZonesFilterToolbar() {
       {/* Right - Actions */}
       <div className="flex items-center gap-2">
         <Button
-          onClick={handleAddZone}
+          onClick={() => onCreateZone()}
           className="h-8 gap-1 rounded-lg bg-emerald-600 px-3 hover:bg-emerald-700"
         >
           <Plus className="h-3 w-3" />

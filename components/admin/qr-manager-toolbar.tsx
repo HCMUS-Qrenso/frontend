@@ -190,14 +190,16 @@ export function QRManagerToolbar({
               Tạo lại toàn bộ mã QR?
             </AlertDialogTitle>
             <AlertDialogDescription className="space-y-2">
-              <p>
+              <span className="block">
                 Hành động này sẽ tạo lại <strong>TẤT CẢ</strong> mã QR cho toàn bộ bàn trong hệ
                 thống.
-              </p>
-              <p className="font-medium text-red-500">
-                ⚠️ Các mã QR cũ đã in hoặc dán tại bàn sẽ KHÔNG còn hoạt động.
-              </p>
-              <p>Bạn sẽ cần in lại và thay thế tất cả mã QR tại nhà hàng.</p>
+              </span>
+              <span className="block font-medium text-red-500">
+                Các mã QR cũ đã in hoặc dán tại bàn sẽ KHÔNG còn hoạt động.
+              </span>
+              <span className="block">
+                Bạn sẽ cần in lại và thay thế tất cả mã QR tại nhà hàng.
+              </span>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

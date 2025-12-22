@@ -3,7 +3,6 @@
 import type React from 'react'
 
 import { useEffect, useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
 import {
   Dialog,
   DialogContent,
@@ -18,23 +17,24 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
 import { Loader2 } from 'lucide-react'
-import {
-  useCategoryQuery,
-  useCreateCategoryMutation,
-  useUpdateCategoryMutation,
-} from '@/hooks/use-categories-query'
+import { useCreateCategoryMutation, useUpdateCategoryMutation } from '@/hooks/use-categories-query'
 import { useErrorHandler } from '@/hooks/use-error-handler'
 import { toast } from 'sonner'
+import { Category } from '@/types/categories'
 
 interface CategoryUpsertModalProps {
   open: boolean
+  mode: 'create' | 'edit'
+  category: Category | null
+  onOpenChange: (open: boolean) => void
 }
 
-export function CategoryUpsertModal({ open }: CategoryUpsertModalProps) {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const mode = searchParams.get('mode') as 'create' | 'edit'
-  const categoryId = searchParams.get('id')
+export function CategoryUpsertModal({
+  open,
+  mode,
+  category,
+  onOpenChange,
+}: CategoryUpsertModalProps) {
   const { handleErrorWithStatus } = useErrorHandler()
 
   const [formData, setFormData] = useState({
@@ -47,12 +47,6 @@ export function CategoryUpsertModal({ open }: CategoryUpsertModalProps) {
     name: '',
   })
 
-  // Load category data for editing
-  const { data: categoryData, isLoading: isLoadingCategory } = useCategoryQuery(
-    categoryId || null,
-    open && !!categoryId,
-  )
-
   // Mutations
   const createMutation = useCreateCategoryMutation()
   const updateMutation = useUpdateCategoryMutation()
@@ -61,8 +55,7 @@ export function CategoryUpsertModal({ open }: CategoryUpsertModalProps) {
 
   // Load data if editing
   useEffect(() => {
-    if (mode === 'edit' && categoryData?.data?.category) {
-      const category = categoryData.data.category
+    if (mode === 'edit' && category) {
       setFormData({
         name: category.name,
         description: category.description || '',
@@ -75,17 +68,8 @@ export function CategoryUpsertModal({ open }: CategoryUpsertModalProps) {
         is_active: true,
       })
     }
-  }, [mode, categoryData])
-
-  const handleClose = () => {
-    const params = new URLSearchParams(searchParams.toString())
-    params.delete('modal')
-    params.delete('mode')
-    params.delete('id')
-    router.push(`?${params.toString()}`)
-    setFormData({ name: '', description: '', is_active: true })
     setErrors({ name: '' })
-  }
+  }, [mode, category])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -110,9 +94,9 @@ export function CategoryUpsertModal({ open }: CategoryUpsertModalProps) {
           is_active: formData.is_active,
         })
         toast.success('Đã tạo danh mục thành công')
-      } else if (mode === 'edit' && categoryId) {
+      } else if (mode === 'edit' && category) {
         await updateMutation.mutateAsync({
-          id: categoryId,
+          id: category.id,
           payload: {
             name: formData.name.trim(),
             description: formData.description.trim() || undefined,
@@ -123,15 +107,15 @@ export function CategoryUpsertModal({ open }: CategoryUpsertModalProps) {
       }
 
       // Success - close modal
-      handleClose()
+      onOpenChange(false)
     } catch (error) {
       handleErrorWithStatus(error, undefined, 'Không thể lưu danh mục')
     }
   }
 
   return (
-    <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[500px]">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-125">
         <DialogHeader>
           <DialogTitle>
             {mode === 'create' ? 'Thêm danh mục mới' : 'Chỉnh sửa danh mục'}
@@ -144,86 +128,76 @@ export function CategoryUpsertModal({ open }: CategoryUpsertModalProps) {
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-5">
-          {mode === 'edit' && isLoadingCategory && (
-            <div className="flex items-center justify-center py-4">
-              <Loader2 className="h-6 w-6 animate-spin text-emerald-600" />
+          {/* Name */}
+          <div className="space-y-2">
+            <Label htmlFor="name">
+              Tên danh mục <span className="text-red-500">*</span>
+            </Label>
+            <Input
+              id="name"
+              value={formData.name || ''}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              placeholder="Ví dụ: Khai vị, Món chính, Tráng miệng..."
+              disabled={isSubmitting}
+            />
+            {errors.name && <p className="text-xs text-red-600">{errors.name}</p>}
+          </div>
+
+          {/* Description */}
+          <div className="space-y-2">
+            <Label htmlFor="description">Mô tả</Label>
+            <Textarea
+              id="description"
+              value={formData.description || ''}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              placeholder="Mô tả ngắn về danh mục này..."
+              rows={3}
+              disabled={isSubmitting}
+            />
+          </div>
+
+          {/* Active Toggle */}
+          <div className="flex items-center justify-between rounded-lg border border-slate-200 p-4 dark:border-slate-800">
+            <div className="space-y-0.5">
+              <Label htmlFor="is_active" className="text-base">
+                Hiển thị danh mục
+              </Label>
+              <p className="text-sm text-slate-500 dark:text-slate-400">
+                Bật để hiển thị danh mục trong menu
+              </p>
             </div>
-          )}
+            <Switch
+              id="is_active"
+              checked={formData.is_active || false}
+              onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
+              disabled={isSubmitting}
+            />
+          </div>
 
-          {(mode === 'create' || !isLoadingCategory) && (
-            <>
-              {/* Name */}
-              <div className="space-y-2">
-                <Label htmlFor="name">
-                  Tên danh mục <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="name"
-                  value={formData.name || ''}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="Ví dụ: Khai vị, Món chính, Tráng miệng..."
-                  disabled={isSubmitting || (mode === 'edit' && isLoadingCategory)}
-                />
-                {errors.name && <p className="text-xs text-red-600">{errors.name}</p>}
-              </div>
-
-              {/* Description */}
-              <div className="space-y-2">
-                <Label htmlFor="description">Mô tả</Label>
-                <Textarea
-                  id="description"
-                  value={formData.description || ''}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder="Mô tả ngắn về danh mục này..."
-                  rows={3}
-                  disabled={isSubmitting || (mode === 'edit' && isLoadingCategory)}
-                />
-              </div>
-
-              {/* Active Toggle */}
-              <div className="flex items-center justify-between rounded-lg border border-slate-200 p-4 dark:border-slate-800">
-                <div className="space-y-0.5">
-                  <Label htmlFor="is_active" className="text-base">
-                    Hiển thị danh mục
-                  </Label>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">
-                    Bật để hiển thị danh mục trong menu
-                  </p>
-                </div>
-                <Switch
-                  id="is_active"
-                  checked={formData.is_active || false}
-                  onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
-                  disabled={isSubmitting || (mode === 'edit' && isLoadingCategory)}
-                />
-              </div>
-
-              <DialogFooter>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleClose}
-                  disabled={isSubmitting}
-                >
-                  Hủy
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="bg-emerald-600 hover:bg-emerald-700"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Đang lưu...
-                    </>
-                  ) : (
-                    'Lưu'
-                  )}
-                </Button>
-              </DialogFooter>
-            </>
-          )}
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+              disabled={isSubmitting}
+            >
+              Hủy
+            </Button>
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="bg-emerald-600 hover:bg-emerald-700"
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Đang lưu...
+                </>
+              ) : (
+                'Lưu'
+              )}
+            </Button>
+          </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>

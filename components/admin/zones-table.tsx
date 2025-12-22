@@ -1,9 +1,7 @@
 'use client'
 
-import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
-import { ConfirmDeleteDialog } from '@/components/ui/confirm-delete-dialog'
 import { StatusBadge, ZONE_ACTIVE_CONFIG } from '@/components/ui/status-badge'
 import { EmptyState } from '@/components/ui/empty-state'
 import {
@@ -23,11 +21,7 @@ import {
   MoreVertical,
 } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import {
-  useZonesQuery,
-  useDeleteZoneMutation,
-  useUpdateZoneMutation,
-} from '@/hooks/use-zones-query'
+import { useZonesQuery, useUpdateZoneMutation } from '@/hooks/use-zones-query'
 import { toast } from 'sonner'
 import type { Zone } from '@/types/zones'
 import { useErrorHandler } from '@/hooks/use-error-handler'
@@ -40,7 +34,12 @@ import {
   TableRow,
 } from '@/components/ui/table'
 
-export function ZonesTable() {
+interface ZonesTableProps {
+  onEdit: (zone: Zone) => void
+  onDelete: (zone: Zone) => void
+}
+
+export function ZonesTable({ onEdit, onDelete }: ZonesTableProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
 
@@ -65,53 +64,13 @@ export function ZonesTable() {
 
   const zones = data?.data || []
   const pagination = data?.pagination
-  const deleteMutation = useDeleteZoneMutation()
   const updateMutation = useUpdateZoneMutation()
   const { handleErrorWithStatus } = useErrorHandler()
-
-  const [zoneToDelete, setZoneToDelete] = useState<Zone | null>(null)
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
-
-  const handleEdit = (zoneId: string) => {
-    const params = new URLSearchParams(searchParams.toString())
-    params.set('modal', 'zone')
-    params.set('mode', 'edit')
-    params.set('id', zoneId)
-    router.push(`/admin/tables/zones?${params.toString()}`)
-  }
-
-  const handleDeleteClick = (zone: Zone) => {
-    setZoneToDelete(zone)
-    setDeleteDialogOpen(true)
-  }
 
   const handlePageChange = (newPage: number) => {
     const params = new URLSearchParams(searchParams.toString())
     params.set('page', newPage.toString())
     router.replace(`/admin/tables/zones?${params.toString()}`)
-  }
-
-  const handleConfirmDelete = async () => {
-    if (!zoneToDelete) return
-
-    try {
-      await deleteMutation.mutateAsync(zoneToDelete.id)
-      toast.success('Khu vực đã được xóa thành công')
-      setDeleteDialogOpen(false)
-      setZoneToDelete(null)
-    } catch (error: any) {
-      // Handle specific error cases with custom message for 409
-      const status = error?.response?.status
-      if (status === 409) {
-        const backendMessage = error?.response?.data?.message
-        const message = Array.isArray(backendMessage)
-          ? backendMessage.join(', ')
-          : backendMessage || 'Không thể xóa khu vực đang có bàn'
-        toast.error(message)
-      } else {
-        handleErrorWithStatus(error, undefined, 'Không thể xóa khu vực. Vui lòng thử lại.')
-      }
-    }
   }
 
   const handleToggleActive = async (zoneId: string, currentStatus: boolean) => {
@@ -136,16 +95,16 @@ export function ZonesTable() {
               <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
                 Tên khu vực
               </TableHead>
-              <TableHead className="w-[200px] px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+              <TableHead className="w-50 px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
                 Mô tả
               </TableHead>
-              <TableHead className="w-[120px] px-6 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+              <TableHead className="w-30 px-6 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
                 Thứ tự
               </TableHead>
-              <TableHead className="w-[120px] px-6 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+              <TableHead className="w-30 px-6 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
                 Trạng thái
               </TableHead>
-              <TableHead className="w-[150px] px-6 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+              <TableHead className="w-37.5 px-6 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
                 Thao tác
               </TableHead>
             </TableRow>
@@ -206,16 +165,16 @@ export function ZonesTable() {
               <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
                 Tên khu vực
               </TableHead>
-              <TableHead className="w-[200px] px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+              <TableHead className="w-50 px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
                 Mô tả
               </TableHead>
-              <TableHead className="w-[120px] px-6 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+              <TableHead className="w-30 px-6 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
                 Thứ tự
               </TableHead>
-              <TableHead className="w-[120px] px-6 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+              <TableHead className="w-30 px-6 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
                 Trạng thái
               </TableHead>
-              <TableHead className="w-[150px] px-6 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+              <TableHead className="w-37.5 px-6 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
                 Thao tác
               </TableHead>
             </TableRow>
@@ -232,10 +191,9 @@ export function ZonesTable() {
                 <TableRow
                   key={zone.id}
                   className={cn(
-                    'cursor-pointer border-b border-slate-100 transition-colors hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800',
+                    'border-b border-slate-100 transition-colors hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800',
                     !zone.is_active && 'opacity-60',
                   )}
-                  onClick={() => handleEdit(zone.id)}
                 >
                   <TableCell className="px-6 py-4">
                     <div className="flex flex-col gap-1">
@@ -245,7 +203,7 @@ export function ZonesTable() {
                     </div>
                   </TableCell>
                   <TableCell className="px-6 py-4">
-                    <span className="max-w-xs text-sm break-words whitespace-normal text-slate-600 sm:max-w-md dark:text-slate-400">
+                    <span className="max-w-xs text-sm wrap-break-word whitespace-normal text-slate-600 sm:max-w-md dark:text-slate-400">
                       {zone.description || 'Không có mô tả'}
                     </span>
                   </TableCell>
@@ -271,7 +229,7 @@ export function ZonesTable() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-48">
-                        <DropdownMenuItem onClick={() => handleEdit(zone.id)}>
+                        <DropdownMenuItem onClick={() => onEdit(zone)}>
                           <Edit2 className="mr-2 h-4 w-4" />
                           Chỉnh sửa
                         </DropdownMenuItem>
@@ -291,7 +249,7 @@ export function ZonesTable() {
                           )}
                         </DropdownMenuItem>
                         <DropdownMenuItem
-                          onClick={() => handleDeleteClick(zone)}
+                          onClick={() => onDelete(zone)}
                           className="text-red-600 focus:text-red-600 dark:text-red-400"
                         >
                           <Trash2 className="mr-2 h-4 w-4" />
@@ -306,18 +264,6 @@ export function ZonesTable() {
           </TableBody>
         </Table>
       </div>
-
-      {/* Delete Confirmation Dialog */}
-      <ConfirmDeleteDialog
-        open={deleteDialogOpen}
-        onOpenChange={setDeleteDialogOpen}
-        title="Xóa khu vực?"
-        description="Hành động này không thể hoàn tác."
-        itemName={zoneToDelete?.name}
-        onConfirm={handleConfirmDelete}
-        isLoading={deleteMutation.isPending}
-        confirmText="Xóa khu vực"
-      />
 
       {/* Pagination */}
       {pagination && pagination.total_pages > 1 && (

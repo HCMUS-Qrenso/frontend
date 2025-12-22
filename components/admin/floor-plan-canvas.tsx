@@ -3,7 +3,7 @@
 import { cn } from '@/lib/utils'
 import { formatRotation } from '@/lib/utils/table-utils'
 import { useRef, useState, useEffect, useMemo, useCallback, memo } from 'react'
-import { RotateCw } from 'lucide-react'
+import { RotateCw, Loader2 } from 'lucide-react'
 import type { TableItem } from '@/app/admin/tables/layout/page'
 import type React from 'react'
 import {
@@ -26,6 +26,7 @@ interface FloorPlanCanvasProps {
   onZoomChange: (zoom: number) => void
   showGrid: boolean
   selectedArea: string
+  isLoading?: boolean
 }
 
 const GRID_SIZE = 20
@@ -78,6 +79,7 @@ function FloorPlanCanvasComponent({
   onZoomChange,
   showGrid,
   selectedArea,
+  isLoading = false,
 }: FloorPlanCanvasProps) {
   const canvasRef = useRef<HTMLDivElement>(null)
   const [panOffset, setPanOffset] = useState({ x: 0, y: 0 })
@@ -269,91 +271,104 @@ function FloorPlanCanvasComponent({
 
   return (
     <div className="rounded-2xl border border-slate-100 bg-white/80 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
-      {/* Header */}
-      <div className="flex flex-col items-center justify-between gap-4 border-b border-slate-100 px-6 py-4 md:flex-row dark:border-slate-800">
-        <div className="text-center md:text-left">
-          <h3 className="font-semibold text-slate-900 dark:text-white">{selectedArea}</h3>
-          <p className="text-xs text-slate-500 dark:text-slate-400">
-            Canvas không giới hạn - Kéo thả để di chuyển
-          </p>
-        </div>
-
-        {/* Legend */}
-        <div className="flex items-center gap-4 text-xs">
-          <div className="flex items-center gap-1.5">
-            <div className="h-3 w-3 rounded border-2 border-emerald-500" />
-            <span className="text-slate-600 dark:text-slate-400">Có sẵn</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <div className="h-3 w-3 rounded border-2 border-amber-500" />
-            <span className="text-slate-600 dark:text-slate-400">Đang sử dụng</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <div className="h-3 w-3 rounded border-2 border-violet-500" />
-            <span className="text-slate-600 dark:text-slate-400">Chờ thanh toán</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <div className="h-3 w-3 rounded border-2 border-slate-400" />
-            <span className="text-slate-600 dark:text-slate-400">Vô hiệu</span>
+      {isLoading ? (
+        <div className="flex items-center justify-center py-12">
+          <div className="text-center">
+            <Loader2 className="mx-auto mb-2 h-8 w-8 animate-spin text-emerald-600" />
+            <p className="text-sm text-slate-500 dark:text-slate-400">Đang tải sơ đồ...</p>
           </div>
         </div>
-      </div>
+      ) : (
+        <>
+          {/* Header */}
+          <div className="flex flex-col items-center justify-between gap-4 border-b border-slate-100 px-6 py-4 md:flex-row dark:border-slate-800">
+            <div className="text-center md:text-left">
+              <h3 className="font-semibold text-slate-900 dark:text-white">{selectedArea}</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Canvas không giới hạn - Kéo thả để di chuyển
+              </p>
+            </div>
 
-      {/* Canvas */}
-      <div className="relative overflow-hidden p-6" style={{ minHeight: '600px' }}>
-        <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-          <div
-            ref={canvasRef}
-            className={cn(
-              'relative overflow-hidden rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800/50',
-              isPanning ? 'cursor-grabbing' : 'cursor-grab',
-            )}
-            onClick={(e) => {
-              if (e.target === e.currentTarget) {
-                onTableSelect(null)
-              }
-            }}
-            onPointerDown={handlePanStart}
-            onMouseEnter={() => setIsHovering(true)}
-            onMouseLeave={() => setIsHovering(false)}
-            style={{
-              width: '100%',
-              height: '600px',
-              cursor: isPanning ? 'grabbing' : 'grab',
-              // Grid background on the canvas itself, adjusted for pan and zoom
-              backgroundImage: showGrid
-                ? 'linear-gradient(to right, rgb(226 232 240 / 0.3) 1px, transparent 1px), linear-gradient(to bottom, rgb(226 232 240 / 0.3) 1px, transparent 1px)'
-                : undefined,
-              backgroundSize: showGrid ? `${GRID_SIZE * zoom}px ${GRID_SIZE * zoom}px` : undefined,
-              backgroundPosition: showGrid ? `${panOffset.x}px ${panOffset.y}px` : undefined,
-            }}
-          >
-            {/* Content layer - transformed for pan and zoom */}
-            <div
-              className="relative"
-              style={{
-                transform: `translate(${panOffset.x}px, ${panOffset.y}px) scale(${zoom})`,
-                transformOrigin: '0 0',
-                // Disable transition during drag to prevent lag
-                transition: 'none',
-              }}
-            >
-              {/* Tables */}
-              {filteredTables.map((table) => (
-                <DraggableTable
-                  key={table.id}
-                  table={table}
-                  isSelected={table.id === selectedTableId}
-                  onSelect={onTableSelect}
-                  onRotateUpdate={handleRotateUpdate}
-                  onRemove={onTableRemove}
-                  zoom={zoom}
-                />
-              ))}
+            {/* Legend */}
+            <div className="flex items-center gap-4 text-xs">
+              <div className="flex items-center gap-1.5">
+                <div className="h-3 w-3 rounded border-2 border-emerald-500" />
+                <span className="text-slate-600 dark:text-slate-400">Có sẵn</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <div className="h-3 w-3 rounded border-2 border-amber-500" />
+                <span className="text-slate-600 dark:text-slate-400">Đang sử dụng</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <div className="h-3 w-3 rounded border-2 border-violet-500" />
+                <span className="text-slate-600 dark:text-slate-400">Chờ thanh toán</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <div className="h-3 w-3 rounded border-2 border-slate-400" />
+                <span className="text-slate-600 dark:text-slate-400">Vô hiệu</span>
+              </div>
             </div>
           </div>
-        </DndContext>
-      </div>
+
+          {/* Canvas */}
+          <div className="relative overflow-hidden p-6" style={{ minHeight: '600px' }}>
+            <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+              <div
+                ref={canvasRef}
+                className={cn(
+                  'relative overflow-hidden rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800/50',
+                  isPanning ? 'cursor-grabbing' : 'cursor-grab',
+                )}
+                onClick={(e) => {
+                  if (e.target === e.currentTarget) {
+                    onTableSelect(null)
+                  }
+                }}
+                onPointerDown={handlePanStart}
+                onMouseEnter={() => setIsHovering(true)}
+                onMouseLeave={() => setIsHovering(false)}
+                style={{
+                  width: '100%',
+                  height: '600px',
+                  cursor: isPanning ? 'grabbing' : 'grab',
+                  // Grid background on the canvas itself, adjusted for pan and zoom
+                  backgroundImage: showGrid
+                    ? 'linear-gradient(to right, rgb(226 232 240 / 0.3) 1px, transparent 1px), linear-gradient(to bottom, rgb(226 232 240 / 0.3) 1px, transparent 1px)'
+                    : undefined,
+                  backgroundSize: showGrid
+                    ? `${GRID_SIZE * zoom}px ${GRID_SIZE * zoom}px`
+                    : undefined,
+                  backgroundPosition: showGrid ? `${panOffset.x}px ${panOffset.y}px` : undefined,
+                }}
+              >
+                {/* Content layer - transformed for pan and zoom */}
+                <div
+                  className="relative"
+                  style={{
+                    transform: `translate(${panOffset.x}px, ${panOffset.y}px) scale(${zoom})`,
+                    transformOrigin: '0 0',
+                    // Disable transition during drag to prevent lag
+                    transition: 'none',
+                  }}
+                >
+                  {/* Tables */}
+                  {filteredTables.map((table) => (
+                    <DraggableTable
+                      key={table.id}
+                      table={table}
+                      isSelected={table.id === selectedTableId}
+                      onSelect={onTableSelect}
+                      onRotateUpdate={handleRotateUpdate}
+                      onRemove={onTableRemove}
+                      zoom={zoom}
+                    />
+                  ))}
+                </div>
+              </div>
+            </DndContext>
+          </div>
+        </>
+      )}
     </div>
   )
 }
@@ -591,7 +606,8 @@ const areEqual = (prevProps: FloorPlanCanvasProps, nextProps: FloorPlanCanvasPro
     prevProps.selectedTableId !== nextProps.selectedTableId ||
     prevProps.zoom !== nextProps.zoom ||
     prevProps.showGrid !== nextProps.showGrid ||
-    prevProps.selectedArea !== nextProps.selectedArea
+    prevProps.selectedArea !== nextProps.selectedArea ||
+    prevProps.isLoading !== nextProps.isLoading
   ) {
     return false
   }

@@ -130,7 +130,7 @@ export function QRTableList({
       )}
 
       {/* Table */}
-      <div className="overflow-x-auto rounded-2xl border border-slate-100 bg-white/80 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
+      <div className="relative overflow-x-auto rounded-2xl border border-slate-100 bg-white/80 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
         <Table>
           <TableHeader>
             <TableRow className="border-b border-slate-100 bg-slate-50/80 hover:bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900">
@@ -204,7 +204,7 @@ export function QRTableList({
                   ) : (
                     <div className="flex h-16 w-16 items-center justify-center rounded-lg border border-dashed border-slate-300 bg-slate-50 dark:border-slate-700 dark:bg-slate-800">
                       <Image
-                        src="/placehoder.jpg"
+                        src="/placeholder.jpg"
                         alt="QR sắp cập nhật"
                         width={40}
                         height={40}

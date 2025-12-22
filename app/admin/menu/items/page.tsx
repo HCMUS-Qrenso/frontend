@@ -29,14 +29,24 @@ function MenuItemsContent() {
 
       {/* Filter Toolbar */}
       <MenuItemsFilterToolbar
-        onCreateClick={() => { setUpsertModalMode('create'); setOpenUpsertModal(true); }}
+        onCreateClick={() => {
+          setUpsertModalMode('create')
+          setOpenUpsertModal(true)
+        }}
         categories={categories}
       />
 
       {/* Menu Items Table */}
       <MenuItemsTable
-        onDeleteClick={(item: MenuItem) => { setSelectedItem(item); setOpenDeleteDialog(true); }}
-        onEditClick={(item: MenuItem) => { setSelectedItem(item); setUpsertModalMode('edit'); setOpenUpsertModal(true); }}
+        onDeleteClick={(item: MenuItem) => {
+          setSelectedItem(item)
+          setOpenDeleteDialog(true)
+        }}
+        onEditClick={(item: MenuItem) => {
+          setSelectedItem(item)
+          setUpsertModalMode('edit')
+          setOpenUpsertModal(true)
+        }}
       />
 
       {/* Modal for Create/Edit */}
@@ -45,18 +55,14 @@ function MenuItemsContent() {
         categories={categories}
         mode={upsertModalMode}
         open={openUpsertModal}
-        onOpenChange={(open: boolean) => {
-          setOpenUpsertModal(open)
-        }}
+        onOpenChange={setOpenUpsertModal}
       />
 
       {/* Delete Confirmation Dialog */}
       <MenuItemDeleteDialog
         item={selectedItem}
         open={openDeleteDialog}
-        onOpenChange={(open: boolean) => {
-          setOpenDeleteDialog(open)
-        }}
+        onOpenChange={setOpenDeleteDialog}
       />
     </div>
   )

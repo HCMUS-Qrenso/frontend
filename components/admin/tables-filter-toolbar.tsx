@@ -8,11 +8,12 @@ import { Plus, LayoutGrid, QrCode, ArrowUpDown } from 'lucide-react'
 import Link from 'next/link'
 import { AdminFilterToolbarWrapper } from './admin-filter-toolbar-wrapper'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useZonesSimpleQuery } from '@/hooks/use-zones-query'
 import type { SimpleZone } from '@/types/zones'
 
 interface TablesFilterToolbarProps {
   isTrashView?: boolean
+  onCreate: () => void
+  zones: SimpleZone[] | undefined
 }
 
 const STATUS_OPTIONS: FilterOption[] = [
@@ -35,17 +36,18 @@ const SORT_ORDER_OPTIONS: FilterOption[] = [
   { value: 'desc', label: 'Giảm dần' },
 ]
 
-export function TablesFilterToolbar({ isTrashView = false }: TablesFilterToolbarProps) {
+export function TablesFilterToolbar({
+  isTrashView = false,
+  onCreate,
+  zones,
+}: TablesFilterToolbarProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const { data: zonesData, isLoading: isLoadingZones } = useZonesSimpleQuery()
-  const zones: SimpleZone[] =
-    zonesData?.zones ?? ((zonesData as { zones?: SimpleZone[] } | undefined)?.zones || [])
 
   // Build dynamic zone options from API data
   const zoneOptions: FilterOption[] = [
     { value: '', label: 'Tất cả' },
-    ...zones.map((zone) => ({ value: zone.id, label: zone.name })),
+    ...(zones?.map((zone) => ({ value: zone.id, label: zone.name })) || []),
   ]
 
   // Get filter values from URL params
@@ -78,14 +80,6 @@ export function TablesFilterToolbar({ isTrashView = false }: TablesFilterToolbar
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [localSearchQuery])
 
-  const handleAddTable = () => {
-    const params = new URLSearchParams(searchParams.toString())
-    params.delete('id')
-    params.set('modal', 'table')
-    params.set('mode', 'create')
-    router.push(`/admin/tables/list?${params.toString()}`)
-  }
-
   return (
     <AdminFilterToolbarWrapper>
       {/* Left - Filters */}
@@ -101,7 +95,6 @@ export function TablesFilterToolbar({ isTrashView = false }: TablesFilterToolbar
           value={selectedZoneId}
           options={zoneOptions}
           onChange={(value) => updateFilter('zone_id', value)}
-          isLoading={isLoadingZones}
           placeholder="Tất cả"
           emptyMessage="Chưa có khu vực"
         />
@@ -156,7 +149,7 @@ export function TablesFilterToolbar({ isTrashView = false }: TablesFilterToolbar
               </Button>
             </Link>
             <Button
-              onClick={handleAddTable}
+              onClick={() => onCreate()}
               className="h-8 gap-1 rounded-lg bg-emerald-600 px-3 hover:bg-emerald-700"
             >
               <Plus className="h-3 w-3" />

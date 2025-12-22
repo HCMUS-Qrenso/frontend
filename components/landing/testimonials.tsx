@@ -53,17 +53,22 @@ export function Testimonials() {
             {testimonials.map((testimonial, index) => (
               <div
                 key={index}
-                className="rounded-2xl border border-slate-200 bg-slate-50 p-6 dark:border-slate-800 dark:bg-slate-900/50 hover:scale-105 hover:outline-2 hover:outline-emerald-500/30 transition-all duration-100 group"
+                className="group rounded-2xl border border-slate-200 bg-slate-50 p-6 transition-all duration-100 hover:scale-105 hover:outline-2 hover:outline-emerald-500/30 dark:border-slate-800 dark:bg-slate-900/50"
               >
                 {/* Rating */}
                 <div className="mb-4 flex gap-1">
                   {Array.from({ length: testimonial.rating }).map((_, i) => (
-                    <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400 group-hover:scale-110 group-hover:text-yellow-500 group-hover:rotate-72 transition-all duration-200" />
+                    <Star
+                      key={i}
+                      className="h-4 w-4 fill-yellow-400 text-yellow-400 transition-all duration-200 group-hover:scale-110 group-hover:rotate-72 group-hover:text-yellow-500"
+                    />
                   ))}
                 </div>
 
                 {/* Quote */}
-                <p className="mb-6 text-slate-600 dark:text-slate-300 group-hover:font-semibold transition-all duration-100">{testimonial.quote}</p>
+                <p className="mb-6 text-slate-600 transition-all duration-100 group-hover:font-semibold dark:text-slate-300">
+                  {testimonial.quote}
+                </p>
 
                 {/* Author */}
                 <div className="flex items-center gap-4">

@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { StatusBadge, TABLE_STATUS_CONFIG } from '@/components/ui/status-badge'
@@ -10,17 +9,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { ConfirmDeleteDialog } from '@/components/ui/confirm-delete-dialog'
 import { LoadingState } from '@/components/ui/loading-state'
 import { ContainerErrorState } from '@/components/ui/loading-state'
 import { EmptyState } from '@/components/ui/empty-state'
 import { Edit2, MapPin, Trash2, RotateCcw, MoreVertical, TableProperties } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import {
-  useTablesQuery,
-  useDeleteTableMutation,
-  useUpdateTableMutation,
-} from '@/hooks/use-tables-query'
+import { useTablesQuery, useUpdateTableMutation } from '@/hooks/use-tables-query'
 import { toast } from 'sonner'
 import type {
   Table as TableType,
@@ -41,15 +35,17 @@ import {
 
 interface TablesListTableProps {
   isTrashView?: boolean
+  onEditClick: (table: TableType) => void
+  onDeleteClick: (table: TableType) => void
 }
 
-export function TablesListTable({ isTrashView = false }: TablesListTableProps) {
+export function TablesListTable({
+  isTrashView = false,
+  onEditClick,
+  onDeleteClick,
+}: TablesListTableProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
-
-  // State for delete dialog
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
-  const [tableToDelete, setTableToDelete] = useState<TableType | null>(null)
 
   // Get query params
   const page = Number.parseInt(searchParams.get('page') || '1')
@@ -80,55 +76,8 @@ export function TablesListTable({ isTrashView = false }: TablesListTableProps) {
 
   const tables = data?.data.tables || []
   const pagination = data?.data.pagination
-  const deleteMutation = useDeleteTableMutation()
   const updateMutation = useUpdateTableMutation()
   const { handleErrorWithStatus } = useErrorHandler()
-
-  const handleEdit = (tableId: string) => {
-    const params = new URLSearchParams(searchParams.toString())
-    params.set('modal', 'table')
-    params.set('mode', 'edit')
-    params.set('id', tableId)
-    router.push(`/admin/tables/list?${params.toString()}`)
-  }
-
-  const handleDeleteClick = (table: TableType) => {
-    setTableToDelete(table)
-    setDeleteDialogOpen(true)
-  }
-
-  const handleConfirmDelete = async () => {
-    if (!tableToDelete) return
-
-    try {
-      await deleteMutation.mutateAsync(tableToDelete.id)
-      toast.success('Bàn đã được xóa thành công')
-      setDeleteDialogOpen(false)
-      setTableToDelete(null)
-    } catch (error: any) {
-      // Handle specific error cases with custom message for 409
-      const status = error?.response?.status
-      if (status === 409) {
-        // Extract message directly from backend response
-        const backendMessage = error?.response?.data?.message
-        const message = Array.isArray(backendMessage)
-          ? backendMessage.join(', ')
-          : backendMessage || 'Không thể xóa bàn đang có đơn hàng'
-        toast.error(message)
-      } else {
-        // Use default error handler for other errors
-        handleErrorWithStatus(error, undefined, 'Không thể xóa bàn. Vui lòng thử lại.')
-      }
-      // Keep dialog open on error so user can try again or cancel
-    }
-  }
-
-  // Format table info for display
-  const getTableDisplayInfo = (table: TableType | null): string => {
-    if (!table) return ''
-    const zoneName = table.zone_name || table.floor || 'Chưa xác định'
-    return `${zoneName} - Bàn #${table.table_number} - ${table.capacity} ghế`
-  }
 
   const handleViewOnLayout = (table: TableType) => {
     // Ưu tiên zone_id từ nested zone object hoặc zone_id field
@@ -265,7 +214,7 @@ export function TablesListTable({ isTrashView = false }: TablesListTableProps) {
                   </TableCell>
                   <TableCell className="px-6 py-4">
                     {table.current_order ? (
-                      <p className="max-w-[180px] truncate text-sm font-medium text-emerald-600 dark:text-emerald-400">
+                      <p className="max-w-45 truncate text-sm font-medium text-emerald-600 dark:text-emerald-400">
                         {table.current_order}
                       </p>
                     ) : (
@@ -293,7 +242,7 @@ export function TablesListTable({ isTrashView = false }: TablesListTableProps) {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end" className="w-48">
-                            <DropdownMenuItem onClick={() => handleEdit(table.id)}>
+                            <DropdownMenuItem onClick={() => onEditClick(table)}>
                               <Edit2 className="mr-2 h-4 w-4" />
                               Chỉnh sửa
                             </DropdownMenuItem>
@@ -302,7 +251,7 @@ export function TablesListTable({ isTrashView = false }: TablesListTableProps) {
                               Xem trên sơ đồ
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                              onClick={() => handleDeleteClick(table)}
+                              onClick={() => onDeleteClick(table)}
                               className="text-red-600 focus:text-red-600 dark:text-red-400"
                             >
                               <Trash2 className="mr-2 h-4 w-4" />
@@ -365,23 +314,6 @@ export function TablesListTable({ isTrashView = false }: TablesListTableProps) {
             </Button>
           </div>
         </div>
-      )}
-
-      {/* Delete Confirmation Dialog - Only show for active view */}
-      {!isTrashView && (
-        <ConfirmDeleteDialog
-          open={deleteDialogOpen}
-          onOpenChange={(open) => {
-            setDeleteDialogOpen(open)
-            if (!open) setTableToDelete(null)
-          }}
-          title="Xóa bàn này?"
-          description="Hành động này không thể hoàn tác."
-          itemName={getTableDisplayInfo(tableToDelete)}
-          onConfirm={handleConfirmDelete}
-          isLoading={deleteMutation.isPending}
-          confirmText="Xóa bàn"
-        />
       )}
     </div>
   )

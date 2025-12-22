@@ -7,7 +7,17 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { ChevronDown, Grid3x3, Minus, Plus, RotateCcw, Save, Undo2, Redo2 } from 'lucide-react'
+import {
+  ChevronDown,
+  Grid3x3,
+  Minus,
+  Plus,
+  RotateCcw,
+  Save,
+  Undo2,
+  Redo2,
+  Loader2,
+} from 'lucide-react'
 
 interface FloorPlanToolbarProps {
   selectedArea: string
@@ -23,6 +33,7 @@ interface FloorPlanToolbarProps {
   onRedo: () => void
   onSave: () => void
   onReset: () => void
+  isLoading?: boolean
 }
 
 export function FloorPlanToolbar({
@@ -39,6 +50,7 @@ export function FloorPlanToolbar({
   onRedo,
   onSave,
   onReset,
+  isLoading = false,
 }: FloorPlanToolbarProps) {
   return (
     <div className="flex flex-col items-center justify-between gap-4 rounded-2xl border border-slate-100 bg-white/80 px-6 py-4 shadow-sm md:flex-row dark:border-slate-800 dark:bg-slate-900/80">
@@ -51,21 +63,28 @@ export function FloorPlanToolbar({
           <p className="text-sm text-slate-500 dark:text-slate-400">Sơ đồ mặt bằng & bố trí bàn</p>
         </div>
 
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="h-8 gap-1 rounded-lg bg-transparent px-3">
-              <span className="text-sm">Khu vực: {selectedArea}</span>
-              <ChevronDown className="h-3 w-3" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-48">
-            {areas.map((area) => (
-              <DropdownMenuItem key={area} onClick={() => onAreaChange(area)}>
-                {area}
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {isLoading ? (
+          <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 dark:border-slate-700 dark:bg-slate-800">
+            <Loader2 className="h-3 w-3 animate-spin text-emerald-600" />
+            <span className="text-sm text-slate-500 dark:text-slate-400">Đang tải...</span>
+          </div>
+        ) : (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="h-8 gap-1 rounded-lg bg-transparent px-3">
+                <span className="text-sm">Khu vực: {selectedArea}</span>
+                <ChevronDown className="h-3 w-3" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-48">
+              {areas.map((area) => (
+                <DropdownMenuItem key={area} onClick={() => onAreaChange(area)}>
+                  {area}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </div>
 
       {/* Right: Actions */}

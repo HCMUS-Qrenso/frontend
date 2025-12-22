@@ -3,11 +3,13 @@ import { ContactFormCard } from './contact-form-card'
 
 export function ContactContent() {
   return (
-    <section className="py-16 md:py-24 border-b border-slate-200 dark:border-slate-800">
+    <section className="border-b border-slate-200 py-16 md:py-24 dark:border-slate-800">
       <div className="container mx-auto px-4">
         {/* Page Title */}
         <div className="mb-12 text-center">
-          <h1 className="mb-4 text-4xl font-bold text-black dark:text-white md:text-5xl">Liên hệ với Qrenso</h1>
+          <h1 className="mb-4 text-4xl font-bold text-black md:text-5xl dark:text-white">
+            Liên hệ với Qrenso
+          </h1>
           <p className="mx-auto max-w-2xl text-lg text-slate-600 dark:text-slate-300">
             Để lại thông tin để đội ngũ Qrenso tư vấn giải pháp phù hợp nhất cho nhà hàng của bạn
           </p>

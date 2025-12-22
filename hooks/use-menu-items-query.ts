@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { menuItemsApi } from '@/lib/api/menu-items'
 import type {
   MenuItem,
@@ -14,6 +14,7 @@ import type {
 } from '@/types/menu-items'
 import type { MessageResponse } from '@/types/auth'
 import { categoriesQueryKeys } from './use-categories-query'
+import { modifiersQueryKeys } from './use-modifiers-query'
 
 // Query Keys
 export const menuItemsQueryKeys = {
@@ -59,9 +60,12 @@ export const useCreateMenuItemMutation = () => {
   return useMutation<MenuItemResponse, unknown, CreateMenuItemPayload>({
     mutationFn: (payload) => menuItemsApi.createMenuItem(payload),
     onSuccess: () => {
-      // Invalidate list and stats queries
+      // Invalidate list and stats queries, and also modifiers
       queryClient.invalidateQueries({ queryKey: menuItemsQueryKeys.lists() })
       queryClient.invalidateQueries({ queryKey: menuItemsQueryKeys.stats() })
+      queryClient.invalidateQueries({ queryKey: modifiersQueryKeys.groups.lists() })
+      queryClient.invalidateQueries({ queryKey: categoriesQueryKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: categoriesQueryKeys.stats() })
     },
   })
 }
@@ -74,9 +78,11 @@ export const useUpdateMenuItemMutation = () => {
     onSuccess: (data, variables) => {
       // Update the specific menu item in cache
       queryClient.setQueryData(menuItemsQueryKeys.detail(variables.id), data)
-      // Invalidate list and stats queries
+      // Invalidate list and stats queries, and also modifiers
       queryClient.invalidateQueries({ queryKey: menuItemsQueryKeys.lists() })
       queryClient.invalidateQueries({ queryKey: menuItemsQueryKeys.stats() })
+      queryClient.invalidateQueries({ queryKey: modifiersQueryKeys.groups.lists() })
+      queryClient.invalidateQueries({ queryKey: categoriesQueryKeys.lists() })
     },
   })
 }
@@ -89,6 +95,8 @@ export const useDeleteMenuItemMutation = () => {
     onSuccess: () => {
       // Invalidate all menu item queries
       queryClient.invalidateQueries({ queryKey: menuItemsQueryKeys.all })
+      queryClient.invalidateQueries({ queryKey: modifiersQueryKeys.groups.lists() })
+      queryClient.invalidateQueries({ queryKey: categoriesQueryKeys.lists() })
     },
   })
 }
@@ -119,9 +127,10 @@ export const useImportMenuMutation = () => {
   return useMutation<ImportMenuResult, unknown, { file: File; mode: ImportMenuMode }>({
     mutationFn: ({ file, mode }) => menuItemsApi.importMenu(file, mode),
     onSuccess: () => {
-      // Invalidate menu items and categories (import may create categories)
+      // Invalidate menu items, categories and modifiers (import may create categories)
       queryClient.invalidateQueries({ queryKey: menuItemsQueryKeys.all })
       queryClient.invalidateQueries({ queryKey: categoriesQueryKeys.all })
+      queryClient.invalidateQueries({ queryKey: modifiersQueryKeys.all })
     },
   })
 }

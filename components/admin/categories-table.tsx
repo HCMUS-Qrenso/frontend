@@ -38,20 +38,13 @@ import {
 import { useErrorHandler } from '@/hooks/use-error-handler'
 import type { CategorySortBy, CategorySortOrder } from '@/types/categories'
 import { toast } from 'sonner'
-
-interface Category {
-  id: string
-  name: string
-  description: string | null
-  display_order: number
-  is_active: boolean
-  item_count: number
-  updated_at: string
-}
+import { Category } from '@/types/categories'
 
 interface CategoriesTableProps {
   reorderMode: boolean
   setReorderMode: (value: boolean) => void
+  onEditClick: (category: Category) => void
+  onDeleteClick: (category: Category) => void
 }
 
 function SortableCategoryRow({
@@ -64,8 +57,8 @@ function SortableCategoryRow({
 }: {
   category: Category
   reorderMode: boolean
-  onEdit: (id: string) => void
-  onDelete: (id: string) => void
+  onEdit: (category: Category) => void
+  onDelete: (category: Category) => void
   onToggleActive: (id: string) => void
   onViewItems: (id: string) => void
 }) {
@@ -143,7 +136,7 @@ function SortableCategoryRow({
               <DropdownMenuItem
                 onClick={(e) => {
                   e.stopPropagation()
-                  onEdit(category.id)
+                  onEdit(category)
                 }}
               >
                 <Pencil className="mr-2 h-4 w-4" />
@@ -171,7 +164,7 @@ function SortableCategoryRow({
               <DropdownMenuItem
                 onClick={(e) => {
                   e.stopPropagation()
-                  onDelete(category.id)
+                  onDelete(category)
                 }}
                 className="text-red-600 focus:text-red-600 dark:text-red-400"
               >
@@ -186,7 +179,12 @@ function SortableCategoryRow({
   )
 }
 
-export function CategoriesTable({ reorderMode, setReorderMode }: CategoriesTableProps) {
+export function CategoriesTable({
+  reorderMode,
+  setReorderMode,
+  onEditClick,
+  onDeleteClick,
+}: CategoriesTableProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { handleErrorWithStatus } = useErrorHandler()
@@ -233,21 +231,6 @@ export function CategoriesTable({ reorderMode, setReorderMode }: CategoriesTable
   // Mutations
   const reorderMutation = useReorderCategoriesMutation()
   const toggleStatusMutation = useToggleCategoryStatusMutation()
-
-  const handleEdit = (categoryId: string) => {
-    const params = new URLSearchParams(searchParams.toString())
-    params.set('modal', 'category')
-    params.set('mode', 'edit')
-    params.set('id', categoryId)
-    router.push(`?${params.toString()}`)
-  }
-
-  const handleDelete = (categoryId: string) => {
-    const params = new URLSearchParams(searchParams.toString())
-    params.set('delete', 'category')
-    params.set('id', categoryId)
-    router.push(`?${params.toString()}`)
-  }
 
   const handleViewItems = (categoryId: string) => {
     router.push(`/admin/menu/items?category_id=${categoryId}`)
@@ -326,23 +309,23 @@ export function CategoriesTable({ reorderMode, setReorderMode }: CategoriesTable
     <Table>
       <TableHeader>
         <TableRow className="border-b border-slate-100 bg-slate-50/80 hover:bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900">
-          {reorderMode && <TableHead className="w-[50px] px-6 py-3"></TableHead>}
+          {reorderMode && <TableHead className="w-12.5 px-6 py-3"></TableHead>}
           <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
             Danh mục
           </TableHead>
-          <TableHead className="w-[150px] px-6 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+          <TableHead className="w-37.5 px-6 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
             Thứ tự
           </TableHead>
-          <TableHead className="w-[150px] px-6 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+          <TableHead className="w-37.5 px-6 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
             Trạng thái
           </TableHead>
-          <TableHead className="w-[150px] px-6 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+          <TableHead className="w-37.5 px-6 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
             # Món ăn
           </TableHead>
-          <TableHead className="w-[120px] px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+          <TableHead className="w-30 px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
             Cập nhật
           </TableHead>
-          <TableHead className="w-[150px] px-6 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+          <TableHead className="w-37.5 px-6 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
             Thao tác
           </TableHead>
         </TableRow>
@@ -358,8 +341,8 @@ export function CategoriesTable({ reorderMode, setReorderMode }: CategoriesTable
                 key={category.id}
                 category={category}
                 reorderMode={reorderMode}
-                onEdit={handleEdit}
-                onDelete={handleDelete}
+                onEdit={onEditClick}
+                onDelete={onDeleteClick}
                 onToggleActive={handleToggleActive}
                 onViewItems={handleViewItems}
               />
@@ -419,7 +402,7 @@ export function CategoriesTable({ reorderMode, setReorderMode }: CategoriesTable
                       <DropdownMenuItem
                         onClick={(e) => {
                           e.stopPropagation()
-                          handleEdit(category.id)
+                          onEditClick(category)
                         }}
                       >
                         <Pencil className="mr-2 h-4 w-4" />
@@ -447,7 +430,7 @@ export function CategoriesTable({ reorderMode, setReorderMode }: CategoriesTable
                       <DropdownMenuItem
                         onClick={(e) => {
                           e.stopPropagation()
-                          handleDelete(category.id)
+                          onDeleteClick(category)
                         }}
                         className="text-red-600 focus:text-red-600 dark:text-red-400"
                       >

@@ -11,6 +11,7 @@ import { Plus, ArrowUpDown } from 'lucide-react'
 interface CategoriesFilterToolbarProps {
   reorderMode: boolean
   setReorderMode: (value: boolean) => void
+  onCreateClick: () => void
 }
 
 const STATUS_OPTIONS: FilterOption[] = [
@@ -34,6 +35,7 @@ const SORT_ORDER_OPTIONS: FilterOption[] = [
 export function CategoriesFilterToolbar({
   reorderMode,
   setReorderMode,
+  onCreateClick,
 }: CategoriesFilterToolbarProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -73,13 +75,6 @@ export function CategoriesFilterToolbar({
     return () => clearTimeout(timer)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [localSearchQuery])
-
-  const handleAddCategory = () => {
-    const params = new URLSearchParams(searchParams.toString())
-    params.set('modal', 'category')
-    params.set('mode', 'create')
-    router.push(`/admin/menu/categories?${params.toString()}`)
-  }
 
   return (
     <AdminFilterToolbarWrapper>
@@ -129,7 +124,7 @@ export function CategoriesFilterToolbar({
           <span className="text-sm">{reorderMode ? 'Hủy sắp xếp' : 'Sắp xếp'}</span>
         </Button>
         <Button
-          onClick={handleAddCategory}
+          onClick={onCreateClick}
           className="h-8 gap-1 rounded-lg bg-emerald-600 px-3 hover:bg-emerald-700"
         >
           <Plus className="h-3 w-3" />

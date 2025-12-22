@@ -49,7 +49,10 @@ export function MenuItemsTable({ onEditClick, onDeleteClick }: MenuItemsTablePro
 
   // Validate status parameter
   const statusParam = searchParams.get('status')
-  const status: MenuItemStatus | undefined = statusParam && ['available', 'unavailable', 'sold_out'].includes(statusParam) ? statusParam as MenuItemStatus : undefined
+  const status: MenuItemStatus | undefined =
+    statusParam && ['available', 'unavailable', 'sold_out'].includes(statusParam)
+      ? (statusParam as MenuItemStatus)
+      : undefined
 
   // Fetch menu items from API (status is not sent to API)
   const { data, isLoading, error } = useMenuItemsQuery({

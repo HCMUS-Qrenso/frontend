@@ -10,6 +10,7 @@ import type {
   ZoneResponse,
 } from '@/types/zones'
 import type { MessageResponse } from '@/types/auth'
+import { tablesQueryKeys } from './use-tables-query'
 
 // Query Keys
 export const zonesQueryKeys = {
@@ -66,6 +67,7 @@ export const useCreateZoneMutation = () => {
       queryClient.invalidateQueries({ queryKey: zonesQueryKeys.lists() })
       queryClient.invalidateQueries({ queryKey: zonesQueryKeys.stats() })
       queryClient.invalidateQueries({ queryKey: zonesQueryKeys.simple() })
+      queryClient.invalidateQueries({ queryKey: tablesQueryKeys.all })
     },
   })
 }
@@ -81,6 +83,7 @@ export const useUpdateZoneMutation = () => {
       queryClient.invalidateQueries({ queryKey: zonesQueryKeys.detail(id) })
       queryClient.invalidateQueries({ queryKey: zonesQueryKeys.stats() })
       queryClient.invalidateQueries({ queryKey: zonesQueryKeys.simple() })
+      queryClient.invalidateQueries({ queryKey: tablesQueryKeys.all })
     },
   })
 }
@@ -95,6 +98,7 @@ export const useDeleteZoneMutation = () => {
       queryClient.invalidateQueries({ queryKey: zonesQueryKeys.lists() })
       queryClient.invalidateQueries({ queryKey: zonesQueryKeys.stats() })
       queryClient.invalidateQueries({ queryKey: zonesQueryKeys.simple() })
+      queryClient.invalidateQueries({ queryKey: tablesQueryKeys.all })
     },
   })
 }

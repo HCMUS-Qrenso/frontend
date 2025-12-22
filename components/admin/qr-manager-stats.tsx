@@ -1,4 +1,4 @@
-import { QrCode, CheckCircle2, AlertCircle, Clock } from 'lucide-react'
+import { QrCode, CheckCircle2, AlertCircle, Clock, Loader2 } from 'lucide-react'
 import type { TableQR } from '@/types/tables'
 import { StatCard } from '../ui/stat-card'
 
@@ -7,6 +7,7 @@ interface QRManagerStatsProps {
   tables_with_qr?: number
   tables_without_qr?: number
   latest_qr_update?: string | null
+  isLoading?: boolean
 }
 
 export function QRManagerStats({
@@ -14,7 +15,22 @@ export function QRManagerStats({
   tables_with_qr,
   tables_without_qr,
   latest_qr_update,
+  isLoading = false,
 }: QRManagerStatsProps) {
+  if (isLoading) {
+    return (
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {[1, 2, 3, 4].map((i) => (
+          <div
+            key={i}
+            className="flex items-center justify-center rounded-2xl border border-slate-100 bg-white/80 p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900/80"
+          >
+            <Loader2 className="h-6 w-6 animate-spin text-emerald-600" />
+          </div>
+        ))}
+      </div>
+    )
+  }
   const latestQrUpdateFormatted = latest_qr_update
     ? new Date(latest_qr_update).toLocaleDateString('vi-VN', {
         day: '2-digit',

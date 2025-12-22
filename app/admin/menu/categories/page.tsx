@@ -6,13 +6,15 @@ import { CategoriesFilterToolbar } from '@/components/admin/categories-filter-to
 import { CategoriesTable } from '@/components/admin/categories-table'
 import { CategoryUpsertModal } from '@/components/admin/category-upsert-modal'
 import { CategoryDeleteDialog } from '@/components/admin/category-delete-dialog'
-import { useSearchParams } from 'next/navigation'
 import { Loader2 } from 'lucide-react'
+import { Category } from '@/types/categories'
 
 function CategoriesContent() {
-  const searchParams = useSearchParams()
-  const modalOpen = searchParams.get('modal') === 'category'
   const [reorderMode, setReorderMode] = useState(false)
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null)
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
+  const [openUpsertModal, setOpenUpsertModal] = useState(false)
+  const [upsertModalMode, setUpsertModalMode] = useState<'create' | 'edit'>('create')
 
   return (
     <div className="space-y-6">
@@ -20,16 +22,44 @@ function CategoriesContent() {
       <CategoriesOverviewStats />
 
       {/* Filter Toolbar */}
-      <CategoriesFilterToolbar reorderMode={reorderMode} setReorderMode={setReorderMode} />
+      <CategoriesFilterToolbar
+        reorderMode={reorderMode}
+        setReorderMode={setReorderMode}
+        onCreateClick={() => {
+          setOpenUpsertModal(true)
+          setUpsertModalMode('create')
+        }}
+      />
 
       {/* Categories Table */}
-      <CategoriesTable reorderMode={reorderMode} setReorderMode={setReorderMode} />
+      <CategoriesTable
+        reorderMode={reorderMode}
+        setReorderMode={setReorderMode}
+        onDeleteClick={(category) => {
+          setSelectedCategory(category)
+          setOpenDeleteDialog(true)
+        }}
+        onEditClick={(category) => {
+          setSelectedCategory(category)
+          setOpenUpsertModal(true)
+          setUpsertModalMode('edit')
+        }}
+      />
 
       {/* Modal for Create/Edit */}
-      <CategoryUpsertModal open={modalOpen} />
+      <CategoryUpsertModal
+        open={openUpsertModal}
+        mode={upsertModalMode}
+        category={selectedCategory}
+        onOpenChange={setOpenUpsertModal}
+      />
 
       {/* Delete Confirmation Dialog */}
-      <CategoryDeleteDialog />
+      <CategoryDeleteDialog
+        category={selectedCategory}
+        open={openDeleteDialog}
+        onOpenChange={setOpenDeleteDialog}
+      />
     </div>
   )
 }

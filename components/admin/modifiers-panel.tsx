@@ -3,7 +3,6 @@
 import type React from 'react'
 
 import { useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
@@ -45,11 +44,18 @@ import { toast } from 'sonner'
 interface ModifiersPanelProps {
   selectedGroup: ModifierGroup | null
   selectedGroupId: string | null
+  onCreateModifier: () => void
+  onEditModifier: (modifier: Modifier) => void
+  onDeleteModifier: (modifier: Modifier) => void
 }
 
-export function ModifiersPanel({ selectedGroup, selectedGroupId }: ModifiersPanelProps) {
-  const router = useRouter()
-  const searchParams = useSearchParams()
+export function ModifiersPanel({
+  selectedGroup,
+  selectedGroupId,
+  onCreateModifier,
+  onEditModifier,
+  onDeleteModifier,
+}: ModifiersPanelProps) {
   const [searchQuery, setSearchQuery] = useState('')
   const [showOnlyAvailable, setShowOnlyAvailable] = useState(false)
   const { handleErrorWithStatus } = useErrorHandler()
@@ -108,14 +114,6 @@ export function ModifiersPanel({ selectedGroup, selectedGroupId }: ModifiersPane
     }
   }
 
-  const openCreateModal = () => {
-    if (!selectedGroup) return
-    const params = new URLSearchParams(searchParams.toString())
-    params.set('modal', 'modifier')
-    params.set('mode', 'create')
-    router.push(`?${params.toString()}`)
-  }
-
   const formatPrice = (amount: number) => {
     if (amount === 0) return 'Chuẩn'
     const formatted = new Intl.NumberFormat('vi-VN').format(Math.abs(amount))
@@ -125,7 +123,7 @@ export function ModifiersPanel({ selectedGroup, selectedGroupId }: ModifiersPane
   if (!selectedGroup) {
     return (
       <div className="rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900/60">
-        <div className="flex h-[400px] items-center justify-center">
+        <div className="flex h-100 items-center justify-center">
           <div className="text-center">
             <Eye className="mx-auto h-12 w-12 text-slate-300 dark:text-slate-600" />
             <p className="mt-4 text-sm text-slate-500 dark:text-slate-400">
@@ -190,7 +188,7 @@ export function ModifiersPanel({ selectedGroup, selectedGroupId }: ModifiersPane
               </DropdownMenuContent>
             </DropdownMenu>
             <Button
-              onClick={openCreateModal}
+              onClick={() => onCreateModifier()}
               size="sm"
               className="bg-emerald-600 hover:bg-emerald-700"
             >
@@ -202,7 +200,7 @@ export function ModifiersPanel({ selectedGroup, selectedGroupId }: ModifiersPane
       </div>
 
       {/* Modifiers List */}
-      <div className="max-h-[600px] overflow-y-auto p-4">
+      <div className="max-h-150 overflow-y-auto p-4">
         {isLoadingModifiers ? (
           <div className="flex items-center justify-center py-12">
             <Loader2 className="h-6 w-6 animate-spin text-emerald-600" />
@@ -223,6 +221,8 @@ export function ModifiersPanel({ selectedGroup, selectedGroupId }: ModifiersPane
                       selectedGroupId={selectedGroupId}
                       toggleAvailabilityMutation={toggleAvailabilityMutation}
                       handleErrorWithStatus={handleErrorWithStatus}
+                      onEdit={() => onEditModifier(modifier)}
+                      onDelete={() => onDeleteModifier(modifier)}
                     />
                   ))}
                 </div>
@@ -251,15 +251,17 @@ function SortableModifierItem({
   selectedGroupId,
   toggleAvailabilityMutation,
   handleErrorWithStatus,
+  onEdit,
+  onDelete,
 }: {
   modifier: Modifier
   formatPrice: (amount: number) => string
   selectedGroupId: string | null
   toggleAvailabilityMutation: any
   handleErrorWithStatus: any
+  onEdit: () => void
+  onDelete: () => void
 }) {
-  const router = useRouter()
-  const searchParams = useSearchParams()
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: modifier.id,
   })
@@ -268,21 +270,6 @@ function SortableModifierItem({
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
-  }
-
-  const handleEdit = () => {
-    const params = new URLSearchParams(searchParams.toString())
-    params.set('modal', 'modifier')
-    params.set('mode', 'edit')
-    params.set('id', modifier.id)
-    router.push(`?${params.toString()}`)
-  }
-
-  const handleDelete = () => {
-    const params = new URLSearchParams(searchParams.toString())
-    params.set('delete', 'modifier')
-    params.set('id', modifier.id)
-    router.push(`?${params.toString()}`)
   }
 
   const handleToggleAvailability = (e: React.MouseEvent) => {
@@ -370,8 +357,8 @@ function SortableModifierItem({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={handleEdit}>Chỉnh sửa</DropdownMenuItem>
-              <DropdownMenuItem onClick={handleDelete} className="text-red-600">
+              <DropdownMenuItem onClick={onEdit}>Chỉnh sửa</DropdownMenuItem>
+              <DropdownMenuItem onClick={onDelete} className="text-red-600">
                 Xoá
               </DropdownMenuItem>
             </DropdownMenuContent>

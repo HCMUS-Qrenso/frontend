@@ -7,14 +7,12 @@ import { ModifierGroupModal } from '@/components/admin/modifier-group-modal'
 import { ModifierModal } from '@/components/admin/modifier-modal'
 import { ModifierGroupDeleteDialog } from '@/components/admin/modifier-group-delete-dialog'
 import { ModifierDeleteDialog } from '@/components/admin/modifier-delete-dialog'
-import { useSearchParams } from 'next/navigation'
 import { Loader2, AlertCircle } from 'lucide-react'
 import { useModifierGroupsQuery } from '@/hooks/use-modifiers-query'
 import { useErrorHandler } from '@/hooks/use-error-handler'
-import type { ModifierGroup } from '@/types/modifiers'
+import { Modifier, type ModifierGroup } from '@/types/modifiers'
 
 function ModifiersContent() {
-  const searchParams = useSearchParams()
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null)
   const { handleErrorWithStatus } = useErrorHandler()
 
@@ -41,8 +39,14 @@ function ModifiersContent() {
     setSelectedGroupId(modifierGroups[0].id)
   }
 
-  const modalGroupOpen = searchParams.get('modal') === 'group'
-  const modalModifierOpen = searchParams.get('modal') === 'modifier'
+  const [selectedModifier, setSelectedModifier] = useState<Modifier | null>(null)
+
+  const [modalGroupOpen, setModalGroupOpen] = useState(false)
+  const [modalGroupMode, setModalGroupMode] = useState<'create' | 'edit'>('create')
+  const [modalModifierOpen, setModalModifierOpen] = useState(false)
+  const [modalModifierMode, setModalModifierMode] = useState<'create' | 'edit'>('create')
+  const [modalDeleteGroupOpen, setModalDeleteGroupOpen] = useState(false)
+  const [modalDeleteModifierOpen, setModalDeleteModifierOpen] = useState(false)
 
   // Loading state
   if (isLoadingGroups) {
@@ -72,20 +76,66 @@ function ModifiersContent() {
           groups={modifierGroups}
           selectedGroupId={selectedGroupId}
           onSelectGroup={setSelectedGroupId}
+          onCreateGroup={() => {
+            setModalGroupMode('create')
+            setModalGroupOpen(true)
+          }}
+          onEditGroup={() => {
+            setModalGroupMode('edit')
+            setModalGroupOpen(true)
+          }}
+          onDeleteGroup={() => {
+            setModalDeleteGroupOpen(true)
+          }}
         />
 
         {/* Right Panel - Modifiers */}
         <ModifiersPanel
           selectedGroup={modifierGroups.find((g) => g.id === selectedGroupId) || null}
           selectedGroupId={selectedGroupId}
+          onCreateModifier={() => {
+            setModalModifierMode('create')
+            setModalModifierOpen(true)
+          }}
+          onEditModifier={(modifier: Modifier) => {
+            setSelectedModifier(modifier)
+            setModalModifierMode('edit')
+            setModalModifierOpen(true)
+          }}
+          onDeleteModifier={(modifier: Modifier) => {
+            setSelectedModifier(modifier)
+            setModalDeleteModifierOpen(true)
+          }}
         />
       </div>
 
       {/* Modals */}
-      <ModifierGroupModal open={modalGroupOpen} />
-      <ModifierModal open={modalModifierOpen} selectedGroupId={selectedGroupId} />
-      <ModifierGroupDeleteDialog />
-      <ModifierDeleteDialog selectedGroupId={selectedGroupId} />
+      <ModifierGroupModal
+        open={modalGroupOpen}
+        mode={modalGroupMode}
+        modifierGroup={modifierGroups.find((g: ModifierGroup) => g.id === selectedGroupId) || null}
+        onOpenChange={setModalGroupOpen}
+      />
+
+      <ModifierGroupDeleteDialog
+        open={modalDeleteGroupOpen}
+        modifierGroup={modifierGroups.find((g: ModifierGroup) => g.id === selectedGroupId) || null}
+        onOpenChange={setModalDeleteGroupOpen}
+      />
+
+      <ModifierModal
+        open={modalModifierOpen}
+        mode={modalModifierMode}
+        modifier={selectedModifier}
+        onOpenChange={setModalModifierOpen}
+        selectedGroupId={selectedGroupId}
+      />
+
+      <ModifierDeleteDialog
+        open={modalDeleteModifierOpen}
+        modifier={selectedModifier}
+        onOpenChange={setModalDeleteModifierOpen}
+      />
     </div>
   )
 }

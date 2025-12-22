@@ -1,7 +1,7 @@
 import { AdminLayout } from '@/components/admin/admin-layout'
 import { Loader2 } from 'lucide-react'
 
-export default function Loading() {
+export default function ModifiersLoading() {
   return (
     <AdminLayout>
       <div className="flex items-center justify-center py-12">
