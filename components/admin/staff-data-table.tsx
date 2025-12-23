@@ -18,53 +18,61 @@ import { EmptyState } from '@/components/ui/empty-state'
 import { CheckCircle2, XCircle, Users, ChevronLeft, ChevronRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useStaffQuery } from '@/hooks/use-staff-query'
-import type { Staff, StaffQueryParams } from '@/types/staff'
+import { useSearchParams, useRouter } from 'next/navigation'
+import type { StaffQueryParams } from '@/types/staff'
 
 interface StaffDataTableProps {
   role: 'waiter' | 'kitchen_staff'
-  searchQuery?: string
-  statusFilter?: string
-  verifiedFilter?: string
-  sortBy?: string
 }
 
-export function StaffDataTable({
-  role,
-  searchQuery = '',
-  statusFilter = 'all',
-  verifiedFilter = 'all',
-  sortBy = 'createdAt',
-}: StaffDataTableProps) {
+export function StaffDataTable({ role }: StaffDataTableProps) {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+
+  // Read filters from URL params
+  const search = searchParams.get('search') || ''
+  const status = searchParams.get('status') || ''
+  const emailVerified = searchParams.get('email_verified') || ''
+  const sortBy = searchParams.get('sort_by') || 'createdAt'
+  const sortOrder = searchParams.get('sort_order') || 'desc'
+  const page = parseInt(searchParams.get('page') || '1', 10)
+
   // Build query params for API
   const queryParams = useMemo<StaffQueryParams>(() => {
     const params: StaffQueryParams = {
       role,
-      page: 1,
+      page,
       limit: 20,
       sortBy: sortBy as 'createdAt' | 'fullName' | 'lastLoginAt',
-      sortOrder: sortBy === 'fullName' ? 'asc' : 'desc',
+      sortOrder: sortOrder as 'asc' | 'desc',
     }
 
-    if (searchQuery) {
-      params.search = searchQuery
+    if (search) {
+      params.search = search
     }
 
-    if (statusFilter !== 'all') {
-      params.status = statusFilter as 'active' | 'inactive' | 'suspended'
+    if (status) {
+      params.status = status as 'active' | 'inactive' | 'suspended'
     }
 
-    if (verifiedFilter !== 'all') {
-      params.emailVerified = verifiedFilter === 'true'
+    if (emailVerified) {
+      params.emailVerified = emailVerified === 'true'
     }
 
     return params
-  }, [role, searchQuery, statusFilter, verifiedFilter, sortBy])
+  }, [role, search, status, emailVerified, sortBy, sortOrder, page])
 
   // Fetch data from API
   const { data, isLoading, error } = useStaffQuery(queryParams)
 
   const staffList = data?.items ?? []
   const pagination = data?.meta
+
+  const handlePageChange = (newPage: number) => {
+    const params = new URLSearchParams(searchParams.toString())
+    params.set('page', newPage.toString())
+    router.push(`/admin/staff?${params.toString()}`)
+  }
 
   const formatDate = (date: string | null) => {
     if (!date) return '—'
@@ -247,30 +255,35 @@ export function StaffDataTable({
               size="sm"
               className="rounded-full bg-transparent"
               disabled={pagination.page === 1}
+              onClick={() => handlePageChange(pagination.page - 1)}
             >
               <ChevronLeft className="h-4 w-4" />
               Trước
             </Button>
-            {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map((pageNum) => (
-              <Button
-                key={pageNum}
-                variant="outline"
-                size="sm"
-                className={cn(
-                  'h-8 w-8 rounded-full',
-                  pageNum === pagination.page
-                    ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10'
-                    : 'bg-transparent',
-                )}
-              >
-                {pageNum}
-              </Button>
-            ))}
+            {Array.from({ length: Math.min(pagination.totalPages, 5) }, (_, i) => i + 1).map(
+              (pageNum) => (
+                <Button
+                  key={pageNum}
+                  variant="outline"
+                  size="sm"
+                  className={cn(
+                    'h-8 w-8 rounded-full',
+                    pageNum === pagination.page
+                      ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10'
+                      : 'bg-transparent',
+                  )}
+                  onClick={() => handlePageChange(pageNum)}
+                >
+                  {pageNum}
+                </Button>
+              ),
+            )}
             <Button
               variant="outline"
               size="sm"
               className="rounded-full bg-transparent"
               disabled={pagination.page === pagination.totalPages}
+              onClick={() => handlePageChange(pagination.page + 1)}
             >
               Sau
               <ChevronRight className="h-4 w-4" />

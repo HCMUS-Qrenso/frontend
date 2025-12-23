@@ -1,51 +1,37 @@
 'use client'
 
 import { useState } from 'react'
-import { Button } from '@/components/ui/button'
 import { StaffDataTable } from '@/components/admin/staff-data-table'
 import { InviteStaffSheet } from '@/components/admin/invite-staff-sheet'
-import { AdminFilterToolbarWrapper } from '@/components/admin/admin-filter-toolbar-wrapper'
-import { SearchInput } from '@/components/ui/search-input'
-import { FilterDropdown, type FilterOption } from '@/components/ui/filter-dropdown'
-import { Download, UserPlus, Users, UserCheck, UserX, UserMinus, Loader2 } from 'lucide-react'
+import { StaffFilterToolbar } from '@/components/admin/staff-filter-toolbar'
+import { Users, UserCheck, UserX, UserMinus, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { StatCard } from '@/components/ui/stat-card'
 import { useStaffStatsQuery } from '@/hooks/use-staff-query'
-
-const STATUS_OPTIONS: FilterOption[] = [
-  { value: 'all', label: 'Tất cả trạng thái' },
-  { value: 'active', label: 'Hoạt động' },
-  { value: 'inactive', label: 'Không hoạt động' },
-  { value: 'suspended', label: 'Đình chỉ' },
-]
-
-const VERIFIED_OPTIONS: FilterOption[] = [
-  { value: 'all', label: 'Tất cả' },
-  { value: 'true', label: 'Đã xác thực' },
-  { value: 'false', label: 'Chưa xác thực' },
-]
-
-const SORT_OPTIONS: FilterOption[] = [
-  { value: 'createdAt', label: 'Mới tạo' },
-  { value: 'fullName', label: 'Tên A-Z' },
-  { value: 'lastLoginAt', label: 'Đăng nhập gần đây' },
-]
+import { useSearchParams, useRouter } from 'next/navigation'
 
 export function StaffTabs() {
-  const [activeRole, setActiveRole] = useState<'waiter' | 'kitchen_staff'>('waiter')
-  const [inviteSheetOpen, setInviteSheetOpen] = useState(false)
+  const router = useRouter()
+  const searchParams = useSearchParams()
 
-  // Filters state
-  const [search, setSearch] = useState('')
-  const [statusFilter, setStatusFilter] = useState('all')
-  const [verifiedFilter, setVerifiedFilter] = useState('all')
-  const [sortBy, setSortBy] = useState('createdAt')
+  // Get role from URL, default to 'waiter'
+  const activeRole = (searchParams.get('role') as 'waiter' | 'kitchen_staff') || 'waiter'
+
+  const [inviteSheetOpen, setInviteSheetOpen] = useState(false)
 
   // Fetch stats from API
   const { data: stats, isLoading: statsLoading } = useStaffStatsQuery()
 
-  const handleExportCSV = () => {
-    console.log('Exporting CSV for', activeRole)
+  const handleRoleChange = (role: 'waiter' | 'kitchen_staff') => {
+    const params = new URLSearchParams(searchParams.toString())
+    if (role === 'waiter') {
+      params.delete('role')
+    } else {
+      params.set('role', role)
+    }
+    // Reset page when switching roles
+    params.delete('page')
+    router.push(`/admin/staff?${params.toString()}`)
   }
 
   // Stats loading skeleton
@@ -107,7 +93,7 @@ export function StaffTabs() {
       {/* Role Toggle Buttons */}
       <div className="flex gap-2">
         <button
-          onClick={() => setActiveRole('waiter')}
+          onClick={() => handleRoleChange('waiter')}
           className={cn(
             'rounded-lg px-4 py-2 text-sm font-medium transition-colors',
             activeRole === 'waiter'
@@ -118,7 +104,7 @@ export function StaffTabs() {
           Phục vụ ({stats?.byRole?.waiter?.total ?? 0})
         </button>
         <button
-          onClick={() => setActiveRole('kitchen_staff')}
+          onClick={() => handleRoleChange('kitchen_staff')}
           className={cn(
             'rounded-lg px-4 py-2 text-sm font-medium transition-colors',
             activeRole === 'kitchen_staff'
@@ -131,66 +117,10 @@ export function StaffTabs() {
       </div>
 
       {/* Filter Toolbar */}
-      <AdminFilterToolbarWrapper>
-        {/* Left: Filters + Sort */}
-        <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
-          <SearchInput
-            placeholder="Tìm theo tên, email, SĐT..."
-            value={search}
-            onChange={setSearch}
-            width="sm:w-56"
-          />
-
-          <FilterDropdown
-            label="Trạng thái:"
-            value={statusFilter}
-            options={STATUS_OPTIONS}
-            onChange={setStatusFilter}
-          />
-
-          <FilterDropdown
-            label="Xác thực:"
-            value={verifiedFilter}
-            options={VERIFIED_OPTIONS}
-            onChange={setVerifiedFilter}
-          />
-
-          <FilterDropdown
-            label="Sắp xếp:"
-            value={sortBy}
-            options={SORT_OPTIONS}
-            onChange={setSortBy}
-          />
-        </div>
-
-        {/* Right: Action Buttons */}
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            onClick={handleExportCSV}
-            className="h-8 gap-1 rounded-lg bg-transparent px-3"
-          >
-            <Download className="h-3 w-3" />
-            <span className="hidden text-sm sm:inline">Xuất CSV</span>
-          </Button>
-          <Button
-            onClick={() => setInviteSheetOpen(true)}
-            className="h-8 gap-1 rounded-lg bg-emerald-600 px-3 hover:bg-emerald-700"
-          >
-            <UserPlus className="h-3 w-3" />
-            <span className="text-sm">Mời nhân viên</span>
-          </Button>
-        </div>
-      </AdminFilterToolbarWrapper>
+      <StaffFilterToolbar onInvite={() => setInviteSheetOpen(true)} />
 
       {/* Data Table */}
-      <StaffDataTable
-        role={activeRole}
-        searchQuery={search}
-        statusFilter={statusFilter}
-        verifiedFilter={verifiedFilter}
-        sortBy={sortBy}
-      />
+      <StaffDataTable role={activeRole} />
 
       {/* Invite Staff Sheet */}
       <InviteStaffSheet
