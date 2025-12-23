@@ -1,21 +1,16 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { StaffDataTable } from '@/components/admin/staff-data-table'
 import { InviteStaffSheet } from '@/components/admin/invite-staff-sheet'
 import { AdminFilterToolbarWrapper } from '@/components/admin/admin-filter-toolbar-wrapper'
 import { SearchInput } from '@/components/ui/search-input'
 import { FilterDropdown, type FilterOption } from '@/components/ui/filter-dropdown'
-import { Download, UserPlus, Users, UserCheck, UserX, UserMinus } from 'lucide-react'
+import { Download, UserPlus, Users, UserCheck, UserX, UserMinus, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { StatCard } from '@/components/ui/stat-card'
-
-// Mock stats
-const MOCK_STATS = {
-  waiter: { total: 3, active: 2, inactive: 1, suspended: 0 },
-  kitchen_staff: { total: 3, active: 2, inactive: 0, suspended: 1 },
-}
+import { useStaffStatsQuery } from '@/hooks/use-staff-query'
 
 const STATUS_OPTIONS: FilterOption[] = [
   { value: 'all', label: 'Tất cả trạng thái' },
@@ -26,71 +21,88 @@ const STATUS_OPTIONS: FilterOption[] = [
 
 const VERIFIED_OPTIONS: FilterOption[] = [
   { value: 'all', label: 'Tất cả' },
-  { value: 'verified', label: 'Đã xác thực' },
-  { value: 'unverified', label: 'Chưa xác thực' },
+  { value: 'true', label: 'Đã xác thực' },
+  { value: 'false', label: 'Chưa xác thực' },
 ]
 
 const SORT_OPTIONS: FilterOption[] = [
-  { value: 'created_at', label: 'Mới tạo' },
-  { value: 'full_name', label: 'Tên A-Z' },
-  { value: 'last_login_at', label: 'Đăng nhập gần đây' },
+  { value: 'createdAt', label: 'Mới tạo' },
+  { value: 'fullName', label: 'Tên A-Z' },
+  { value: 'lastLoginAt', label: 'Đăng nhập gần đây' },
 ]
 
 export function StaffTabs() {
   const [activeRole, setActiveRole] = useState<'waiter' | 'kitchen_staff'>('waiter')
   const [inviteSheetOpen, setInviteSheetOpen] = useState(false)
 
-  // Filters state (shared for the toolbar)
+  // Filters state
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [verifiedFilter, setVerifiedFilter] = useState('all')
-  const [sortBy, setSortBy] = useState('created_at')
+  const [sortBy, setSortBy] = useState('createdAt')
 
-  // Stats for current role
-  const stats = MOCK_STATS[activeRole]
-  const totalAll = MOCK_STATS.waiter.total + MOCK_STATS.kitchen_staff.total
+  // Fetch stats from API
+  const { data: stats, isLoading: statsLoading } = useStaffStatsQuery()
 
   const handleExportCSV = () => {
     console.log('Exporting CSV for', activeRole)
   }
 
+  // Stats loading skeleton
+  const renderStatsSkeleton = () => (
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {[1, 2, 3, 4].map((i) => (
+        <div
+          key={i}
+          className="flex items-center justify-center rounded-2xl border border-slate-100 bg-white/80 p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900/80"
+        >
+          <Loader2 className="h-6 w-6 animate-spin text-emerald-600" />
+        </div>
+      ))}
+    </div>
+  )
+
   return (
     <div className="space-y-6">
       {/* Stat Cards */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard
-          title="Tổng nhân viên"
-          value={totalAll.toString()}
-          subtext="Tất cả nhân viên"
-          icon={Users}
-          iconColor="text-blue-600 dark:text-blue-400"
-          iconBgColor="bg-blue-100 dark:bg-blue-500/10"
-        />
-        <StatCard
-          title="Đang hoạt động"
-          value={stats.active.toString()}
-          subtext="Active"
-          icon={UserCheck}
-          iconColor="text-emerald-600 dark:text-emerald-400"
-          iconBgColor="bg-emerald-100 dark:bg-emerald-500/10"
-        />
-        <StatCard
-          title="Không hoạt động"
-          value={stats.inactive.toString()}
-          subtext="Inactive"
-          icon={UserX}
-          iconColor="text-slate-600 dark:text-slate-400"
-          iconBgColor="bg-slate-100 dark:bg-slate-500/10"
-        />
-        <StatCard
-          title="Đình chỉ"
-          value={stats.suspended.toString()}
-          subtext="Suspended"
-          icon={UserMinus}
-          iconColor="text-red-600 dark:text-red-400"
-          iconBgColor="bg-red-100 dark:bg-red-500/10"
-        />
-      </div>
+      {statsLoading ? (
+        renderStatsSkeleton()
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <StatCard
+            title="Tổng nhân viên"
+            value={String(stats?.total ?? 0)}
+            subtext="Tất cả nhân viên"
+            icon={Users}
+            iconColor="text-blue-600 dark:text-blue-400"
+            iconBgColor="bg-blue-100 dark:bg-blue-500/10"
+          />
+          <StatCard
+            title="Đang hoạt động"
+            value={String(stats?.summary?.active ?? 0)}
+            subtext="Active"
+            icon={UserCheck}
+            iconColor="text-emerald-600 dark:text-emerald-400"
+            iconBgColor="bg-emerald-100 dark:bg-emerald-500/10"
+          />
+          <StatCard
+            title="Không hoạt động"
+            value={String(stats?.summary?.inactive ?? 0)}
+            subtext="Inactive"
+            icon={UserX}
+            iconColor="text-slate-600 dark:text-slate-400"
+            iconBgColor="bg-slate-100 dark:bg-slate-500/10"
+          />
+          <StatCard
+            title="Đình chỉ"
+            value={String(stats?.summary?.suspended ?? 0)}
+            subtext="Suspended"
+            icon={UserMinus}
+            iconColor="text-red-600 dark:text-red-400"
+            iconBgColor="bg-red-100 dark:bg-red-500/10"
+          />
+        </div>
+      )}
 
       {/* Role Toggle Buttons */}
       <div className="flex gap-2">
@@ -103,7 +115,7 @@ export function StaffTabs() {
               : 'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700',
           )}
         >
-          Phục vụ ({MOCK_STATS.waiter.total})
+          Phục vụ ({stats?.byRole?.waiter?.total ?? 0})
         </button>
         <button
           onClick={() => setActiveRole('kitchen_staff')}
@@ -114,7 +126,7 @@ export function StaffTabs() {
               : 'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700',
           )}
         >
-          Bếp ({MOCK_STATS.kitchen_staff.total})
+          Bếp ({stats?.byRole?.kitchen_staff?.total ?? 0})
         </button>
       </div>
 
