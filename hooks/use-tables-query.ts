@@ -117,12 +117,15 @@ export const useCreateTableMutation = () => {
 
   return useMutation<TableResponse, unknown, CreateTablePayload>({
     mutationFn: (payload) => tablesApi.createTable(payload),
-    onSuccess: () => {
+    onSuccess: (response) => {
       // Invalidate list and stats queries
       queryClient.invalidateQueries({ queryKey: tablesQueryKeys.lists() })
       queryClient.invalidateQueries({ queryKey: tablesQueryKeys.stats() })
       queryClient.invalidateQueries({ queryKey: tablesQueryKeys.zones() })
       queryClient.invalidateQueries({ queryKey: tablesQueryKeys.floors() }) // Deprecated
+      queryClient.invalidateQueries({
+        queryKey: tablesQueryKeys.layout(response.data.zone_id || ''),
+      })
     },
   })
 }
@@ -138,6 +141,7 @@ export const useUpdateTableMutation = () => {
       // Invalidate list and stats queries
       queryClient.invalidateQueries({ queryKey: tablesQueryKeys.lists() })
       queryClient.invalidateQueries({ queryKey: tablesQueryKeys.stats() })
+      queryClient.invalidateQueries({ queryKey: tablesQueryKeys.layout(data.data.zone_id || '') })
       // Invalidate layout queries if position changed
       if (variables.payload.position) {
         queryClient.invalidateQueries({ queryKey: tablesQueryKeys.all })

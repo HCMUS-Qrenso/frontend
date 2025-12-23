@@ -33,15 +33,19 @@ interface ModifierGroupsPanelProps {
   groups: ModifierGroup[]
   selectedGroupId: string | null
   onSelectGroup: (id: string) => void
+  onCreateGroup: () => void
+  onEditGroup: () => void
+  onDeleteGroup: () => void
 }
 
 export function ModifierGroupsPanel({
   groups,
   selectedGroupId,
   onSelectGroup,
+  onCreateGroup,
+  onEditGroup,
+  onDeleteGroup,
 }: ModifierGroupsPanelProps) {
-  const router = useRouter()
-  const searchParams = useSearchParams()
   const [searchQuery, setSearchQuery] = useState('')
   const { handleErrorWithStatus } = useErrorHandler()
 
@@ -78,24 +82,13 @@ export function ModifierGroupsPanel({
     }
   }
 
-  const openCreateModal = () => {
-    const params = new URLSearchParams(searchParams.toString())
-    params.set('modal', 'group')
-    params.set('mode', 'create')
-    router.push(`?${params.toString()}`)
-  }
-
   return (
     <div className="rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900/60">
       {/* Header */}
       <div className="border-b border-slate-200 p-6 dark:border-slate-800">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Nhóm tuỳ chọn</h2>
-          <Button
-            onClick={openCreateModal}
-            size="sm"
-            className="bg-emerald-600 hover:bg-emerald-700"
-          >
+          <Button onClick={onCreateGroup} size="sm" className="bg-emerald-600 hover:bg-emerald-700">
             <Plus className="mr-2 h-4 w-4" />
             Tạo nhóm
           </Button>
@@ -114,7 +107,7 @@ export function ModifierGroupsPanel({
       </div>
 
       {/* Groups List */}
-      <div className="max-h-[600px] overflow-y-auto p-4">
+      <div className="max-h-150 overflow-y-auto p-4">
         <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
           <SortableContext
             items={filteredGroups.map((g) => g.id)}
@@ -127,6 +120,8 @@ export function ModifierGroupsPanel({
                   group={group}
                   isSelected={group.id === selectedGroupId}
                   onSelect={() => onSelectGroup(group.id)}
+                  onDelete={onDeleteGroup}
+                  onEdit={onEditGroup}
                 />
               ))}
             </div>
@@ -147,13 +142,16 @@ function SortableGroupItem({
   group,
   isSelected,
   onSelect,
+  onDelete,
+  onEdit,
 }: {
   group: ModifierGroup
   isSelected: boolean
   onSelect: () => void
+  onDelete: () => void
+  onEdit: () => void
 }) {
   const router = useRouter()
-  const searchParams = useSearchParams()
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: group.id,
   })
@@ -164,24 +162,9 @@ function SortableGroupItem({
     opacity: isDragging ? 0.5 : 1,
   }
 
-  const handleEdit = () => {
-    const params = new URLSearchParams(searchParams.toString())
-    params.set('modal', 'group')
-    params.set('mode', 'edit')
-    params.set('id', group.id)
-    router.push(`?${params.toString()}`)
-  }
-
   const handleDuplicate = () => {
     // TODO: Implement duplicate
     console.log('Duplicate group', group.id)
-  }
-
-  const handleDelete = () => {
-    const params = new URLSearchParams(searchParams.toString())
-    params.set('delete', 'group')
-    params.set('id', group.id)
-    router.push(`?${params.toString()}`)
   }
 
   const handleUsedByClick = (e: React.MouseEvent) => {
@@ -237,10 +220,10 @@ function SortableGroupItem({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={handleEdit}>Chỉnh sửa</DropdownMenuItem>
+              <DropdownMenuItem onClick={onEdit}>Chỉnh sửa</DropdownMenuItem>
               <DropdownMenuItem onClick={handleDuplicate}>Nhân bản</DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleDelete} className="text-red-600">
+              <DropdownMenuItem onClick={onDelete} className="text-red-600">
                 Xoá
               </DropdownMenuItem>
             </DropdownMenuContent>

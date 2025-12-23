@@ -144,7 +144,9 @@ export function ContactFormCard() {
           <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500/10">
             <Check className="h-8 w-8 text-emerald-500" />
           </div>
-          <h3 className="mb-3 text-2xl font-bold text-black dark:text-white">Cảm ơn bạn đã liên hệ!</h3>
+          <h3 className="mb-3 text-2xl font-bold text-black dark:text-white">
+            Cảm ơn bạn đã liên hệ!
+          </h3>
           <p className="mb-6 text-slate-600 dark:text-slate-300">
             Đội ngũ Qrenso sẽ liên hệ với bạn trong vòng{' '}
             <strong className="text-black dark:text-white">24 giờ làm việc</strong>.
@@ -250,7 +252,8 @@ export function ContactFormCard() {
         {/* City */}
         <div className="space-y-2">
           <Label htmlFor="city" className="text-slate-700 dark:text-slate-200">
-            Khu vực / Thành phố <span className="text-sm text-slate-500 dark:text-slate-400">(Tùy chọn)</span>
+            Khu vực / Thành phố{' '}
+            <span className="text-sm text-slate-500 dark:text-slate-400">(Tùy chọn)</span>
           </Label>
           <Input
             id="city"
@@ -264,7 +267,8 @@ export function ContactFormCard() {
         {/* Branches */}
         <div className="space-y-2">
           <Label htmlFor="branches" className="text-slate-700 dark:text-slate-200">
-            Số chi nhánh / Số bàn <span className="text-sm text-slate-500 dark:text-slate-400">(Tùy chọn)</span>
+            Số chi nhánh / Số bàn{' '}
+            <span className="text-sm text-slate-500 dark:text-slate-400">(Tùy chọn)</span>
           </Label>
           <Input
             id="branches"

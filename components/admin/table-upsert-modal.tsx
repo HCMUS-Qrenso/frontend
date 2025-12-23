@@ -2,8 +2,7 @@
 
 import type React from 'react'
 
-import { useEffect, useState, useRef } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -14,21 +13,29 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { X, Loader2 } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 import { Switch } from '@/components/ui/switch'
 import {
-  useTableQuery,
-  useCreateTableMutation,
-  useUpdateTableMutation,
-} from '@/hooks/use-tables-query'
-import { useZonesSimpleQuery } from '@/hooks/use-zones-query'
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogClose,
+} from '@/components/ui/dialog'
+import { useCreateTableMutation, useUpdateTableMutation } from '@/hooks/use-tables-query'
 import type { SimpleZone } from '@/types/zones'
 import { toast } from 'sonner'
-import type { TableStatus, TableShape, TablePosition } from '@/types/tables'
+import type { TableStatus, TableShape, TablePosition, Table } from '@/types/tables'
 import { useErrorHandler } from '@/hooks/use-error-handler'
 
-interface TableUpsertDrawerProps {
+interface TableUpsertModalProps {
   open: boolean
+  mode: 'create' | 'edit'
+  table: Table | null
+  zones: SimpleZone[] | undefined
+  onOpenChange: (open: boolean) => void
 }
 
 interface TableFormData {
@@ -53,58 +60,19 @@ const initialFormData: TableFormData = {
   position: { x: -1, y: -1, rotation: 0 }, // Default position for new tables (not placed in layout)
 }
 
-export function TableUpsertDrawer({ open }: TableUpsertDrawerProps) {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const mode = searchParams.get('mode') as 'create' | 'edit' | null
-  const tableId = searchParams.get('id')
-
+export function TableUpsertModal({
+  open,
+  mode,
+  table,
+  onOpenChange,
+  zones,
+}: TableUpsertModalProps) {
   const [formData, setFormData] = useState<TableFormData>(initialFormData)
   const [errors, setErrors] = useState<Partial<Record<keyof TableFormData, string>>>({})
   const [isLoading, setIsLoading] = useState(false)
 
-  const closeButtonRef = useRef<HTMLButtonElement>(null)
-  const previousFocusRef = useRef<HTMLElement | null>(null)
-  const scrollYRef = useRef<number>(0)
-
   useEffect(() => {
-    if (open) {
-      previousFocusRef.current = document.activeElement as HTMLElement
-    }
-  }, [open])
-
-  // Lock body scroll when modal is open
-  useEffect(() => {
-    if (open) {
-      // Save current scroll position
-      scrollYRef.current = window.scrollY
-      document.body.style.position = 'fixed'
-      document.body.style.top = `-${scrollYRef.current}px`
-      document.body.style.width = '100%'
-      document.body.style.overflow = 'hidden'
-
-      return () => {
-        // Restore scroll position
-        document.body.style.position = ''
-        document.body.style.top = ''
-        document.body.style.width = ''
-        document.body.style.overflow = ''
-        window.scrollTo(0, scrollYRef.current)
-      }
-    }
-  }, [open])
-
-  // Load table data when editing
-  const { data: tableData, isLoading: isLoadingTable } = useTableQuery(
-    mode === 'edit' && tableId ? tableId : null,
-    mode === 'edit' && open,
-  )
-  const { data: zonesData } = useZonesSimpleQuery()
-  const zones: SimpleZone[] = zonesData?.zones || []
-
-  useEffect(() => {
-    if (mode === 'edit' && tableData?.data && open) {
-      const table = tableData.data
+    if (mode === 'edit' && table) {
       // Parse position from JSON string
       let position: TablePosition | undefined
       if (table.position) {
@@ -118,46 +86,20 @@ export function TableUpsertDrawer({ open }: TableUpsertDrawerProps) {
       setFormData({
         table_number: table.table_number,
         capacity: table.capacity.toString(),
-        zone_id: table.zone_id || '',
+        zone_id: table.zone?.id || table.zone_id || '',
         shape: (table.shape as TableShape) || 'rectangle',
         status: table.status,
         is_active: table.is_active,
         autoGenerateQR: false,
         position,
       })
-    } else if (mode === 'create' && open) {
-      setFormData(initialFormData)
+
+      console.log(formData)
+    } else if (mode === 'create') {
+      setFormData({ ...initialFormData, zone_id: zones && zones.length > 0 ? zones[0].id : '' })
     }
-  }, [mode, tableData, open])
-
-  // When creating a new table, default the zone to the first available zone
-  useEffect(() => {
-    if (!open) return
-    if (mode !== 'create') return
-    if (!zones || zones.length === 0) return
-
-    // Only set default if user hasn't chosen anything yet
-    if (!formData.zone_id) {
-      setFormData((prev) => ({
-        ...prev,
-        zone_id: zones[0].id,
-      }))
-    }
-  }, [open, mode, zones, formData.zone_id])
-
-  const closeDrawer = () => {
-    const params = new URLSearchParams(searchParams.toString())
-    params.delete('modal')
-    params.delete('mode')
-    params.delete('id')
-    router.push(`/admin/tables/list?${params.toString()}`)
-    setFormData(initialFormData)
     setErrors({})
-
-    setTimeout(() => {
-      previousFocusRef.current?.focus()
-    }, 100)
-  }
+  }, [mode, table])
 
   const validateForm = (): boolean => {
     const newErrors: Partial<Record<keyof TableFormData, string>> = {}
@@ -201,9 +143,9 @@ export function TableUpsertDrawer({ open }: TableUpsertDrawerProps) {
       if (mode === 'create') {
         await createMutation.mutateAsync(payload)
         toast.success('Bàn đã được tạo thành công')
-      } else if (mode === 'edit' && tableId) {
+      } else if (mode === 'edit' && table) {
         await updateMutation.mutateAsync({
-          id: tableId,
+          id: table.id,
           payload: {
             ...payload,
           },
@@ -211,8 +153,8 @@ export function TableUpsertDrawer({ open }: TableUpsertDrawerProps) {
         toast.success('Bàn đã được cập nhật thành công')
       }
 
-      // Close drawer
-      closeDrawer()
+      // Close modal
+      onOpenChange(false)
     } catch (error: any) {
       console.error('Error saving table:', error)
 
@@ -257,110 +199,21 @@ export function TableUpsertDrawer({ open }: TableUpsertDrawerProps) {
     }
   }
 
-  useEffect(() => {
-    const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && open && !isLoading) {
-        closeDrawer()
-      }
-    }
-    window.addEventListener('keydown', handleEsc)
-    return () => window.removeEventListener('keydown', handleEsc)
-  }, [open, isLoading])
-
-  useEffect(() => {
-    if (!open) return
-
-    const modal = document.querySelector('[role="dialog"]') as HTMLElement
-    if (!modal) return
-
-    const focusableElements = modal.querySelectorAll<HTMLElement>(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
-    )
-    const firstElement = focusableElements[0]
-    const lastElement = focusableElements[focusableElements.length - 1]
-
-    const handleTab = (e: KeyboardEvent) => {
-      if (e.key !== 'Tab') return
-
-      if (e.shiftKey) {
-        if (document.activeElement === firstElement) {
-          lastElement?.focus()
-          e.preventDefault()
-        }
-      } else {
-        if (document.activeElement === lastElement) {
-          firstElement?.focus()
-          e.preventDefault()
-        }
-      }
-    }
-
-    modal.addEventListener('keydown', handleTab)
-    firstElement?.focus()
-
-    return () => modal.removeEventListener('keydown', handleTab)
-  }, [open])
-
-  if (!open) return null
-
-  if (mode === 'edit' && isLoadingTable) {
-    return (
-      <>
-        <div className="fixed inset-0 z-60 bg-black/60 backdrop-blur-sm m-0" aria-hidden="true" />
-        <div className="fixed top-1/2 left-1/2 z-70 flex max-h-[90vh] w-full max-w-xl -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-700 dark:bg-slate-900">
-          <div className="flex items-center justify-center p-12">
-            <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
-          </div>
-        </div>
-      </>
-    )
-  }
-
   return (
-    <>
-      {/* Overlay - Click to close only when not loading */}
-      <div
-        className="fixed inset-0 z-60 bg-black/60 backdrop-blur-sm m-0"
-        onClick={() => !isLoading && closeDrawer()}
-        aria-hidden="true"
-      />
-
-      {/* Modal Panel */}
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="modal-title"
-        aria-describedby="modal-description"
-        className="fixed top-1/2 left-1/2 z-70 flex max-h-[90vh] w-full max-w-xl -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-700 dark:bg-slate-900"
-      >
-        {/* Header - Sticky */}
-        <div className="flex items-start justify-between border-b border-slate-200 p-6 dark:border-slate-800">
-          <div>
-            <h2 id="modal-title" className="text-xl font-semibold text-slate-900 dark:text-white">
-              {mode === 'create' ? 'Thêm bàn mới' : 'Chỉnh sửa bàn'}
-            </h2>
-            <p id="modal-description" className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-              {mode === 'create'
-                ? 'Điền đầy đủ thông tin để thêm bàn mới vào hệ thống'
-                : 'Cập nhật thông tin bàn trong form bên dưới'}
-            </p>
-          </div>
-          <Button
-            ref={closeButtonRef}
-            variant="ghost"
-            size="icon"
-            onClick={closeDrawer}
-            disabled={isLoading}
-            className="h-9 w-9 rounded-full"
-            aria-label="Đóng"
-          >
-            <X className="h-5 w-5" />
-          </Button>
-        </div>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="flex flex-col max-h-[90vh] w-full max-w-xl">
+        <DialogHeader>
+          <DialogTitle>{mode === 'create' ? 'Thêm bàn mới' : 'Chỉnh sửa bàn'}</DialogTitle>
+          <DialogDescription>
+            {mode === 'create'
+              ? 'Điền đầy đủ thông tin để thêm bàn mới vào hệ thống'
+              : 'Cập nhật thông tin bàn trong form bên dưới'}
+          </DialogDescription>
+        </DialogHeader>
 
         {/* Form Content - Scrollable */}
-        <form onSubmit={handleSubmit} className="flex flex-1 flex-col overflow-hidden">
-          <div className="flex-1 space-y-6 overflow-y-auto p-6">
+        <div className="flex flex-1 flex-col overflow-hidden">
+          <div className="flex-1 space-y-6 overflow-y-auto pr-6">
             {/* Table Number */}
             <div className="space-y-2">
               <Label htmlFor="table_number">
@@ -393,13 +246,16 @@ export function TableUpsertDrawer({ open }: TableUpsertDrawerProps) {
               <Label htmlFor="zone_id">Khu vực / Tầng</Label>
               <Select
                 value={formData.zone_id}
-                onValueChange={(value) => setFormData({ ...formData, zone_id: value })}
+                onValueChange={(value) => {
+                  if (!value) return
+                  setFormData((prev) => ({ ...prev, zone_id: value }))
+                }}
               >
                 <SelectTrigger id="zone_id">
                   <SelectValue placeholder="Chọn khu vực" />
                 </SelectTrigger>
-                <SelectContent className="z-80">
-                  {zones.map((zone: SimpleZone) => (
+                <SelectContent>
+                  {zones?.map((zone: SimpleZone) => (
                     <SelectItem key={zone.id} value={zone.id}>
                       {zone.name}
                     </SelectItem>
@@ -441,7 +297,7 @@ export function TableUpsertDrawer({ open }: TableUpsertDrawerProps) {
                 <SelectTrigger id="shape">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="z-80">
+                <SelectContent>
                   <SelectItem value="circle">Tròn</SelectItem>
                   <SelectItem value="rectangle">Chữ nhật</SelectItem>
                   <SelectItem value="oval">Oval</SelectItem>
@@ -461,7 +317,7 @@ export function TableUpsertDrawer({ open }: TableUpsertDrawerProps) {
                 <SelectTrigger id="status">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="z-80">
+                <SelectContent>
                   <SelectItem value="available">Trống</SelectItem>
                   <SelectItem value="occupied">Đang sử dụng</SelectItem>
                   <SelectItem value="waiting_for_payment">Chờ thanh toán</SelectItem>
@@ -512,40 +368,36 @@ export function TableUpsertDrawer({ open }: TableUpsertDrawerProps) {
             )}
 
             {/* Show table ID in edit mode (read-only) */}
-            {mode === 'edit' && tableId && (
+            {mode === 'edit' && table && (
               <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-800/50">
                 <Label className="text-xs text-slate-500 dark:text-slate-400">
                   ID bàn (read-only)
                 </Label>
                 <p className="mt-1 font-mono text-sm text-slate-700 dark:text-slate-300">
-                  {tableId}
+                  {table.id}
                 </p>
               </div>
             )}
           </div>
+        </div>
 
-          {/* Footer - Sticky */}
-          <div className="flex items-center justify-end gap-3 border-t border-slate-200 p-6 dark:border-slate-800">
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={closeDrawer}
-              disabled={isLoading}
-              className="rounded-full"
-            >
+        {/* Footer */}
+        <DialogFooter className="mt-4 flex-row gap-3">
+          <DialogClose asChild>
+            <Button type="button" variant="outline" disabled={isLoading}>
               Huỷ
             </Button>
-            <Button
-              type="submit"
-              disabled={isLoading}
-              className="gap-2 rounded-full bg-emerald-600 hover:bg-emerald-700"
-            >
-              {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
-              {isLoading ? 'Đang lưu...' : 'Lưu bàn'}
-            </Button>
-          </div>
-        </form>
-      </div>
-    </>
+          </DialogClose>
+          <Button
+            onClick={handleSubmit}
+            disabled={isLoading}
+            className="gap-2 bg-emerald-600 hover:bg-emerald-700"
+          >
+            {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+            {isLoading ? 'Đang lưu...' : 'Lưu bàn'}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }

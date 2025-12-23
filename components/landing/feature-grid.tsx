@@ -67,7 +67,7 @@ export function FeatureGrid() {
             {features.map((feature, index) => (
               <div
                 key={index}
-                className="group rounded-2xl border border-slate-200 bg-white p-6 transition-all hover:border-emerald-500/50 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900/50 dark:hover:bg-slate-900 hover:scale-105 hover:outline-2 hover:outline-emerald-500/30"
+                className="group rounded-2xl border border-slate-200 bg-white p-6 transition-all hover:scale-105 hover:border-emerald-500/50 hover:bg-slate-50 hover:outline-2 hover:outline-emerald-500/30 dark:border-slate-800 dark:bg-slate-900/50 dark:hover:bg-slate-900"
               >
                 <div className="mb-4 inline-flex rounded-xl bg-emerald-500/10 p-3">
                   <feature.icon className="h-6 w-6 text-emerald-400" />

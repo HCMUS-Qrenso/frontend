@@ -1,13 +1,22 @@
 'use client'
 
-import { Shield, AlertTriangle, CheckCircle2, Eye, X } from 'lucide-react'
+import { Shield, AlertTriangle, CheckCircle2, Eye } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog'
 
 interface QRSecurityModalProps {
-  onClose: () => void
+  open: boolean
+  onOpenChange: (open: boolean) => void
 }
 
-export function QRSecurityModal({ onClose }: QRSecurityModalProps) {
+export function QRSecurityModal({ open, onOpenChange }: QRSecurityModalProps) {
   const bestPractices = [
     {
       icon: CheckCircle2,
@@ -32,36 +41,19 @@ export function QRSecurityModal({ onClose }: QRSecurityModalProps) {
   ]
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
-      onClick={onClose}
-    >
-      <div
-        className="w-full max-w-lg space-y-6 rounded-2xl bg-white p-6 shadow-xl dark:bg-slate-900"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div className="flex items-start justify-between">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-lg rounded-2xl">
+        <DialogHeader>
           <div className="flex items-center gap-3">
             <div className="rounded-xl bg-emerald-50 p-2.5 dark:bg-emerald-500/10">
               <Shield className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
-                Lưu ý bảo mật khi sử dụng QR menu
-              </h3>
-              <p className="text-sm text-slate-500 dark:text-slate-400">
-                Thực hành tốt nhất & cảnh báo quan trọng
-              </p>
+              <DialogTitle>Lưu ý bảo mật khi sử dụng QR menu</DialogTitle>
+              <DialogDescription>Thực hành tốt nhất & cảnh báo quan trọng</DialogDescription>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-300"
-          >
-            <X className="h-5 w-5" />
-          </button>
-        </div>
+        </DialogHeader>
 
         {/* Best practices section */}
         <div className="space-y-3">
@@ -120,13 +112,15 @@ export function QRSecurityModal({ onClose }: QRSecurityModalProps) {
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="flex justify-end">
-          <Button onClick={onClose} className="rounded-full bg-emerald-500 hover:bg-emerald-600">
+        <DialogFooter>
+          <Button
+            onClick={() => onOpenChange(false)}
+            className="rounded-full bg-emerald-500 hover:bg-emerald-600"
+          >
             Đã hiểu
           </Button>
-        </div>
-      </div>
-    </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }

@@ -3,7 +3,6 @@
 import type React from 'react'
 
 import { useEffect, useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
 import {
   Dialog,
   DialogContent,
@@ -17,36 +16,31 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Loader2 } from 'lucide-react'
-import {
-  useCreateModifierMutation,
-  useUpdateModifierMutation,
-  useModifiersQuery,
-} from '@/hooks/use-modifiers-query'
+import { useCreateModifierMutation, useUpdateModifierMutation } from '@/hooks/use-modifiers-query'
 import { useErrorHandler } from '@/hooks/use-error-handler'
 import { toast } from 'sonner'
+import { Modifier } from '@/types/modifiers'
 
 interface ModifierModalProps {
   open: boolean
   selectedGroupId: string | null
+  mode: 'create' | 'edit'
+  modifier: Modifier | null
+  onOpenChange: (open: boolean) => void
 }
 
-export function ModifierModal({ open, selectedGroupId }: ModifierModalProps) {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const mode = searchParams.get('mode') as 'create' | 'edit'
-  const modifierId = searchParams.get('id')
+export function ModifierModal({
+  open,
+  selectedGroupId,
+  mode,
+  modifier,
+  onOpenChange,
+}: ModifierModalProps) {
   const { handleErrorWithStatus } = useErrorHandler()
 
   // Mutations
   const createMutation = useCreateModifierMutation()
   const updateMutation = useUpdateModifierMutation()
-
-  // Fetch modifiers to get data for editing
-  const { data: modifiersData } = useModifiersQuery(
-    selectedGroupId,
-    { include_unavailable: true },
-    open && mode === 'edit' && !!selectedGroupId,
-  )
 
   const isSubmitting = createMutation.isPending || updateMutation.isPending
 
@@ -62,8 +56,7 @@ export function ModifierModal({ open, selectedGroupId }: ModifierModalProps) {
 
   // Load data if editing
   useEffect(() => {
-    if (mode === 'edit' && modifierId && modifiersData?.data.modifiers) {
-      const modifier = modifiersData.data.modifiers.find((m) => m.id === modifierId)
+    if (mode === 'edit' && modifier) {
       if (modifier) {
         setFormData({
           name: modifier.name,
@@ -78,16 +71,8 @@ export function ModifierModal({ open, selectedGroupId }: ModifierModalProps) {
         is_available: true,
       })
     }
-  }, [mode, modifierId, modifiersData])
-
-  const handleClose = () => {
-    const params = new URLSearchParams(searchParams.toString())
-    params.delete('modal')
-    params.delete('mode')
-    params.delete('id')
-    router.push(`?${params.toString()}`)
     setErrors({ name: '' })
-  }
+  }, [mode, modifier])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -121,7 +106,7 @@ export function ModifierModal({ open, selectedGroupId }: ModifierModalProps) {
         {
           onSuccess: () => {
             toast.success('Đã tạo option')
-            handleClose()
+            onOpenChange(false)
           },
           onError: (error) => {
             handleErrorWithStatus(error)
@@ -129,13 +114,13 @@ export function ModifierModal({ open, selectedGroupId }: ModifierModalProps) {
           },
         },
       )
-    } else if (mode === 'edit' && modifierId) {
+    } else if (mode === 'edit' && modifier) {
       updateMutation.mutate(
-        { id: modifierId, groupId: selectedGroupId, payload },
+        { id: modifier.id, groupId: selectedGroupId, payload },
         {
           onSuccess: () => {
             toast.success('Đã cập nhật option')
-            handleClose()
+            onOpenChange(false)
           },
           onError: (error) => {
             handleErrorWithStatus(error)
@@ -147,8 +132,8 @@ export function ModifierModal({ open, selectedGroupId }: ModifierModalProps) {
   }
 
   return (
-    <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[500px]">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-125">
         <DialogHeader>
           <DialogTitle>{mode === 'create' ? 'Thêm option mới' : 'Chỉnh sửa option'}</DialogTitle>
           <DialogDescription>
@@ -218,7 +203,12 @@ export function ModifierModal({ open, selectedGroupId }: ModifierModalProps) {
           </div>
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={handleClose} disabled={isSubmitting}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+              disabled={isSubmitting}
+            >
               Hủy
             </Button>
             <Button

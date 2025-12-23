@@ -26,7 +26,7 @@ const templates: Template[] = [
   {
     id: '1',
     name: 'Minimal A4 2-Column',
-    thumbnail: '/minimal-clean-menu-template.jpg',
+    thumbnail: '/placeholder.jpg',
     tags: ['A4', '2-col', 'Có ảnh'],
     description: 'Thiết kế tối giản, 2 cột, phù hợp menu có ảnh món',
     format: 'A4',
@@ -34,7 +34,7 @@ const templates: Template[] = [
   {
     id: '2',
     name: 'Photo-Forward Premium',
-    thumbnail: '/photo-menu-restaurant-elegant.jpg',
+    thumbnail: '/placeholder.jpg',
     tags: ['A4', 'Ảnh lớn', 'Premium'],
     description: 'Ảnh món nổi bật, phong cách cao cấp',
     format: 'A4',
@@ -42,7 +42,7 @@ const templates: Template[] = [
   {
     id: '3',
     name: 'Chalkboard Dark',
-    thumbnail: '/chalkboard-menu-dark-vintage.jpg',
+    thumbnail: '/placeholder.jpg',
     tags: ['Dark', 'Vintage', 'Không ảnh'],
     description: 'Phong cách bảng đen cổ điển, không cần ảnh',
     format: 'A4',
@@ -50,7 +50,7 @@ const templates: Template[] = [
   {
     id: '4',
     name: 'Tri-Fold Classic',
-    thumbnail: '/trifold-menu-restaurant-classic.jpg',
+    thumbnail: '/placeholder.jpg',
     tags: ['Tri-fold', '3-page', 'Compact'],
     description: 'Menu gấp 3, gọn gàng cho nhà hàng nhỏ',
     format: 'Letter',
@@ -97,11 +97,11 @@ export function TemplateExportTab() {
               {templates.map((template) => (
                 <div
                   key={template.id}
-                  className="group overflow-hidden rounded-xl border border-slate-200 transition-all hover:border-emerald-500 hover:shadow-lg dark:border-slate-800 dark:hover:border-emerald-600"
+                  className="group overflow-hidden rounded-xl border border-slate-200 transition-all hover:border-emerald-500 hover:shadow-lg dark:border-slate-800 dark:hover:border-emerald-600 flex flex-col h-full"
                 >
                   <div className="relative aspect-[3/4] overflow-hidden bg-slate-100 dark:bg-slate-800">
                     <img
-                      src={template.thumbnail || '/placeholder.svg'}
+                      src={template.thumbnail || '/placeholder.jpg'}
                       alt={template.name}
                       className="h-full w-full object-cover transition-transform group-hover:scale-105"
                     />
@@ -119,9 +119,9 @@ export function TemplateExportTab() {
                       </div>
                     </div>
                   </div>
-                  <div className="p-4">
+                  <div className="p-4 flex-1 flex flex-col">
                     <h4 className="font-medium text-slate-900 dark:text-white">{template.name}</h4>
-                    <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                    <p className="mt-1 text-xs text-slate-500 dark:text-slate-400 flex-1">
                       {template.description}
                     </p>
                     <div className="mt-3 flex flex-wrap gap-1">

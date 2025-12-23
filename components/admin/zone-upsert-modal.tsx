@@ -1,9 +1,7 @@
 'use client'
 
 import type React from 'react'
-
 import { useEffect, useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
 import {
   Dialog,
   DialogContent,
@@ -17,12 +15,16 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
 import { Loader2 } from 'lucide-react'
-import { useZoneQuery, useCreateZoneMutation, useUpdateZoneMutation } from '@/hooks/use-zones-query'
+import { useCreateZoneMutation, useUpdateZoneMutation } from '@/hooks/use-zones-query'
 import { useErrorHandler } from '@/hooks/use-error-handler'
 import { toast } from 'sonner'
+import { Zone } from '@/types/zones'
 
 interface ZoneUpsertModalProps {
   open: boolean
+  onOpenChange: (open: boolean) => void
+  zone: Zone | null
+  mode: 'create' | 'edit'
 }
 
 interface ZoneFormData {
@@ -39,18 +41,10 @@ const initialFormData: ZoneFormData = {
   is_active: true,
 }
 
-export function ZoneUpsertModal({ open }: ZoneUpsertModalProps) {
-  const router = useRouter()
-  const searchParams = useSearchParams()
+export function ZoneUpsertModal({ open, onOpenChange, zone, mode }: ZoneUpsertModalProps) {
   const [formData, setFormData] = useState<ZoneFormData>(initialFormData)
 
-  const mode = searchParams.get('mode') || 'create'
-  const zoneId = searchParams.get('id')
-
   const isEdit = mode === 'edit'
-
-  // Load zone data for edit mode
-  const { data: zoneData } = useZoneQuery(zoneId || '', open && isEdit && !!zoneId)
 
   const createMutation = useCreateZoneMutation()
   const updateMutation = useUpdateZoneMutation()
@@ -60,8 +54,7 @@ export function ZoneUpsertModal({ open }: ZoneUpsertModalProps) {
 
   // Load zone data for edit mode
   useEffect(() => {
-    if (open && isEdit && zoneData) {
-      const zone = zoneData
+    if (open && isEdit && zone) {
       setFormData({
         name: zone.name,
         description: zone.description || '',
@@ -72,15 +65,7 @@ export function ZoneUpsertModal({ open }: ZoneUpsertModalProps) {
       // Reset form for create mode
       setFormData(initialFormData)
     }
-  }, [open, isEdit, zoneData])
-
-  const handleClose = () => {
-    const params = new URLSearchParams(searchParams.toString())
-    params.delete('modal')
-    params.delete('mode')
-    params.delete('id')
-    router.push(`/admin/tables/zones?${params.toString()}`)
-  }
+  }, [open, isEdit, zone])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -104,15 +89,15 @@ export function ZoneUpsertModal({ open }: ZoneUpsertModalProps) {
         is_active: formData.is_active,
       }
 
-      if (isEdit && zoneId) {
-        await updateMutation.mutateAsync({ id: zoneId, payload })
+      if (isEdit && zone) {
+        await updateMutation.mutateAsync({ id: zone.id, payload })
         toast.success('Khu vực đã được cập nhật thành công')
       } else {
         await createMutation.mutateAsync(payload)
         toast.success('Khu vực đã được tạo thành công')
       }
 
-      handleClose()
+      onOpenChange(false)
     } catch (error: any) {
       handleError(error, 'Có lỗi xảy ra khi lưu khu vực')
     }
@@ -126,7 +111,7 @@ export function ZoneUpsertModal({ open }: ZoneUpsertModalProps) {
   }
 
   return (
-    <Dialog open={open} onOpenChange={handleClose}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md rounded-2xl">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold text-slate-900 dark:text-white">
@@ -163,7 +148,7 @@ export function ZoneUpsertModal({ open }: ZoneUpsertModalProps) {
               placeholder="Mô tả ngắn gọn về khu vực này..."
               value={formData.description}
               onChange={(e) => handleInputChange('description', e.target.value)}
-              className="min-h-[80px] resize-none rounded-lg"
+              className="min-h-20 resize-none rounded-lg"
               disabled={isLoading}
             />
           </div>
@@ -205,7 +190,7 @@ export function ZoneUpsertModal({ open }: ZoneUpsertModalProps) {
             <Button
               type="button"
               variant="outline"
-              onClick={handleClose}
+              onClick={() => onOpenChange(false)}
               disabled={isLoading}
               className="flex-1 rounded-lg"
             >

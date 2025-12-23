@@ -1,35 +1,27 @@
 'use client'
 
-import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
+import { StatusBadge, ZONE_ACTIVE_CONFIG } from '@/components/ui/status-badge'
+import { EmptyState } from '@/components/ui/empty-state'
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
-import { Badge } from '@/components/ui/badge'
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import {
   Edit2,
   Trash2,
   Loader2,
-  AlertTriangle,
   ChevronLeft,
   ChevronRight,
   Eye,
   EyeOff,
+  MoreVertical,
 } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import {
-  useZonesQuery,
-  useDeleteZoneMutation,
-  useUpdateZoneMutation,
-} from '@/hooks/use-zones-query'
+import { useZonesQuery, useUpdateZoneMutation } from '@/hooks/use-zones-query'
 import { toast } from 'sonner'
 import type { Zone } from '@/types/zones'
 import { useErrorHandler } from '@/hooks/use-error-handler'
@@ -42,7 +34,12 @@ import {
   TableRow,
 } from '@/components/ui/table'
 
-export function ZonesTable() {
+interface ZonesTableProps {
+  onEdit: (zone: Zone) => void
+  onDelete: (zone: Zone) => void
+}
+
+export function ZonesTable({ onEdit, onDelete }: ZonesTableProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
 
@@ -50,6 +47,7 @@ export function ZonesTable() {
   const page = Number.parseInt(searchParams.get('page') || '1')
   const limit = Number.parseInt(searchParams.get('limit') || '10')
   const search = searchParams.get('search') || undefined
+  const isActive = searchParams.get('is_active') as 'true' | 'false' | undefined
   const sortBy =
     (searchParams.get('sort_by') as 'name' | 'displayOrder' | 'createdAt' | 'updatedAt') ||
     'displayOrder'
@@ -59,59 +57,20 @@ export function ZonesTable() {
     page,
     limit,
     search,
+    is_active: isActive,
     sort_by: sortBy,
     sort_order: sortOrder,
   })
 
   const zones = data?.data || []
   const pagination = data?.pagination
-  const deleteMutation = useDeleteZoneMutation()
   const updateMutation = useUpdateZoneMutation()
   const { handleErrorWithStatus } = useErrorHandler()
-
-  const [zoneToDelete, setZoneToDelete] = useState<Zone | null>(null)
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
-
-  const handleEdit = (zoneId: string) => {
-    const params = new URLSearchParams(searchParams.toString())
-    params.set('modal', 'zone')
-    params.set('mode', 'edit')
-    params.set('id', zoneId)
-    router.push(`/admin/tables/zones?${params.toString()}`)
-  }
-
-  const handleDeleteClick = (zone: Zone) => {
-    setZoneToDelete(zone)
-    setDeleteDialogOpen(true)
-  }
 
   const handlePageChange = (newPage: number) => {
     const params = new URLSearchParams(searchParams.toString())
     params.set('page', newPage.toString())
     router.replace(`/admin/tables/zones?${params.toString()}`)
-  }
-
-  const handleConfirmDelete = async () => {
-    if (!zoneToDelete) return
-
-    try {
-      await deleteMutation.mutateAsync(zoneToDelete.id)
-      toast.success('Khu vực đã được xóa thành công')
-      setDeleteDialogOpen(false)
-      setZoneToDelete(null)
-    } catch (error: any) {
-      // Handle specific error cases with custom message for 409
-      const status = error?.response?.status
-      if (status === 409) {
-        const backendMessage = error?.response?.data?.message
-        const message = Array.isArray(backendMessage)
-          ? backendMessage.join(', ')
-          : backendMessage || 'Không thể xóa khu vực đang có bàn'
-        toast.error(message)
-      } else {
-        handleErrorWithStatus(error, undefined, 'Không thể xóa khu vực. Vui lòng thử lại.')
-      }
-    }
   }
 
   const handleToggleActive = async (zoneId: string, currentStatus: boolean) => {
@@ -136,16 +95,16 @@ export function ZonesTable() {
               <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
                 Tên khu vực
               </TableHead>
-              <TableHead className="w-[200px] px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+              <TableHead className="w-50 px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
                 Mô tả
               </TableHead>
-              <TableHead className="w-[120px] px-6 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+              <TableHead className="w-30 px-6 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
                 Thứ tự
               </TableHead>
-              <TableHead className="w-[120px] px-6 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+              <TableHead className="w-30 px-6 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
                 Trạng thái
               </TableHead>
-              <TableHead className="w-[150px] px-6 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+              <TableHead className="w-37.5 px-6 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
                 Thao tác
               </TableHead>
             </TableRow>
@@ -206,16 +165,16 @@ export function ZonesTable() {
               <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
                 Tên khu vực
               </TableHead>
-              <TableHead className="w-[200px] px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+              <TableHead className="w-50 px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
                 Mô tả
               </TableHead>
-              <TableHead className="w-[120px] px-6 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+              <TableHead className="w-30 px-6 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
                 Thứ tự
               </TableHead>
-              <TableHead className="w-[120px] px-6 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+              <TableHead className="w-30 px-6 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
                 Trạng thái
               </TableHead>
-              <TableHead className="w-[150px] px-6 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+              <TableHead className="w-37.5 px-6 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
                 Thao tác
               </TableHead>
             </TableRow>
@@ -223,8 +182,8 @@ export function ZonesTable() {
           <TableBody>
             {zones.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="px-6 py-12 text-center text-slate-500">
-                  Chưa có khu vực nào. Hãy tạo khu vực đầu tiên.
+                <TableCell colSpan={5} className="px-6 py-0">
+                  <EmptyState title="Chưa có khu vực nào" description="Hãy tạo khu vực đầu tiên" />
                 </TableCell>
               </TableRow>
             ) : (
@@ -232,10 +191,9 @@ export function ZonesTable() {
                 <TableRow
                   key={zone.id}
                   className={cn(
-                    'cursor-pointer border-b border-slate-100 transition-colors hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800',
+                    'border-b border-slate-100 transition-colors hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800',
                     !zone.is_active && 'opacity-60',
                   )}
-                  onClick={() => handleEdit(zone.id)}
                 >
                   <TableCell className="px-6 py-4">
                     <div className="flex flex-col gap-1">
@@ -245,7 +203,7 @@ export function ZonesTable() {
                     </div>
                   </TableCell>
                   <TableCell className="px-6 py-4">
-                    <span className="max-w-xs text-sm break-words whitespace-normal text-slate-600 sm:max-w-md dark:text-slate-400">
+                    <span className="max-w-xs text-sm wrap-break-word whitespace-normal text-slate-600 sm:max-w-md dark:text-slate-400">
                       {zone.description || 'Không có mô tả'}
                     </span>
                   </TableCell>
@@ -253,64 +211,52 @@ export function ZonesTable() {
                     {zone.display_order}
                   </TableCell>
                   <TableCell className="px-6 py-4 text-center">
-                    <Badge
-                      variant={zone.is_active ? 'default' : 'secondary'}
-                      className={cn(
-                        'font-medium',
-                        zone.is_active
-                          ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400'
-                          : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400',
-                      )}
-                    >
-                      {zone.is_active ? 'Hoạt động' : 'Tạm ẩn'}
-                    </Badge>
+                    <StatusBadge
+                      status={zone.is_active ? 'active' : 'inactive'}
+                      config={ZONE_ACTIVE_CONFIG}
+                    />
                   </TableCell>
                   <TableCell className="px-6 py-4 text-right">
-                    <div className="flex items-center justify-end gap-1">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 rounded-full"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleEdit(zone.id)
-                        }}
-                        title="Chỉnh sửa"
-                        disabled={updateMutation.isPending || deleteMutation.isPending}
-                      >
-                        <Edit2 className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 rounded-full"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleToggleActive(zone.id, zone.is_active)
-                        }}
-                        title={zone.is_active ? 'Ẩn khu vực' : 'Hiện khu vực'}
-                        disabled={updateMutation.isPending || deleteMutation.isPending}
-                      >
-                        {zone.is_active ? (
-                          <Eye className="h-4 w-4" />
-                        ) : (
-                          <EyeOff className="h-4 w-4" />
-                        )}
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 rounded-full text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-500"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleDeleteClick(zone)
-                        }}
-                        title="Xóa"
-                        disabled={updateMutation.isPending || deleteMutation.isPending}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 rounded-full"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-48">
+                        <DropdownMenuItem onClick={() => onEdit(zone)}>
+                          <Edit2 className="mr-2 h-4 w-4" />
+                          Chỉnh sửa
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => handleToggleActive(zone.id, zone.is_active)}
+                        >
+                          {zone.is_active ? (
+                            <>
+                              <EyeOff className="mr-2 h-4 w-4" />
+                              Ẩn khu vực
+                            </>
+                          ) : (
+                            <>
+                              <Eye className="mr-2 h-4 w-4" />
+                              Hiện khu vực
+                            </>
+                          )}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => onDelete(zone)}
+                          className="text-red-600 focus:text-red-600 dark:text-red-400"
+                        >
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          Xóa khu vực
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </TableCell>
                 </TableRow>
               ))
@@ -318,39 +264,6 @@ export function ZonesTable() {
           </TableBody>
         </Table>
       </div>
-
-      {/* Delete Confirmation Dialog */}
-      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent className="rounded-2xl">
-          <AlertDialogHeader>
-            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-50 dark:bg-red-500/10">
-              <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-400" />
-            </div>
-            <AlertDialogTitle className="text-center text-lg font-semibold text-slate-900 dark:text-white">
-              Xóa khu vực?
-            </AlertDialogTitle>
-            <AlertDialogDescription className="text-center text-sm text-slate-500 dark:text-slate-400">
-              Bạn có chắc chắn muốn xóa khu vực "{zoneToDelete?.name}" không? Hành động này không
-              thể hoàn tác.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className="flex-row justify-end gap-3 sm:flex-row">
-            <AlertDialogCancel
-              className="m-0 rounded-full"
-              onClick={() => setDeleteDialogOpen(false)}
-            >
-              Hủy
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleConfirmDelete}
-              className="m-0 gap-2 rounded-full bg-red-600 hover:bg-red-700"
-            >
-              <Trash2 className="h-4 w-4" />
-              Xóa khu vực
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
 
       {/* Pagination */}
       {pagination && pagination.total_pages > 1 && (

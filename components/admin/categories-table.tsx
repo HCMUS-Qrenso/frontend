@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { formatRelativeDate } from '@/lib/utils/format'
 import {
   Table,
   TableBody,
@@ -11,8 +12,15 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { GripVertical, Pencil, Trash2, Eye, EyeOff, Loader2 } from 'lucide-react'
+import { StatusBadge, CATEGORY_ACTIVE_CONFIG } from '@/components/ui/status-badge'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { GripVertical, Pencil, Trash2, Eye, EyeOff, Loader2, MoreVertical } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { DndContext, closestCenter, type DragEndEvent } from '@dnd-kit/core'
 import {
@@ -30,37 +38,13 @@ import {
 import { useErrorHandler } from '@/hooks/use-error-handler'
 import type { CategorySortBy, CategorySortOrder } from '@/types/categories'
 import { toast } from 'sonner'
-
-interface Category {
-  id: string
-  name: string
-  description: string | null
-  display_order: number
-  is_active: boolean
-  item_count: number
-  updated_at: string
-}
-
-// Format date to relative time
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString)
-  const now = new Date()
-  const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60))
-
-  if (diffInHours < 1) {
-    return 'Vừa xong'
-  } else if (diffInHours < 24) {
-    return `${diffInHours}h trước`
-  } else if (diffInHours < 48) {
-    return '1 ngày trước'
-  } else {
-    return date.toLocaleDateString('vi-VN')
-  }
-}
+import { Category } from '@/types/categories'
 
 interface CategoriesTableProps {
   reorderMode: boolean
   setReorderMode: (value: boolean) => void
+  onEditClick: (category: Category) => void
+  onDeleteClick: (category: Category) => void
 }
 
 function SortableCategoryRow({
@@ -73,8 +57,8 @@ function SortableCategoryRow({
 }: {
   category: Category
   reorderMode: boolean
-  onEdit: (id: string) => void
-  onDelete: (id: string) => void
+  onEdit: (category: Category) => void
+  onDelete: (category: Category) => void
   onToggleActive: (id: string) => void
   onViewItems: (id: string) => void
 }) {
@@ -124,69 +108,83 @@ function SortableCategoryRow({
         {category.display_order}
       </TableCell>
       <TableCell className="px-6 py-4 text-center">
-        <Badge
-          variant={category.is_active ? 'default' : 'secondary'}
-          className={cn(
-            'font-medium',
-            category.is_active
-              ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400'
-              : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400',
-          )}
-        >
-          {category.is_active ? 'Active' : 'Hidden'}
-        </Badge>
+        <StatusBadge
+          status={category.is_active ? 'active' : 'hidden'}
+          config={CATEGORY_ACTIVE_CONFIG}
+        />
       </TableCell>
       <TableCell className="px-6 py-4 text-center text-slate-600 dark:text-slate-400">
         {category.item_count}
       </TableCell>
       <TableCell className="px-6 py-4 text-slate-600 dark:text-slate-400">
-        {formatDate(category.updated_at)}
+        {formatRelativeDate(category.updated_at)}
       </TableCell>
       <TableCell className="px-6 py-4 text-right">
-        <div className="flex items-center justify-end gap-1">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 rounded-full"
-            onClick={(e) => {
-              e.stopPropagation()
-              onEdit(category.id)
-            }}
-            title="Chỉnh sửa"
-          >
-            <Pencil className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 rounded-full"
-            onClick={(e) => {
-              e.stopPropagation()
-              onToggleActive(category.id)
-            }}
-            title={category.is_active ? 'Ẩn danh mục' : 'Hiện danh mục'}
-          >
-            {category.is_active ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 rounded-full text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-500"
-            onClick={(e) => {
-              e.stopPropagation()
-              onDelete(category.id)
-            }}
-            title="Xóa"
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
+        <div className="flex items-center justify-end">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 rounded-full"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <MoreVertical className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onEdit(category)
+                }}
+              >
+                <Pencil className="mr-2 h-4 w-4" />
+                Chỉnh sửa
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onToggleActive(category.id)
+                }}
+              >
+                {category.is_active ? (
+                  <>
+                    <EyeOff className="mr-2 h-4 w-4" />
+                    Ẩn danh mục
+                  </>
+                ) : (
+                  <>
+                    <Eye className="mr-2 h-4 w-4" />
+                    Hiện danh mục
+                  </>
+                )}
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onDelete(category)
+                }}
+                className="text-red-600 focus:text-red-600 dark:text-red-400"
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                Xóa danh mục
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </TableCell>
     </TableRow>
   )
 }
 
-export function CategoriesTable({ reorderMode, setReorderMode }: CategoriesTableProps) {
+export function CategoriesTable({
+  reorderMode,
+  setReorderMode,
+  onEditClick,
+  onDeleteClick,
+}: CategoriesTableProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { handleErrorWithStatus } = useErrorHandler()
@@ -233,21 +231,6 @@ export function CategoriesTable({ reorderMode, setReorderMode }: CategoriesTable
   // Mutations
   const reorderMutation = useReorderCategoriesMutation()
   const toggleStatusMutation = useToggleCategoryStatusMutation()
-
-  const handleEdit = (categoryId: string) => {
-    const params = new URLSearchParams(searchParams.toString())
-    params.set('modal', 'category')
-    params.set('mode', 'edit')
-    params.set('id', categoryId)
-    router.push(`?${params.toString()}`)
-  }
-
-  const handleDelete = (categoryId: string) => {
-    const params = new URLSearchParams(searchParams.toString())
-    params.set('delete', 'category')
-    params.set('id', categoryId)
-    router.push(`?${params.toString()}`)
-  }
 
   const handleViewItems = (categoryId: string) => {
     router.push(`/admin/menu/items?category_id=${categoryId}`)
@@ -326,23 +309,23 @@ export function CategoriesTable({ reorderMode, setReorderMode }: CategoriesTable
     <Table>
       <TableHeader>
         <TableRow className="border-b border-slate-100 bg-slate-50/80 hover:bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900">
-          {reorderMode && <TableHead className="w-[50px] px-6 py-3"></TableHead>}
+          {reorderMode && <TableHead className="w-12.5 px-6 py-3"></TableHead>}
           <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
             Danh mục
           </TableHead>
-          <TableHead className="w-[150px] px-6 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+          <TableHead className="w-37.5 px-6 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
             Thứ tự
           </TableHead>
-          <TableHead className="w-[150px] px-6 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+          <TableHead className="w-37.5 px-6 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
             Trạng thái
           </TableHead>
-          <TableHead className="w-[150px] px-6 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+          <TableHead className="w-37.5 px-6 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
             # Món ăn
           </TableHead>
-          <TableHead className="w-[120px] px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+          <TableHead className="w-30 px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
             Cập nhật
           </TableHead>
-          <TableHead className="w-[150px] px-6 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+          <TableHead className="w-37.5 px-6 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
             Thao tác
           </TableHead>
         </TableRow>
@@ -358,8 +341,8 @@ export function CategoriesTable({ reorderMode, setReorderMode }: CategoriesTable
                 key={category.id}
                 category={category}
                 reorderMode={reorderMode}
-                onEdit={handleEdit}
-                onDelete={handleDelete}
+                onEdit={onEditClick}
+                onDelete={onDeleteClick}
                 onToggleActive={handleToggleActive}
                 onViewItems={handleViewItems}
               />
@@ -391,66 +374,71 @@ export function CategoriesTable({ reorderMode, setReorderMode }: CategoriesTable
                 {category.display_order}
               </TableCell>
               <TableCell className="px-6 py-4 text-center">
-                <Badge
-                  variant={category.is_active ? 'default' : 'secondary'}
-                  className={cn(
-                    'font-medium',
-                    category.is_active
-                      ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400'
-                      : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400',
-                  )}
-                >
-                  {category.is_active ? 'Active' : 'Hidden'}
-                </Badge>
+                <StatusBadge
+                  status={category.is_active ? 'active' : 'hidden'}
+                  config={CATEGORY_ACTIVE_CONFIG}
+                />
               </TableCell>
               <TableCell className="px-6 py-4 text-center text-slate-600 dark:text-slate-400">
                 {category.item_count}
               </TableCell>
               <TableCell className="px-6 py-4 text-slate-600 dark:text-slate-400">
-                {formatDate(category.updated_at)}
+                {formatRelativeDate(category.updated_at)}
               </TableCell>
               <TableCell className="px-6 py-4 text-right">
-                <div className="flex items-center justify-end gap-1">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 rounded-full"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      handleEdit(category.id)
-                    }}
-                    title="Chỉnh sửa"
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 rounded-full"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      handleToggleActive(category.id)
-                    }}
-                    title={category.is_active ? 'Ẩn danh mục' : 'Hiện danh mục'}
-                  >
-                    {category.is_active ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 rounded-full text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-500"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      handleDelete(category.id)
-                    }}
-                    title="Xóa"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                <div className="flex items-center justify-end">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 rounded-full"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-48">
+                      <DropdownMenuItem
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          onEditClick(category)
+                        }}
+                      >
+                        <Pencil className="mr-2 h-4 w-4" />
+                        Chỉnh sửa
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleToggleActive(category.id)
+                        }}
+                      >
+                        {category.is_active ? (
+                          <>
+                            <EyeOff className="mr-2 h-4 w-4" />
+                            Ẩn danh mục
+                          </>
+                        ) : (
+                          <>
+                            <Eye className="mr-2 h-4 w-4" />
+                            Hiện danh mục
+                          </>
+                        )}
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          onDeleteClick(category)
+                        }}
+                        className="text-red-600 focus:text-red-600 dark:text-red-400"
+                      >
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        Xóa danh mục
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               </TableCell>
             </TableRow>

@@ -1,79 +1,45 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
-import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
-import { Button } from '@/components/ui/button'
-import { Loader2 } from 'lucide-react'
-import { useMenuItemQuery, useDeleteMenuItemMutation } from '@/hooks/use-menu-items-query'
+import { ConfirmDeleteDialog } from '@/components/ui/confirm-delete-dialog'
+import { useDeleteMenuItemMutation } from '@/hooks/use-menu-items-query'
 import { useErrorHandler } from '@/hooks/use-error-handler'
 import { toast } from 'sonner'
+import { MenuItem } from '@/types/menu-items'
 
-export function MenuItemDeleteDialog() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
+interface MenuItemDeleteDialogProps {
+  open: boolean
+  item: MenuItem | null
+  onOpenChange: (open: boolean) => void
+}
+
+export function MenuItemDeleteDialog({ open, item, onOpenChange }: MenuItemDeleteDialogProps) {
   const { handleErrorWithStatus } = useErrorHandler()
-  const open = searchParams.get('delete') === 'item'
-  const itemId = searchParams.get('id')
-
-  // Fetch menu item data
-  const { data: itemData } = useMenuItemQuery(itemId || null, open && !!itemId)
-  const item = itemData?.data
 
   // Mutation
   const deleteMutation = useDeleteMenuItemMutation()
 
-  const handleClose = () => {
-    const params = new URLSearchParams(searchParams.toString())
-    params.delete('delete')
-    params.delete('id')
-    router.push(`?${params.toString()}`)
-  }
-
   const handleDelete = async () => {
-    if (!itemId) return
+    if (!item) return
 
     try {
-      await deleteMutation.mutateAsync(itemId)
+      await deleteMutation.mutateAsync(item.id)
+      onOpenChange(false)
       toast.success('Đã xóa món ăn thành công')
-      handleClose()
     } catch (error) {
       handleErrorWithStatus(error, undefined, 'Không thể xóa món ăn')
     }
   }
 
   return (
-    <AlertDialog open={open} onOpenChange={handleClose}>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Xóa món "{item?.name}"?</AlertDialogTitle>
-          <AlertDialogDescription>
-            Hành động này không thể hoàn tác. Món ăn sẽ bị xóa vĩnh viễn khỏi menu.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <Button variant="outline" onClick={handleClose} disabled={deleteMutation.isPending}>
-            Hủy
-          </Button>
-          <Button variant="destructive" onClick={handleDelete} disabled={deleteMutation.isPending}>
-            {deleteMutation.isPending ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Đang xóa...
-              </>
-            ) : (
-              'Xóa món ăn'
-            )}
-          </Button>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+    <ConfirmDeleteDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      title="Xóa món"
+      description="Hành động này không thể hoàn tác. Món ăn sẽ bị xóa vĩnh viễn khỏi menu."
+      itemName={item?.name}
+      onConfirm={handleDelete}
+      isLoading={deleteMutation.isPending}
+      confirmText="Xóa món ăn"
+    />
   )
 }
