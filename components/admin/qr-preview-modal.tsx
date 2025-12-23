@@ -119,7 +119,7 @@ export function QRPreviewModal({ table, open, onOpenChange }: QRPreviewModalProp
           {/* Actions */}
           <div className="grid w-full grid-cols-2 gap-2">
             <Button
-              className="gap-2 rounded-full bg-emerald-500 text-white hover:bg-emerald-600"
+              className="gap-2 bg-emerald-500 text-white hover:bg-emerald-600"
               onClick={() => handleDownload('png')}
               disabled={!table?.qrUrl || downloading !== null}
             >
@@ -131,7 +131,7 @@ export function QRPreviewModal({ table, open, onOpenChange }: QRPreviewModalProp
               <span className="text-xs">PNG</span>
             </Button>
             <Button
-              className="gap-2 rounded-full bg-indigo-500 text-white hover:bg-indigo-600"
+              className="gap-2 bg-indigo-500 text-white hover:bg-indigo-600"
               onClick={() => handleDownload('pdf')}
               disabled={!table?.qrUrl || downloading !== null}
             >

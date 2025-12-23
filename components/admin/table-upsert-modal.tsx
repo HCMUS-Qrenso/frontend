@@ -201,7 +201,7 @@ export function TableUpsertModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] w-full max-w-xl">
+      <DialogContent className="flex flex-col max-h-[90vh] w-full max-w-xl">
         <DialogHeader>
           <DialogTitle>{mode === 'create' ? 'Thêm bàn mới' : 'Chỉnh sửa bàn'}</DialogTitle>
           <DialogDescription>
@@ -212,7 +212,7 @@ export function TableUpsertModal({
         </DialogHeader>
 
         {/* Form Content - Scrollable */}
-        <form onSubmit={handleSubmit} className="flex flex-1 flex-col overflow-hidden">
+        <div className="flex flex-1 flex-col overflow-hidden">
           <div className="flex-1 space-y-6 overflow-y-auto pr-6">
             {/* Table Number */}
             <div className="space-y-2">
@@ -379,24 +379,24 @@ export function TableUpsertModal({
               </div>
             )}
           </div>
+        </div>
 
-          {/* Footer */}
-          <DialogFooter className="mt-4 flex-row gap-3">
-            <DialogClose asChild>
-              <Button type="button" variant="ghost" disabled={isLoading} className="rounded-full">
-                Huỷ
-              </Button>
-            </DialogClose>
-            <Button
-              type="submit"
-              disabled={isLoading}
-              className="gap-2 rounded-full bg-emerald-600 hover:bg-emerald-700"
-            >
-              {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
-              {isLoading ? 'Đang lưu...' : 'Lưu bàn'}
+        {/* Footer */}
+        <DialogFooter className="mt-4 flex-row gap-3">
+          <DialogClose asChild>
+            <Button type="button" variant="outline" disabled={isLoading}>
+              Huỷ
             </Button>
-          </DialogFooter>
-        </form>
+          </DialogClose>
+          <Button
+            onClick={handleSubmit}
+            disabled={isLoading}
+            className="gap-2 bg-emerald-600 hover:bg-emerald-700"
+          >
+            {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+            {isLoading ? 'Đang lưu...' : 'Lưu bàn'}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   )
