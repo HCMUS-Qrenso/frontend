@@ -134,7 +134,7 @@ export function InviteStaffSheet({ open, onOpenChange, defaultRole }: InviteStaf
                 type="tel"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                placeholder="+84 xxx xxx xxx"
+                placeholder="Nhập số điện thoại"
                 disabled={createMutation.isPending}
               />
             </div>

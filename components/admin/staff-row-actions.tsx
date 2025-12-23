@@ -361,7 +361,7 @@ export function StaffRowActions({ staff }: StaffRowActionsProps) {
                 id="phone"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                placeholder="+84 xxx xxx xxx"
+                placeholder="Nhập số điện thoại"
                 disabled={updateMutation.isPending}
               />
             </div>
