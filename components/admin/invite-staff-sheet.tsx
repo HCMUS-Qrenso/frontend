@@ -26,6 +26,9 @@ import { Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { useCreateStaffMutation } from '@/hooks/use-staff-query'
 import { useErrorHandler } from '@/hooks/use-error-handler'
+import { useAuth } from '@/hooks/use-auth'
+
+type StaffRole = 'admin' | 'waiter' | 'kitchen_staff'
 
 interface InviteStaffSheetProps {
   open: boolean
@@ -37,10 +40,14 @@ export function InviteStaffSheet({ open, onOpenChange, defaultRole }: InviteStaf
   const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
-  const [role, setRole] = useState<'waiter' | 'kitchen_staff'>(defaultRole)
+  const [role, setRole] = useState<StaffRole>(defaultRole)
 
+  const { user } = useAuth()
   const createMutation = useCreateStaffMutation()
   const { handleError } = useErrorHandler()
+
+  // Check if current user is Owner
+  const isOwner = user?.role === 'owner'
 
   // Reset form when dialog closes
   useEffect(() => {
@@ -144,13 +151,22 @@ export function InviteStaffSheet({ open, onOpenChange, defaultRole }: InviteStaf
               <Label htmlFor="role">Vai trò</Label>
               <Select
                 value={role}
-                onValueChange={(value) => setRole(value as 'waiter' | 'kitchen_staff')}
+                onValueChange={(value) => setRole(value as StaffRole)}
                 disabled={createMutation.isPending}
               >
                 <SelectTrigger id="role">
                   <SelectValue placeholder="Chọn vai trò" />
                 </SelectTrigger>
                 <SelectContent>
+                  {/* Admin option - Only visible for Owner */}
+                  {isOwner && (
+                    <SelectItem value="admin">
+                      <span className="flex items-center gap-2">
+                        <span className="h-2 w-2 rounded-full bg-violet-500" />
+                        Quản trị viên
+                      </span>
+                    </SelectItem>
+                  )}
                   <SelectItem value="waiter">Phục vụ</SelectItem>
                   <SelectItem value="kitchen_staff">Nhân viên bếp</SelectItem>
                 </SelectContent>
