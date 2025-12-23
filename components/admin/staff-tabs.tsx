@@ -4,25 +4,32 @@ import { useState } from 'react'
 import { StaffDataTable } from '@/components/admin/staff-data-table'
 import { InviteStaffSheet } from '@/components/admin/invite-staff-sheet'
 import { StaffFilterToolbar } from '@/components/admin/staff-filter-toolbar'
-import { Users, UserCheck, UserX, UserMinus, Loader2 } from 'lucide-react'
+import { Users, UserCheck, UserX, UserMinus, Loader2, Shield } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { StatCard } from '@/components/ui/stat-card'
 import { useStaffStatsQuery } from '@/hooks/use-staff-query'
 import { useSearchParams, useRouter } from 'next/navigation'
+import { useAuth } from '@/hooks/use-auth'
+
+type StaffRole = 'admin' | 'waiter' | 'kitchen_staff'
 
 export function StaffTabs() {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const { user } = useAuth()
+
+  // Check if current user is Owner
+  const isOwner = user?.role === 'owner'
 
   // Get role from URL, default to 'waiter'
-  const activeRole = (searchParams.get('role') as 'waiter' | 'kitchen_staff') || 'waiter'
+  const activeRole = (searchParams.get('role') as StaffRole) || 'waiter'
 
   const [inviteSheetOpen, setInviteSheetOpen] = useState(false)
 
   // Fetch stats from API
   const { data: stats, isLoading: statsLoading } = useStaffStatsQuery()
 
-  const handleRoleChange = (role: 'waiter' | 'kitchen_staff') => {
+  const handleRoleChange = (role: StaffRole) => {
     const params = new URLSearchParams(searchParams.toString())
     if (role === 'waiter') {
       params.delete('role')
@@ -91,7 +98,22 @@ export function StaffTabs() {
       )}
 
       {/* Role Toggle Buttons */}
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
+        {/* Admin Tab - Only visible for Owner */}
+        {isOwner && (
+          <button
+            onClick={() => handleRoleChange('admin')}
+            className={cn(
+              'flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium transition-colors',
+              activeRole === 'admin'
+                ? 'bg-violet-500 text-white dark:bg-violet-600'
+                : 'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700',
+            )}
+          >
+            <Shield className="h-4 w-4" />
+            Quản trị ({stats?.byRole?.admin?.total ?? 0})
+          </button>
+        )}
         <button
           onClick={() => handleRoleChange('waiter')}
           className={cn(
@@ -126,7 +148,7 @@ export function StaffTabs() {
       <InviteStaffSheet
         open={inviteSheetOpen}
         onOpenChange={setInviteSheetOpen}
-        defaultRole={activeRole}
+        defaultRole={activeRole === 'admin' ? 'waiter' : activeRole}
       />
     </div>
   )

@@ -7,7 +7,7 @@ export interface Staff {
   fullName: string
   phone: string | null
   avatarUrl: string | null
-  role: 'waiter' | 'kitchen_staff'
+  role: 'admin' | 'waiter' | 'kitchen_staff'
   tenantId: string
   emailVerified: boolean
   status: 'active' | 'inactive' | 'suspended'
@@ -21,7 +21,7 @@ export interface StaffQueryParams {
   page?: number
   limit?: number
   search?: string
-  role?: 'waiter' | 'kitchen_staff'
+  role?: 'admin' | 'waiter' | 'kitchen_staff'
   status?: 'active' | 'inactive' | 'suspended'
   emailVerified?: boolean
   sortBy?: 'createdAt' | 'fullName' | 'lastLoginAt'
@@ -50,6 +50,7 @@ export interface StaffRoleStats {
 export interface StaffStatsResponse {
   total: number
   byRole: {
+    admin: StaffRoleStats
     waiter: StaffRoleStats
     kitchen_staff: StaffRoleStats
   }
@@ -65,7 +66,7 @@ export interface CreateStaffPayload {
   fullName: string
   email: string
   phone?: string
-  role: 'waiter' | 'kitchen_staff'
+  role: 'admin' | 'waiter' | 'kitchen_staff'
 }
 
 // Payload for PUT /staff/:id (update)

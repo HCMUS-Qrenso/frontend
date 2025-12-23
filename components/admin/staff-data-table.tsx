@@ -22,7 +22,7 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import type { StaffQueryParams } from '@/types/staff'
 
 interface StaffDataTableProps {
-  role: 'waiter' | 'kitchen_staff'
+  role: 'admin' | 'waiter' | 'kitchen_staff'
 }
 
 export function StaffDataTable({ role }: StaffDataTableProps) {
