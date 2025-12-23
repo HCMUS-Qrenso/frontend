@@ -3,7 +3,7 @@
 import { cn } from '@/lib/utils'
 import { formatRotation } from '@/lib/utils/table-utils'
 import { useRef, useState, useEffect, useMemo, useCallback, memo } from 'react'
-import { RotateCw, Loader2 } from 'lucide-react'
+import { RotateCw, Loader2, RotateCcw, X } from 'lucide-react'
 import type { TableItem } from '@/app/admin/tables/layout/page'
 import type React from 'react'
 import {
@@ -15,6 +15,8 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core'
+import { useQueryClient } from '@tanstack/react-query'
+import { tablesQueryKeys } from '@/hooks/use-tables-query'
 
 interface FloorPlanCanvasProps {
   tables: TableItem[]
@@ -27,6 +29,7 @@ interface FloorPlanCanvasProps {
   showGrid: boolean
   selectedArea: string
   isLoading?: boolean
+  onReset?: () => void
 }
 
 const GRID_SIZE = 20
@@ -80,6 +83,7 @@ function FloorPlanCanvasComponent({
   showGrid,
   selectedArea,
   isLoading = false,
+  onReset,
 }: FloorPlanCanvasProps) {
   const canvasRef = useRef<HTMLDivElement>(null)
   const [panOffset, setPanOffset] = useState({ x: 0, y: 0 })
@@ -87,6 +91,7 @@ function FloorPlanCanvasComponent({
   const [panStart, setPanStart] = useState({ x: 0, y: 0 })
   const [canvasSize, setCanvasSize] = useState({ width: 800, height: 600 })
   const [isHovering, setIsHovering] = useState(false)
+  const queryClient = useQueryClient()
 
   // Update canvas size when container resizes
   useEffect(() => {
@@ -269,6 +274,17 @@ function FloorPlanCanvasComponent({
     [tables, zoom, onTableUpdate],
   )
 
+  // Reset changes handler
+  const handleResetChanges = useCallback(() => {
+    // Call parent reset function to reset layout
+    onReset?.()
+    // Reset pan and zoom to default
+    setPanOffset({ x: 0, y: 0 })
+    onZoomChange(1)
+    // Deselect any selected table
+    onTableSelect(null)
+  }, [onReset, onZoomChange, onTableSelect])
+
   return (
     <div className="rounded-2xl border border-slate-100 bg-white/80 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
       {isLoading ? (
@@ -364,6 +380,15 @@ function FloorPlanCanvasComponent({
                     />
                   ))}
                 </div>
+
+                {/* Floating Reset Button */}
+                <button
+                  onClick={handleResetChanges}
+                  className="absolute bottom-4 right-4 z-30 flex h-8 w-8 items-center justify-center rounded-full border border-slate-300 bg-white text-slate-600 shadow-lg hover:bg-slate-50 hover:border-slate-400 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-500"
+                  title="Đặt lại thay đổi chưa lưu"
+                >
+                  <RotateCcw className="h-4 w-4" />
+                </button>
               </div>
             </DndContext>
           </div>
@@ -577,7 +602,7 @@ const DraggableTable = memo(function DraggableTable({
           }}
           className="no-drag absolute -top-2 -left-2 z-10 flex h-6 w-6 items-center justify-center rounded-full border border-red-500 bg-white text-red-600 shadow-sm hover:bg-red-50 dark:bg-slate-800 dark:text-red-400"
         >
-          ×
+          <X className="h-3 w-3" />
         </button>
       )}
 

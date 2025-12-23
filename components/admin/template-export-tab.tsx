@@ -97,7 +97,7 @@ export function TemplateExportTab() {
               {templates.map((template) => (
                 <div
                   key={template.id}
-                  className="group overflow-hidden rounded-xl border border-slate-200 transition-all hover:border-emerald-500 hover:shadow-lg dark:border-slate-800 dark:hover:border-emerald-600"
+                  className="group overflow-hidden rounded-xl border border-slate-200 transition-all hover:border-emerald-500 hover:shadow-lg dark:border-slate-800 dark:hover:border-emerald-600 flex flex-col h-full"
                 >
                   <div className="relative aspect-[3/4] overflow-hidden bg-slate-100 dark:bg-slate-800">
                     <img
@@ -119,9 +119,9 @@ export function TemplateExportTab() {
                       </div>
                     </div>
                   </div>
-                  <div className="p-4">
+                  <div className="p-4 flex-1 flex flex-col">
                     <h4 className="font-medium text-slate-900 dark:text-white">{template.name}</h4>
-                    <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                    <p className="mt-1 text-xs text-slate-500 dark:text-slate-400 flex-1">
                       {template.description}
                     </p>
                     <div className="mt-3 flex flex-wrap gap-1">

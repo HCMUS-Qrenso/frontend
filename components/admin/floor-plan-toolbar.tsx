@@ -14,8 +14,6 @@ import {
   Plus,
   RotateCcw,
   Save,
-  Undo2,
-  Redo2,
   Loader2,
 } from 'lucide-react'
 
@@ -27,10 +25,6 @@ interface FloorPlanToolbarProps {
   onZoomChange: (zoom: number) => void
   showGrid: boolean
   onShowGridChange: (show: boolean) => void
-  canUndo: boolean
-  canRedo: boolean
-  onUndo: () => void
-  onRedo: () => void
   onSave: () => void
   onReset: () => void
   isLoading?: boolean
@@ -44,10 +38,6 @@ export function FloorPlanToolbar({
   onZoomChange,
   showGrid,
   onShowGridChange,
-  canUndo,
-  canRedo,
-  onUndo,
-  onRedo,
   onSave,
   onReset,
   isLoading = false,
@@ -89,30 +79,6 @@ export function FloorPlanToolbar({
 
       {/* Right: Actions */}
       <div className="flex flex-wrap items-center justify-center gap-2 md:justify-end">
-        {/* Undo/Redo */}
-        <div className="flex items-center gap-1 rounded-full bg-slate-100 p-1 dark:bg-slate-800">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="rounded-full"
-            disabled={!canUndo}
-            onClick={onUndo}
-            title="Hoàn tác"
-          >
-            <Undo2 className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="rounded-full"
-            disabled={!canRedo}
-            onClick={onRedo}
-            title="Làm lại"
-          >
-            <Redo2 className="h-4 w-4" />
-          </Button>
-        </div>
-
         {/* Zoom controls */}
         <div className="flex items-center gap-1 rounded-full bg-slate-100 p-1 dark:bg-slate-800">
           <Button

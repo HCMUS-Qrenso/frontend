@@ -146,8 +146,6 @@ export default function TableLayoutPage() {
   const [selectedZone, setSelectedZone] = useState(zoneParam || '')
   const [zoom, setZoom] = useState(1)
   const [showGrid, setShowGrid] = useState(true)
-  const [history, setHistory] = useState<TableItem[][]>([])
-  const [historyIndex, setHistoryIndex] = useState(0)
   const [positionChanges, setPositionChanges] = useState<Map<string, TablePosition>>(new Map())
   const [resetDialogOpen, setResetDialogOpen] = useState(false)
 
@@ -161,7 +159,7 @@ export default function TableLayoutPage() {
   const currentZoneId = currentZoneObj?.id || ''
   const currentZoneName = currentZoneObj?.name || currentZoneId
 
-  const { data: layoutData, isLoading: isLoadingLayout } = useZoneLayoutQuery(
+  const { data: layoutData, isLoading: isLoadingLayout, refetch: refetchLayout, isStale } = useZoneLayoutQuery(
     currentZoneId || null,
     !!currentZoneId,
   )
@@ -182,8 +180,6 @@ export default function TableLayoutPage() {
     if (prevZoneRef.current !== currentZoneId && prevZoneRef.current !== '') {
       // Zone đã thay đổi, reset local state
       setLocalTables([])
-      setHistory([])
-      setHistoryIndex(0)
       setPositionChanges(new Map())
       setSelectedTableId(null)
     }
@@ -253,25 +249,12 @@ export default function TableLayoutPage() {
     }
   }, [tableIdParam, tables])
 
-  // Initialize history when tables load
-  useEffect(() => {
-    if (tables.length > 0 && history.length === 0) {
-      setHistory([tables])
-      setHistoryIndex(0)
-    }
-  }, [tables, history.length])
-
   // Memoize addToHistory function
   const addToHistory = useCallback(
     (newTables: TableItem[]) => {
-      setHistory((prevHistory) => {
-        const newHistory = prevHistory.slice(0, historyIndex + 1)
-        newHistory.push(newTables)
-        setHistoryIndex(newHistory.length - 1)
-        return newHistory
-      })
+      // History functionality removed
     },
-    [historyIndex],
+    [],
   )
 
   const handleTableUpdate = useCallback(
@@ -333,7 +316,6 @@ export default function TableLayoutPage() {
           }
           return t
         })
-        addToHistory(newTables)
         return newTables
       })
     },
@@ -346,12 +328,11 @@ export default function TableLayoutPage() {
       // We just update local state for immediate UI feedback
       setLocalTables((prevTables) => {
         const newTables = prevTables.filter((t) => t.id !== id)
-        addToHistory(newTables)
         return newTables
       })
       setSelectedTableId(null)
     },
-    [addToHistory],
+    [],
   )
 
   // Map frontend status to backend status
@@ -452,24 +433,6 @@ export default function TableLayoutPage() {
     [currentZoneObj, currentZoneId, createTableMutation, handleError],
   )
 
-  const handleUndo = useCallback(() => {
-    if (historyIndex > 0 && history.length > 0) {
-      const newIndex = historyIndex - 1
-      setHistoryIndex(newIndex)
-      // Note: We can't directly set tables since they come from API
-      // Undo/redo would need to be handled differently with API integration
-      // For now, we'll keep the history but tables will sync from API
-    }
-  }, [historyIndex, history.length])
-
-  const handleRedo = useCallback(() => {
-    if (historyIndex < history.length - 1 && history.length > 0) {
-      const newIndex = historyIndex + 1
-      setHistoryIndex(newIndex)
-      // Note: Same as undo - tables sync from API
-    }
-  }, [historyIndex, history.length])
-
   const handleSave = useCallback(async () => {
     try {
       // Only send tables with position changes
@@ -506,6 +469,18 @@ export default function TableLayoutPage() {
     setResetDialogOpen(true)
   }, [])
 
+  const handleResetLayout = useCallback(async () => {
+    let dataToUse = layoutData
+    if (isStale) {
+      const { data } = await refetchLayout()
+      dataToUse = data
+    }
+    const freshTables = dataToUse?.data.tables ? dataToUse.data.tables.map(transformTableToItem) : []
+    setLocalTables(freshTables)
+    setPositionChanges(new Map())
+    setSelectedTableId(null)
+  }, [layoutData, isStale, refetchLayout])
+
   const handleConfirmReset = useCallback(async () => {
     try {
       // Batch update API doesn't support null positions, so use individual PUT requests
@@ -530,8 +505,6 @@ export default function TableLayoutPage() {
       )
 
       // Clear local state
-      setHistory([])
-      setHistoryIndex(0)
       setSelectedTableId(null)
       setPositionChanges(new Map())
       setResetDialogOpen(false)
@@ -553,8 +526,6 @@ export default function TableLayoutPage() {
       // Lưu id để gọi API, nhưng hiển thị tên trong dropdown
       setSelectedZone(zone?.id || area)
       setSelectedTableId(null)
-      setHistory([])
-      setHistoryIndex(0)
       setPositionChanges(new Map())
       // localTables will sync automatically via useEffect when currentZone changes
     },
@@ -583,10 +554,6 @@ export default function TableLayoutPage() {
         onZoomChange={setZoom}
         showGrid={showGrid}
         onShowGridChange={setShowGrid}
-        canUndo={historyIndex > 0}
-        canRedo={historyIndex < history.length - 1}
-        onUndo={handleUndo}
-        onRedo={handleRedo}
         onSave={handleSave}
         onReset={handleReset}
         isLoading={isLoadingLayout}
@@ -606,6 +573,7 @@ export default function TableLayoutPage() {
           selectedArea={currentZoneName}
           onTableRemove={handleTableRemove}
           isLoading={isLoadingLayout}
+          onReset={handleResetLayout}
         />
 
         {/* Side Panel */}
