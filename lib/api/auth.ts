@@ -6,6 +6,7 @@ import type {
   LoginCredentials,
   MessageResponse,
   ResetPasswordPayload,
+  SetupPasswordPayload,
   SignupPayload,
   VerifyEmailPayload,
   User,
@@ -50,6 +51,11 @@ export const authApi = {
 
   getProfile: async (): Promise<User> => {
     const { data } = await apiClient.get<User>('/auth/me')
+    return data
+  },
+
+  setupPassword: async (payload: SetupPasswordPayload): Promise<MessageResponse> => {
+    const { data } = await apiClient.post<MessageResponse>('/auth/setup-password', payload)
     return data
   },
 }

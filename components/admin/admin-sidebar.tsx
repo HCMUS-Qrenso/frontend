@@ -65,7 +65,7 @@ const menuItems = [
       { icon: MapPin, label: 'Khu vực', href: '/admin/tables/zones' },
     ],
   },
-  { icon: Users, label: 'Nhân viên', href: '/admin/staff', wip: true },
+  { icon: Users, label: 'Nhân viên', href: '/admin/staff'},
   { icon: BarChart3, label: 'Báo cáo', href: '/admin/reports', wip: true },
   { icon: Settings, label: 'Cài đặt', href: '/admin/settings', wip: true },
 ]

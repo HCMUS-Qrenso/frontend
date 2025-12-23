@@ -53,6 +53,12 @@ export interface VerifyEmailPayload {
   token: string
 }
 
+export interface SetupPasswordPayload {
+  email: string
+  token: string
+  password: string
+}
+
 export interface MessageResponse {
   message: string
 }

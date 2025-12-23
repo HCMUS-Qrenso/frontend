@@ -23,6 +23,9 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Loader2 } from 'lucide-react'
+import { toast } from 'sonner'
+import { useCreateStaffMutation } from '@/hooks/use-staff-query'
+import { useErrorHandler } from '@/hooks/use-error-handler'
 
 interface InviteStaffSheetProps {
   open: boolean
@@ -35,7 +38,9 @@ export function InviteStaffSheet({ open, onOpenChange, defaultRole }: InviteStaf
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
   const [role, setRole] = useState<'waiter' | 'kitchen_staff'>(defaultRole)
-  const [isLoading, setIsLoading] = useState(false)
+
+  const createMutation = useCreateStaffMutation()
+  const { handleError } = useErrorHandler()
 
   // Reset form when dialog closes
   useEffect(() => {
@@ -44,7 +49,6 @@ export function InviteStaffSheet({ open, onOpenChange, defaultRole }: InviteStaf
       setEmail('')
       setPhone('')
       setRole(defaultRole)
-      setIsLoading(false)
     }
   }, [open, defaultRole])
 
@@ -59,29 +63,23 @@ export function InviteStaffSheet({ open, onOpenChange, defaultRole }: InviteStaf
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(email)) {
-      alert('Vui lòng nhập email hợp lệ')
+      toast.error('Vui lòng nhập email hợp lệ')
       return
     }
 
-    setIsLoading(true)
+    try {
+      await createMutation.mutateAsync({
+        fullName: fullName.trim(),
+        email: email.trim(),
+        phone: phone.trim() || undefined,
+        role,
+      })
 
-    // TODO: Call API to create/invite staff
-    console.log('Inviting staff:', {
-      full_name: fullName,
-      email,
-      phone: phone || null,
-      role,
-      status: 'active',
-    })
-
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-
-    setIsLoading(false)
-    onOpenChange(false)
-
-    // Show success toast (would use toast library in real app)
-    alert('Đã gửi lời mời thành công!')
+      toast.success('Đã gửi lời mời thành công! Nhân viên sẽ nhận được email để thiết lập mật khẩu.')
+      onOpenChange(false)
+    } catch (error) {
+      handleError(error, 'Không thể gửi lời mời')
+    }
   }
 
   return (
@@ -91,7 +89,8 @@ export function InviteStaffSheet({ open, onOpenChange, defaultRole }: InviteStaf
           <DialogHeader>
             <DialogTitle>Mời nhân viên mới</DialogTitle>
             <DialogDescription>
-              Tạo tài khoản và gửi email mời cho nhân viên. Họ sẽ nhận được link để đăng nhập.
+              Tạo tài khoản và gửi email mời cho nhân viên. Họ sẽ nhận được link để thiết lập mật
+              khẩu.
             </DialogDescription>
           </DialogHeader>
 
@@ -107,7 +106,7 @@ export function InviteStaffSheet({ open, onOpenChange, defaultRole }: InviteStaf
                 onChange={(e) => setFullName(e.target.value)}
                 placeholder="Nguyễn Văn A"
                 required
-                disabled={isLoading}
+                disabled={createMutation.isPending}
               />
             </div>
 
@@ -123,7 +122,7 @@ export function InviteStaffSheet({ open, onOpenChange, defaultRole }: InviteStaf
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="email@restaurant.com"
                 required
-                disabled={isLoading}
+                disabled={createMutation.isPending}
               />
             </div>
 
@@ -135,8 +134,8 @@ export function InviteStaffSheet({ open, onOpenChange, defaultRole }: InviteStaf
                 type="tel"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                placeholder="+84 xxx xxx xxx"
-                disabled={isLoading}
+                placeholder="Nhập số điện thoại"
+                disabled={createMutation.isPending}
               />
             </div>
 
@@ -146,7 +145,7 @@ export function InviteStaffSheet({ open, onOpenChange, defaultRole }: InviteStaf
               <Select
                 value={role}
                 onValueChange={(value) => setRole(value as 'waiter' | 'kitchen_staff')}
-                disabled={isLoading}
+                disabled={createMutation.isPending}
               >
                 <SelectTrigger id="role">
                   <SelectValue placeholder="Chọn vai trò" />
@@ -175,16 +174,16 @@ export function InviteStaffSheet({ open, onOpenChange, defaultRole }: InviteStaf
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
-              disabled={isLoading}
+              disabled={createMutation.isPending}
             >
               Hủy
             </Button>
             <Button
               type="submit"
-              disabled={isLoading}
+              disabled={createMutation.isPending}
               className="bg-emerald-600 hover:bg-emerald-700"
             >
-              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {createMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Gửi lời mời
             </Button>
           </DialogFooter>

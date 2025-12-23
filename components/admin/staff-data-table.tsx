@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useEffect } from 'react'
+import { useMemo } from 'react'
 import {
   Table,
   TableBody,
@@ -10,185 +10,69 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { StatusBadge, USER_STATUS_CONFIG, USER_ROLE_CONFIG } from '@/components/ui/status-badge'
+import { Button } from '@/components/ui/button'
+import { StatusBadge, USER_ROLE_CONFIG, USER_STATUS_CONFIG } from '@/components/ui/status-badge'
 import { StaffRowActions } from '@/components/admin/staff-row-actions'
 import { LoadingState } from '@/components/ui/loading-state'
 import { EmptyState } from '@/components/ui/empty-state'
-import { CheckCircle2, XCircle, Users } from 'lucide-react'
+import { CheckCircle2, XCircle, Users, ChevronLeft, ChevronRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
-
-interface User {
-  id: string
-  email: string
-  full_name: string
-  phone: string | null
-  avatar_url: string | null
-  role: 'waiter' | 'kitchen_staff'
-  tenant_id: string
-  email_verified: boolean
-  status: 'active' | 'inactive' | 'suspended'
-  last_login_at: string | null
-  created_at: string
-  updated_at: string
-}
-
-// Mock data
-const mockWaiters: User[] = [
-  {
-    id: '1',
-    email: 'nguyen.van.a@restaurant.com',
-    full_name: 'Nguyễn Văn A',
-    phone: '+84 912 345 678',
-    avatar_url: null,
-    role: 'waiter',
-    tenant_id: 'tenant-1',
-    email_verified: true,
-    status: 'active',
-    last_login_at: '2024-01-15T10:30:00Z',
-    created_at: '2023-11-01T08:00:00Z',
-    updated_at: '2024-01-15T10:30:00Z',
-  },
-  {
-    id: '2',
-    email: 'tran.thi.b@restaurant.com',
-    full_name: 'Trần Thị B',
-    phone: '+84 923 456 789',
-    avatar_url: null,
-    role: 'waiter',
-    tenant_id: 'tenant-1',
-    email_verified: true,
-    status: 'active',
-    last_login_at: '2024-01-15T09:15:00Z',
-    created_at: '2023-11-15T08:00:00Z',
-    updated_at: '2024-01-15T09:15:00Z',
-  },
-  {
-    id: '3',
-    email: 'le.van.c@restaurant.com',
-    full_name: 'Lê Văn C',
-    phone: '+84 934 567 890',
-    avatar_url: null,
-    role: 'waiter',
-    tenant_id: 'tenant-1',
-    email_verified: false,
-    status: 'inactive',
-    last_login_at: null,
-    created_at: '2024-01-10T08:00:00Z',
-    updated_at: '2024-01-10T08:00:00Z',
-  },
-]
-
-const mockKitchenStaff: User[] = [
-  {
-    id: '4',
-    email: 'pham.van.d@restaurant.com',
-    full_name: 'Phạm Văn D',
-    phone: '+84 945 678 901',
-    avatar_url: null,
-    role: 'kitchen_staff',
-    tenant_id: 'tenant-1',
-    email_verified: true,
-    status: 'active',
-    last_login_at: '2024-01-15T07:00:00Z',
-    created_at: '2023-10-01T08:00:00Z',
-    updated_at: '2024-01-15T07:00:00Z',
-  },
-  {
-    id: '5',
-    email: 'hoang.thi.e@restaurant.com',
-    full_name: 'Hoàng Thị E',
-    phone: '+84 956 789 012',
-    avatar_url: null,
-    role: 'kitchen_staff',
-    tenant_id: 'tenant-1',
-    email_verified: true,
-    status: 'active',
-    last_login_at: '2024-01-15T06:45:00Z',
-    created_at: '2023-10-15T08:00:00Z',
-    updated_at: '2024-01-15T06:45:00Z',
-  },
-  {
-    id: '6',
-    email: 'vu.van.f@restaurant.com',
-    full_name: 'Vũ Văn F',
-    phone: '+84 967 890 123',
-    avatar_url: null,
-    role: 'kitchen_staff',
-    tenant_id: 'tenant-1',
-    email_verified: true,
-    status: 'suspended',
-    last_login_at: '2024-01-10T08:00:00Z',
-    created_at: '2023-12-01T08:00:00Z',
-    updated_at: '2024-01-12T08:00:00Z',
-  },
-]
+import { useStaffQuery } from '@/hooks/use-staff-query'
+import { useSearchParams, useRouter } from 'next/navigation'
+import type { StaffQueryParams } from '@/types/staff'
 
 interface StaffDataTableProps {
   role: 'waiter' | 'kitchen_staff'
-  searchQuery?: string
-  statusFilter?: string
-  verifiedFilter?: string
-  sortBy?: string
 }
 
-export function StaffDataTable({
-  role,
-  searchQuery = '',
-  statusFilter = 'all',
-  verifiedFilter = 'all',
-  sortBy = 'created_at',
-}: StaffDataTableProps) {
-  const rawData = role === 'waiter' ? mockWaiters : mockKitchenStaff
-  const [data, setData] = useState<User[]>(rawData)
-  const [isLoading, setIsLoading] = useState(false)
+export function StaffDataTable({ role }: StaffDataTableProps) {
+  const router = useRouter()
+  const searchParams = useSearchParams()
 
-  // Update data when role changes
-  useEffect(() => {
-    setData(role === 'waiter' ? mockWaiters : mockKitchenStaff)
-  }, [role])
+  // Read filters from URL params
+  const search = searchParams.get('search') || ''
+  const status = searchParams.get('status') || ''
+  const emailVerified = searchParams.get('email_verified') || ''
+  const sortBy = searchParams.get('sort_by') || 'createdAt'
+  const sortOrder = searchParams.get('sort_order') || 'desc'
+  const page = parseInt(searchParams.get('page') || '1', 10)
 
-  // Filter and sort data
-  const filteredData = useMemo(() => {
-    let result = [...data]
-
-    // Search filter
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase()
-      result = result.filter(
-        (user) =>
-          user.full_name.toLowerCase().includes(query) ||
-          user.email.toLowerCase().includes(query) ||
-          user.phone?.toLowerCase().includes(query),
-      )
+  // Build query params for API
+  const queryParams = useMemo<StaffQueryParams>(() => {
+    const params: StaffQueryParams = {
+      role,
+      page,
+      limit: 20,
+      sortBy: sortBy as 'createdAt' | 'fullName' | 'lastLoginAt',
+      sortOrder: sortOrder as 'asc' | 'desc',
     }
 
-    // Status filter
-    if (statusFilter !== 'all') {
-      result = result.filter((user) => user.status === statusFilter)
+    if (search) {
+      params.search = search
     }
 
-    // Verified filter
-    if (verifiedFilter !== 'all') {
-      const isVerified = verifiedFilter === 'verified'
-      result = result.filter((user) => user.email_verified === isVerified)
+    if (status) {
+      params.status = status as 'active' | 'inactive' | 'suspended'
     }
 
-    // Sort
-    result.sort((a, b) => {
-      if (sortBy === 'full_name') {
-        return a.full_name.localeCompare(b.full_name)
-      } else if (sortBy === 'created_at') {
-        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-      } else if (sortBy === 'last_login_at') {
-        const aTime = a.last_login_at ? new Date(a.last_login_at).getTime() : 0
-        const bTime = b.last_login_at ? new Date(b.last_login_at).getTime() : 0
-        return bTime - aTime
-      }
-      return 0
-    })
+    if (emailVerified) {
+      params.emailVerified = emailVerified === 'true'
+    }
 
-    return result
-  }, [data, searchQuery, statusFilter, verifiedFilter, sortBy])
+    return params
+  }, [role, search, status, emailVerified, sortBy, sortOrder, page])
+
+  // Fetch data from API
+  const { data, isLoading, error } = useStaffQuery(queryParams)
+
+  const staffList = data?.items ?? []
+  const pagination = data?.meta
+
+  const handlePageChange = (newPage: number) => {
+    const params = new URLSearchParams(searchParams.toString())
+    params.set('page', newPage.toString())
+    router.push(`/admin/staff?${params.toString()}`)
+  }
 
   const formatDate = (date: string | null) => {
     if (!date) return '—'
@@ -223,6 +107,17 @@ export function StaffDataTable({
     return <LoadingState />
   }
 
+  // Error state
+  if (error) {
+    return (
+      <div className="rounded-2xl border border-red-200 bg-red-50 p-6 dark:border-red-800 dark:bg-red-500/10">
+        <p className="text-sm text-red-600 dark:text-red-400">
+          Có lỗi xảy ra khi tải danh sách nhân viên. Vui lòng thử lại.
+        </p>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-4">
       {/* Table */}
@@ -254,7 +149,7 @@ export function StaffDataTable({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredData.length === 0 ? (
+            {staffList.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={7} className="px-6 py-0">
                   <EmptyState
@@ -269,29 +164,29 @@ export function StaffDataTable({
                 </TableCell>
               </TableRow>
             ) : (
-              filteredData.map((user, index) => (
+              staffList.map((staff, index) => (
                 <TableRow
-                  key={user.id}
+                  key={staff.id}
                   className={cn(
                     'border-b border-slate-100 transition-colors hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800',
-                    index === filteredData.length - 1 && 'border-b-0',
+                    index === staffList.length - 1 && 'border-b-0',
                   )}
                 >
                   {/* Staff Info */}
                   <TableCell className="px-6 py-4">
                     <div className="flex items-center gap-3">
                       <Avatar className="h-10 w-10">
-                        <AvatarImage src={user.avatar_url || undefined} />
+                        <AvatarImage src={staff.avatarUrl || undefined} />
                         <AvatarFallback className="bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400">
-                          {getInitials(user.full_name)}
+                          {getInitials(staff.fullName)}
                         </AvatarFallback>
                       </Avatar>
                       <div>
                         <p className="text-sm font-medium text-slate-900 dark:text-white">
-                          {user.full_name}
+                          {staff.fullName}
                         </p>
                         <p className="text-xs text-slate-500 dark:text-slate-400">
-                          Tham gia {formatDate(user.created_at)}
+                          Tham gia {formatDate(staff.createdAt)}
                         </p>
                       </div>
                     </div>
@@ -300,26 +195,26 @@ export function StaffDataTable({
                   {/* Contact */}
                   <TableCell className="px-6 py-4">
                     <div>
-                      <p className="text-sm text-slate-700 dark:text-slate-300">{user.email}</p>
+                      <p className="text-sm text-slate-700 dark:text-slate-300">{staff.email}</p>
                       <p className="text-xs text-slate-500 dark:text-slate-400">
-                        {user.phone || '—'}
+                        {staff.phone || '—'}
                       </p>
                     </div>
                   </TableCell>
 
                   {/* Role */}
                   <TableCell className="px-6 py-4">
-                    <StatusBadge status={user.role} config={USER_ROLE_CONFIG} />
+                    <StatusBadge status={staff.role} config={USER_ROLE_CONFIG} />
                   </TableCell>
 
                   {/* Status */}
                   <TableCell className="px-6 py-4">
-                    <StatusBadge status={user.status} config={USER_STATUS_CONFIG} />
+                    <StatusBadge status={staff.status} config={USER_STATUS_CONFIG} />
                   </TableCell>
 
                   {/* Email Verified */}
                   <TableCell className="px-6 py-4 text-center">
-                    {user.email_verified ? (
+                    {staff.emailVerified ? (
                       <CheckCircle2 className="mx-auto h-5 w-5 text-emerald-600" />
                     ) : (
                       <XCircle className="mx-auto h-5 w-5 text-slate-400" />
@@ -329,21 +224,14 @@ export function StaffDataTable({
                   {/* Last Login */}
                   <TableCell className="px-6 py-4">
                     <p className="text-sm text-slate-600 dark:text-slate-400">
-                      {formatDateTime(user.last_login_at)}
+                      {formatDateTime(staff.lastLoginAt)}
                     </p>
                   </TableCell>
 
                   {/* Actions */}
                   <TableCell className="px-6 py-4">
                     <div className="flex items-center justify-end">
-                      <StaffRowActions
-                        user={user}
-                        onUpdate={(updatedUser) => {
-                          setData((prev) =>
-                            prev.map((u) => (u.id === updatedUser.id ? updatedUser : u)),
-                          )
-                        }}
-                      />
+                      <StaffRowActions staff={staff} />
                     </div>
                   </TableCell>
                 </TableRow>
@@ -352,6 +240,57 @@ export function StaffDataTable({
           </TableBody>
         </Table>
       </div>
+
+      {/* Pagination */}
+      {pagination && pagination.totalPages > 1 && (
+        <div className="flex items-center justify-between">
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            Hiển thị {(pagination.page - 1) * pagination.limit + 1}-
+            {Math.min(pagination.page * pagination.limit, pagination.total)} trên {pagination.total}{' '}
+            nhân viên
+          </p>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="rounded-full bg-transparent"
+              disabled={pagination.page === 1}
+              onClick={() => handlePageChange(pagination.page - 1)}
+            >
+              <ChevronLeft className="h-4 w-4" />
+              Trước
+            </Button>
+            {Array.from({ length: Math.min(pagination.totalPages, 5) }, (_, i) => i + 1).map(
+              (pageNum) => (
+                <Button
+                  key={pageNum}
+                  variant="outline"
+                  size="sm"
+                  className={cn(
+                    'h-8 w-8 rounded-full',
+                    pageNum === pagination.page
+                      ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10'
+                      : 'bg-transparent',
+                  )}
+                  onClick={() => handlePageChange(pageNum)}
+                >
+                  {pageNum}
+                </Button>
+              ),
+            )}
+            <Button
+              variant="outline"
+              size="sm"
+              className="rounded-full bg-transparent"
+              disabled={pagination.page === pagination.totalPages}
+              onClick={() => handlePageChange(pagination.page + 1)}
+            >
+              Sau
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
