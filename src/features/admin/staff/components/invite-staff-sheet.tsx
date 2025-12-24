@@ -1,17 +1,7 @@
 'use client'
 
-import type React from 'react'
-
 import { useState, useEffect } from 'react'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/src/components/ui/dialog'
-import { Button } from '@/src/components/ui/button'
+import { FormDialog, FormDialogField } from '@/src/components/ui/form-dialog'
 import { Input } from '@/src/components/ui/input'
 import { Label } from '@/src/components/ui/label'
 import { Badge } from '@/src/components/ui/badge'
@@ -22,7 +12,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/src/components/ui/select'
-import { Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { useCreateStaffMutation } from '@/src/features/admin/staff/queries/staff.queries'
 import { useErrorHandler } from '@/src/hooks/use-error-handler'
@@ -65,9 +54,7 @@ export function InviteStaffSheet({ open, onOpenChange, defaultRole }: InviteStaf
     setRole(defaultRole)
   }, [defaultRole])
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-
+  const handleSubmit = async () => {
     // Validate with Zod schema
     const result = inviteStaffSchema.safeParse({
       fullName,
@@ -98,121 +85,88 @@ export function InviteStaffSheet({ open, onOpenChange, defaultRole }: InviteStaf
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
-        <form onSubmit={handleSubmit}>
-          <DialogHeader>
-            <DialogTitle>Mời nhân viên mới</DialogTitle>
-            <DialogDescription>
-              Tạo tài khoản và gửi email mời cho nhân viên. Họ sẽ nhận được link để thiết lập mật
-              khẩu.
-            </DialogDescription>
-          </DialogHeader>
+    <FormDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      title="Mời nhân viên mới"
+      description="Tạo tài khoản và gửi email mời cho nhân viên. Họ sẽ nhận được link để thiết lập mật khẩu."
+      onSubmit={handleSubmit}
+      isSubmitting={createMutation.isPending}
+      submitText="Gửi lời mời"
+      loadingText="Đang gửi..."
+      size="md"
+    >
+      {/* Họ và tên */}
+      <FormDialogField label="Họ và tên" required>
+        <Input
+          id="full_name"
+          value={fullName}
+          onChange={(e) => setFullName(e.target.value)}
+          placeholder="Nguyễn Văn A"
+          disabled={createMutation.isPending}
+        />
+      </FormDialogField>
 
-          <div className="space-y-4 py-4">
-            {/* Full Name */}
-            <div className="space-y-2">
-              <Label htmlFor="full_name">
-                Họ và tên <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="full_name"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                placeholder="Nguyễn Văn A"
-                required
-                disabled={createMutation.isPending}
-              />
-            </div>
+      {/* Email */}
+      <FormDialogField label="Email" required>
+        <Input
+          id="email"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="email@restaurant.com"
+          disabled={createMutation.isPending}
+        />
+      </FormDialogField>
 
-            {/* Email */}
-            <div className="space-y-2">
-              <Label htmlFor="email">
-                Email <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="email@restaurant.com"
-                required
-                disabled={createMutation.isPending}
-              />
-            </div>
+      {/* Số điện thoại */}
+      <FormDialogField label="Số điện thoại">
+        <Input
+          id="phone"
+          type="tel"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          placeholder="Nhập số điện thoại"
+          disabled={createMutation.isPending}
+        />
+      </FormDialogField>
 
-            {/* Phone */}
-            <div className="space-y-2">
-              <Label htmlFor="phone">Số điện thoại</Label>
-              <Input
-                id="phone"
-                type="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="Nhập số điện thoại"
-                disabled={createMutation.isPending}
-              />
-            </div>
+      {/* Vai trò */}
+      <FormDialogField label="Vai trò">
+        <Select
+          value={role}
+          onValueChange={(value) => setRole(value as StaffRole)}
+          disabled={createMutation.isPending}
+        >
+          <SelectTrigger id="role">
+            <SelectValue placeholder="Chọn vai trò" />
+          </SelectTrigger>
+          <SelectContent>
+            {/* Admin option - Only visible for Owner */}
+            {isOwner && (
+              <SelectItem value="admin">
+                <span className="flex items-center gap-2">
+                  <span className="h-2 w-2 rounded-full bg-violet-500" />
+                  Quản trị viên
+                </span>
+              </SelectItem>
+            )}
+            <SelectItem value="waiter">Phục vụ</SelectItem>
+            <SelectItem value="kitchen_staff">Nhân viên bếp</SelectItem>
+          </SelectContent>
+        </Select>
+      </FormDialogField>
 
-            {/* Role Select */}
-            <div className="space-y-2">
-              <Label htmlFor="role">Vai trò</Label>
-              <Select
-                value={role}
-                onValueChange={(value) => setRole(value as StaffRole)}
-                disabled={createMutation.isPending}
-              >
-                <SelectTrigger id="role">
-                  <SelectValue placeholder="Chọn vai trò" />
-                </SelectTrigger>
-                <SelectContent>
-                  {/* Admin option - Only visible for Owner */}
-                  {isOwner && (
-                    <SelectItem value="admin">
-                      <span className="flex items-center gap-2">
-                        <span className="h-2 w-2 rounded-full bg-violet-500" />
-                        Quản trị viên
-                      </span>
-                    </SelectItem>
-                  )}
-                  <SelectItem value="waiter">Phục vụ</SelectItem>
-                  <SelectItem value="kitchen_staff">Nhân viên bếp</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Initial Status */}
-            <div className="space-y-2">
-              <Label>Trạng thái ban đầu</Label>
-              <div className="flex items-center gap-2">
-                <Badge className="bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400">
-                  Hoạt động
-                </Badge>
-                <span className="text-xs text-slate-500">(Mặc định)</span>
-              </div>
-            </div>
-          </div>
-
-          <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              disabled={createMutation.isPending}
-            >
-              Hủy
-            </Button>
-            <Button
-              type="submit"
-              disabled={createMutation.isPending}
-              className="bg-emerald-600 hover:bg-emerald-700"
-            >
-              {createMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Gửi lời mời
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+      {/* Trạng thái ban đầu */}
+      <div className="space-y-2">
+        <Label>Trạng thái ban đầu</Label>
+        <div className="flex items-center gap-2">
+          <Badge className="bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400">
+            Hoạt động
+          </Badge>
+          <span className="text-xs text-slate-500">(Mặc định)</span>
+        </div>
+      </div>
+    </FormDialog>
   )
 }
