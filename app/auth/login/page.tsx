@@ -15,6 +15,7 @@ import { Eye, EyeOff, Loader2, AlertCircle } from 'lucide-react'
 import { Alert, AlertDescription } from '@/src/components/ui/alert'
 import { useAuth } from '@/src/hooks/use-auth'
 import type { ApiErrorResponse } from '@/src/features/auth/types/auth'
+import { loginSchema } from '@/src/features/auth/schemas'
 
 const REMEMBER_ME_KEY = 'rememberMe'
 const REMEMBERED_EMAIL_KEY = 'rememberedEmail'
@@ -46,42 +47,24 @@ export default function LoginPage() {
     }
   }, [])
 
-  const [fieldErrors, setFieldErrors] = useState({
-    email: '',
-    password: '',
-  })
-
-  const validateEmail = (email: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    return emailRegex.test(email)
-  }
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
-    setFieldErrors({ email: '', password: '' })
+    setFieldErrors({})
 
-    // Validation
-    const errors = { email: '', password: '' }
-    let hasError = false
+    // Validate with Zod schema
+    const result = loginSchema.safeParse({ ...formData, rememberMe })
 
-    if (!formData.email) {
-      errors.email = 'Vui lòng nhập email'
-      hasError = true
-    } else if (!validateEmail(formData.email)) {
-      errors.email = 'Email không hợp lệ'
-      hasError = true
-    }
-
-    if (!formData.password) {
-      errors.password = 'Vui lòng nhập mật khẩu'
-      hasError = true
-    } else if (formData.password.length < 8) {
-      errors.password = 'Mật khẩu phải có ít nhất 8 ký tự'
-      hasError = true
-    }
-
-    if (hasError) {
+    if (!result.success) {
+      const errors: Record<string, string> = {}
+      result.error.issues.forEach((issue) => {
+        const field = issue.path[0] as string
+        if (!errors[field]) {
+          errors[field] = issue.message
+        }
+      })
       setFieldErrors(errors)
       return
     }

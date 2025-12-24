@@ -29,6 +29,7 @@ import type { SimpleZone } from '@/src/features/admin/tables/types/zones'
 import { toast } from 'sonner'
 import type { TableStatus, TableShape, TablePosition, Table } from '@/src/features/admin/tables/types/tables'
 import { useErrorHandler } from '@/src/hooks/use-error-handler'
+import { tableFormSchema } from '@/src/features/admin/tables/schemas'
 
 interface TableUpsertModalProps {
   open: boolean
@@ -102,19 +103,23 @@ export function TableUpsertModal({
   }, [mode, table])
 
   const validateForm = (): boolean => {
-    const newErrors: Partial<Record<keyof TableFormData, string>> = {}
+    // Validate with Zod schema
+    const result = tableFormSchema.safeParse(formData)
 
-    if (!formData.table_number.trim()) {
-      newErrors.table_number = 'Vui lòng nhập tên/số bàn'
+    if (!result.success) {
+      const newErrors: Partial<Record<keyof TableFormData, string>> = {}
+      result.error.issues.forEach((issue) => {
+        const field = issue.path[0] as keyof TableFormData
+        if (!newErrors[field]) {
+          newErrors[field] = issue.message
+        }
+      })
+      setErrors(newErrors)
+      return false
     }
 
-    const capacityNum = Number.parseInt(formData.capacity)
-    if (!formData.capacity || isNaN(capacityNum) || capacityNum <= 0) {
-      newErrors.capacity = 'Số ghế phải lớn hơn 0'
-    }
-
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
+    setErrors({})
+    return true
   }
 
   const createMutation = useCreateTableMutation()

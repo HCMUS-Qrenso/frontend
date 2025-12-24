@@ -13,6 +13,7 @@ import { Loader2, CheckCircle2, AlertCircle } from 'lucide-react'
 import { Alert, AlertDescription } from '@/src/components/ui/alert'
 import { useAuth } from '@/src/hooks/use-auth'
 import type { ApiErrorResponse } from '@/src/features/auth/types/auth'
+import { forgotPasswordSchema } from '@/src/features/auth/schemas'
 
 export default function ForgotPasswordPage() {
   const { forgotPassword, forgotPasswordPending } = useAuth()
@@ -21,24 +22,18 @@ export default function ForgotPasswordPage() {
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [generalError, setGeneralError] = useState<string | null>(null)
 
-  const validateEmail = (email: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    return emailRegex.test(email)
-  }
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setEmailError('')
     setGeneralError(null)
 
-    // Validation
-    if (!email) {
-      setEmailError('Vui lòng nhập email')
-      return
-    }
+    // Validate with Zod schema
+    const result = forgotPasswordSchema.safeParse({ email })
 
-    if (!validateEmail(email)) {
-      setEmailError('Email không hợp lệ')
+    if (!result.success) {
+      setEmailError(result.error.issues[0]?.message || 'Email không hợp lệ')
       return
     }
 

@@ -27,6 +27,7 @@ import { toast } from 'sonner'
 import { useCreateStaffMutation } from '@/src/features/admin/staff/queries/staff.queries'
 import { useErrorHandler } from '@/src/hooks/use-error-handler'
 import { useAuth } from '@/src/hooks/use-auth'
+import { inviteStaffSchema } from '@/src/features/admin/staff/schemas'
 
 type StaffRole = 'admin' | 'waiter' | 'kitchen_staff'
 
@@ -67,10 +68,17 @@ export function InviteStaffSheet({ open, onOpenChange, defaultRole }: InviteStaf
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(email)) {
-      toast.error('Vui lòng nhập email hợp lệ')
+    // Validate with Zod schema
+    const result = inviteStaffSchema.safeParse({
+      fullName,
+      email,
+      phone: phone || undefined,
+      role,
+    })
+
+    if (!result.success) {
+      const firstError = result.error.issues[0]
+      toast.error(firstError?.message || 'Dữ liệu không hợp lệ')
       return
     }
 

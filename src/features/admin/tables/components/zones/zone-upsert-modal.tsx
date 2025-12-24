@@ -19,6 +19,7 @@ import { useCreateZoneMutation, useUpdateZoneMutation } from '@/src/features/adm
 import { useErrorHandler } from '@/src/hooks/use-error-handler'
 import { toast } from 'sonner'
 import { Zone } from '@/src/features/admin/tables/types/zones'
+import { zoneFormSchema } from '@/src/features/admin/tables/schemas'
 
 interface ZoneUpsertModalProps {
   open: boolean
@@ -70,14 +71,12 @@ export function ZoneUpsertModal({ open, onOpenChange, zone, mode }: ZoneUpsertMo
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!formData.name.trim()) {
-      toast.error('Tên khu vực không được để trống')
-      return
-    }
+    // Validate with Zod schema
+    const result = zoneFormSchema.safeParse(formData)
 
-    const displayOrder = parseInt(formData.display_order)
-    if (isNaN(displayOrder) || displayOrder < 1) {
-      toast.error('Thứ tự hiển thị phải là số dương')
+    if (!result.success) {
+      const firstError = result.error.issues[0]
+      toast.error(firstError?.message || 'Dữ liệu không hợp lệ')
       return
     }
 
@@ -85,7 +84,7 @@ export function ZoneUpsertModal({ open, onOpenChange, zone, mode }: ZoneUpsertMo
       const payload = {
         name: formData.name.trim(),
         description: formData.description.trim() || null,
-        display_order: displayOrder,
+        display_order: parseInt(formData.display_order),
         is_active: formData.is_active,
       }
 
