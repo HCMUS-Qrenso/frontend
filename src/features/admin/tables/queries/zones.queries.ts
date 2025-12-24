@@ -10,17 +10,13 @@ import type {
   ZoneResponse,
 } from '@/src/features/admin/tables/types/zones'
 import type { MessageResponse } from '@/src/features/auth/types/auth'
-import { tablesQueryKeys } from './tables.queries'
+import { tablesQueryKeys } from './tables.keys'
 
-// Query Keys
-export const zonesQueryKeys = {
-  all: ['zones'] as const,
-  lists: () => [...zonesQueryKeys.all, 'list'] as const,
-  list: (params?: ZoneQueryParams) => [...zonesQueryKeys.lists(), params] as const,
-  detail: (id: string) => [...zonesQueryKeys.all, 'detail', id] as const,
-  stats: () => [...zonesQueryKeys.all, 'stats'] as const,
-  simple: () => [...zonesQueryKeys.all, 'simple'] as const,
-}
+// Import and re-export query keys from dedicated keys file
+export { zonesQueryKeys } from './zones.keys'
+import { zonesQueryKeys } from './zones.keys'
+
+// Query Hooks
 
 // Query Hooks
 export const useZonesQuery = (params?: ZoneQueryParams, enabled = true) => {

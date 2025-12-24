@@ -16,25 +16,13 @@ import type {
   MessageResponse,
 } from '@/src/features/admin/menu/types/modifiers'
 
-// ============================================
-// QUERY KEYS
-// ============================================
+// Import and re-export query keys from dedicated keys file
+export { modifiersQueryKeys } from './modifiers.keys'
+import { modifiersQueryKeys } from './modifiers.keys'
 
-export const modifiersQueryKeys = {
-  all: ['modifiers'] as const,
-  groups: {
-    all: () => [...modifiersQueryKeys.all, 'groups'] as const,
-    lists: () => [...modifiersQueryKeys.groups.all(), 'list'] as const,
-    list: (params?: QueryModifierGroupsParams) =>
-      [...modifiersQueryKeys.groups.lists(), params] as const,
-    detail: (id: string) => [...modifiersQueryKeys.groups.all(), 'detail', id] as const,
-  },
-  modifiers: {
-    all: () => [...modifiersQueryKeys.all, 'items'] as const,
-    list: (groupId: string, params?: QueryModifiersParams) =>
-      [...modifiersQueryKeys.modifiers.all(), 'list', groupId, params] as const,
-  },
-}
+// ============================================
+// QUERY HOOKS - MODIFIER GROUPS
+// ============================================
 
 // ============================================
 // QUERY HOOKS - MODIFIER GROUPS

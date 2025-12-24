@@ -13,14 +13,11 @@ import type {
 } from '@/src/features/admin/menu/types/categories'
 import type { MessageResponse } from '@/src/features/auth/types/auth'
 
-// Query Keys
-export const categoriesQueryKeys = {
-  all: ['categories'] as const,
-  lists: () => [...categoriesQueryKeys.all, 'list'] as const,
-  list: (params?: CategoryQueryParams) => [...categoriesQueryKeys.lists(), params] as const,
-  detail: (id: string) => [...categoriesQueryKeys.all, 'detail', id] as const,
-  stats: () => [...categoriesQueryKeys.all, 'stats'] as const,
-}
+// Import and re-export query keys from dedicated keys file
+export { categoriesQueryKeys } from './categories.keys'
+import { categoriesQueryKeys } from './categories.keys'
+
+// Query Hooks
 
 // Query Hooks
 export const useCategoriesQuery = (params?: CategoryQueryParams, enabled = true) => {

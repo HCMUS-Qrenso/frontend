@@ -11,17 +11,13 @@ import type {
 } from '@/src/features/admin/staff/types/staff'
 import type { MessageResponse } from '@/src/features/auth/types/auth'
 
-// ============================================
-// Query Keys
-// ============================================
+// Import and re-export query keys from dedicated keys file
+export { staffQueryKeys } from './staff.keys'
+import { staffQueryKeys } from './staff.keys'
 
-export const staffQueryKeys = {
-  all: ['staff'] as const,
-  lists: () => [...staffQueryKeys.all, 'list'] as const,
-  list: (params?: StaffQueryParams) => [...staffQueryKeys.lists(), params] as const,
-  detail: (id: string) => [...staffQueryKeys.all, 'detail', id] as const,
-  stats: () => [...staffQueryKeys.all, 'stats'] as const,
-}
+// ============================================
+// Query Hooks
+// ============================================
 
 // ============================================
 // Query Hooks

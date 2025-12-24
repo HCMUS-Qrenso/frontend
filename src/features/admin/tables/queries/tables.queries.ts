@@ -25,24 +25,11 @@ import type {
 } from '@/src/features/admin/tables/types/tables'
 import type { MessageResponse } from '@/src/features/auth/types/auth'
 
-// Query Keys
-export const tablesQueryKeys = {
-  all: ['tables'] as const,
-  lists: () => [...tablesQueryKeys.all, 'list'] as const,
-  list: (params?: TableQueryParams) => [...tablesQueryKeys.lists(), params] as const,
-  detail: (id: string) => [...tablesQueryKeys.all, 'detail', id] as const,
-  stats: () => [...tablesQueryKeys.all, 'stats'] as const,
-  layout: (zone: string) => [...tablesQueryKeys.all, 'layout', zone] as const,
-  zones: () => [...tablesQueryKeys.all, 'zones'] as const,
-  floors: () => [...tablesQueryKeys.all, 'floors'] as const, // Deprecated
-  qr: {
-    all: () => [...tablesQueryKeys.all, 'qr'] as const,
-    list: (params?: QRCodeListQueryParams) =>
-      [...tablesQueryKeys.qr.all(), 'list', params] as const,
-    detail: (id: string) => [...tablesQueryKeys.qr.all(), 'detail', id] as const,
-    stats: () => [...tablesQueryKeys.qr.all(), 'stats'] as const,
-  },
-}
+// Import and re-export query keys from dedicated keys file
+export { tablesQueryKeys } from './tables.keys'
+import { tablesQueryKeys } from './tables.keys'
+
+// Query Hooks
 
 // Query Hooks
 export const useTablesQuery = (params?: TableQueryParams, enabled = true) => {

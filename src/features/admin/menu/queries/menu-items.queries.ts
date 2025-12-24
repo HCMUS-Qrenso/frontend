@@ -13,17 +13,14 @@ import type {
   ImportMenuResult,
 } from '@/src/features/admin/menu/types/menu-items'
 import type { MessageResponse } from '@/src/features/auth/types/auth'
-import { categoriesQueryKeys } from './categories.queries'
-import { modifiersQueryKeys } from './modifiers.queries'
+import { categoriesQueryKeys } from './categories.keys'
+import { modifiersQueryKeys } from './modifiers.keys'
 
-// Query Keys
-export const menuItemsQueryKeys = {
-  all: ['menu-items'] as const,
-  lists: () => [...menuItemsQueryKeys.all, 'list'] as const,
-  list: (params?: MenuItemQueryParams) => [...menuItemsQueryKeys.lists(), params] as const,
-  detail: (id: string) => [...menuItemsQueryKeys.all, 'detail', id] as const,
-  stats: () => [...menuItemsQueryKeys.all, 'stats'] as const,
-}
+// Import and re-export query keys from dedicated keys file
+export { menuItemsQueryKeys } from './menu-items.keys'
+import { menuItemsQueryKeys } from './menu-items.keys'
+
+// Query Hooks
 
 // Query Hooks
 export const useMenuItemsQuery = (params?: MenuItemQueryParams, enabled = true) => {
