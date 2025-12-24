@@ -1,21 +1,10 @@
 'use client'
 
-import type React from 'react'
-
 import { useEffect, useState } from 'react'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/src/components/ui/dialog'
-import { Button } from '@/src/components/ui/button'
+import { FormDialog, FormDialogField, FormDialogSection } from '@/src/components/ui/form-dialog'
 import { Input } from '@/src/components/ui/input'
-import { Label } from '@/src/components/ui/label'
 import { Switch } from '@/src/components/ui/switch'
-import { Loader2 } from 'lucide-react'
+import { Label } from '@/src/components/ui/label'
 import { useCreateModifierMutation, useUpdateModifierMutation } from '@/src/features/admin/menu/queries/modifiers.queries'
 import { useErrorHandler } from '@/src/hooks/use-error-handler'
 import { toast } from 'sonner'
@@ -50,20 +39,16 @@ export function ModifierModal({
     is_available: true,
   })
 
-  const [errors, setErrors] = useState({
-    name: '',
-  })
+  const [errors, setErrors] = useState<Record<string, string>>({})
 
   // Load data if editing
   useEffect(() => {
     if (mode === 'edit' && modifier) {
-      if (modifier) {
-        setFormData({
-          name: modifier.name,
-          price_adjustment: modifier.price_adjustment,
-          is_available: modifier.is_available,
-        })
-      }
+      setFormData({
+        name: modifier.name,
+        price_adjustment: modifier.price_adjustment,
+        is_available: modifier.is_available,
+      })
     } else if (mode === 'create') {
       setFormData({
         name: '',
@@ -71,12 +56,11 @@ export function ModifierModal({
         is_available: true,
       })
     }
-    setErrors({ name: '' })
+    setErrors({})
   }, [mode, modifier])
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setErrors({ name: '' })
+  const handleSubmit = async () => {
+    setErrors({})
 
     // Validation
     if (!formData.name.trim()) {
@@ -132,102 +116,71 @@ export function ModifierModal({
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-125">
-        <DialogHeader>
-          <DialogTitle>{mode === 'create' ? 'Thêm option mới' : 'Chỉnh sửa option'}</DialogTitle>
-          <DialogDescription>
-            {mode === 'create' ? 'Tạo tuỳ chọn mới cho nhóm' : 'Cập nhật thông tin tuỳ chọn'}
-          </DialogDescription>
-        </DialogHeader>
+    <FormDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      title={mode === 'create' ? 'Thêm option mới' : 'Chỉnh sửa option'}
+      description={mode === 'create' ? 'Tạo tuỳ chọn mới cho nhóm' : 'Cập nhật thông tin tuỳ chọn'}
+      onSubmit={handleSubmit}
+      isSubmitting={isSubmitting}
+      submitText="Lưu"
+      loadingText="Đang lưu..."
+      size="md"
+    >
+      {/* Tên option */}
+      <FormDialogField label="Tên option" required error={errors.name}>
+        <Input
+          id="name"
+          value={formData.name}
+          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+          placeholder="Ví dụ: Lớn (Large), Phô mai thêm..."
+          disabled={isSubmitting}
+        />
+      </FormDialogField>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          {/* Name */}
-          <div className="space-y-2">
-            <Label htmlFor="name">
-              Tên option <span className="text-red-500">*</span>
-            </Label>
-            <Input
-              id="name"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              placeholder="Ví dụ: Lớn (Large), Phô mai thêm..."
-              disabled={isSubmitting}
-            />
-            {errors.name && <p className="text-xs text-red-600">{errors.name}</p>}
+      {/* Điều chỉnh giá */}
+      <FormDialogField
+        label="Điều chỉnh giá"
+        hint="Số dương để tăng giá, số âm để giảm giá. Để 0 nếu không thay đổi."
+      >
+        <div className="relative">
+          <Input
+            id="price"
+            type="number"
+            value={formData.price_adjustment}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                price_adjustment: Number.parseInt(e.target.value) || 0,
+              })
+            }
+            placeholder="0"
+            disabled={isSubmitting}
+            className="pr-12"
+          />
+          <div className="absolute top-1/2 right-3 -translate-y-1/2 text-sm text-slate-500">
+            đ
           </div>
+        </div>
+      </FormDialogField>
 
-          {/* Price Adjustment */}
-          <div className="space-y-2">
-            <Label htmlFor="price">Điều chỉnh giá</Label>
-            <div className="relative">
-              <Input
-                id="price"
-                type="number"
-                value={formData.price_adjustment}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    price_adjustment: Number.parseInt(e.target.value) || 0,
-                  })
-                }
-                placeholder="0"
-                disabled={isSubmitting}
-                className="pr-12"
-              />
-              <div className="absolute top-1/2 right-3 -translate-y-1/2 text-sm text-slate-500">
-                đ
-              </div>
-            </div>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              Số dương để tăng giá, số âm để giảm giá. Để 0 nếu không thay đổi.
-            </p>
-          </div>
-
-          {/* Available Toggle */}
-          <div className="flex items-center justify-between rounded-lg border border-slate-200 p-4 dark:border-slate-800">
-            <div className="space-y-0.5">
-              <Label htmlFor="is_available" className="text-base">
-                Có sẵn
-              </Label>
-              <p className="text-sm text-slate-500 dark:text-slate-400">
-                Tắt nếu tạm thời hết hàng
-              </p>
-            </div>
-            <Switch
-              id="is_available"
-              checked={formData.is_available}
-              onCheckedChange={(checked) => setFormData({ ...formData, is_available: checked })}
-              disabled={isSubmitting}
-            />
-          </div>
-
-          <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              disabled={isSubmitting}
-            >
-              Hủy
-            </Button>
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-              className="bg-emerald-600 hover:bg-emerald-700"
-            >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Đang lưu...
-                </>
-              ) : (
-                'Lưu'
-              )}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+      {/* Có sẵn */}
+      <FormDialogSection>
+        <div className="space-y-0.5">
+          <Label htmlFor="is_available" className="text-sm font-medium">
+            Có sẵn
+          </Label>
+          <p className="text-xs text-slate-500 dark:text-slate-400">
+            Tắt nếu tạm thời hết hàng
+          </p>
+        </div>
+        <Switch
+          id="is_available"
+          checked={formData.is_available}
+          onCheckedChange={(checked) => setFormData({ ...formData, is_available: checked })}
+          disabled={isSubmitting}
+        />
+      </FormDialogSection>
+    </FormDialog>
   )
 }

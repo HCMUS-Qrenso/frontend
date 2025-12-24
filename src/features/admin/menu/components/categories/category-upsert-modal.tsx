@@ -1,27 +1,16 @@
 'use client'
 
-import type React from 'react'
-
 import { useEffect, useState } from 'react'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/src/components/ui/dialog'
-import { Button } from '@/src/components/ui/button'
+import { FormDialog, FormDialogField, FormDialogSection } from '@/src/components/ui/form-dialog'
 import { Input } from '@/src/components/ui/input'
-import { Label } from '@/src/components/ui/label'
 import { Textarea } from '@/src/components/ui/textarea'
 import { Switch } from '@/src/components/ui/switch'
-import { Loader2 } from 'lucide-react'
+import { Label } from '@/src/components/ui/label'
 import { useCreateCategoryMutation, useUpdateCategoryMutation } from '@/src/features/admin/menu/queries/categories.queries'
 import { useErrorHandler } from '@/src/hooks/use-error-handler'
 import { toast } from 'sonner'
 import { Category } from '@/src/features/admin/menu/types/categories'
-import { createCategorySchema, type CreateCategoryFormData } from '@/src/features/admin/menu/schemas'
+import { createCategorySchema } from '@/src/features/admin/menu/schemas'
 
 interface CategoryUpsertModalProps {
   open: boolean
@@ -70,15 +59,13 @@ export function CategoryUpsertModal({
     setErrors({})
   }, [mode, category])
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleSubmit = async () => {
     setErrors({})
 
     // Validate with Zod schema
     const result = createCategorySchema.safeParse(formData)
 
     if (!result.success) {
-      // Convert Zod errors to our error format
       const fieldErrors: Record<string, string> = {}
       result.error.issues.forEach((issue) => {
         const field = issue.path[0] as string
@@ -110,7 +97,6 @@ export function CategoryUpsertModal({
         toast.success('Đã cập nhật danh mục thành công')
       }
 
-      // Success - close modal
       onOpenChange(false)
     } catch (error) {
       handleErrorWithStatus(error, undefined, 'Không thể lưu danh mục')
@@ -118,92 +104,61 @@ export function CategoryUpsertModal({
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-125">
-        <DialogHeader>
-          <DialogTitle>
-            {mode === 'create' ? 'Thêm danh mục mới' : 'Chỉnh sửa danh mục'}
-          </DialogTitle>
-          <DialogDescription>
-            {mode === 'create'
-              ? 'Tạo danh mục mới để nhóm các món ăn theo loại'
-              : 'Cập nhật thông tin danh mục'}
-          </DialogDescription>
-        </DialogHeader>
+    <FormDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      title={mode === 'create' ? 'Thêm danh mục mới' : 'Chỉnh sửa danh mục'}
+      description={
+        mode === 'create'
+          ? 'Tạo danh mục mới để nhóm các món ăn theo loại'
+          : 'Cập nhật thông tin danh mục'
+      }
+      onSubmit={handleSubmit}
+      isSubmitting={isSubmitting}
+      submitText="Lưu"
+      loadingText="Đang lưu..."
+      size="md"
+    >
+      {/* Tên danh mục */}
+      <FormDialogField label="Tên danh mục" required error={errors.name}>
+        <Input
+          id="name"
+          value={formData.name || ''}
+          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+          placeholder="Ví dụ: Khai vị, Món chính, Tráng miệng..."
+          disabled={isSubmitting}
+        />
+      </FormDialogField>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          {/* Name */}
-          <div className="space-y-2">
-            <Label htmlFor="name">
-              Tên danh mục <span className="text-red-500">*</span>
-            </Label>
-            <Input
-              id="name"
-              value={formData.name || ''}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              placeholder="Ví dụ: Khai vị, Món chính, Tráng miệng..."
-              disabled={isSubmitting}
-            />
-            {errors.name && <p className="text-xs text-red-600">{errors.name}</p>}
-          </div>
+      {/* Mô tả */}
+      <FormDialogField label="Mô tả">
+        <Textarea
+          id="description"
+          value={formData.description || ''}
+          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+          placeholder="Mô tả ngắn về danh mục này..."
+          rows={3}
+          disabled={isSubmitting}
+        />
+      </FormDialogField>
 
-          {/* Description */}
-          <div className="space-y-2">
-            <Label htmlFor="description">Mô tả</Label>
-            <Textarea
-              id="description"
-              value={formData.description || ''}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              placeholder="Mô tả ngắn về danh mục này..."
-              rows={3}
-              disabled={isSubmitting}
-            />
-          </div>
-
-          {/* Active Toggle */}
-          <div className="flex items-center justify-between rounded-lg border border-slate-200 p-4 dark:border-slate-800">
-            <div className="space-y-0.5">
-              <Label htmlFor="is_active" className="text-base">
-                Hiển thị danh mục
-              </Label>
-              <p className="text-sm text-slate-500 dark:text-slate-400">
-                Bật để hiển thị danh mục trong menu
-              </p>
-            </div>
-            <Switch
-              id="is_active"
-              checked={formData.is_active || false}
-              onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
-              disabled={isSubmitting}
-            />
-          </div>
-
-          <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              disabled={isSubmitting}
-            >
-              Hủy
-            </Button>
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-              className="bg-emerald-600 hover:bg-emerald-700"
-            >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Đang lưu...
-                </>
-              ) : (
-                'Lưu'
-              )}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+      {/* Hiển thị danh mục */}
+      <FormDialogSection>
+        <div className="space-y-0.5">
+          <Label htmlFor="is_active" className="text-sm font-medium">
+            Hiển thị danh mục
+          </Label>
+          <p className="text-xs text-slate-500 dark:text-slate-400">
+            Bật để hiển thị danh mục trong menu
+          </p>
+        </div>
+        <Switch
+          id="is_active"
+          checked={formData.is_active || false}
+          onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
+          disabled={isSubmitting}
+        />
+      </FormDialogSection>
+    </FormDialog>
   )
 }

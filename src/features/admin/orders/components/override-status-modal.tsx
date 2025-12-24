@@ -1,17 +1,7 @@
 'use client'
 
-import type React from 'react'
-
 import { useState } from 'react'
-import { Button } from '@/src/components/ui/button'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/src/components/ui/dialog'
+import { FormDialog, FormDialogField } from '@/src/components/ui/form-dialog'
 import {
   Select,
   SelectContent,
@@ -22,7 +12,6 @@ import {
 import { Textarea } from '@/src/components/ui/textarea'
 import { Label } from '@/src/components/ui/label'
 import { Checkbox } from '@/src/components/ui/checkbox'
-import { Loader2 } from 'lucide-react'
 
 const ORDER_STATUSES = [
   { value: 'pending', label: 'Chờ xử lý' },
@@ -54,9 +43,7 @@ export function OverrideStatusModal({
   const [notifyStaff, setNotifyStaff] = useState(false)
   const [loading, setLoading] = useState(false)
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-
+  const handleSubmit = async () => {
     if (!newStatus || !reason.trim()) {
       alert('Vui lòng chọn trạng thái mới và nhập lý do')
       return
@@ -81,93 +68,68 @@ export function OverrideStatusModal({
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
-        <form onSubmit={handleSubmit}>
-          <DialogHeader>
-            <DialogTitle>Thay đổi trạng thái đơn hàng</DialogTitle>
-            <DialogDescription>
-              Thay đổi trạng thái đơn hàng #{orderId}. Vui lòng nhập lý do để ghi vào lịch sử.
-            </DialogDescription>
-          </DialogHeader>
+    <FormDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      title="Thay đổi trạng thái đơn hàng"
+      description={`Thay đổi trạng thái đơn hàng #${orderId}. Vui lòng nhập lý do để ghi vào lịch sử.`}
+      onSubmit={handleSubmit}
+      isSubmitting={loading}
+      submitText="Xác nhận"
+      loadingText="Đang xử lý..."
+      size="md"
+    >
+      {/* Trạng thái hiện tại */}
+      <div className="space-y-2">
+        <Label>Trạng thái hiện tại</Label>
+        <div className="rounded-lg bg-slate-100 px-3 py-2 dark:bg-slate-800">
+          <p className="text-sm font-medium text-slate-900 capitalize dark:text-white">
+            {currentStatus}
+          </p>
+        </div>
+      </div>
 
-          <div className="space-y-4 py-4">
-            {/* Current Status */}
-            <div className="space-y-2">
-              <Label>Trạng thái hiện tại</Label>
-              <div className="rounded-lg bg-slate-100 px-3 py-2 dark:bg-slate-800">
-                <p className="text-sm font-medium text-slate-900 capitalize dark:text-white">
-                  {currentStatus}
-                </p>
-              </div>
-            </div>
+      {/* Trạng thái mới */}
+      <FormDialogField label="Trạng thái mới" required>
+        <Select value={newStatus} onValueChange={setNewStatus}>
+          <SelectTrigger id="new-status">
+            <SelectValue placeholder="Chọn trạng thái mới" />
+          </SelectTrigger>
+          <SelectContent>
+            {ORDER_STATUSES.filter((s) => s.value !== currentStatus).map((status) => (
+              <SelectItem key={status.value} value={status.value}>
+                {status.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </FormDialogField>
 
-            {/* New Status */}
-            <div className="space-y-2">
-              <Label htmlFor="new-status">Trạng thái mới *</Label>
-              <Select value={newStatus} onValueChange={setNewStatus}>
-                <SelectTrigger id="new-status">
-                  <SelectValue placeholder="Chọn trạng thái mới" />
-                </SelectTrigger>
-                <SelectContent>
-                  {ORDER_STATUSES.filter((s) => s.value !== currentStatus).map((status) => (
-                    <SelectItem key={status.value} value={status.value}>
-                      {status.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+      {/* Lý do */}
+      <FormDialogField label="Lý do" required>
+        <Textarea
+          id="reason"
+          placeholder="Nhập lý do thay đổi trạng thái..."
+          value={reason}
+          onChange={(e) => setReason(e.target.value)}
+          rows={3}
+        />
+      </FormDialogField>
 
-            {/* Reason */}
-            <div className="space-y-2">
-              <Label htmlFor="reason">Lý do *</Label>
-              <Textarea
-                id="reason"
-                placeholder="Nhập lý do thay đổi trạng thái..."
-                value={reason}
-                onChange={(e) => setReason(e.target.value)}
-                rows={3}
-                required
-              />
-            </div>
-
-            {/* Notify Staff */}
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="notify"
-                checked={notifyStaff}
-                onCheckedChange={(checked) => setNotifyStaff(checked === true)}
-              />
-              <label
-                htmlFor="notify"
-                className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                Thông báo cho nhân viên
-              </label>
-            </div>
-          </div>
-
-          <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              disabled={loading}
-            >
-              Hủy
-            </Button>
-            <Button
-              type="submit"
-              disabled={loading}
-              className="bg-emerald-600 hover:bg-emerald-700"
-            >
-              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Xác nhận
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+      {/* Thông báo cho nhân viên */}
+      <div className="flex items-center space-x-2">
+        <Checkbox
+          id="notify"
+          checked={notifyStaff}
+          onCheckedChange={(checked) => setNotifyStaff(checked === true)}
+        />
+        <label
+          htmlFor="notify"
+          className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+        >
+          Thông báo cho nhân viên
+        </label>
+      </div>
+    </FormDialog>
   )
 }

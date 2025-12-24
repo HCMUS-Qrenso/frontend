@@ -1,20 +1,11 @@
 'use client'
 
-import type React from 'react'
 import { useEffect, useState } from 'react'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/src/components/ui/dialog'
-import { Button } from '@/src/components/ui/button'
+import { FormDialog, FormDialogField, FormDialogSection } from '@/src/components/ui/form-dialog'
 import { Input } from '@/src/components/ui/input'
-import { Label } from '@/src/components/ui/label'
 import { Textarea } from '@/src/components/ui/textarea'
 import { Switch } from '@/src/components/ui/switch'
-import { Loader2 } from 'lucide-react'
+import { Label } from '@/src/components/ui/label'
 import { useCreateZoneMutation, useUpdateZoneMutation } from '@/src/features/admin/tables/queries/zones.queries'
 import { useErrorHandler } from '@/src/hooks/use-error-handler'
 import { toast } from 'sonner'
@@ -68,9 +59,7 @@ export function ZoneUpsertModal({ open, onOpenChange, zone, mode }: ZoneUpsertMo
     }
   }, [open, isEdit, zone])
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-
+  const handleSubmit = async () => {
     // Validate with Zod schema
     const result = zoneFormSchema.safeParse(formData)
 
@@ -110,102 +99,74 @@ export function ZoneUpsertModal({ open, onOpenChange, zone, mode }: ZoneUpsertMo
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md rounded-2xl">
-        <DialogHeader>
-          <DialogTitle className="text-xl font-semibold text-slate-900 dark:text-white">
-            {isEdit ? 'Chỉnh sửa khu vực' : 'Thêm khu vực mới'}
-          </DialogTitle>
-          <DialogDescription className="text-sm text-slate-500 dark:text-slate-400">
-            {isEdit
-              ? 'Cập nhật thông tin khu vực bàn ăn'
-              : 'Tạo khu vực mới để nhóm các bàn lại với nhau'}
-          </DialogDescription>
-        </DialogHeader>
+    <FormDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      title={isEdit ? 'Chỉnh sửa khu vực' : 'Thêm khu vực mới'}
+      description={
+        isEdit
+          ? 'Cập nhật thông tin khu vực bàn ăn'
+          : 'Tạo khu vực mới để nhóm các bàn lại với nhau'
+      }
+      onSubmit={handleSubmit}
+      isSubmitting={isLoading}
+      submitText={isEdit ? 'Cập nhật' : 'Tạo khu vực'}
+      loadingText={isEdit ? 'Đang cập nhật...' : 'Đang tạo...'}
+      size="sm"
+    >
+      {/* Tên khu vực */}
+      <FormDialogField label="Tên khu vực" required>
+        <Input
+          id="name"
+          placeholder="Ví dụ: Tầng 1 - Khu vực chính"
+          value={formData.name}
+          onChange={(e) => handleInputChange('name', e.target.value)}
+          disabled={isLoading}
+        />
+      </FormDialogField>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="name" className="text-sm font-medium">
-              Tên khu vực <span className="text-red-500">*</span>
-            </Label>
-            <Input
-              id="name"
-              placeholder="Ví dụ: Tầng 1 - Khu vực chính"
-              value={formData.name}
-              onChange={(e) => handleInputChange('name', e.target.value)}
-              className="rounded-lg"
-              disabled={isLoading}
-            />
-          </div>
+      {/* Mô tả */}
+      <FormDialogField label="Mô tả">
+        <Textarea
+          id="description"
+          placeholder="Mô tả ngắn gọn về khu vực này..."
+          value={formData.description}
+          onChange={(e) => handleInputChange('description', e.target.value)}
+          className="min-h-20 resize-none"
+          disabled={isLoading}
+        />
+      </FormDialogField>
 
-          <div className="space-y-2">
-            <Label htmlFor="description" className="text-sm font-medium">
-              Mô tả
-            </Label>
-            <Textarea
-              id="description"
-              placeholder="Mô tả ngắn gọn về khu vực này..."
-              value={formData.description}
-              onChange={(e) => handleInputChange('description', e.target.value)}
-              className="min-h-20 resize-none rounded-lg"
-              disabled={isLoading}
-            />
-          </div>
+      {/* Thứ tự hiển thị */}
+      <FormDialogField label="Thứ tự hiển thị" required>
+        <Input
+          id="display_order"
+          type="number"
+          min="1"
+          placeholder="1"
+          value={formData.display_order}
+          onChange={(e) => handleInputChange('display_order', e.target.value)}
+          disabled={isLoading}
+        />
+      </FormDialogField>
 
-          <div className="space-y-2">
-            <Label htmlFor="display_order" className="text-sm font-medium">
-              Thứ tự hiển thị <span className="text-red-500">*</span>
-            </Label>
-            <Input
-              id="display_order"
-              type="number"
-              min="1"
-              placeholder="1"
-              value={formData.display_order}
-              onChange={(e) => handleInputChange('display_order', e.target.value)}
-              className="rounded-lg"
-              disabled={isLoading}
-            />
-          </div>
-
-          <div className="flex items-center justify-between">
-            <div className="space-y-1">
-              <Label htmlFor="is_active" className="text-sm font-medium">
-                Trạng thái hoạt động
-              </Label>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Khu vực sẽ hiển thị cho khách hàng khi bật
-              </p>
-            </div>
-            <Switch
-              id="is_active"
-              checked={formData.is_active}
-              onCheckedChange={(checked) => handleInputChange('is_active', checked)}
-              disabled={isLoading}
-            />
-          </div>
-
-          <div className="flex gap-3 pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              disabled={isLoading}
-              className="flex-1 rounded-lg"
-            >
-              Hủy
-            </Button>
-            <Button
-              type="submit"
-              disabled={isLoading}
-              className="flex-1 rounded-lg bg-emerald-600 hover:bg-emerald-700"
-            >
-              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {isEdit ? 'Cập nhật' : 'Tạo khu vực'}
-            </Button>
-          </div>
-        </form>
-      </DialogContent>
-    </Dialog>
+      {/* Trạng thái hoạt động */}
+      <FormDialogSection>
+        <div className="space-y-1">
+          <Label htmlFor="is_active" className="text-sm font-medium">
+            Trạng thái hoạt động
+          </Label>
+          <p className="text-xs text-slate-500 dark:text-slate-400">
+            Khu vực sẽ hiển thị cho khách hàng khi bật
+          </p>
+        </div>
+        <Switch
+          id="is_active"
+          checked={formData.is_active}
+          onCheckedChange={(checked) => handleInputChange('is_active', checked)}
+          disabled={isLoading}
+        />
+      </FormDialogSection>
+    </FormDialog>
   )
 }
