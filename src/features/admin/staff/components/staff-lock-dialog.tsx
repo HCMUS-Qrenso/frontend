@@ -12,8 +12,8 @@ import {
 } from '@/src/components/ui/alert-dialog'
 import { Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
-import type { Staff } from '@/src/features/admin/staff/types/staff'
-import { useUpdateStaffStatusMutation } from '@/src/features/admin/staff/queries/staff.queries'
+import type { Staff } from '@/src/features/admin/staff/types'
+import { useUpdateStaffStatusMutation } from '@/src/features/admin/staff/queries'
 import { useErrorHandler } from '@/src/hooks/use-error-handler'
 
 interface StaffLockDialogProps {

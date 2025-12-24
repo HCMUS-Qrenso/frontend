@@ -2,8 +2,8 @@
 
 import { ConfirmDeleteDialog } from '@/src/components/ui/confirm-delete-dialog'
 import { toast } from 'sonner'
-import type { Staff } from '@/src/features/admin/staff/types/staff'
-import { useDeleteStaffMutation } from '@/src/features/admin/staff/queries/staff.queries'
+import type { Staff } from '@/src/features/admin/staff/types'
+import { useDeleteStaffMutation } from '@/src/features/admin/staff/queries'
 import { useErrorHandler } from '@/src/hooks/use-error-handler'
 
 interface StaffDeleteDialogProps {

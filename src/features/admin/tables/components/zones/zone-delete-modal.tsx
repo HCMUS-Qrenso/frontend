@@ -1,10 +1,10 @@
 'use client'
 
 import { ConfirmDeleteDialog } from '@/src/components/ui/confirm-delete-dialog'
-import { useDeleteZoneMutation } from '@/src/features/admin/tables/queries/zones.queries'
+import { useDeleteZoneMutation } from '@/src/features/admin/tables/queries'
 import { useErrorHandler } from '@/src/hooks/use-error-handler'
 import { toast } from 'sonner'
-import { Zone } from '@/src/features/admin/tables/types/zones'
+import type { Zone } from '@/src/features/admin/tables/types'
 
 interface ZoneDeleteModalProps {
   open: boolean

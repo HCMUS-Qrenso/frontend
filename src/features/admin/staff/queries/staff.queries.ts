@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { staffApi } from '@/src/features/admin/staff/api/staff.api'
+import { staffApi } from '@/src/features/admin/staff/api'
 import type {
   Staff,
   StaffQueryParams,
@@ -8,8 +8,8 @@ import type {
   CreateStaffPayload,
   UpdateStaffPayload,
   UpdateStatusPayload,
-} from '@/src/features/admin/staff/types/staff'
-import type { MessageResponse } from '@/src/features/auth/types/auth'
+} from '@/src/features/admin/staff/types'
+import type { MessageResponse } from '@/src/types/common'
 
 // Import and re-export query keys from dedicated keys file
 export { staffQueryKeys } from './staff.keys'

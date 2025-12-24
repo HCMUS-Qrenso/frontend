@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { modifiersApi } from '@/src/features/admin/menu/api/modifiers.api'
+import { modifiersApi } from '@/src/features/admin/menu/api'
 import type {
   ModifierGroup,
   ModifierGroupListResponse,
@@ -14,7 +14,7 @@ import type {
   ReorderModifierGroupsPayload,
   ReorderModifiersPayload,
   MessageResponse,
-} from '@/src/features/admin/menu/types/modifiers'
+} from '@/src/features/admin/menu/types'
 
 // Import and re-export query keys from dedicated keys file
 export { modifiersQueryKeys } from './modifiers.keys'

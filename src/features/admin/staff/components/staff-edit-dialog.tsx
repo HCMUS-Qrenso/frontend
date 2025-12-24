@@ -11,8 +11,8 @@ import {
   SelectValue,
 } from '@/src/components/ui/select'
 import { toast } from 'sonner'
-import type { Staff } from '@/src/features/admin/staff/types/staff'
-import { useUpdateStaffMutation } from '@/src/features/admin/staff/queries/staff.queries'
+import type { Staff } from '@/src/features/admin/staff/types'
+import { useUpdateStaffMutation } from '@/src/features/admin/staff/queries'
 import { useErrorHandler } from '@/src/hooks/use-error-handler'
 
 type StaffStatus = Staff['status']

@@ -11,14 +11,14 @@
  */
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { ordersApi } from '@/src/features/admin/orders/api/orders.api'
+import { ordersApi } from '@/src/features/admin/orders/api'
 import type {
   Order,
   OrderQueryParams,
   OrderListResponse,
   OrderResponse,
   UpdateOrderStatusPayload,
-} from '@/src/features/admin/orders/types/orders'
+} from '@/src/features/admin/orders/types'
 
 // Import and re-export query keys from dedicated keys file
 export { ordersQueryKeys } from './orders.keys'

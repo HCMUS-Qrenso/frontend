@@ -12,10 +12,9 @@ import {
   SelectValue,
 } from '@/src/components/ui/select'
 import { Switch } from '@/src/components/ui/switch'
-import { useCreateTableMutation, useUpdateTableMutation } from '@/src/features/admin/tables/queries/tables.queries'
-import type { SimpleZone } from '@/src/features/admin/tables/types/zones'
+import { useCreateTableMutation, useUpdateTableMutation } from '@/src/features/admin/tables/queries'
+import type { SimpleZone, TableStatus, TableShape, TablePosition, Table } from '@/src/features/admin/tables/types'
 import { toast } from 'sonner'
-import type { TableStatus, TableShape, TablePosition, Table } from '@/src/features/admin/tables/types/tables'
 import { useErrorHandler } from '@/src/hooks/use-error-handler'
 import { tableFormSchema } from '@/src/features/admin/tables/schemas'
 

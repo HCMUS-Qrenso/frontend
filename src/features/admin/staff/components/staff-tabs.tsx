@@ -7,7 +7,7 @@ import { StaffFilterToolbar } from '@/src/features/admin/staff/components/staff-
 import { Users, UserCheck, UserX, UserMinus, Loader2, Shield } from 'lucide-react'
 import { cn } from '@/src/lib/utils'
 import { StatCard } from '@/src/components/ui/stat-card'
-import { useStaffStatsQuery } from '@/src/features/admin/staff/queries/staff.queries'
+import { useStaffStatsQuery } from '@/src/features/admin/staff/queries'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { useAuth } from '@/src/hooks/use-auth'
 

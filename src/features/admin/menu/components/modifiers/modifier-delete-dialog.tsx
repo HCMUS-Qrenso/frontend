@@ -1,10 +1,10 @@
 'use client'
 
 import { ConfirmDeleteDialog } from '@/src/components/ui/confirm-delete-dialog'
-import { useDeleteModifierMutation } from '@/src/features/admin/menu/queries/modifiers.queries'
+import { useDeleteModifierMutation } from '@/src/features/admin/menu/queries'
 import { useErrorHandler } from '@/src/hooks/use-error-handler'
 import { toast } from 'sonner'
-import { Modifier } from '@/src/features/admin/menu/types/modifiers'
+import type { Modifier } from '@/src/features/admin/menu/types/modifiers'
 
 interface ModifierDeleteDialogProps {
   open: boolean

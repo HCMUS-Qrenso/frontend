@@ -1,4 +1,4 @@
-import type { StaffQueryParams } from '@/src/features/admin/staff/types/staff'
+import type { StaffQueryParams } from '@/src/features/admin/staff/types'
 
 /**
  * Query key factory for staff

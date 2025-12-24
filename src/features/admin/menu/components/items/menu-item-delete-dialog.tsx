@@ -1,10 +1,10 @@
 'use client'
 
 import { ConfirmDeleteDialog } from '@/src/components/ui/confirm-delete-dialog'
-import { useDeleteMenuItemMutation } from '@/src/features/admin/menu/queries/menu-items.queries'
+import { useDeleteMenuItemMutation } from '@/src/features/admin/menu/queries'
 import { useErrorHandler } from '@/src/hooks/use-error-handler'
 import { toast } from 'sonner'
-import { MenuItem } from '@/src/features/admin/menu/types/menu-items'
+import type { MenuItem } from '@/src/features/admin/menu/types'
 
 interface MenuItemDeleteDialogProps {
   open: boolean

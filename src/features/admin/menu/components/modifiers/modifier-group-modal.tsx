@@ -10,7 +10,7 @@ import type { ModifierGroup, ModifierGroupType } from '@/src/features/admin/menu
 import {
   useCreateModifierGroupMutation,
   useUpdateModifierGroupMutation,
-} from '@/src/features/admin/menu/queries/modifiers.queries'
+} from '@/src/features/admin/menu/queries'
 import { useErrorHandler } from '@/src/hooks/use-error-handler'
 import { toast } from 'sonner'
 

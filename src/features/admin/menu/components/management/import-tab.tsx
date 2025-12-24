@@ -15,10 +15,10 @@ import {
   Loader2,
 } from 'lucide-react'
 import { cn } from '@/src/lib/utils'
-import { useImportMenuMutation } from '@/src/features/admin/menu/queries/menu-items.queries'
+import { useImportMenuMutation } from '@/src/features/admin/menu/queries'
 import { useErrorHandler } from '@/src/hooks/use-error-handler'
 import { toast } from 'sonner'
-import type { ImportMenuMode, ImportMenuResult } from '@/src/features/admin/menu/types/menu-items'
+import type { ImportMenuMode, ImportMenuResult } from '@/src/features/admin/menu/types'
 
 type ImportStep = 1 | 2
 

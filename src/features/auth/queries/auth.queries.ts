@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { authApi } from '@/src/features/auth/api/auth.api'
-import { usersApi } from '@/src/features/auth/api/users'
+import { authApi } from '@/src/features/auth/api'
+import { usersApi } from '@/src/features/auth/api'
 import { tenantsApi } from '@/src/features/admin/tenants/api/tenants.api'
 import { useAuthStore } from '@/src/store/auth-store'
 import { useTenantStore } from '@/src/store/tenant-store'
@@ -15,7 +15,7 @@ import type {
   SignupPayload,
   User,
   VerifyEmailPayload,
-} from '@/src/features/auth/types/auth'
+} from '@/src/features/auth/types'
 
 export const authQueryKeys = {
   profile: ['auth', 'me'] as const,

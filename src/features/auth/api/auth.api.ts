@@ -10,7 +10,7 @@ import type {
   SignupPayload,
   VerifyEmailPayload,
   User,
-} from '@/src/features/auth/types/auth'
+} from '@/src/features/auth/types'
 
 export const authApi = {
   login: async (payload: LoginCredentials): Promise<AuthResponse> => {

@@ -7,7 +7,7 @@ import { Badge } from '@/src/components/ui/badge'
 import { Button } from '@/src/components/ui/button'
 import { X, Loader2, Package } from 'lucide-react'
 import { cn } from '@/src/lib/utils'
-import { useModifierGroupsQuery } from '@/src/features/admin/menu/queries/modifiers.queries'
+import { useModifierGroupsQuery } from '@/src/features/admin/menu/queries'
 import {
   Dialog,
   DialogContent,

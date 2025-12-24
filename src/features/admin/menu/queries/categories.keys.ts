@@ -1,4 +1,4 @@
-import type { CategoryQueryParams } from '@/src/features/admin/menu/types/categories'
+import type { CategoryQueryParams } from '@/src/features/admin/menu/types'
 
 /**
  * Query key factory for categories

@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from '@/src/components/ui/dropdown-menu'
 import { MoreVertical, Pencil, Lock, Unlock, Key, Mail, Trash2 } from 'lucide-react'
-import type { Staff } from '@/src/features/admin/staff/types/staff'
+import type { Staff } from '@/src/features/admin/staff/types'
 import { StaffEditDialog } from './staff-edit-dialog'
 import { StaffLockDialog } from './staff-lock-dialog'
 import { StaffDeleteDialog } from './staff-delete-dialog'

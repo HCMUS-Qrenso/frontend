@@ -6,10 +6,10 @@ import { Input } from '@/src/components/ui/input'
 import { Textarea } from '@/src/components/ui/textarea'
 import { Switch } from '@/src/components/ui/switch'
 import { Label } from '@/src/components/ui/label'
-import { useCreateZoneMutation, useUpdateZoneMutation } from '@/src/features/admin/tables/queries/zones.queries'
+import { useCreateZoneMutation, useUpdateZoneMutation } from '@/src/features/admin/tables/queries'
 import { useErrorHandler } from '@/src/hooks/use-error-handler'
 import { toast } from 'sonner'
-import { Zone } from '@/src/features/admin/tables/types/zones'
+import type { Zone } from '@/src/features/admin/tables/types'
 import { zoneFormSchema } from '@/src/features/admin/tables/schemas'
 
 interface ZoneUpsertModalProps {

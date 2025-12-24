@@ -12,11 +12,11 @@ import {
 } from '@/src/components/ui/alert-dialog'
 import { Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
-import type { Staff } from '@/src/features/admin/staff/types/staff'
+import type { Staff } from '@/src/features/admin/staff/types'
 import {
   useResetPasswordMutation,
   useResendInviteMutation,
-} from '@/src/features/admin/staff/queries/staff.queries'
+} from '@/src/features/admin/staff/queries'
 import { useErrorHandler } from '@/src/hooks/use-error-handler'
 
 interface StaffPasswordDialogProps {

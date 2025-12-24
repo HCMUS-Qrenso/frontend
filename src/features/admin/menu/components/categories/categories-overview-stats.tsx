@@ -2,7 +2,7 @@
 
 import { cn } from '@/src/lib/utils'
 import { FolderOpen, Eye, EyeOff, Loader2 } from 'lucide-react'
-import { useCategoriesStatsQuery } from '@/src/features/admin/menu/queries/categories.queries'
+import { useCategoriesStatsQuery } from '@/src/features/admin/menu/queries'
 import { StatCard } from '../../../../../components/ui/stat-card'
 
 export function CategoriesOverviewStats() {

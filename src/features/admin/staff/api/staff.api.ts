@@ -7,8 +7,8 @@ import type {
   CreateStaffPayload,
   UpdateStaffPayload,
   UpdateStatusPayload,
-} from '@/src/features/admin/staff/types/staff'
-import type { MessageResponse } from '@/src/features/auth/types/auth'
+} from '@/src/features/admin/staff/types'
+import type { MessageResponse } from '@/src/types/common'
 
 export const staffApi = {
   /**

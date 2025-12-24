@@ -13,7 +13,7 @@ import type {
   ReorderModifierGroupsPayload,
   ReorderModifiersPayload,
   MessageResponse,
-} from '@/src/features/admin/menu/types/modifiers'
+} from '@/src/features/admin/menu/types'
 
 export const modifiersApi = {
   // ============================================

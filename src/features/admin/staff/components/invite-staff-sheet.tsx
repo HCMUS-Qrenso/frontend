@@ -13,7 +13,7 @@ import {
   SelectValue,
 } from '@/src/components/ui/select'
 import { toast } from 'sonner'
-import { useCreateStaffMutation } from '@/src/features/admin/staff/queries/staff.queries'
+import { useCreateStaffMutation } from '@/src/features/admin/staff/queries'
 import { useErrorHandler } from '@/src/hooks/use-error-handler'
 import { useAuth } from '@/src/hooks/use-auth'
 import { inviteStaffSchema } from '@/src/features/admin/staff/schemas'

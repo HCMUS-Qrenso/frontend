@@ -1,4 +1,4 @@
-import type { QueryModifierGroupsParams, QueryModifiersParams } from '@/src/features/admin/menu/types/modifiers'
+import type { QueryModifierGroupsParams, QueryModifiersParams } from '@/src/features/admin/menu/types'
 
 /**
  * Query key factory for modifiers

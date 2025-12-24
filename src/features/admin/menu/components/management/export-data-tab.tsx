@@ -12,8 +12,7 @@ import {
 } from '@/src/components/ui/select'
 import { Download, FileSpreadsheet, Loader2 } from 'lucide-react'
 import { cn } from '@/src/lib/utils'
-import { useExportMenuMutation } from '@/src/features/admin/menu/queries/menu-items.queries'
-import { useCategoriesQuery } from '@/src/features/admin/menu/queries/categories.queries'
+import { useExportMenuMutation, useCategoriesQuery } from '@/src/features/admin/menu/queries'
 import { toast } from 'sonner'
 import { useErrorHandler } from '@/src/hooks/use-error-handler'
 

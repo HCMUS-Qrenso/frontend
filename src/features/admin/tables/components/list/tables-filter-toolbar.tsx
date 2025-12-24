@@ -8,7 +8,7 @@ import { Plus, LayoutGrid, QrCode, ArrowUpDown } from 'lucide-react'
 import Link from 'next/link'
 import { AdminFilterToolbarWrapper } from '../../../shared/components/admin-filter-toolbar-wrapper'
 import { useRouter, useSearchParams } from 'next/navigation'
-import type { SimpleZone } from '@/src/features/admin/tables/types/zones'
+import type { SimpleZone } from '@/src/features/admin/tables/types'
 
 interface TablesFilterToolbarProps {
   isTrashView?: boolean

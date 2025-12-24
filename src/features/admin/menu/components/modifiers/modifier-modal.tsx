@@ -5,10 +5,10 @@ import { FormDialog, FormDialogField, FormDialogSection } from '@/src/components
 import { Input } from '@/src/components/ui/input'
 import { Switch } from '@/src/components/ui/switch'
 import { Label } from '@/src/components/ui/label'
-import { useCreateModifierMutation, useUpdateModifierMutation } from '@/src/features/admin/menu/queries/modifiers.queries'
+import { useCreateModifierMutation, useUpdateModifierMutation } from '@/src/features/admin/menu/queries'
 import { useErrorHandler } from '@/src/hooks/use-error-handler'
 import { toast } from 'sonner'
-import { Modifier } from '@/src/features/admin/menu/types/modifiers'
+import type { Modifier } from '@/src/features/admin/menu/types/modifiers'
 
 interface ModifierModalProps {
   open: boolean

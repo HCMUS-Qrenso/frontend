@@ -9,8 +9,8 @@ import type {
   CategoryQueryParams,
   ReorderCategoriesPayload,
   ToggleCategoryStatusPayload,
-} from '@/src/features/admin/menu/types/categories'
-import type { MessageResponse } from '@/src/features/auth/types/auth'
+} from '@/src/features/admin/menu/types'
+import type { MessageResponse } from '@/src/features/auth/types'
 
 export const categoriesApi = {
   // Category Management

@@ -10,8 +10,8 @@ import type {
   ExportMenuParams,
   ImportMenuMode,
   ImportMenuResult,
-} from '@/src/features/admin/menu/types/menu-items'
-import type { MessageResponse } from '@/src/features/auth/types/auth'
+} from '@/src/features/admin/menu/types'
+import type { MessageResponse } from '@/src/features/auth/types'
 
 export const menuItemsApi = {
   // Menu Item Management

@@ -1,7 +1,7 @@
 'use client'
 
 import { UtensilsCrossed, CheckCircle2, XCircle, EyeOff, Award, Loader2 } from 'lucide-react'
-import { useMenuItemsStatsQuery } from '@/src/features/admin/menu/queries/menu-items.queries'
+import { useMenuItemsStatsQuery } from '@/src/features/admin/menu/queries'
 import { StatCard } from '../../../../../components/ui/stat-card'
 
 export function MenuItemsOverviewStats() {

@@ -25,7 +25,7 @@ import {
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import type { ModifierGroup } from '@/src/features/admin/menu/types/modifiers'
-import { useReorderModifierGroupsMutation } from '@/src/features/admin/menu/queries/modifiers.queries'
+import { useReorderModifierGroupsMutation } from '@/src/features/admin/menu/queries'
 import { useErrorHandler } from '@/src/hooks/use-error-handler'
 import { toast } from 'sonner'
 

@@ -24,13 +24,12 @@ import {
 } from '@/src/components/ui/select'
 import { Loader2, Upload, X } from 'lucide-react'
 import Image from 'next/image'
-import { useCreateMenuItemMutation, useUpdateMenuItemMutation } from '@/src/features/admin/menu/queries/menu-items.queries'
+import { useCreateMenuItemMutation, useUpdateMenuItemMutation } from '@/src/features/admin/menu/queries'
 import { useErrorHandler } from '@/src/hooks/use-error-handler'
 import { useUploadFiles } from '@/src/hooks/use-uploads'
 import { toast } from 'sonner'
 import { ModifierGroupSelector } from './menu-item-modifier-groups-selector'
-import { MenuItem } from '@/src/features/admin/menu/types/menu-items'
-import { Category } from '@/src/features/admin/menu/types/categories'
+import type { MenuItem, Category } from '@/src/features/admin/menu/types'
 import { menuItemFormSchema } from '@/src/features/admin/menu/schemas'
 
 interface MenuItemUpsertModalProps {

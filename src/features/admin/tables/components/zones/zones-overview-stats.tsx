@@ -1,7 +1,7 @@
 'use client'
 
 import { MapPin, CheckCircle2, EyeOff, Loader2 } from 'lucide-react'
-import { useZonesStatsQuery } from '@/src/features/admin/tables/queries/zones.queries'
+import { useZonesStatsQuery } from '@/src/features/admin/tables/queries'
 import { StatCard } from '../../../../../components/ui/stat-card'
 
 export function ZonesOverviewStats() {

@@ -21,9 +21,9 @@ import {
   MoreVertical,
 } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useZonesQuery, useUpdateZoneMutation } from '@/src/features/admin/tables/queries/zones.queries'
+import { useZonesQuery, useUpdateZoneMutation } from '@/src/features/admin/tables/queries'
 import { toast } from 'sonner'
-import type { Zone } from '@/src/features/admin/tables/types/zones'
+import type { Zone } from '@/src/features/admin/tables/types'
 import { useErrorHandler } from '@/src/hooks/use-error-handler'
 import {
   Table,

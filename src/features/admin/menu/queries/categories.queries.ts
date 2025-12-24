@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { categoriesApi } from '@/src/features/admin/menu/api/categories.api'
+import { categoriesApi } from '@/src/features/admin/menu/api'
 import type {
   Category,
   CategoryListResponse,
@@ -10,8 +10,8 @@ import type {
   CategoryQueryParams,
   ReorderCategoriesPayload,
   ToggleCategoryStatusPayload,
-} from '@/src/features/admin/menu/types/categories'
-import type { MessageResponse } from '@/src/features/auth/types/auth'
+} from '@/src/features/admin/menu/types'
+import type { MessageResponse } from '@/src/features/auth/types'
 
 // Import and re-export query keys from dedicated keys file
 export { categoriesQueryKeys } from './categories.keys'

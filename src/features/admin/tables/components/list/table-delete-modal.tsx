@@ -1,6 +1,6 @@
-import { Table } from '@/src/features/admin/tables/types/tables'
+import type { Table } from '@/src/features/admin/tables/types'
 import { ConfirmDeleteDialog } from '../../../../../components/ui/confirm-delete-dialog'
-import { useDeleteTableMutation } from '@/src/features/admin/tables/queries/tables.queries'
+import { useDeleteTableMutation } from '@/src/features/admin/tables/queries'
 import { toast } from 'sonner'
 import { useErrorHandler } from '@/src/hooks/use-error-handler'
 

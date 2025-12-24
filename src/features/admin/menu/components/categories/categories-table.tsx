@@ -34,11 +34,11 @@ import {
   useCategoriesQuery,
   useReorderCategoriesMutation,
   useToggleCategoryStatusMutation,
-} from '@/src/features/admin/menu/queries/categories.queries'
+} from '@/src/features/admin/menu/queries'
 import { useErrorHandler } from '@/src/hooks/use-error-handler'
-import type { CategorySortBy, CategorySortOrder } from '@/src/features/admin/menu/types/categories'
+import type { CategorySortBy, CategorySortOrder, Category } from '@/src/features/admin/menu/types'
 import { toast } from 'sonner'
-import { Category } from '@/src/features/admin/menu/types/categories'
+
 
 interface CategoriesTableProps {
   reorderMode: boolean

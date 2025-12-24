@@ -12,10 +12,10 @@ import {
   AlertDialogTitle,
 } from '@/src/components/ui/alert-dialog'
 import { AlertCircle, Loader2 } from 'lucide-react'
-import { useDeleteModifierGroupMutation } from '@/src/features/admin/menu/queries/modifiers.queries'
+import { useDeleteModifierGroupMutation } from '@/src/features/admin/menu/queries'
 import { useErrorHandler } from '@/src/hooks/use-error-handler'
 import { toast } from 'sonner'
-import { ModifierGroup } from '@/src/features/admin/menu/types/modifiers'
+import type { ModifierGroup } from '@/src/features/admin/menu/types/modifiers'
 
 interface ModifierGroupDeleteDialogProps {
   open: boolean

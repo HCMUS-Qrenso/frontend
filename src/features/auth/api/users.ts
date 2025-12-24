@@ -1,5 +1,5 @@
 import { apiClient } from '@/src/lib/axios'
-import type { UserProfile } from '@/src/features/auth/types/auth'
+import type { UserProfile } from '@/src/features/auth/types'
 
 export const usersApi = {
   getProfile: async (): Promise<UserProfile> => {

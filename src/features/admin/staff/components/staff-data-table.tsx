@@ -17,9 +17,9 @@ import { LoadingState } from '@/src/components/ui/loading-state'
 import { EmptyState } from '@/src/components/ui/empty-state'
 import { CheckCircle2, XCircle, Users, ChevronLeft, ChevronRight } from 'lucide-react'
 import { cn } from '@/src/lib/utils'
-import { useStaffQuery } from '@/src/features/admin/staff/queries/staff.queries'
+import { useStaffQuery } from '@/src/features/admin/staff/queries'
 import { useSearchParams, useRouter } from 'next/navigation'
-import type { StaffQueryParams } from '@/src/features/admin/staff/types/staff'
+import type { StaffQueryParams } from '@/src/features/admin/staff/types'
 
 interface StaffDataTableProps {
   role: 'admin' | 'waiter' | 'kitchen_staff'

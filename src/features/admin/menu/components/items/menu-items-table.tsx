@@ -24,8 +24,8 @@ import { StatusBadge, MENU_ITEM_STATUS_CONFIG } from '@/src/components/ui/status
 import { ContainerLoadingState, ContainerErrorState } from '@/src/components/ui/loading-state'
 import { EmptyState } from '@/src/components/ui/empty-state'
 import Image from 'next/image'
-import { useMenuItemsQuery } from '@/src/features/admin/menu/queries/menu-items.queries'
-import type { MenuItemSortBy, MenuItemSortOrder, MenuItemStatus } from '@/src/features/admin/menu/types/menu-items'
+import { useMenuItemsQuery } from '@/src/features/admin/menu/queries'
+import type { MenuItemSortBy, MenuItemSortOrder, MenuItemStatus } from '@/src/features/admin/menu/types'
 
 interface MenuItemsTableProps {
   onEditClick: (item: any) => void

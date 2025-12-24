@@ -1,4 +1,4 @@
-import type { MenuItemQueryParams } from '@/src/features/admin/menu/types/menu-items'
+import type { MenuItemQueryParams } from '@/src/features/admin/menu/types'
 
 /**
  * Query key factory for menu items

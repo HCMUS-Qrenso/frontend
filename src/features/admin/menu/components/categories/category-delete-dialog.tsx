@@ -12,10 +12,10 @@ import {
 import { Button } from '@/src/components/ui/button'
 import { Alert, AlertDescription } from '@/src/components/ui/alert'
 import { AlertTriangle, Loader2 } from 'lucide-react'
-import { useDeleteCategoryMutation } from '@/src/features/admin/menu/queries/categories.queries'
+import { useDeleteCategoryMutation } from '@/src/features/admin/menu/queries'
 import { useErrorHandler } from '@/src/hooks/use-error-handler'
 import { toast } from 'sonner'
-import { Category } from '@/src/features/admin/menu/types/categories'
+import type { Category } from '@/src/features/admin/menu/types'
 
 interface CategoryDeleteDialogProps {
   open: boolean

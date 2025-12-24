@@ -1,4 +1,4 @@
-import type { OrderQueryParams } from '@/src/features/admin/orders/types/orders'
+import type { OrderQueryParams } from '@/src/features/admin/orders/types'
 
 /**
  * Query key factory for orders

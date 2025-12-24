@@ -37,7 +37,7 @@ import {
   useModifiersQuery,
   useReorderModifiersMutation,
   useToggleModifierAvailabilityMutation,
-} from '@/src/features/admin/menu/queries/modifiers.queries'
+} from '@/src/features/admin/menu/queries'
 import { useErrorHandler } from '@/src/hooks/use-error-handler'
 import { toast } from 'sonner'
 

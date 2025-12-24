@@ -7,7 +7,7 @@ import { SearchInput } from '@/src/components/ui/search-input'
 import { FilterDropdown, type FilterOption } from '@/src/components/ui/filter-dropdown'
 import { Plus, Download, ArrowUpDown } from 'lucide-react'
 import { AdminFilterToolbarWrapper } from '../../../shared/components/admin-filter-toolbar-wrapper'
-import { Category } from '@/src/features/admin/menu/types/categories'
+import type { Category } from '@/src/features/admin/menu/types'
 
 const STATUS_OPTIONS: FilterOption[] = [
   { value: 'all', label: 'Tất cả' },

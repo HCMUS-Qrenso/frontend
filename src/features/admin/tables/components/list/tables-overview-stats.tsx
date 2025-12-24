@@ -1,7 +1,7 @@
 'use client'
 
 import { LayoutGrid, CheckCircle2, Users2, Clock, Loader2 } from 'lucide-react'
-import { useTableStatsQuery } from '@/src/features/admin/tables/queries/tables.queries'
+import { useTableStatsQuery } from '@/src/features/admin/tables/queries'
 import { StatCard } from '../../../../../components/ui/stat-card'
 
 export function TablesOverviewStats() {

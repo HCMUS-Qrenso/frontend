@@ -14,7 +14,7 @@ import { ContainerErrorState } from '@/src/components/ui/loading-state'
 import { EmptyState } from '@/src/components/ui/empty-state'
 import { Edit2, MapPin, Trash2, RotateCcw, MoreVertical, TableProperties } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useTablesQuery, useUpdateTableMutation } from '@/src/features/admin/tables/queries/tables.queries'
+import { useTablesQuery, useUpdateTableMutation } from '@/src/features/admin/tables/queries'
 import { toast } from 'sonner'
 import type {
   Table as TableType,
@@ -22,7 +22,7 @@ import type {
   TablePosition,
   TableSortBy,
   TableSortOrder,
-} from '@/src/features/admin/tables/types/tables'
+} from '@/src/features/admin/tables/types'
 import { useErrorHandler } from '@/src/hooks/use-error-handler'
 import {
   Table,

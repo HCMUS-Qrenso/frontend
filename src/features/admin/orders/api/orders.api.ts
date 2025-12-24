@@ -17,7 +17,7 @@ import type {
   OrderListResponse,
   OrderResponse,
   UpdateOrderStatusPayload,
-} from '@/src/features/admin/orders/types/orders'
+} from '@/src/features/admin/orders/types'
 
 export const ordersApi = {
   /**
