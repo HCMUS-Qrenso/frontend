@@ -266,7 +266,7 @@ function SetupPasswordContent() {
         </Alert>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} noValidate className="space-y-5">
           {/* Password Field */}
           <div className="space-y-2">
             <Label htmlFor="password" className="text-sm font-medium text-slate-700 dark:text-white">

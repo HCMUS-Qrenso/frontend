@@ -146,6 +146,7 @@ describe('calculateTableSize', () => {
 })
 
 describe('transformTableToItem', () => {
+  // Mock data - using 'as any' since we're testing transformation, not type safety
   const mockZoneLayoutTable = {
     id: 'table-1',
     name: 'Bàn 1',
@@ -154,7 +155,7 @@ describe('transformTableToItem', () => {
     type: 'rectangle',
     position: { x: 100, y: 200, rotation: 45 },
     zone: 'Tầng 1',
-  }
+  } as any
 
   it('should transform basic table data', () => {
     const result = transformTableToItem(mockZoneLayoutTable)

@@ -42,3 +42,11 @@ next-env.d.ts
 
 DATABASE_DESCRIPTION.txt
 DATABASE_DESIGN.txt
+
+# Playwright
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
