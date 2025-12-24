@@ -4,7 +4,7 @@ import { cn } from '@/src/lib/utils'
 import { formatRotation } from '@/src/features/admin/tables/utils/table-utils'
 import { useRef, useState, useEffect, useMemo, useCallback, memo } from 'react'
 import { RotateCw, Loader2, RotateCcw, X } from 'lucide-react'
-import type { TableItem } from '@/app/admin/tables/layout/page'
+import type { TableItem } from '@/src/features/admin/tables/utils/layout-transforms'
 import type React from 'react'
 import {
   DndContext,

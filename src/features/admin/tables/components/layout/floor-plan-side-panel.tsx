@@ -14,7 +14,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/src/components/ui/tabs'
 import { Textarea } from '@/src/components/ui/textarea'
 import { Circle, Square, Users } from 'lucide-react'
-import type { TableItem } from '@/app/admin/tables/layout/page'
+import type { TableItem } from '@/src/features/admin/tables/utils/layout-transforms'
 
 interface FloorPlanSidePanelProps {
   selectedTable: TableItem | undefined
