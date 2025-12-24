@@ -1,7 +1,7 @@
 'use client'
-import { FloorPlanCanvas } from '@/components/admin/floor-plan-canvas'
-import { FloorPlanToolbar } from '@/components/admin/floor-plan-toolbar'
-import { FloorPlanSidePanel } from '@/components/admin/floor-plan-side-panel'
+import { FloorPlanCanvas } from '@/src/features/admin/tables/components/layout/floor-plan-canvas'
+import { FloorPlanToolbar } from '@/src/features/admin/tables/components/layout/floor-plan-toolbar'
+import { FloorPlanSidePanel } from '@/src/features/admin/tables/components/layout/floor-plan-side-panel'
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { useSearchParams } from 'next/navigation'
 import {
@@ -10,11 +10,11 @@ import {
   useBatchUpdatePositionsMutation,
   useCreateTableMutation,
   useUpdateTableMutation,
-} from '@/hooks/use-tables-query'
+} from '@/src/features/admin/tables/queries/tables.queries'
 import { toast } from 'sonner'
-import { useErrorHandler } from '@/hooks/use-error-handler'
-import type { ZoneLayoutTable, TablePosition } from '@/types/tables'
-import { formatRotation } from '@/lib/utils/table-utils'
+import { useErrorHandler } from '@/src/hooks/use-error-handler'
+import type { ZoneLayoutTable, TablePosition } from '@/src/features/admin/tables/types/tables'
+import { formatRotation } from '@/src/features/admin/tables/utils/table-utils'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,7 +24,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
+} from '@/src/components/ui/alert-dialog'
 import { Loader2, AlertTriangle } from 'lucide-react'
 
 export interface TableItem {

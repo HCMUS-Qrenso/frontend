@@ -1,9 +1,9 @@
 'use client'
 
 import { Suspense, useState } from 'react'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { ImportTab } from '@/components/admin/import-tab'
-import { ExportDataTab } from '@/components/admin/export-data-tab'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/src/components/ui/tabs'
+import { ImportTab } from '@/src/features/admin/menu/components/management/import-tab'
+import { ExportDataTab } from '@/src/features/admin/menu/components/management/export-data-tab'
 import { Loader2, Upload, Download } from 'lucide-react'
 
 function ImportExportContent() {

@@ -1,9 +1,9 @@
 'use client'
 
 import { Suspense } from 'react'
-import { OrdersOverviewStats } from '@/components/admin/orders-overview-stats'
-import { OrdersFilterToolbar } from '@/components/admin/orders-filter-toolbar'
-import { OrdersTable } from '@/components/admin/orders-table'
+import { OrdersOverviewStats } from '@/src/features/admin/orders/components/orders-overview-stats'
+import { OrdersFilterToolbar } from '@/src/features/admin/orders/components/orders-filter-toolbar'
+import { OrdersTable } from '@/src/features/admin/orders/components/orders-table'
 import { useSearchParams } from 'next/navigation'
 import { Loader2 } from 'lucide-react'
 

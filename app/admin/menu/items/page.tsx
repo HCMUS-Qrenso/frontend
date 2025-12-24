@@ -1,16 +1,16 @@
 'use client'
 
 import { Suspense, useState } from 'react'
-import { MenuItemsOverviewStats } from '@/components/admin/menu-items-overview-stats'
-import { MenuItemsFilterToolbar } from '@/components/admin/menu-items-filter-toolbar'
-import { MenuItemsTable } from '@/components/admin/menu-items-table'
-import { MenuItemUpsertModal } from '@/components/admin/menu-item-upsert-modal'
-import { MenuItemDeleteDialog } from '@/components/admin/menu-item-delete-dialog'
+import { MenuItemsOverviewStats } from '@/src/features/admin/menu/components/items/menu-items-overview-stats'
+import { MenuItemsFilterToolbar } from '@/src/features/admin/menu/components/items/menu-items-filter-toolbar'
+import { MenuItemsTable } from '@/src/features/admin/menu/components/items/menu-items-table'
+import { MenuItemUpsertModal } from '@/src/features/admin/menu/components/items/menu-item-upsert-modal'
+import { MenuItemDeleteDialog } from '@/src/features/admin/menu/components/items/menu-item-delete-dialog'
 import { useSearchParams } from 'next/navigation'
 import { Loader2 } from 'lucide-react'
-import { MenuItem } from '@/types/menu-items'
-import { Category } from '@/types/categories'
-import { useCategoriesQuery } from '@/hooks/use-categories-query'
+import { MenuItem } from '@/src/features/admin/menu/types/menu-items'
+import { Category } from '@/src/features/admin/menu/types/categories'
+import { useCategoriesQuery } from '@/src/features/admin/menu/queries/categories.queries'
 
 function MenuItemsContent() {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false)

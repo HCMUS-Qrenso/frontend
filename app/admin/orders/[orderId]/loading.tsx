@@ -1,4 +1,4 @@
-import { AdminLayout } from '@/components/admin/admin-layout'
+import { AdminLayout } from '@/src/features/admin/shared/components/admin-layout'
 import { Loader2 } from 'lucide-react'
 
 export default function LoadingOrderDetail() {

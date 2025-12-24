@@ -1,7 +1,7 @@
 'use client'
 
 import { Suspense } from 'react'
-import { TemplateExportTab } from '@/components/admin/template-export-tab'
+import { TemplateExportTab } from '@/src/features/admin/menu/components/templates/template-export-tab'
 import { Loader2 } from 'lucide-react'
 
 function TemplatesContent() {

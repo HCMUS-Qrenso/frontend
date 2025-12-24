@@ -1,7 +1,7 @@
 'use client'
 
 import { Suspense } from 'react'
-import { StaffTabs } from '@/components/admin/staff-tabs'
+import { StaffTabs } from '@/src/features/admin/staff/components/staff-tabs'
 import { Loader2 } from 'lucide-react'
 
 function StaffContent() {
