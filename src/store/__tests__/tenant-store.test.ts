@@ -6,11 +6,25 @@
 
 import { useTenantStore } from '../tenant-store'
 import { setTenantId } from '@/src/lib/axios'
+import type { TenantSummary } from '@/src/features/admin/tenants/types/tenants'
 
 // Mock axios setTenantId
 jest.mock('@/src/lib/axios', () => ({
   setTenantId: jest.fn(),
 }))
+
+// Helper to create a complete TenantSummary mock
+const createMockTenant = (overrides: Partial<TenantSummary> & { id: string; name: string }): TenantSummary => ({
+  slug: `${overrides.name.toLowerCase().replace(/\s+/g, '-')}`,
+  address: null,
+  image: null,
+  status: 'active',
+  subscription_tier: 'basic',
+  settings: null,
+  created_at: new Date().toISOString(),
+  updated_at: new Date().toISOString(),
+  ...overrides,
+})
 
 describe('useTenantStore', () => {
   beforeEach(() => {
@@ -38,8 +52,8 @@ describe('useTenantStore', () => {
   describe('setTenants', () => {
     it('should update tenants list', () => {
       const mockTenants = [
-        { id: 'tenant-1', name: 'Restaurant A', status: 'active' as const },
-        { id: 'tenant-2', name: 'Restaurant B', status: 'active' as const },
+        createMockTenant({ id: 'tenant-1', name: 'Restaurant A' }),
+        createMockTenant({ id: 'tenant-2', name: 'Restaurant B' }),
       ]
 
       useTenantStore.getState().setTenants(mockTenants)
@@ -52,12 +66,12 @@ describe('useTenantStore', () => {
     it('should replace existing tenants', () => {
       // Set initial tenants
       useTenantStore.getState().setTenants([
-        { id: 'old-1', name: 'Old Restaurant', status: 'active' as const },
+        createMockTenant({ id: 'old-1', name: 'Old Restaurant' }),
       ])
 
       // Replace with new tenants
       useTenantStore.getState().setTenants([
-        { id: 'new-1', name: 'New Restaurant', status: 'active' as const },
+        createMockTenant({ id: 'new-1', name: 'New Restaurant' }),
       ])
 
       const { tenants } = useTenantStore.getState()
@@ -70,8 +84,8 @@ describe('useTenantStore', () => {
     beforeEach(() => {
       // Setup tenants for selection tests
       useTenantStore.getState().setTenants([
-        { id: 'tenant-1', name: 'Restaurant A', status: 'active' as const },
-        { id: 'tenant-2', name: 'Restaurant B', status: 'active' as const },
+        createMockTenant({ id: 'tenant-1', name: 'Restaurant A' }),
+        createMockTenant({ id: 'tenant-2', name: 'Restaurant B' }),
       ])
     })
 
@@ -107,7 +121,7 @@ describe('useTenantStore', () => {
     beforeEach(() => {
       // Setup some state to reset
       useTenantStore.setState({
-        tenants: [{ id: 'tenant-1', name: 'Restaurant', status: 'active' as const }],
+        tenants: [createMockTenant({ id: 'tenant-1', name: 'Restaurant' })],
         selectedTenantId: 'tenant-1',
       })
     })

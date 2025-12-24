@@ -5,7 +5,7 @@ import type React from 'react'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { isAxiosError } from 'axios'
+import { extractErrorMessage } from '@/src/lib/helpers/error-handler'
 import { AuthContainer } from '@/src/features/auth/components/auth-container'
 import { Button } from '@/src/components/ui/button'
 import { Input } from '@/src/components/ui/input'
@@ -14,7 +14,7 @@ import { Checkbox } from '@/src/components/ui/checkbox'
 import { Eye, EyeOff, Loader2, AlertCircle } from 'lucide-react'
 import { Alert, AlertDescription } from '@/src/components/ui/alert'
 import { useAuth } from '@/src/features/auth/hooks'
-import type { ApiErrorResponse } from '@/src/features/auth/types/auth'
+
 import { loginSchema } from '@/src/features/auth/schemas'
 
 const REMEMBER_ME_KEY = 'rememberMe'
@@ -86,21 +86,11 @@ export default function LoginPage() {
       await login({ ...formData, rememberMe })
       router.push('/admin/dashboard')
     } catch (err) {
-      const message = getErrorMessage(err)
-      setError(message)
+      setError(extractErrorMessage(err))
     }
   }
 
-  const getErrorMessage = (err: unknown) => {
-    if (isAxiosError<ApiErrorResponse>(err)) {
-      const data = err.response?.data
-      if (data?.message) {
-        return Array.isArray(data.message) ? data.message.join(', ') : data.message
-      }
-      if (data?.error) return data.error
-    }
-    return 'Có lỗi xảy ra. Vui lòng thử lại.'
-  }
+
 
   return (
     <AuthContainer>

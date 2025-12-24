@@ -4,7 +4,7 @@ import type React from 'react'
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { isAxiosError } from 'axios'
+import { extractErrorMessage } from '@/src/lib/helpers/error-handler'
 import { AuthContainer } from '@/src/features/auth/components/auth-container'
 import { Button } from '@/src/components/ui/button'
 import { Input } from '@/src/components/ui/input'
@@ -12,7 +12,7 @@ import { Label } from '@/src/components/ui/label'
 import { Loader2, CheckCircle2, AlertCircle } from 'lucide-react'
 import { Alert, AlertDescription } from '@/src/components/ui/alert'
 import { useAuth } from '@/src/features/auth/hooks'
-import type { ApiErrorResponse } from '@/src/features/auth/types/auth'
+
 import { forgotPasswordSchema } from '@/src/features/auth/schemas'
 
 export default function ForgotPasswordPage() {
@@ -41,19 +41,11 @@ export default function ForgotPasswordPage() {
       await forgotPassword({ email })
       setIsSubmitted(true)
     } catch (err) {
-      setGeneralError(getErrorMessage(err))
+      setGeneralError(extractErrorMessage(err))
     }
   }
 
-  const getErrorMessage = (err: unknown) => {
-    if (isAxiosError<ApiErrorResponse>(err)) {
-      const data = err.response?.data
-      if (data?.message) {
-        return Array.isArray(data.message) ? data.message.join(', ') : data.message
-      }
-    }
-    return 'Có lỗi xảy ra, vui lòng thử lại sau.'
-  }
+
 
   // Success State
   if (isSubmitted) {
