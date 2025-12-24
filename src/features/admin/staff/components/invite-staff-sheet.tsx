@@ -15,7 +15,7 @@ import {
 import { toast } from 'sonner'
 import { useCreateStaffMutation } from '@/src/features/admin/staff/queries'
 import { useErrorHandler } from '@/src/hooks/use-error-handler'
-import { useAuth } from '@/src/hooks/use-auth'
+import { useAuth } from '@/src/features/auth/hooks'
 import { inviteStaffSchema } from '@/src/features/admin/staff/schemas'
 
 type StaffRole = 'admin' | 'waiter' | 'kitchen_staff'

@@ -12,7 +12,7 @@ import { Input } from '@/src/components/ui/input'
 import { Label } from '@/src/components/ui/label'
 import { Loader2, CheckCircle2, Eye, EyeOff, AlertCircle, AlertTriangle } from 'lucide-react'
 import { Alert, AlertDescription } from '@/src/components/ui/alert'
-import { useAuth } from '@/src/hooks/use-auth'
+import { useAuth } from '@/src/features/auth/hooks'
 import type { ApiErrorResponse } from '@/src/features/auth/types/auth'
 
 type PasswordStrength = 'weak' | 'medium' | 'strong'

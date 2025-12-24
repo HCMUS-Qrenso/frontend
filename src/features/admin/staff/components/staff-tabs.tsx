@@ -9,7 +9,7 @@ import { cn } from '@/src/lib/utils'
 import { StatCard } from '@/src/components/ui/stat-card'
 import { useStaffStatsQuery } from '@/src/features/admin/staff/queries'
 import { useSearchParams, useRouter } from 'next/navigation'
-import { useAuth } from '@/src/hooks/use-auth'
+import { useAuth } from '@/src/features/auth/hooks'
 
 type StaffRole = 'admin' | 'waiter' | 'kitchen_staff'
 

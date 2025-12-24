@@ -4,7 +4,7 @@ import { usersApi } from '@/src/features/auth/api'
 import { tenantsApi } from '@/src/features/admin/tenants/api/tenants.api'
 import { useAuthStore } from '@/src/store/auth-store'
 import { useTenantStore } from '@/src/store/tenant-store'
-import { usersQueryKeys } from '@/src/hooks/use-users-query'
+import { usersQueryKeys } from '@/src/features/auth/hooks'
 import { tenantsQueryKeys } from '@/src/features/admin/tenants/queries/tenants.queries'
 import type {
   AuthResponse,
