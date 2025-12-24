@@ -21,6 +21,7 @@ import { useCreateCategoryMutation, useUpdateCategoryMutation } from '@/src/feat
 import { useErrorHandler } from '@/src/hooks/use-error-handler'
 import { toast } from 'sonner'
 import { Category } from '@/src/features/admin/menu/types/categories'
+import { createCategorySchema, type CreateCategoryFormData } from '@/src/features/admin/menu/schemas'
 
 interface CategoryUpsertModalProps {
   open: boolean
@@ -43,9 +44,7 @@ export function CategoryUpsertModal({
     is_active: true,
   })
 
-  const [errors, setErrors] = useState({
-    name: '',
-  })
+  const [errors, setErrors] = useState<Record<string, string>>({})
 
   // Mutations
   const createMutation = useCreateCategoryMutation()
@@ -68,39 +67,44 @@ export function CategoryUpsertModal({
         is_active: true,
       })
     }
-    setErrors({ name: '' })
+    setErrors({})
   }, [mode, category])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setErrors({ name: '' })
+    setErrors({})
 
-    // Validation
-    if (!formData.name.trim()) {
-      setErrors({ name: 'Vui lòng nhập tên danh mục' })
+    // Validate with Zod schema
+    const result = createCategorySchema.safeParse(formData)
+
+    if (!result.success) {
+      // Convert Zod errors to our error format
+      const fieldErrors: Record<string, string> = {}
+      result.error.issues.forEach((issue) => {
+        const field = issue.path[0] as string
+        fieldErrors[field] = issue.message
+      })
+      setErrors(fieldErrors)
       return
     }
 
-    if (formData.name.length > 100) {
-      setErrors({ name: 'Tên danh mục không được vượt quá 100 ký tự' })
-      return
-    }
+    const validData = result.data
 
     try {
       if (mode === 'create') {
         await createMutation.mutateAsync({
-          name: formData.name.trim(),
-          description: formData.description.trim() || undefined,
-          is_active: formData.is_active,
+          name: validData.name,
+          description: validData.description,
+          is_active: validData.is_active,
         })
         toast.success('Đã tạo danh mục thành công')
       } else if (mode === 'edit' && category) {
         await updateMutation.mutateAsync({
           id: category.id,
           payload: {
-            name: formData.name.trim(),
-            description: formData.description.trim() || undefined,
-            is_active: formData.is_active,
+            name: validData.name,
+            description: validData.description,
+            is_active: validData.is_active,
           },
         })
         toast.success('Đã cập nhật danh mục thành công')

@@ -31,6 +31,7 @@ import { toast } from 'sonner'
 import { ModifierGroupSelector } from './menu-item-modifier-groups-selector'
 import { MenuItem } from '@/src/features/admin/menu/types/menu-items'
 import { Category } from '@/src/features/admin/menu/types/categories'
+import { menuItemFormSchema } from '@/src/features/admin/menu/schemas'
 
 interface MenuItemUpsertModalProps {
   open: boolean
@@ -75,10 +76,7 @@ export function MenuItemUpsertModal({
   // Store original item data for comparison
   const [originalItemData, setOriginalItemData] = useState<MenuItem | null>(null)
 
-  const [errors, setErrors] = useState({
-    name: '',
-    base_price: '',
-  })
+  const [errors, setErrors] = useState<Record<string, string>>({})
 
   // Load data if editing
   useEffect(() => {
@@ -213,67 +211,27 @@ export function MenuItemUpsertModal({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setErrors({ name: '', base_price: '' })
+    setErrors({})
 
-    // Validation
-    const newErrors = { name: '', base_price: '' }
+    // Validate with Zod schema
+    const result = menuItemFormSchema.safeParse(formData)
 
-    if (!formData.name.trim()) {
-      newErrors.name = 'Vui lòng nhập tên món'
-    } else if (formData.name.trim().length > 200) {
-      newErrors.name = 'Tên món không được vượt quá 200 ký tự'
-    }
+    if (!result.success) {
+      // Convert Zod errors to our error format
+      const fieldErrors: Record<string, string> = {}
+      result.error.issues.forEach((issue) => {
+        const field = issue.path[0] as string
+        if (!fieldErrors[field]) {
+          fieldErrors[field] = issue.message
+        }
+      })
+      setErrors(fieldErrors)
 
-    if (!formData.base_price) {
-      newErrors.base_price = 'Vui lòng nhập giá'
-    } else if (Number(formData.base_price) <= 0) {
-      newErrors.base_price = 'Giá phải lớn hơn 0'
-    } else if (isNaN(Number(formData.base_price))) {
-      newErrors.base_price = 'Giá không hợp lệ'
-    }
-
-    // Validate preparation time
-    if (formData.preparation_time && isNaN(Number(formData.preparation_time))) {
-      toast.error('Thời gian chuẩn bị không hợp lệ')
-      return
-    }
-    if (formData.preparation_time && Number(formData.preparation_time) < 0) {
-      toast.error('Thời gian chuẩn bị phải lớn hơn hoặc bằng 0')
-      return
-    }
-
-    // Validate category selection
-    if (!formData.category_id) {
-      toast.error('Vui lòng chọn danh mục')
-      return
-    }
-
-    // Validate nutritional info if provided
-    if (formData.fat && (isNaN(parseFloat(formData.fat)) || parseFloat(formData.fat) < 0)) {
-      toast.error('Lượng chất béo không hợp lệ')
-      return
-    }
-    if (formData.carbs && (isNaN(parseFloat(formData.carbs)) || parseFloat(formData.carbs) < 0)) {
-      toast.error('Lượng carbs không hợp lệ')
-      return
-    }
-    if (
-      formData.protein &&
-      (isNaN(parseFloat(formData.protein)) || parseFloat(formData.protein) < 0)
-    ) {
-      toast.error('Lượng protein không hợp lệ')
-      return
-    }
-    if (
-      formData.calories &&
-      (isNaN(parseFloat(formData.calories)) || parseFloat(formData.calories) < 0)
-    ) {
-      toast.error('Lượng calories không hợp lệ')
-      return
-    }
-
-    if (newErrors.name || newErrors.base_price) {
-      setErrors(newErrors)
+      // Show first error as toast for fields not displayed inline
+      const firstError = result.error.issues[0]
+      if (firstError && !['name', 'base_price'].includes(firstError.path[0] as string)) {
+        toast.error(firstError.message)
+      }
       return
     }
 
