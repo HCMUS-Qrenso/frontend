@@ -22,6 +22,18 @@ import { pdf, Document, Page, Text, View, StyleSheet, Font, Image } from '@react
 Font.register({
   family: 'Inter',
   src: '/fonts/Inter.ttf',
+  fontWeight: 'normal',
+});
+
+Font.register({
+  family: 'Inter',
+  src: '/fonts/Inter.ttf',
+  fontWeight: 'bold',
+});
+
+Font.registerEmojiSource({
+  format: 'png',
+  url: 'https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/',
 });
 
 // Helper function to generate PDF blob
@@ -32,7 +44,6 @@ const generatePDFBlob = async (
   displayOptions: any,
   theme: string,
   accentColor: string,
-  quality: 'standard' | 'high' = 'standard',
   templateId: string,
   fontSize: 'small' | 'medium' | 'large' = 'medium'
 ): Promise<Blob> => {
@@ -44,7 +55,6 @@ const generatePDFBlob = async (
       displayOptions={displayOptions}
       theme={theme}
       accentColor={accentColor}
-      quality={quality}
       templateId={templateId}
       fontSize={fontSize}
     />
@@ -61,7 +71,6 @@ const MenuPDFDocument = ({
   displayOptions, 
   theme, 
   accentColor,
-  quality = 'standard',
   templateId,
   fontSize = 'medium'
 }: {
@@ -71,7 +80,6 @@ const MenuPDFDocument = ({
   displayOptions: any
   theme: string
   accentColor: string
-  quality?: 'standard' | 'high'
   templateId: string
   fontSize?: 'small' | 'medium' | 'large'
 }) => {
@@ -87,54 +95,53 @@ const MenuPDFDocument = ({
   // Quality and font size-based font sizes and spacing
   const baseFontSizes = {
     small: {
-      title: 20,
-      subtitle: 10,
-      categoryHeader: 12,
-      itemName: 11,
+      title: 15,
+      subtitle: 9,
+      categoryHeader: 9,
+      itemName: 9,
       itemDescription: 9,
-      itemPrice: 11,
+      itemPrice: 9,
       truncationText: 9,
     },
     medium: {
-      title: 24,
-      subtitle: 12,
-      categoryHeader: 14,
-      itemName: 12,
-      itemDescription: 10,
-      itemPrice: 12,
-      truncationText: 10,
+      title: 17,
+      subtitle: 11,
+      categoryHeader: 11,
+      itemName: 11,
+      itemDescription: 11,
+      itemPrice: 11,
+      truncationText: 11,
     },
     large: {
-      title: 28,
-      subtitle: 14,
-      categoryHeader: 16,
+      title: 19,
+      subtitle: 13,
+      categoryHeader: 13,
       itemName: 13,
-      itemDescription: 11,
+      itemDescription: 13,
       itemPrice: 13,
-      truncationText: 11,
+      truncationText: 13,
     },
   }
 
-  const qualityMultiplier = quality === 'high' ? 1.2 : 1
   const fontSizes = {
-    title: baseFontSizes[fontSize].title * qualityMultiplier,
-    subtitle: baseFontSizes[fontSize].subtitle * qualityMultiplier,
-    categoryHeader: baseFontSizes[fontSize].categoryHeader * qualityMultiplier,
-    itemName: baseFontSizes[fontSize].itemName * qualityMultiplier,
-    itemDescription: baseFontSizes[fontSize].itemDescription * qualityMultiplier,
-    itemPrice: baseFontSizes[fontSize].itemPrice * qualityMultiplier,
-    truncationText: baseFontSizes[fontSize].truncationText * qualityMultiplier,
+    title: baseFontSizes[fontSize].title,
+    subtitle: baseFontSizes[fontSize].subtitle,
+    categoryHeader: baseFontSizes[fontSize].categoryHeader,
+    itemName: baseFontSizes[fontSize].itemName,
+    itemDescription: baseFontSizes[fontSize].itemDescription,
+    itemPrice: baseFontSizes[fontSize].itemPrice,
+    truncationText: baseFontSizes[fontSize].truncationText,
   }
 
   const styles = StyleSheet.create({
     page: {
-      padding: quality === 'high' ? 25 : 20,
+      padding: 20,
       backgroundColor: theme === 'light' ? '#ffffff' : '#1e293b',
       color: theme === 'light' ? '#0f172a' : '#f1f5f9',
-      fontFamily: 'Inter', // Courier has better Unicode support for Vietnamese than Helvetica
+      fontFamily: 'Inter', 
     },
     header: {
-      marginBottom: quality === 'high' ? 28 : 24,
+      marginBottom: 24,
       textAlign: 'center',
     },
     title: {
@@ -148,7 +155,7 @@ const MenuPDFDocument = ({
       color: theme === 'light' ? '#475569' : '#cbd5e1',
     },
     category: {
-      marginBottom: quality === 'high' ? 18 : 16,
+      marginBottom: 16,
       breakInside: 'avoid',
     },
     categoryHeader: {
@@ -164,7 +171,7 @@ const MenuPDFDocument = ({
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'flex-start',
-      marginBottom: quality === 'high' ? 10 : 8,
+      marginBottom: 8,
       breakInside: 'avoid',
     },
     itemLeft: {
@@ -178,7 +185,7 @@ const MenuPDFDocument = ({
     itemDescription: {
       fontSize: fontSizes.itemDescription,
       color: theme === 'light' ? '#64748b' : '#94a3b8',
-      marginTop: quality === 'high' ? 5 : 4,
+      marginTop: 4,
     },
     itemPrice: {
       fontSize: fontSizes.itemPrice,
@@ -189,19 +196,19 @@ const MenuPDFDocument = ({
     truncationText: {
       fontSize: fontSizes.truncationText,
       color: theme === 'light' ? '#64748b' : '#94a3b8',
-      marginTop: quality === 'high' ? 10 : 8,
+      marginTop: 8,
     },
     emptyState: {
       textAlign: 'center',
-      paddingTop: quality === 'high' ? 40 : 32,
+      paddingTop: 32,
       color: theme === 'light' ? '#64748b' : '#94a3b8',
     },
   })
 
   // Template-specific rendering
   const renderTemplateContent = () => {
-    const effectiveTheme = templateId === '3' ? 'dark' : theme
-    const effectiveAccent = templateId === '3' ? '#ffffff' : categoryColor
+    const effectiveTheme = theme
+    const effectiveAccent = categoryColor
 
     // Calculate pagination
     const getMaxItemsPerPage = (templateId: string) => {
@@ -242,7 +249,7 @@ const MenuPDFDocument = ({
             }, {} as Record<string, MenuItem[]>)
 
             pages.push(
-              <Page key={pageIndex} size={[1200, 1600]} style={styles.page}>
+              <Page key={pageIndex} size={[595, 842]} style={styles.page}>
                 {pageIndex === 0 && (
                   <View style={styles.header}>
                     <Text style={[styles.title, { color: effectiveTheme === 'light' ? '#0f172a' : '#ffffff' }]}>
@@ -266,11 +273,6 @@ const MenuPDFDocument = ({
                           <View>
                             {items.map((item) => (
                               <View key={item.id} style={[styles.menuItem, { flexDirection: 'row', alignItems: 'center' }]}>
-                                {item.images && item.images.length > 0 && (
-                                  <View style={{ width: 40, height: 40, marginRight: 8 }}>
-                                    <Image src={item.images[0]} style={{ width: 40, height: 40, borderRadius: 4 }} />
-                                  </View>
-                                )}
                                 <View style={styles.itemLeft}>
                                   <Text style={[styles.itemName, { color: effectiveTheme === 'light' ? '#0f172a' : '#ffffff' }]}>
                                     {item.name}
@@ -306,11 +308,6 @@ const MenuPDFDocument = ({
                           <View>
                             {items.map((item) => (
                               <View key={item.id} style={[styles.menuItem, { flexDirection: 'row', alignItems: 'center' }]}>
-                                {item.images && item.images.length > 0 && (
-                                  <View style={{ width: 40, height: 40, marginRight: 8 }}>
-                                    <Image src={item.images[0]} style={{ width: 40, height: 40, borderRadius: 4 }} />
-                                  </View>
-                                )}
                                 <View style={styles.itemLeft}>
                                   <Text style={[styles.itemName, { color: effectiveTheme === 'light' ? '#0f172a' : '#ffffff' }]}>
                                     {item.name}
@@ -342,7 +339,7 @@ const MenuPDFDocument = ({
         } else {
           // Single page - original logic
           return (
-            <Page size={[1200, 1600]} style={styles.page}>
+            <Page size={[595, 842]} style={styles.page}>
               <View style={styles.header}>
                 <Text style={[styles.title, { color: effectiveTheme === 'light' ? '#0f172a' : '#ffffff' }]}>
                   {restaurantInfo.name}
@@ -364,11 +361,6 @@ const MenuPDFDocument = ({
                         <View>
                           {items.map((item) => (
                             <View key={item.id} style={[styles.menuItem, { flexDirection: 'row', alignItems: 'center' }]}>
-                              {item.images && item.images.length > 0 && (
-                                <View style={{ width: 40, height: 40, marginRight: 8 }}>
-                                  <Image src={item.images[0]} style={{ width: 40, height: 40, borderRadius: 4 }} />
-                                </View>
-                              )}
                               <View style={styles.itemLeft}>
                                 <Text style={[styles.itemName, { color: effectiveTheme === 'light' ? '#0f172a' : '#ffffff' }]}>
                                   {item.name}
@@ -404,11 +396,6 @@ const MenuPDFDocument = ({
                         <View>
                           {items.map((item) => (
                             <View key={item.id} style={[styles.menuItem, { flexDirection: 'row', alignItems: 'center' }]}>
-                              {item.images && item.images.length > 0 && (
-                                <View style={{ width: 40, height: 40, marginRight: 8 }}>
-                                  <Image src={item.images[0]} style={{ width: 40, height: 40, borderRadius: 4 }} />
-                              </View>
-                              )}
                               <View style={styles.itemLeft}>
                                 <Text style={[styles.itemName, { color: effectiveTheme === 'light' ? '#0f172a' : '#ffffff' }]}>
                                   {item.name}
@@ -457,10 +444,10 @@ const MenuPDFDocument = ({
             }, {} as Record<string, MenuItem[]>)
 
             pages.push(
-              <Page key={pageIndex} size={[1200, 1600]} style={[styles.page, { backgroundColor: effectiveTheme === 'light' ? '#fafafa' : '#1e293b' }]}>
+              <Page key={pageIndex} size={[595, 842]} style={[styles.page, { backgroundColor: effectiveTheme === 'light' ? '#ffffff' : '#1e293b' }]}>
                 {pageIndex === 0 && (
                   <View style={[styles.header, { marginBottom: 32 }]}>
-                    <Text style={[styles.title, { color: effectiveTheme === 'light' ? '#0f172a' : '#ffffff', fontSize: fontSizes.title + 4 }]}>
+                    <Text style={[styles.title, { color: effectiveTheme === 'light' ? '#0f172a' : '#ffffff' }]}>
                       {restaurantInfo.name}
                     </Text>
                     <Text style={[styles.subtitle, { color: effectiveTheme === 'light' ? '#475569' : '#cbd5e1' }]}>
@@ -472,21 +459,28 @@ const MenuPDFDocument = ({
                   const category = categories.find(c => c.id === categoryId)
                   if (!category) return null
                   return (
-                    <View key={categoryId} style={[styles.category, { marginBottom: 24, marginTop: pageIndex === 0 ? 0 : 32 }]}>
-                      <Text style={[styles.categoryHeader, { color: effectiveAccent, fontSize: fontSizes.categoryHeader + 2, marginBottom: 8 }]}>
+                    <View key={categoryId} style={[styles.category, { marginBottom: 12 }]}>
+                      <Text style={[styles.categoryHeader, { color: effectiveAccent, marginBottom: 8 }]}>
                         {category.name}
                       </Text>
                       <View>
                         {items.map((item) => (
-                          <View key={item.id} style={[styles.menuItem, { marginBottom: 12, padding: 12, backgroundColor: effectiveTheme === 'light' ? '#ffffff' : '#334155', borderRadius: 6, flexDirection: 'row', alignItems: 'flex-start' }]}>
+                          <View key={item.id} style={[styles.menuItem, { marginBottom: 12, padding: 12, backgroundColor: effectiveTheme === 'light' ? '#ffffff' : '#334155', borderRadius: 6, borderWidth: 1, borderColor: effectiveTheme === 'light' ? '#e5e7eb' : '#475569', flexDirection: 'row', alignItems: 'flex-start' }]}>
                             {item.images && item.images.length > 0 && (
-                              <View style={{ width: 80, height: 80, marginRight: 12 }}>
-                                <Image src={item.images[0]} style={{ width: 80, height: 80, borderRadius: 4 }} />
+                              <View style={{ width: 60, height: 60, marginRight: 12 }}>
+                                <Image
+                                  src={
+                                    typeof item.images[0] === 'string'
+                                    ? item.images[0]
+                                    : (item.images[0] as any)?.image_url || '/placeholder.svg'
+                                  }
+                                  style={{ width: 80, height: 80, borderRadius: 4 }}
+                                />
                               </View>
                             )}
                             <View style={{ flex: 1 }}>
                               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4 }}>
-                                <Text style={[styles.itemName, { color: effectiveTheme === 'light' ? '#0f172a' : '#ffffff', fontSize: fontSizes.itemName + 1 }]}>
+                                <Text style={[styles.itemName, { color: effectiveTheme === 'light' ? '#0f172a' : '#ffffff' }]}>
                                   {item.name}
                                   {displayOptions.showChefRecommendations && item.is_chef_recommendation ? ' ⭐' : ''}
                                 </Text>
@@ -515,9 +509,9 @@ const MenuPDFDocument = ({
         } else {
           // Single page - original logic
           return (
-            <Page size={[1200, 1600]} style={[styles.page, { backgroundColor: effectiveTheme === 'light' ? '#fafafa' : '#1e293b' }]}>
+            <Page size={[1200, 1600]} style={[styles.page, { backgroundColor: effectiveTheme === 'light' ? '#fafafa' : '#0f172a' }]}>
               <View style={[styles.header, { marginBottom: 32 }]}>
-                <Text style={[styles.title, { color: effectiveTheme === 'light' ? '#0f172a' : '#ffffff', fontSize: fontSizes.title + 4 }]}>
+                <Text style={[styles.title, { color: effectiveTheme === 'light' ? '#0f172a' : '#ffffff' }]}>
                   {restaurantInfo.name}
                 </Text>
                 <Text style={[styles.subtitle, { color: effectiveTheme === 'light' ? '#475569' : '#cbd5e1' }]}>
@@ -529,7 +523,7 @@ const MenuPDFDocument = ({
                 if (!category) return null
                 return (
                   <View key={categoryId} style={[styles.category, { marginBottom: 24 }]}>
-                    <Text style={[styles.categoryHeader, { color: effectiveAccent, fontSize: fontSizes.categoryHeader + 2, marginBottom: 8 }]}>
+                    <Text style={[styles.categoryHeader, { color: effectiveAccent, marginBottom: 8 }]}>
                       {category.name}
                     </Text>
                     <View>
@@ -542,7 +536,7 @@ const MenuPDFDocument = ({
                           )}
                           <View style={{ flex: 1 }}>
                             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4 }}>
-                              <Text style={[styles.itemName, { color: effectiveTheme === 'light' ? '#0f172a' : '#ffffff', fontSize: fontSizes.itemName + 1 }]}>
+                              <Text style={[styles.itemName, { color: effectiveTheme === 'light' ? '#0f172a' : '#ffffff' }]}>
                                 {item.name}
                                 {displayOptions.showChefRecommendations && item.is_chef_recommendation ? ' ⭐' : ''}
                               </Text>
@@ -588,13 +582,13 @@ const MenuPDFDocument = ({
             }, {} as Record<string, MenuItem[]>)
 
             pages.push(
-              <Page key={pageIndex} size={[1200, 1600]} style={[styles.page, { backgroundColor: '#1a1a1a' }]}>
+              <Page key={pageIndex} size={[595, 842]} style={[styles.page, { backgroundColor: effectiveTheme === 'light' ? '#ffffff' : '#1e293b' }]}>
                 {pageIndex === 0 && (
                   <View style={styles.header}>
-                    <Text style={[styles.title, { color: '#ffffff', fontSize: fontSizes.title + 2 }]}>
+                    <Text style={[styles.title, { color: effectiveTheme === 'light' ? '#0f172a' : '#ffffff' }]}>
                       {restaurantInfo.name}
                     </Text>
-                    <Text style={[styles.subtitle, { color: '#cccccc' }]}>
+                    <Text style={[styles.subtitle, { color: effectiveTheme === 'light' ? '#475569' : '#cbd5e1' }]}>
                       {restaurantInfo.address} • {restaurantInfo.phone}
                     </Text>
                   </View>
@@ -604,25 +598,25 @@ const MenuPDFDocument = ({
                   if (!category) return null
                   return (
                     <View key={categoryId} style={[styles.category, { marginTop: pageIndex === 0 ? 0 : 32 }]}>
-                      <Text style={[styles.categoryHeader, { color: '#ffffff', borderBottomColor: '#666666' }]}>
+                      <Text style={[styles.categoryHeader, { color: effectiveAccent, borderBottomColor: effectiveTheme === 'light' ? '#e2e8f0' : '#475569' }]}>
                         {category.name}
                       </Text>
                       <View>
                         {items.map((item) => (
                           <View key={item.id} style={styles.menuItem}>
                             <View style={styles.itemLeft}>
-                              <Text style={[styles.itemName, { color: '#ffffff' }]}>
+                              <Text style={[styles.itemName, { color: effectiveTheme === 'light' ? '#0f172a' : '#ffffff' }]}>
                                 {item.name}
                                 {displayOptions.showChefRecommendations && item.is_chef_recommendation ? ' ⭐' : ''}
                               </Text>
                               {displayOptions.showDescriptions && item.description && (
-                                <Text style={[styles.itemDescription, { color: '#aaaaaa' }]}>
+                                <Text style={[styles.itemDescription, { color: effectiveTheme === 'light' ? '#64748b' : '#94a3b8' }]}>
                                   {item.description}
                                 </Text>
                               )}
                             </View>
                             {displayOptions.showPrices && (
-                              <Text style={[styles.itemPrice, { color: '#ffffff' }]}>
+                              <Text style={[styles.itemPrice, { color: effectiveTheme === 'light' ? '#0f172a' : '#ffffff' }]}>
                                 {new Intl.NumberFormat('vi-VN').format(parseInt(item.base_price))}đ
                               </Text>
                             )}
@@ -639,12 +633,12 @@ const MenuPDFDocument = ({
         } else {
           // Single page - original logic
           return (
-            <Page size={[1200, 1600]} style={[styles.page, { backgroundColor: '#1a1a1a' }]}>
+            <Page size={[595, 842]} style={[styles.page, { backgroundColor: effectiveTheme === 'light' ? '#ffffff' : '#1e293b' }]}>
               <View style={styles.header}>
-                <Text style={[styles.title, { color: '#ffffff', fontSize: fontSizes.title + 2 }]}>
+                <Text style={[styles.title, { color: effectiveTheme === 'light' ? '#0f172a' : '#ffffff' }]}>
                   {restaurantInfo.name}
                 </Text>
-                <Text style={[styles.subtitle, { color: '#cccccc' }]}>
+                <Text style={[styles.subtitle, { color: effectiveTheme === 'light' ? '#475569' : '#cbd5e1' }]}>
                   {restaurantInfo.address} • {restaurantInfo.phone}
                 </Text>
               </View>
@@ -653,68 +647,11 @@ const MenuPDFDocument = ({
                 if (!category) return null
                 return (
                   <View key={categoryId} style={styles.category}>
-                    <Text style={[styles.categoryHeader, { color: '#ffffff', borderBottomColor: '#666666' }]}>
+                    <Text style={[styles.categoryHeader, { color: effectiveAccent, borderBottomColor: effectiveTheme === 'light' ? '#e2e8f0' : '#475569' }]}>
                       {category.name}
                     </Text>
                     <View>
                       {items.map((item) => (
-                        <View key={item.id} style={styles.menuItem}>
-                          <View style={styles.itemLeft}>
-                            <Text style={[styles.itemName, { color: '#ffffff' }]}>
-                              {item.name}
-                              {displayOptions.showChefRecommendations && item.is_chef_recommendation ? ' ⭐' : ''}
-                            </Text>
-                            {displayOptions.showDescriptions && item.description && (
-                              <Text style={[styles.itemDescription, { color: '#aaaaaa' }]}>
-                                {item.description}
-                              </Text>
-                            )}
-                          </View>
-                          {displayOptions.showPrices && (
-                            <Text style={[styles.itemPrice, { color: '#ffffff' }]}>
-                              {new Intl.NumberFormat('vi-VN').format(parseInt(item.base_price))}đ
-                            </Text>
-                          )}
-                        </View>
-                      ))}
-                    </View>
-                  </View>
-                )
-              })}
-            </Page>
-          )
-        }
-
-      case '4': // Tri-Fold Classic
-        const categoriesArray = Object.entries(menuItemsByCategory)
-        const itemsPerPage = Math.ceil(categoriesArray.length / 3)
-        const pages = []
-        for (let i = 0; i < 3; i++) {
-          const start = i * itemsPerPage
-          const end = start + itemsPerPage
-          const pageCategories = categoriesArray.slice(start, end)
-          pages.push(
-            <Page key={i} size="A4" style={styles.page}>
-              {i === 0 && (
-                <View style={styles.header}>
-                  <Text style={[styles.title, { color: effectiveTheme === 'light' ? '#0f172a' : '#ffffff' }]}>
-                    {restaurantInfo.name}
-                  </Text>
-                  <Text style={[styles.subtitle, { color: effectiveTheme === 'light' ? '#475569' : '#cbd5e1' }]}>
-                    {restaurantInfo.address} • {restaurantInfo.phone}
-                  </Text>
-                </View>
-              )}
-              {pageCategories.map(([categoryId, items]) => {
-                const category = categories.find(c => c.id === categoryId)
-                if (!category) return null
-                return (
-                  <View key={categoryId} style={styles.category}>
-                    <Text style={[styles.categoryHeader, { color: effectiveAccent }]}>
-                      {category.name}
-                    </Text>
-                    <View>
-                      {items.slice(0, 15).map((item) => (
                         <View key={item.id} style={styles.menuItem}>
                           <View style={styles.itemLeft}>
                             <Text style={[styles.itemName, { color: effectiveTheme === 'light' ? '#0f172a' : '#ffffff' }]}>
@@ -741,7 +678,135 @@ const MenuPDFDocument = ({
             </Page>
           )
         }
-        return pages
+
+      case '4': // Tri-Fold Classic - Horizontal A4 with separators
+        const categoriesArray = Object.entries(menuItemsByCategory)
+        const itemsPerSection = Math.ceil(categoriesArray.length / 3)
+        
+        return (
+          <Page size={[842, 595]} style={styles.page}> {/* Landscape A4: 297mm x 210mm */}
+            <View style={styles.header}>
+              <Text style={[styles.title, { color: effectiveTheme === 'light' ? '#0f172a' : '#ffffff' }]}>
+                {restaurantInfo.name}
+              </Text>
+              <Text style={[styles.subtitle, { color: effectiveTheme === 'light' ? '#475569' : '#cbd5e1' }]}>
+                {restaurantInfo.address} • {restaurantInfo.phone}
+              </Text>
+            </View>
+            <View style={{ flexDirection: 'row', height: '86%' }}>
+              {/* Section 1 */}
+              <View style={{ flex: 1, paddingRight: 10, borderRightWidth: 1, borderRightColor: effectiveTheme === 'light' ? '#e2e8f0' : '#475569' }}>
+                {categoriesArray.slice(0, itemsPerSection).map(([categoryId, items]) => {
+                  const category = categories.find(c => c.id === categoryId)
+                  if (!category) return null
+                  return (
+                    <View key={categoryId} style={styles.category}>
+                      <Text style={[styles.categoryHeader, { color: effectiveAccent }]}>
+                        {category.name}
+                      </Text>
+                      <View>
+                        {items.slice(0, 15).map((item) => (
+                          <View key={item.id} style={styles.menuItem}>
+                            <View style={styles.itemLeft}>
+                              <Text style={[styles.itemName, { color: effectiveTheme === 'light' ? '#0f172a' : '#ffffff' }]}>
+                                {item.name}
+                                {displayOptions.showChefRecommendations && item.is_chef_recommendation ? ' ⭐' : ''}
+                              </Text>
+                              {displayOptions.showDescriptions && item.description && (
+                                <Text style={[styles.itemDescription, { color: effectiveTheme === 'light' ? '#64748b' : '#94a3b8' }]}>
+                                  {item.description}
+                                </Text>
+                              )}
+                            </View>
+                            {displayOptions.showPrices && (
+                              <Text style={[styles.itemPrice, { color: effectiveTheme === 'light' ? '#0f172a' : '#ffffff' }]}>
+                                {new Intl.NumberFormat('vi-VN').format(parseInt(item.base_price))}đ
+                              </Text>
+                            )}
+                          </View>
+                        ))}
+                      </View>
+                    </View>
+                  )
+                })}
+              </View>
+              
+              {/* Section 2 */}
+              <View style={{ flex: 1, paddingHorizontal: 10, borderRightWidth: 1, borderRightColor: effectiveTheme === 'light' ? '#e2e8f0' : '#475569' }}>
+                {categoriesArray.slice(itemsPerSection, itemsPerSection * 2).map(([categoryId, items]) => {
+                  const category = categories.find(c => c.id === categoryId)
+                  if (!category) return null
+                  return (
+                    <View key={categoryId} style={styles.category}>
+                      <Text style={[styles.categoryHeader, { color: effectiveAccent }]}>
+                        {category.name}
+                      </Text>
+                      <View>
+                        {items.slice(0, 15).map((item) => (
+                          <View key={item.id} style={styles.menuItem}>
+                            <View style={styles.itemLeft}>
+                              <Text style={[styles.itemName, { color: effectiveTheme === 'light' ? '#0f172a' : '#ffffff' }]}>
+                                {item.name}
+                                {displayOptions.showChefRecommendations && item.is_chef_recommendation ? ' ⭐' : ''}
+                              </Text>
+                              {displayOptions.showDescriptions && item.description && (
+                                <Text style={[styles.itemDescription, { color: effectiveTheme === 'light' ? '#64748b' : '#94a3b8' }]}>
+                                  {item.description}
+                                </Text>
+                              )}
+                            </View>
+                            {displayOptions.showPrices && (
+                              <Text style={[styles.itemPrice, { color: effectiveTheme === 'light' ? '#0f172a' : '#ffffff' }]}>
+                                {new Intl.NumberFormat('vi-VN').format(parseInt(item.base_price))}đ
+                              </Text>
+                            )}
+                          </View>
+                        ))}
+                      </View>
+                    </View>
+                  )
+                })}
+              </View>
+              
+              {/* Section 3 */}
+              <View style={{ flex: 1, paddingLeft: 10 }}>
+                {categoriesArray.slice(itemsPerSection * 2).map(([categoryId, items]) => {
+                  const category = categories.find(c => c.id === categoryId)
+                  if (!category) return null
+                  return (
+                    <View key={categoryId} style={styles.category}>
+                      <Text style={[styles.categoryHeader, { color: effectiveAccent }]}>
+                        {category.name}
+                      </Text>
+                      <View>
+                        {items.slice(0, 15).map((item) => (
+                          <View key={item.id} style={styles.menuItem}>
+                            <View style={styles.itemLeft}>
+                              <Text style={[styles.itemName, { color: effectiveTheme === 'light' ? '#0f172a' : '#ffffff' }]}>
+                                {item.name}
+                                {displayOptions.showChefRecommendations && item.is_chef_recommendation ? ' ⭐' : ''}
+                              </Text>
+                              {displayOptions.showDescriptions && item.description && (
+                                <Text style={[styles.itemDescription, { color: effectiveTheme === 'light' ? '#64748b' : '#94a3b8' }]}>
+                                  {item.description}
+                                </Text>
+                              )}
+                            </View>
+                            {displayOptions.showPrices && (
+                              <Text style={[styles.itemPrice, { color: effectiveTheme === 'light' ? '#0f172a' : '#ffffff' }]}>
+                                {new Intl.NumberFormat('vi-VN').format(parseInt(item.base_price))}đ
+                              </Text>
+                            )}
+                          </View>
+                        ))}
+                      </View>
+                    </View>
+                  )
+                })}
+              </View>
+            </View>
+          </Page>
+        )
 
       default: // Default single column
         const totalItemsDefault = allItems.length
@@ -763,7 +828,7 @@ const MenuPDFDocument = ({
             }, {} as Record<string, MenuItem[]>)
 
             pages.push(
-              <Page key={pageIndex} size="A3" style={styles.page}>
+              <Page key={pageIndex} size={[595, 842]} style={styles.page}>
                 {pageIndex === 0 && (
                   <View style={styles.header}>
                     <Text style={styles.title}>{restaurantInfo.name}</Text>
@@ -816,7 +881,7 @@ const MenuPDFDocument = ({
         } else {
           // Single page - original logic
           return (
-            <Page size="A3" style={styles.page}>
+            <Page size={[595, 842]} style={styles.page}>
               <View style={styles.header}>
                 <Text style={styles.title}>{restaurantInfo.name}</Text>
                 <Text style={styles.subtitle}>
@@ -887,8 +952,8 @@ const templates: Template[] = [
     id: '1',
     name: 'Minimal A4 2-Column',
     thumbnail: '/placeholder.jpg',
-    tags: ['A4', '2-col', 'Có ảnh'],
-    description: 'Thiết kế tối giản, 2 cột, phù hợp menu có ảnh món',
+    tags: ['A4', '2-col'],
+    description: 'Thiết kế tối giản, 2 cột, phù hợp menu đơn giản',
     format: 'A4',
   },
   {
@@ -911,9 +976,9 @@ const templates: Template[] = [
     id: '4',
     name: 'Tri-Fold Classic',
     thumbnail: '/placeholder.jpg',
-    tags: ['Tri-fold', '3-page', 'Compact'],
-    description: 'Menu gấp 3, gọn gàng cho nhà hàng nhỏ',
-    format: 'Letter',
+    tags: ['Horizontal', '3-section', 'A4'],
+    description: 'Menu ngang A4 với 3 phần, gọn gàng cho nhà hàng nhỏ',
+    format: 'A4',
   },
 ]
 
@@ -964,8 +1029,6 @@ export function TemplateExportTab() {
     showDescriptions: true,
     showChefRecommendations: true
   })
-  const [exportFormat, setExportFormat] = useState<'pdf'>('pdf')
-  const [exportQuality, setExportQuality] = useState<'standard' | 'high'>('standard')
   const [isExporting, setIsExporting] = useState(false)
   const [activeTab, setActiveTab] = useState<'data' | 'style'>('data')
   const [fontSize, setFontSize] = useState<'small' | 'medium' | 'large'>('medium')
@@ -1035,7 +1098,16 @@ export function TemplateExportTab() {
       large: 'text-3xl'
     }
 
-    const effectiveTheme = selectedTemplate === '3' ? 'dark' : theme
+    const effectiveTheme = theme
+
+    // Define accent color classes for preview (matching PDF logic)
+    const accentColorClasses = {
+      emerald: effectiveTheme === 'light' ? 'text-emerald-600' : 'text-emerald-400',
+      blue: effectiveTheme === 'light' ? 'text-blue-600' : 'text-blue-400',
+      amber: effectiveTheme === 'light' ? 'text-amber-600' : 'text-amber-400',
+      rose: effectiveTheme === 'light' ? 'text-rose-600' : 'text-rose-400',
+    }
+    const categoryAccentClass = accentColorClasses[accentColor as keyof typeof accentColorClasses]
 
     // Calculate approximate items per page based on template
     const getMaxItemsPerPage = (templateId: string) => {
@@ -1104,7 +1176,8 @@ export function TemplateExportTab() {
                     <div key={categoryId} className="mb-4">
                       <h2 className={cn(
                         "mb-2 pb-1 font-bold border-b",
-                        effectiveTheme === 'light' ? 'border-slate-200 text-slate-900' : 'border-slate-600 text-white'
+                        effectiveTheme === 'light' ? 'border-slate-200' : 'border-slate-600',
+                        categoryAccentClass
                       )}>
                         {category.name}
                       </h2>
@@ -1153,7 +1226,8 @@ export function TemplateExportTab() {
                     <div key={categoryId} className="mb-4">
                       <h2 className={cn(
                         "mb-2 pb-1 font-bold border-b",
-                        effectiveTheme === 'light' ? 'border-slate-200 text-slate-900' : 'border-slate-600 text-white'
+                        effectiveTheme === 'light' ? 'border-slate-200' : 'border-slate-600',
+                        categoryAccentClass
                       )}>
                         {category.name}
                       </h2>
@@ -1206,7 +1280,19 @@ export function TemplateExportTab() {
             fontSizeClasses[fontSize],
             effectiveTheme === 'light' ? 'text-slate-900 bg-white' : 'text-slate-100 bg-slate-800'
           )}>
-            <div className="flex-1 pr-4">
+            <div className="absolute top-4 left-1/2 transform -translate-x-1/2 text-center">
+              <h1 className={cn(
+                titleSizeClasses[fontSize],
+                "font-bold",
+                effectiveTheme === 'light' ? 'text-slate-900' : 'text-white'
+              )}>
+                {restaurantInfo.name}
+              </h1>
+              <p className={effectiveTheme === 'light' ? 'text-slate-600' : 'text-slate-300'}>
+                {restaurantInfo.address} • {restaurantInfo.phone}
+              </p>
+            </div>
+            <div className="flex-1 pr-4 mt-16">
               {Object.entries(menuItemsByCategory).slice(0, Math.ceil(Object.keys(menuItemsByCategory).length / 2)).map(([categoryId, items]) => {
                 const category = categories.find(c => c.id === categoryId)
                 if (!category) return null
@@ -1214,7 +1300,8 @@ export function TemplateExportTab() {
                   <div key={categoryId} className="mb-4">
                     <h2 className={cn(
                       "mb-2 pb-1 font-bold border-b",
-                      effectiveTheme === 'light' ? 'border-slate-200 text-slate-900' : 'border-slate-600 text-white'
+                      effectiveTheme === 'light' ? 'border-slate-200' : 'border-slate-600',
+                      categoryAccentClass
                     )}>
                       {category.name}
                     </h2>
@@ -1255,7 +1342,7 @@ export function TemplateExportTab() {
                 )
               })}
             </div>
-            <div className="flex-1 pl-4">
+            <div className="flex-1 pl-4 mt-16">
               {Object.entries(menuItemsByCategory).slice(Math.ceil(Object.keys(menuItemsByCategory).length / 2)).map(([categoryId, items]) => {
                 const category = categories.find(c => c.id === categoryId)
                 if (!category) return null
@@ -1263,7 +1350,8 @@ export function TemplateExportTab() {
                   <div key={categoryId} className="mb-4">
                     <h2 className={cn(
                       "mb-2 pb-1 font-bold border-b",
-                      effectiveTheme === 'light' ? 'border-slate-200 text-slate-900' : 'border-slate-600 text-white'
+                      effectiveTheme === 'light' ? 'border-slate-200' : 'border-slate-600',
+                      categoryAccentClass
                     )}>
                       {category.name}
                     </h2>
@@ -1355,7 +1443,8 @@ export function TemplateExportTab() {
                     <div key={categoryId}>
                       <h2 className={cn(
                         "mb-3 pb-2 font-bold text-lg border-b-2",
-                        effectiveTheme === 'light' ? 'border-slate-300 text-slate-900' : 'border-slate-600 text-white'
+                        effectiveTheme === 'light' ? 'border-slate-300' : 'border-slate-600',
+                        categoryAccentClass
                       )}>
                         {category.name}
                       </h2>
@@ -1448,7 +1537,8 @@ export function TemplateExportTab() {
                   <div key={categoryId}>
                     <h2 className={cn(
                       "mb-3 pb-2 font-bold text-lg border-b-2",
-                      effectiveTheme === 'light' ? 'border-slate-300 text-slate-900' : 'border-slate-600 text-white'
+                      effectiveTheme === 'light' ? 'border-slate-300' : 'border-slate-600',
+                      categoryAccentClass
                     )}>
                       {category.name}
                     </h2>
@@ -1530,18 +1620,20 @@ export function TemplateExportTab() {
 
           pages.push(
             <div key={pageIndex} className={cn(
-              "flex h-full flex-col p-8 bg-slate-900 text-white",
-              fontSizeClasses[fontSize]
+              "flex h-full flex-col p-8",
+              fontSizeClasses[fontSize],
+              effectiveTheme === 'light' ? 'text-slate-900 bg-white' : 'text-slate-100 bg-slate-800'
             )}>
               {pageIndex === 0 && (
                 <div className="mb-6 text-center">
                   <h1 className={cn(
                     titleSizeClasses[fontSize],
-                    "font-bold text-white"
+                    "font-bold",
+                    effectiveTheme === 'light' ? 'text-slate-900' : 'text-white'
                   )}>
                     {restaurantInfo.name}
                   </h1>
-                  <p className="text-gray-300">
+                  <p className={effectiveTheme === 'light' ? 'text-slate-600' : 'text-slate-300'}>
                     {restaurantInfo.address} • {restaurantInfo.phone}
                   </p>
                 </div>
@@ -1552,27 +1644,40 @@ export function TemplateExportTab() {
                   if (!category) return null
                   return (
                     <div key={categoryId}>
-                      <h2 className="mb-2 pb-1 font-bold text-white border-b border-gray-600">
+                      <h2 className={cn(
+                        "mb-2 pb-1 font-bold border-b",
+                        effectiveTheme === 'light' ? 'border-slate-200' : 'border-slate-600',
+                        categoryAccentClass
+                      )}>
                         {category.name}
                       </h2>
                       <div className="space-y-2">
                         {items.map((item) => (
                           <div key={item.id} className="flex justify-between">
                             <div className="flex-1">
-                              <span className="font-medium text-white">
+                              <span className={cn(
+                                "font-medium",
+                                effectiveTheme === 'light' ? 'text-slate-900' : 'text-white'
+                              )}>
                                 {item.name}
                                 {displayOptions.showChefRecommendations && item.is_chef_recommendation && (
                                   <span className="ml-1 text-amber-500">⭐</span>
                                 )}
                               </span>
                               {displayOptions.showDescriptions && item.description && (
-                                <p className="mt-1 text-gray-400">
+                                <p className={cn(
+                                  "mt-1",
+                                  effectiveTheme === 'light' ? 'text-slate-500' : 'text-slate-400'
+                                )}>
                                   {item.description}
                                 </p>
                               )}
                             </div>
                             {displayOptions.showPrices && (
-                              <span className="font-semibold ml-2 text-white">
+                              <span className={cn(
+                                "font-semibold ml-2",
+                                effectiveTheme === 'light' ? 'text-slate-900' : 'text-white'
+                              )}>
                                 {new Intl.NumberFormat('vi-VN').format(parseInt(item.base_price))}đ
                               </span>
                             )}
@@ -1591,17 +1696,19 @@ export function TemplateExportTab() {
         // Single page - original logic
         return (
           <div className={cn(
-            "flex h-full flex-col p-8 bg-slate-900 text-white",
-            fontSizeClasses[fontSize]
+            "flex h-full flex-col p-8",
+            fontSizeClasses[fontSize],
+            effectiveTheme === 'light' ? 'text-slate-900 bg-white' : 'text-slate-100 bg-slate-800'
           )}>
             <div className="mb-6 text-center">
               <h1 className={cn(
                 titleSizeClasses[fontSize],
-                "font-bold text-white"
+                "font-bold",
+                effectiveTheme === 'light' ? 'text-slate-900' : 'text-white'
               )}>
                 {restaurantInfo.name}
               </h1>
-              <p className="text-gray-300">
+              <p className={effectiveTheme === 'light' ? 'text-slate-600' : 'text-slate-300'}>
                 {restaurantInfo.address} • {restaurantInfo.phone}
               </p>
             </div>
@@ -1611,82 +1718,10 @@ export function TemplateExportTab() {
                 if (!category) return null
                 return (
                   <div key={categoryId}>
-                    <h2 className="mb-2 pb-1 font-bold text-white border-b border-gray-600">
-                      {category.name}
-                    </h2>
-                    <div className="space-y-2">
-                      {items.map((item) => (
-                        <div key={item.id} className="flex justify-between">
-                          <div className="flex-1">
-                            <span className="font-medium text-white">
-                              {item.name}
-                              {displayOptions.showChefRecommendations && item.is_chef_recommendation && (
-                                <span className="ml-1 text-amber-500">⭐</span>
-                              )}
-                            </span>
-                            {displayOptions.showDescriptions && item.description && (
-                              <p className="mt-1 text-gray-400">
-                                {item.description}
-                              </p>
-                            )}
-                          </div>
-                          {displayOptions.showPrices && (
-                            <span className="font-semibold ml-2 text-white">
-                              {new Intl.NumberFormat('vi-VN').format(parseInt(item.base_price))}đ
-                            </span>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-        )
-      }
-    } else if (selectedTemplate === '4') {
-      // Tri-Fold Classic - matches PDF pagination exactly
-      const categoriesArray = Object.entries(menuItemsByCategory)
-      const itemsPerPage = Math.ceil(categoriesArray.length / 3)
-      const pages = []
-
-      for (let i = 0; i < 3; i++) {
-        const start = i * itemsPerPage
-        const end = start + itemsPerPage
-        const pageCategories = categoriesArray.slice(start, end)
-
-        pages.push(
-          <div key={i} className={cn(
-            "flex h-full flex-col p-8",
-            fontSizeClasses[fontSize],
-            effectiveTheme === 'light' ? 'text-slate-900 bg-white' : 'text-slate-100 bg-slate-800'
-          )}>
-            {i === 0 && (
-              <div className="mb-6 text-center">
-                <h1 className={cn(
-                  titleSizeClasses[fontSize],
-                  "font-bold",
-                  effectiveTheme === 'light' ? 'text-slate-900' : 'text-white'
-                )}>
-                  {restaurantInfo.name}
-                </h1>
-                <p className={effectiveTheme === 'light' ? 'text-slate-600' : 'text-slate-300'}>
-                  {restaurantInfo.address} • {restaurantInfo.phone}
-                </p>
-              </div>
-            )}
-            <div className="flex-1 space-y-4">
-              {pageCategories.map(([categoryId, items]) => {
-                const category = categories.find(c => c.id === categoryId)
-                if (!category) return null
-                return (
-                  <div key={categoryId}>
                     <h2 className={cn(
-                      "mb-2 pb-1 font-bold",
-                      effectiveTheme === 'light' 
-                        ? 'border-b border-slate-200 text-slate-900' 
-                        : 'border-b border-slate-600 text-white'
+                      "mb-2 pb-1 font-bold border-b",
+                      effectiveTheme === 'light' ? 'border-slate-200' : 'border-slate-600',
+                      categoryAccentClass
                     )}>
                       {category.name}
                     </h2>
@@ -1730,8 +1765,188 @@ export function TemplateExportTab() {
           </div>
         )
       }
-
-      return pages
+    } else if (selectedTemplate === '4') {
+      // Tri-Fold Classic - Horizontal A4 with separators
+      const categoriesArray = Object.entries(menuItemsByCategory)
+      const itemsPerSection = Math.ceil(categoriesArray.length / 3)
+      
+      return (
+        <div className={cn(
+          "flex h-full p-8",
+          fontSizeClasses[fontSize],
+          effectiveTheme === 'light' ? 'text-slate-900 bg-white' : 'text-slate-100 bg-slate-800'
+        )}>
+          <div className="absolute top-4 left-1/2 transform -translate-x-1/2 text-center">
+            <h1 className={cn(
+              titleSizeClasses[fontSize],
+              "font-bold",
+              effectiveTheme === 'light' ? 'text-slate-900' : 'text-white'
+            )}>
+              {restaurantInfo.name}
+            </h1>
+            <p className={effectiveTheme === 'light' ? 'text-slate-600' : 'text-slate-300'}>
+              {restaurantInfo.address} • {restaurantInfo.phone}
+            </p>
+          </div>
+          <div className="flex-1 flex mt-16">
+            {/* Section 1 */}
+            <div className="flex-1 pr-4 border-r border-slate-300 dark:border-slate-600">
+              {categoriesArray.slice(0, itemsPerSection).map(([categoryId, items]) => {
+                const category = categories.find(c => c.id === categoryId)
+                if (!category) return null
+                return (
+                  <div key={categoryId} className="mb-4">
+                    <h2 className={cn(
+                      "mb-2 pb-1 font-bold border-b",
+                      effectiveTheme === 'light' ? 'border-slate-200' : 'border-slate-600',
+                      categoryAccentClass
+                    )}>
+                      {category.name}
+                    </h2>
+                    <div className="space-y-1">
+                      {items.map((item) => (
+                        <div key={item.id} className="flex justify-between">
+                          <div className="flex-1">
+                            <span className={cn(
+                              "font-medium",
+                              effectiveTheme === 'light' ? 'text-slate-900' : 'text-white'
+                            )}>
+                              {item.name}
+                              {displayOptions.showChefRecommendations && item.is_chef_recommendation && (
+                                <span className="ml-1 text-amber-500">⭐</span>
+                              )}
+                            </span>
+                            {displayOptions.showDescriptions && item.description && (
+                              <p className={cn(
+                                "mt-1",
+                                effectiveTheme === 'light' ? 'text-slate-500' : 'text-slate-400'
+                              )}>
+                                {item.description}
+                              </p>
+                            )}
+                          </div>
+                          {displayOptions.showPrices && (
+                            <span className={cn(
+                              "font-semibold ml-2",
+                              effectiveTheme === 'light' ? 'text-slate-900' : 'text-white'
+                            )}>
+                              {new Intl.NumberFormat('vi-VN').format(parseInt(item.base_price))}đ
+                            </span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+            
+            {/* Section 2 */}
+            <div className="flex-1 px-4 border-r border-slate-300 dark:border-slate-600">
+              {categoriesArray.slice(itemsPerSection, itemsPerSection * 2).map(([categoryId, items]) => {
+                const category = categories.find(c => c.id === categoryId)
+                if (!category) return null
+                return (
+                  <div key={categoryId} className="mb-4">
+                    <h2 className={cn(
+                      "mb-2 pb-1 font-bold border-b",
+                      effectiveTheme === 'light' ? 'border-slate-200' : 'border-slate-600',
+                      categoryAccentClass
+                    )}>
+                      {category.name}
+                    </h2>
+                    <div className="space-y-1">
+                      {items.map((item) => (
+                        <div key={item.id} className="flex justify-between">
+                          <div className="flex-1">
+                            <span className={cn(
+                              "font-medium",
+                              effectiveTheme === 'light' ? 'text-slate-900' : 'text-white'
+                            )}>
+                              {item.name}
+                              {displayOptions.showChefRecommendations && item.is_chef_recommendation && (
+                                <span className="ml-1 text-amber-500">⭐</span>
+                              )}
+                            </span>
+                            {displayOptions.showDescriptions && item.description && (
+                              <p className={cn(
+                                "mt-1",
+                                effectiveTheme === 'light' ? 'text-slate-500' : 'text-slate-400'
+                              )}>
+                                {item.description}
+                              </p>
+                            )}
+                          </div>
+                          {displayOptions.showPrices && (
+                            <span className={cn(
+                              "font-semibold ml-2",
+                              effectiveTheme === 'light' ? 'text-slate-900' : 'text-white'
+                            )}>
+                              {new Intl.NumberFormat('vi-VN').format(parseInt(item.base_price))}đ
+                            </span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+            
+            {/* Section 3 */}
+            <div className="flex-1 pl-4">
+              {categoriesArray.slice(itemsPerSection * 2).map(([categoryId, items]) => {
+                const category = categories.find(c => c.id === categoryId)
+                if (!category) return null
+                return (
+                  <div key={categoryId} className="mb-4">
+                    <h2 className={cn(
+                      "mb-2 pb-1 font-bold border-b",
+                      effectiveTheme === 'light' ? 'border-slate-200' : 'border-slate-600',
+                      categoryAccentClass
+                    )}>
+                      {category.name}
+                    </h2>
+                    <div className="space-y-1">
+                      {items.map((item) => (
+                        <div key={item.id} className="flex justify-between">
+                          <div className="flex-1">
+                            <span className={cn(
+                              "font-medium",
+                              effectiveTheme === 'light' ? 'text-slate-900' : 'text-white'
+                            )}>
+                              {item.name}
+                              {displayOptions.showChefRecommendations && item.is_chef_recommendation && (
+                                <span className="ml-1 text-amber-500">⭐</span>
+                              )}
+                            </span>
+                            {displayOptions.showDescriptions && item.description && (
+                              <p className={cn(
+                                "mt-1",
+                                effectiveTheme === 'light' ? 'text-slate-500' : 'text-slate-400'
+                              )}>
+                                {item.description}
+                              </p>
+                            )}
+                          </div>
+                          {displayOptions.showPrices && (
+                            <span className={cn(
+                              "font-semibold ml-2",
+                              effectiveTheme === 'light' ? 'text-slate-900' : 'text-white'
+                            )}>
+                              {new Intl.NumberFormat('vi-VN').format(parseInt(item.base_price))}đ
+                            </span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        </div>
+      )
     } else {
       // Default single column - add pagination if too many items
       const totalItems = allItems.length
@@ -1781,13 +1996,12 @@ export function TemplateExportTab() {
                     <div key={categoryId}>
                       <h2 className={cn(
                         "mb-2 pb-1 font-bold",
-                        effectiveTheme === 'light' 
-                          ? 'border-b border-slate-200' 
-                          : 'border-b border-slate-600',
-                        accentColor === 'emerald' && (effectiveTheme === 'light' ? 'text-emerald-600' : 'text-emerald-400'),
-                        accentColor === 'blue' && (effectiveTheme === 'light' ? 'text-blue-600' : 'text-blue-400'),
-                        accentColor === 'amber' && (effectiveTheme === 'light' ? 'text-amber-600' : 'text-amber-400'),
-                        accentColor === 'rose' && (effectiveTheme === 'light' ? 'text-rose-600' : 'text-rose-400')
+                        selectedTemplate === '3' 
+                          ? 'border-b border-slate-600' 
+                          : effectiveTheme === 'light' 
+                            ? 'border-b border-slate-200' 
+                            : 'border-b border-slate-600',
+                        categoryAccentClass
                       )}>
                         {category.name}
                       </h2>
@@ -1845,7 +2059,6 @@ export function TemplateExportTab() {
           <div className={cn(
             "flex h-full flex-col p-8",
             fontSizeClasses[fontSize],
-            effectiveTheme === 'light' ? 'text-slate-900' : 'text-slate-100'
           )}>
             <div className="mb-6 text-center">
               <h1 className={cn(
@@ -1871,10 +2084,7 @@ export function TemplateExportTab() {
                       effectiveTheme === 'light' 
                         ? 'border-b border-slate-200' 
                         : 'border-b border-slate-600',
-                      accentColor === 'emerald' && (effectiveTheme === 'light' ? 'text-emerald-600' : 'text-emerald-400'),
-                      accentColor === 'blue' && (effectiveTheme === 'light' ? 'text-blue-600' : 'text-blue-400'),
-                      accentColor === 'amber' && (effectiveTheme === 'light' ? 'text-amber-600' : 'text-amber-400'),
-                      accentColor === 'rose' && (effectiveTheme === 'light' ? 'text-rose-600' : 'text-rose-400')
+                      categoryAccentClass
                     )}>
                       {category.name}
                     </h2>
@@ -1942,7 +2152,6 @@ export function TemplateExportTab() {
         displayOptions,
         theme,
         accentColor,
-        exportQuality,
         selectedTemplate,
         fontSize
       )
@@ -2055,7 +2264,11 @@ export function TemplateExportTab() {
                       ))}
                     </div>
                     <Button
-                      onClick={() => setSelectedTemplate(template.id)}
+                      onClick={() => {
+                        setSelectedTemplate(template.id)
+                        if (template.id === '3') setTheme('dark')
+                        else setTheme('light')
+                      }}
                       className="mt-4 w-full bg-emerald-600 hover:bg-emerald-700"
                       size="sm"
                     >
@@ -2087,7 +2300,11 @@ export function TemplateExportTab() {
                 {templates.map((template) => (
                   <DropdownMenuItem
                     key={template.id}
-                    onClick={() => setSelectedTemplate(template.id)}
+                    onClick={() => {
+                      setSelectedTemplate(template.id)
+                      if (template.id === '3') setTheme('dark')
+                      else setTheme('light')
+                    }}
                     disabled={template.id === selectedTemplate}
                   >
                     {template.name}
@@ -2101,7 +2318,7 @@ export function TemplateExportTab() {
             </DropdownMenu>
           </div>
 
-          <div className="grid gap-6 lg:grid-cols-[300px_1fr] h-full m-6">
+          <div className="grid gap-6 lg:grid-cols-[400px_1fr] h-[75vh]">
             {/* Left Panel: Tabbed Data Source & Style Controls */}
             <Card className="rounded-2xl p-0 border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 h-full overflow-hidden">
               {/* Tabs */}
@@ -2307,36 +2524,6 @@ export function TemplateExportTab() {
                       />
                     </div>
 
-                    {/* Quality */}
-                    <div className="space-y-2">
-                      <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
-                        Chất lượng xuất
-                      </label>
-                      <div className="grid grid-cols-2 gap-2">
-                        <button
-                          onClick={() => setExportQuality('standard')}
-                          className={cn(
-                            'rounded-lg border-2 p-3 text-sm transition-all',
-                            exportQuality === 'standard'
-                              ? 'border-emerald-500 bg-emerald-50 dark:border-emerald-600 dark:bg-emerald-500/10'
-                              : 'border-slate-200 dark:border-slate-700',
-                          )}
-                        >
-                          Tiêu chuẩn
-                        </button>
-                        <button
-                          onClick={() => setExportQuality('high')}
-                          className={cn(
-                            'rounded-lg border-2 p-3 text-sm transition-all',
-                            exportQuality === 'high'
-                              ? 'border-emerald-500 bg-emerald-50 dark:border-emerald-600 dark:bg-emerald-500/10'
-                              : 'border-slate-200 dark:border-slate-700',
-                          )}
-                        >
-                          Cao cấp
-                        </button>
-                      </div>
-                    </div>
                     {/* Options */}
                     <div className="space-y-2">
                       <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
@@ -2387,9 +2574,7 @@ export function TemplateExportTab() {
                   <div className="flex items-center gap-2">
                     <Badge variant="secondary">A4 • 210×297mm</Badge>
                     <Badge variant="secondary">
-                      {(() => {
-                        if (selectedTemplate === '4') return 3
-                        
+                      {(() => {                 
                         // Calculate pages for other templates based on content
                         const allItems = Object.entries(menuItemsByCategory).flatMap(([categoryId, items]) => 
                           items.map(item => ({ ...item, categoryId }))
@@ -2484,6 +2669,10 @@ export function TemplateExportTab() {
                     {/* Multi-page Preview for templates that create multiple pages */}
                     {(() => {
                       const content = renderMenuContent()
+                      const isTriFold = selectedTemplate === '4'
+                      const canvasWidth = isTriFold ? '1123px' : '794px' // Landscape A4 width : Portrait A4 width
+                      const canvasHeight = isTriFold ? '794px' : '1123px' // Landscape A4 height : Portrait A4 height
+                      
                       if (Array.isArray(content)) {
                         // Multi-page template (like Tri-Fold) - display horizontally
                         return content.map((pageContent, index) => (
@@ -2494,9 +2683,9 @@ export function TemplateExportTab() {
                               theme === 'light' ? 'bg-white' : 'bg-slate-800'
                             )}
                             style={{
-                              width: '794px', // 210mm at 96dpi
-                              height: '1123px', // 297mm at 96dpi
-                              left: `${index * 894 * (zoom / 100)}px`,
+                              width: canvasWidth,
+                              height: canvasHeight,
+                              left: `${index * (parseInt(canvasWidth) + 100) * (zoom / 100)}px`,
                               top: '0',
                               transform: `translate(${panX}px, ${panY}px) scale(${zoom / 100})`,
                               transformOrigin: 'top center'
@@ -2514,8 +2703,8 @@ export function TemplateExportTab() {
                               theme === 'light' ? 'bg-white' : 'bg-slate-800'
                             )}
                             style={{
-                              width: '794px',
-                              height: '1123px',
+                              width: canvasWidth,
+                              height: canvasHeight,
                               left: '0',
                               top: '0',
                               transform: `translate(${panX}px, ${panY}px) scale(${zoom / 100})`,
