@@ -1,18 +1,19 @@
 'use client'
 
 import { Suspense, useState } from 'react'
-import { CategoriesOverviewStats } from '@/components/admin/categories-overview-stats'
-import { CategoriesFilterToolbar } from '@/components/admin/categories-filter-toolbar'
-import { CategoriesTable } from '@/components/admin/categories-table'
-import { CategoryUpsertModal } from '@/components/admin/category-upsert-modal'
-import { CategoryDeleteDialog } from '@/components/admin/category-delete-dialog'
-import { useSearchParams } from 'next/navigation'
-import { Loader2 } from 'lucide-react'
+import { CategoriesOverviewStats } from '@/src/features/admin/menu/components/categories/categories-overview-stats'
+import { CategoriesFilterToolbar } from '@/src/features/admin/menu/components/categories/categories-filter-toolbar'
+import { CategoriesTable } from '@/src/features/admin/menu/components/categories/categories-table'
+import { CategoryUpsertModal } from '@/src/features/admin/menu/components/categories/category-upsert-modal'
+import { CategoryDeleteDialog } from '@/src/features/admin/menu/components/categories/category-delete-dialog'
+import { Category } from '@/src/features/admin/menu/types/categories'
 
 function CategoriesContent() {
-  const searchParams = useSearchParams()
-  const modalOpen = searchParams.get('modal') === 'category'
   const [reorderMode, setReorderMode] = useState(false)
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null)
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
+  const [openUpsertModal, setOpenUpsertModal] = useState(false)
+  const [upsertModalMode, setUpsertModalMode] = useState<'create' | 'edit'>('create')
 
   return (
     <div className="space-y-6">
@@ -20,31 +21,51 @@ function CategoriesContent() {
       <CategoriesOverviewStats />
 
       {/* Filter Toolbar */}
-      <CategoriesFilterToolbar reorderMode={reorderMode} setReorderMode={setReorderMode} />
+      <CategoriesFilterToolbar
+        reorderMode={reorderMode}
+        setReorderMode={setReorderMode}
+        onCreateClick={() => {
+          setOpenUpsertModal(true)
+          setUpsertModalMode('create')
+        }}
+      />
 
       {/* Categories Table */}
-      <CategoriesTable reorderMode={reorderMode} setReorderMode={setReorderMode} />
+      <CategoriesTable
+        reorderMode={reorderMode}
+        setReorderMode={setReorderMode}
+        onDeleteClick={(category) => {
+          setSelectedCategory(category)
+          setOpenDeleteDialog(true)
+        }}
+        onEditClick={(category) => {
+          setSelectedCategory(category)
+          setOpenUpsertModal(true)
+          setUpsertModalMode('edit')
+        }}
+      />
 
       {/* Modal for Create/Edit */}
-      <CategoryUpsertModal open={modalOpen} />
+      <CategoryUpsertModal
+        open={openUpsertModal}
+        mode={upsertModalMode}
+        category={selectedCategory}
+        onOpenChange={setOpenUpsertModal}
+      />
 
       {/* Delete Confirmation Dialog */}
-      <CategoryDeleteDialog />
-    </div>
-  )
-}
-
-function LoadingFallback() {
-  return (
-    <div className="flex items-center justify-center py-12">
-      <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
+      <CategoryDeleteDialog
+        category={selectedCategory}
+        open={openDeleteDialog}
+        onOpenChange={setOpenDeleteDialog}
+      />
     </div>
   )
 }
 
 export default function CategoriesPage() {
   return (
-    <Suspense fallback={<LoadingFallback />}>
+    <Suspense fallback={null}>
       <CategoriesContent />
     </Suspense>
   )

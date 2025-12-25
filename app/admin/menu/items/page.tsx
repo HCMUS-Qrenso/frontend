@@ -1,17 +1,25 @@
 'use client'
 
-import { Suspense } from 'react'
-import { MenuItemsOverviewStats } from '@/components/admin/menu-items-overview-stats'
-import { MenuItemsFilterToolbar } from '@/components/admin/menu-items-filter-toolbar'
-import { MenuItemsTable } from '@/components/admin/menu-items-table'
-import { MenuItemUpsertModal } from '@/components/admin/menu-item-upsert-modal'
-import { MenuItemDeleteDialog } from '@/components/admin/menu-item-delete-dialog'
+import { Suspense, useState } from 'react'
+import { MenuItemsOverviewStats } from '@/src/features/admin/menu/components/items/menu-items-overview-stats'
+import { MenuItemsFilterToolbar } from '@/src/features/admin/menu/components/items/menu-items-filter-toolbar'
+import { MenuItemsTable } from '@/src/features/admin/menu/components/items/menu-items-table'
+import { MenuItemUpsertModal } from '@/src/features/admin/menu/components/items/menu-item-upsert-modal'
+import { MenuItemDeleteDialog } from '@/src/features/admin/menu/components/items/menu-item-delete-dialog'
 import { useSearchParams } from 'next/navigation'
-import { Loader2 } from 'lucide-react'
+import { MenuItem } from '@/src/features/admin/menu/types/menu-items'
+import { Category } from '@/src/features/admin/menu/types/categories'
+import { useCategoriesQuery } from '@/src/features/admin/menu/queries/categories.queries'
 
 function MenuItemsContent() {
-  const searchParams = useSearchParams()
-  const modalOpen = searchParams.get('modal') === 'item'
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
+  const [openUpsertModal, setOpenUpsertModal] = useState(false)
+  const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null)
+  const [upsertModalMode, setUpsertModalMode] = useState<'create' | 'edit'>('create')
+
+  // Fetch categories from API
+  const { data: categoriesData } = useCategoriesQuery()
+  const categories = categoriesData?.data.categories || []
 
   return (
     <div className="space-y-6">
@@ -19,31 +27,49 @@ function MenuItemsContent() {
       <MenuItemsOverviewStats />
 
       {/* Filter Toolbar */}
-      <MenuItemsFilterToolbar />
+      <MenuItemsFilterToolbar
+        onCreateClick={() => {
+          setUpsertModalMode('create')
+          setOpenUpsertModal(true)
+        }}
+        categories={categories}
+      />
 
       {/* Menu Items Table */}
-      <MenuItemsTable />
+      <MenuItemsTable
+        onDeleteClick={(item: MenuItem) => {
+          setSelectedItem(item)
+          setOpenDeleteDialog(true)
+        }}
+        onEditClick={(item: MenuItem) => {
+          setSelectedItem(item)
+          setUpsertModalMode('edit')
+          setOpenUpsertModal(true)
+        }}
+      />
 
       {/* Modal for Create/Edit */}
-      <MenuItemUpsertModal open={modalOpen} />
+      <MenuItemUpsertModal
+        item={selectedItem}
+        categories={categories}
+        mode={upsertModalMode}
+        open={openUpsertModal}
+        onOpenChange={setOpenUpsertModal}
+      />
 
       {/* Delete Confirmation Dialog */}
-      <MenuItemDeleteDialog />
-    </div>
-  )
-}
-
-function LoadingFallback() {
-  return (
-    <div className="flex items-center justify-center py-12">
-      <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
+      <MenuItemDeleteDialog
+        item={selectedItem}
+        open={openDeleteDialog}
+        onOpenChange={setOpenDeleteDialog}
+      />
     </div>
   )
 }
 
 export default function MenuItemsPage() {
   return (
-    <Suspense fallback={<LoadingFallback />}>
+    <Suspense fallback={null}>
       <MenuItemsContent />
     </Suspense>
   )

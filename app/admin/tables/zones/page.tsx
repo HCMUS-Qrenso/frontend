@@ -1,17 +1,20 @@
 'use client'
 
-import { Suspense } from 'react'
-import { ZonesOverviewStats } from '@/components/admin/zones-overview-stats'
-import { ZonesFilterToolbar } from '@/components/admin/zones-filter-toolbar'
-import { ZonesTable } from '@/components/admin/zones-table'
-import { ZoneUpsertModal } from '@/components/admin/zone-upsert-modal'
-import { ZoneDeleteDialog } from '@/components/admin/zone-delete-dialog'
+import { Suspense, useState } from 'react'
+import { ZonesOverviewStats } from '@/src/features/admin/tables/components/zones/zones-overview-stats'
+import { ZonesFilterToolbar } from '@/src/features/admin/tables/components/zones/zones-filter-toolbar'
+import { ZonesTable } from '@/src/features/admin/tables/components/zones/zones-table'
+import { ZoneUpsertModal } from '@/src/features/admin/tables/components/zones/zone-upsert-modal'
+import { ZoneDeleteModal } from '@/src/features/admin/tables/components/zones/zone-delete-modal'
 import { useSearchParams } from 'next/navigation'
-import { Loader2 } from 'lucide-react'
+import { Zone } from '@/src/features/admin/tables/types/zones'
 
 function ZonesContent() {
   const searchParams = useSearchParams()
-  const modalOpen = searchParams.get('modal') === 'zone'
+  const [upsertModalOpen, setUpsertModalOpen] = useState(false)
+  const [upsertModalMode, setUpsertModalMode] = useState<'create' | 'edit'>('create')
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+  const [selectedZone, setSelectedZone] = useState<Zone | null>(null)
 
   return (
     <div className="space-y-6">
@@ -19,31 +22,47 @@ function ZonesContent() {
       <ZonesOverviewStats />
 
       {/* Filter Toolbar */}
-      <ZonesFilterToolbar />
+      <ZonesFilterToolbar
+        onCreateZone={() => {
+          setUpsertModalMode('create')
+          setUpsertModalOpen(true)
+        }}
+      />
 
       {/* Zones Table */}
-      <ZonesTable />
+      <ZonesTable
+        onEdit={(zone) => {
+          setSelectedZone(zone)
+          setUpsertModalMode('edit')
+          setUpsertModalOpen(true)
+        }}
+        onDelete={(zone) => {
+          setSelectedZone(zone)
+          setDeleteModalOpen(true)
+        }}
+      />
 
       {/* Modal for Create/Edit */}
-      <ZoneUpsertModal open={modalOpen} />
+      <ZoneUpsertModal
+        open={upsertModalOpen}
+        mode={upsertModalMode}
+        zone={selectedZone}
+        onOpenChange={setUpsertModalOpen}
+      />
 
-      {/* Delete Confirmation Dialog */}
-      <ZoneDeleteDialog />
-    </div>
-  )
-}
-
-function LoadingFallback() {
-  return (
-    <div className="flex items-center justify-center py-12">
-      <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
+      {/* Modal for Delete */}
+      <ZoneDeleteModal
+        open={deleteModalOpen}
+        zone={selectedZone}
+        onOpenChange={setDeleteModalOpen}
+      />
     </div>
   )
 }
 
 export default function ZonesPage() {
   return (
-    <Suspense fallback={<LoadingFallback />}>
+    <Suspense fallback={null}>
       <ZonesContent />
     </Suspense>
   )

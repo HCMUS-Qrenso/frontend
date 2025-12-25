@@ -1,8 +1,8 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import { ProtectedRoute } from '@/components/auth/protected-route'
-import { AdminLayout } from '@/components/admin/admin-layout'
+import { ProtectedRoute } from '@/src/features/auth/components/protected-route'
+import { AdminLayout } from '@/src/features/admin/shared/components/admin-layout'
 
 interface AdminRootLayoutProps {
   children: ReactNode

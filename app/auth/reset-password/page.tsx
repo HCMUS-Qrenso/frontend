@@ -5,15 +5,14 @@ import type React from 'react'
 import { Suspense, useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useSearchParams, useRouter } from 'next/navigation'
-import { isAxiosError } from 'axios'
-import { AuthContainer } from '@/components/auth/auth-container'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { extractErrorMessage } from '@/src/lib/helpers/error-handler'
+import { AuthContainer } from '@/src/features/auth/components/auth-container'
+import { Button } from '@/src/components/ui/button'
+import { Input } from '@/src/components/ui/input'
+import { Label } from '@/src/components/ui/label'
 import { Loader2, CheckCircle2, Eye, EyeOff, AlertCircle, AlertTriangle } from 'lucide-react'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { useAuth } from '@/hooks/use-auth'
-import type { ApiErrorResponse } from '@/types/auth'
+import { Alert, AlertDescription } from '@/src/components/ui/alert'
+import { useAuth } from '@/src/features/auth/hooks'
 
 type PasswordStrength = 'weak' | 'medium' | 'strong'
 
@@ -112,19 +111,9 @@ function ResetPasswordContent() {
       await resetPassword({ token: token ?? '', newPassword: formData.password })
       setIsSuccess(true)
     } catch (err) {
-      const message = getErrorMessage(err)
+      const message = extractErrorMessage(err)
       setFieldErrors((prev) => ({ ...prev, password: message }))
     }
-  }
-
-  const getErrorMessage = (err: unknown) => {
-    if (isAxiosError<ApiErrorResponse>(err)) {
-      const data = err.response?.data
-      if (data?.message) {
-        return Array.isArray(data.message) ? data.message.join(', ') : data.message
-      }
-    }
-    return 'Không thể đặt lại mật khẩu. Vui lòng thử lại.'
   }
 
   // Loading State
@@ -250,7 +239,7 @@ function ResetPasswordContent() {
         </Alert>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} noValidate className="space-y-5">
           {/* New Password Field */}
           <div className="space-y-2">
             <Label

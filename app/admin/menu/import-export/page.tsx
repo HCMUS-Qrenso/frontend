@@ -1,10 +1,10 @@
 'use client'
 
 import { Suspense, useState } from 'react'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { ImportTab } from '@/components/admin/import-tab'
-import { ExportDataTab } from '@/components/admin/export-data-tab'
-import { Loader2, Upload, Download } from 'lucide-react'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/src/components/ui/tabs'
+import { ImportTab } from '@/src/features/admin/menu/components/management/import-tab'
+import { ExportDataTab } from '@/src/features/admin/menu/components/management/export-data-tab'
+import { Upload, Download } from 'lucide-react'
 
 function ImportExportContent() {
   const [activeTab, setActiveTab] = useState('import')
@@ -38,17 +38,9 @@ function ImportExportContent() {
   )
 }
 
-function LoadingFallback() {
-  return (
-    <div className="flex items-center justify-center py-12">
-      <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
-    </div>
-  )
-}
-
 export default function ImportExportPage() {
   return (
-    <Suspense fallback={<LoadingFallback />}>
+    <Suspense fallback={null}>
       <ImportExportContent />
     </Suspense>
   )
