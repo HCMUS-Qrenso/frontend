@@ -4,7 +4,7 @@ import type React from 'react'
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { extractErrorMessage } from '@/src/lib/helpers/error-handler'
 import { AuthContainer } from '@/src/features/auth/components/auth-container'
 import { Button } from '@/src/components/ui/button'
@@ -22,14 +22,10 @@ const REMEMBERED_EMAIL_KEY = 'rememberedEmail'
 
 export default function LoginPage() {
   const router = useRouter()
-  const searchParams = useSearchParams()
   const { login, loginPending } = useAuth()
   const [showPassword, setShowPassword] = useState(false)
   const [rememberMe, setRememberMe] = useState(false)
   const [error, setError] = useState<string | null>(null)
-
-  // Get redirect URL from query params, default to /admin/dashboard
-  const redirectTo = searchParams.get('redirect') || '/admin/dashboard'
 
   const [formData, setFormData] = useState({
     email: '',
@@ -88,9 +84,7 @@ export default function LoginPage() {
 
       // Truyền rememberMe vào login call
       await login({ ...formData, rememberMe })
-      
-      // Redirect to the original destination or dashboard
-      router.push(redirectTo)
+      router.push('/admin/dashboard')
     } catch (err) {
       setError(extractErrorMessage(err))
     }
