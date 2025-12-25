@@ -89,7 +89,6 @@ export function useTableLayout({
     data: layoutData,
     isLoading: isLoadingLayout,
     refetch: refetchLayout,
-    isStale,
   } = useZoneLayoutQuery(currentZoneId || null, !!currentZoneId)
 
   // Mutations
@@ -319,18 +318,14 @@ export function useTableLayout({
   }, [])
 
   const handleResetLayout = useCallback(async () => {
-    let dataToUse = layoutData
-    if (isStale) {
-      const { data } = await refetchLayout()
-      dataToUse = data
-    }
-    const freshTables = dataToUse?.data.tables
-      ? dataToUse.data.tables.map(transformTableToItem)
+    const { data } = await refetchLayout()
+    const freshTables = data?.data.tables
+      ? data.data.tables.map(transformTableToItem)
       : []
     setLocalTables(freshTables)
     setPositionChanges(new Map())
     setSelectedTableId(null)
-  }, [layoutData, isStale, refetchLayout])
+  }, [layoutData, refetchLayout])
 
   const handleConfirmReset = useCallback(async () => {
     try {

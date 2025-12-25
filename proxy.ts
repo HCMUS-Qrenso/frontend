@@ -21,7 +21,7 @@ const AUTH_ROUTES = ['/auth/login', '/auth/signup', '/auth/forgot-password']
 // Public routes that don't need any checks
 const PUBLIC_ROUTES = ['/', '/contact', '/auth/reset-password', '/auth/setup-password', '/auth/verify-email']
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   // Get refreshToken cookie (httpOnly cookie set by backend)
