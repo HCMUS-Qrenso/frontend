@@ -14,6 +14,14 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async rewrites() {
+    return [
+      {
+        source: '/s3-storage/:path*',
+        destination: 'https://s3.ntnhan.site/:path*',
+      },
+    ]
+  },
 }
 
 export default nextConfig
