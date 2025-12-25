@@ -1,6 +1,9 @@
 import { Category, MenuItem } from '../../types'
 import { pdf, Document, Page, Text, View, StyleSheet, Font, Image } from '@react-pdf/renderer'
 
+// S3 Public URL
+const S3_PUBLIC_URL = process.env.NEXT_PUBLIC_S3_PUBLIC_URL || 'https://s3.ntnhan.site'
+
 Font.register({
   family: 'Inter',
   fonts: [
@@ -30,6 +33,29 @@ Font.registerEmojiSource({
   url: 'https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/',
 })
 
+// Helper function to load image as PNG data URI
+const loadImageAsDataURI = async (url: string): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const img = document.createElement('img');
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        reject(new Error('Canvas context not available'));
+        return;
+      }
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx.drawImage(img, 0, 0);
+      const dataURI = canvas.toDataURL('image/png');
+      resolve(dataURI);
+    };
+    img.onerror = reject;
+    img.src = url;
+  });
+};
+
 // Helper function to generate PDF blob
 export const generatePDFBlob = async (
   restaurantInfo: any,
@@ -42,6 +68,35 @@ export const generatePDFBlob = async (
   fontSize: 'small' | 'medium' | 'large' = 'medium',
   chefIcon: string = '⭐',
 ): Promise<Blob> => {
+  
+  // Collect all unique image URLs that need conversion (unsupported formats)
+  const allItems = Object.values(menuItemsByCategory).flat();
+  const unsupportedUrls = new Set<string>();
+  allItems.forEach(item => {
+    if (item.images && item.images.length > 0) {
+      const primary = item.images.find((img: any) => img.is_primary)?.image_url;
+      const first = item.images[0]?.image_url;
+      [primary, first].forEach(url => {
+        if (url && url.startsWith(S3_PUBLIC_URL) && !/\.(jpg|jpeg|png)$/i.test(url)) {
+          unsupportedUrls.add(url);
+        }
+      });
+    }
+  });
+
+  // Load unsupported images as PNG data URIs
+  const imageData: Record<string, string> = {};
+  await Promise.all(Array.from(unsupportedUrls).map(async (url) => {
+    try {
+      const loadUrl = url.replace(`${S3_PUBLIC_URL}`, '/s3-storage');
+      const dataURI = await loadImageAsDataURI(loadUrl);
+      imageData[url] = dataURI;
+    } catch (error) {
+      console.error('Failed to convert image:', url, error);
+      // Will fall back to placeholder
+    }
+  }));
+
   const doc = (
     <MenuPDFDocument
       restaurantInfo={restaurantInfo}
@@ -53,6 +108,7 @@ export const generatePDFBlob = async (
       templateId={templateId}
       fontSize={fontSize}
       chefIcon={' ' + chefIcon}
+      imageData={imageData}
     />
   )
 
@@ -70,6 +126,7 @@ const MenuPDFDocument = ({
   templateId,
   fontSize = 'medium',
   chefIcon = '⭐',
+  imageData = {},
 }: {
   restaurantInfo: any
   menuItemsByCategory: Record<string, any[]>
@@ -80,7 +137,27 @@ const MenuPDFDocument = ({
   templateId: string
   fontSize?: 'small' | 'medium' | 'large'
   chefIcon?: string
+  imageData?: Record<string, string>
 }) => {
+  const getSelectedImageUrl = (images: any[]) => {
+    const primary = images.find((img: any) => img.is_primary);
+    return primary?.image_url || images[0]?.image_url || '/placeholder.jpg';
+  };
+
+  const transformImageUrl = (url: string) => {
+    // Unsupported format converted to data URI
+    if (imageData[url]) {
+      return imageData[url];
+    }
+
+    // Transform S3 URL to local rewrite path
+    if (url.startsWith(S3_PUBLIC_URL)) {
+      const transformed = url.replace(`${S3_PUBLIC_URL}`, '/s3-storage');
+      return transformed;
+    }
+    return url;
+  };
+
   const accentColors = {
     emerald: { light: '#059669', dark: '#34d399' },
     blue: { light: '#2563eb', dark: '#60a5fa' },
@@ -669,9 +746,7 @@ const MenuPDFDocument = ({
                               <View style={{ width: 60, height: 60, marginRight: 12 }}>
                                 <Image
                                   src={
-                                    item.images.find((img: any) => img.is_primary)?.image_url ||
-                                    item.images[0]?.image_url ||
-                                    '/placeholder.jpg'
+                                    transformImageUrl(getSelectedImageUrl(item.images))
                                   }
                                   style={{
                                     width: 60,
@@ -799,9 +874,7 @@ const MenuPDFDocument = ({
                             <View style={{ width: 80, height: 80, marginRight: 12 }}>
                               <Image
                                 src={
-                                  item.images.find((img: any) => img.is_primary)?.image_url ||
-                                  item.images[0]?.image_url ||
-                                  '/placeholder.jpg'
+                                  transformImageUrl(getSelectedImageUrl(item.images))
                                 }
                                 style={{
                                   width: 80,
