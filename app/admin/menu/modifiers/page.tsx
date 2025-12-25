@@ -1,16 +1,16 @@
 'use client'
 
 import { Suspense, useState } from 'react'
-import { ModifierGroupsPanel } from '@/components/admin/modifier-groups-panel'
-import { ModifiersPanel } from '@/components/admin/modifiers-panel'
-import { ModifierGroupModal } from '@/components/admin/modifier-group-modal'
-import { ModifierModal } from '@/components/admin/modifier-modal'
-import { ModifierGroupDeleteDialog } from '@/components/admin/modifier-group-delete-dialog'
-import { ModifierDeleteDialog } from '@/components/admin/modifier-delete-dialog'
+import { ModifierGroupsPanel } from '@/src/features/admin/menu/components/modifiers/modifier-groups-panel'
+import { ModifiersPanel } from '@/src/features/admin/menu/components/modifiers/modifiers-panel'
+import { ModifierGroupModal } from '@/src/features/admin/menu/components/modifiers/modifier-group-modal'
+import { ModifierModal } from '@/src/features/admin/menu/components/modifiers/modifier-modal'
+import { ModifierGroupDeleteDialog } from '@/src/features/admin/menu/components/modifiers/modifier-group-delete-dialog'
+import { ModifierDeleteDialog } from '@/src/features/admin/menu/components/modifiers/modifier-delete-dialog'
 import { Loader2, AlertCircle } from 'lucide-react'
-import { useModifierGroupsQuery } from '@/hooks/use-modifiers-query'
-import { useErrorHandler } from '@/hooks/use-error-handler'
-import { Modifier, type ModifierGroup } from '@/types/modifiers'
+import { useModifierGroupsQuery } from '@/src/features/admin/menu/queries/modifiers.queries'
+import { useErrorHandler } from '@/src/hooks/use-error-handler'
+import { Modifier, type ModifierGroup } from '@/src/features/admin/menu/types/modifiers'
 
 function ModifiersContent() {
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null)
@@ -140,18 +140,11 @@ function ModifiersContent() {
   )
 }
 
-function LoadingFallback() {
-  return (
-    <div className="flex items-center justify-center py-12">
-      <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
-    </div>
-  )
-}
-
 export default function ModifiersPage() {
   return (
-    <Suspense fallback={<LoadingFallback />}>
+    <Suspense fallback={null}>
       <ModifiersContent />
     </Suspense>
   )
 }
+

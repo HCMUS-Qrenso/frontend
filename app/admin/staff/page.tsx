@@ -1,8 +1,7 @@
 'use client'
 
 import { Suspense } from 'react'
-import { StaffTabs } from '@/components/admin/staff-tabs'
-import { Loader2 } from 'lucide-react'
+import { StaffTabs } from '@/src/features/admin/staff/components/staff-tabs'
 
 function StaffContent() {
   return (
@@ -13,18 +12,11 @@ function StaffContent() {
   )
 }
 
-function LoadingFallback() {
-  return (
-    <div className="flex items-center justify-center py-12">
-      <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
-    </div>
-  )
-}
-
 export default function StaffPage() {
   return (
-    <Suspense fallback={<LoadingFallback />}>
+    <Suspense fallback={null}>
       <StaffContent />
     </Suspense>
   )
 }
+

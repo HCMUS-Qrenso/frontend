@@ -1,7 +1,7 @@
 'use client'
 
 import type React from 'react'
-import { GuestRoute } from '@/components/auth/guest-route'
+import { GuestRoute } from '@/src/features/auth/components/guest-route'
 
 interface AuthLayoutProps {
   children: React.ReactNode

@@ -1,8 +1,8 @@
 import { Suspense } from 'react'
-import { TodayStats } from '@/components/admin/today-stats'
-import { PerformanceChart } from '@/components/admin/performance-chart'
-import { RecentOrders } from '@/components/admin/recent-orders'
-import { TopItems } from '@/components/admin/top-items'
+import { TodayStats } from '@/src/features/admin/dashboard/components/today-stats'
+import { PerformanceChart } from '@/src/features/admin/dashboard/components/performance-chart'
+import { RecentOrders } from '@/src/features/admin/dashboard/components/recent-orders'
+import { TopItems } from '@/src/features/admin/dashboard/components/top-items'
 
 export default function AdminDashboardPage() {
   return (

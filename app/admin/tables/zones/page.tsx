@@ -1,14 +1,13 @@
 'use client'
 
 import { Suspense, useState } from 'react'
-import { ZonesOverviewStats } from '@/components/admin/zones-overview-stats'
-import { ZonesFilterToolbar } from '@/components/admin/zones-filter-toolbar'
-import { ZonesTable } from '@/components/admin/zones-table'
-import { ZoneUpsertModal } from '@/components/admin/zone-upsert-modal'
-import { ZoneDeleteModal } from '@/components/admin/zone-delete-modal'
+import { ZonesOverviewStats } from '@/src/features/admin/tables/components/zones/zones-overview-stats'
+import { ZonesFilterToolbar } from '@/src/features/admin/tables/components/zones/zones-filter-toolbar'
+import { ZonesTable } from '@/src/features/admin/tables/components/zones/zones-table'
+import { ZoneUpsertModal } from '@/src/features/admin/tables/components/zones/zone-upsert-modal'
+import { ZoneDeleteModal } from '@/src/features/admin/tables/components/zones/zone-delete-modal'
 import { useSearchParams } from 'next/navigation'
-import { Loader2 } from 'lucide-react'
-import { Zone } from '@/types/zones'
+import { Zone } from '@/src/features/admin/tables/types/zones'
 
 function ZonesContent() {
   const searchParams = useSearchParams()
@@ -61,18 +60,11 @@ function ZonesContent() {
   )
 }
 
-function LoadingFallback() {
-  return (
-    <div className="flex items-center justify-center py-12">
-      <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
-    </div>
-  )
-}
-
 export default function ZonesPage() {
   return (
-    <Suspense fallback={<LoadingFallback />}>
+    <Suspense fallback={null}>
       <ZonesContent />
     </Suspense>
   )
 }
+

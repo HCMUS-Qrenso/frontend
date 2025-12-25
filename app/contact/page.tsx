@@ -1,7 +1,7 @@
-import { ContactContent } from '@/components/contact/contact-content'
-import { Footer } from '@/components/landing/footer'
+import { ContactContent } from '@/src/features/landing/components/contact/contact-content'
+import { Footer } from '@/src/features/landing/components/contact/footer'
 import type { Metadata } from 'next'
-import { Header } from '@/components/landing/header'
+import { Header } from '@/src/features/landing/components/contact/header'
 
 export const metadata: Metadata = {
   title: 'Liên hệ - Đăng ký dùng thử Qrenso | Đặt lịch demo miễn phí',

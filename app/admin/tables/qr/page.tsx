@@ -2,25 +2,24 @@
 
 import { Suspense } from 'react'
 import { useState, useMemo } from 'react'
-import { QRManagerStats } from '@/components/admin/qr-manager-stats'
-import { QRManagerToolbar } from '@/components/admin/qr-manager-toolbar'
-import { QRTableList } from '@/components/admin/qr-table-list'
-import { QRPreviewModal } from '@/components/admin/qr-preview-modal'
-import { QRBatchPrintDialog } from '@/components/admin/qr-batch-print-dialog'
-import { QRSecurityModal } from '@/components/admin/qr-security-modal'
+import { QRManagerStats } from '@/src/features/admin/tables/components/qr/qr-manager-stats'
+import { QRManagerToolbar } from '@/src/features/admin/tables/components/qr/qr-manager-toolbar'
+import { QRTableList } from '@/src/features/admin/tables/components/qr/qr-table-list'
+import { QRPreviewModal } from '@/src/features/admin/tables/components/qr/qr-preview-modal'
+import { QRBatchPrintDialog } from '@/src/features/admin/tables/components/qr/qr-batch-print-dialog'
+import { QRSecurityModal } from '@/src/features/admin/tables/components/qr/qr-security-modal'
 import {
   useQRCodesQuery,
   useBatchGenerateQRMutation,
   useGenerateQRMutation,
   useQrStatsQuery,
-} from '@/hooks/use-tables-query'
-import { useZonesSimpleQuery } from '@/hooks/use-zones-query'
-import { tablesApi } from '@/lib/api/tables'
-import { downloadBlobWithHeaders } from '@/lib/utils/download'
+} from '@/src/features/admin/tables/queries/tables.queries'
+import { useZonesSimpleQuery } from '@/src/features/admin/tables/queries/zones.queries'
+import { tablesApi } from '@/src/features/admin/tables/api/tables.api'
+import { downloadBlobWithHeaders } from '@/src/lib/helpers/download'
 import { toast } from 'sonner'
-import { useErrorHandler } from '@/hooks/use-error-handler'
-import { QrStats, type QRStatus, type TableQR } from '@/types/tables'
-import { Loader2 } from 'lucide-react'
+import { useErrorHandler } from '@/src/hooks/use-error-handler'
+import { QrStats, type QRStatus, type TableQR } from '@/src/features/admin/tables/types/tables'
 
 // Helper function to map backend QR status to UI status
 // API returns title case: "Missing", "Ready", "Outdated"
@@ -302,18 +301,11 @@ function QRManagerContent() {
   )
 }
 
-function LoadingFallback() {
-  return (
-    <div className="flex items-center justify-center py-12">
-      <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
-    </div>
-  )
-}
-
 export default function QRManagerPage() {
   return (
-    <Suspense fallback={<LoadingFallback />}>
+    <Suspense fallback={null}>
       <QRManagerContent />
     </Suspense>
   )
 }
+

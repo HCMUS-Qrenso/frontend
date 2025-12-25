@@ -5,16 +5,17 @@ import type React from 'react'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { isAxiosError } from 'axios'
-import { AuthContainer } from '@/components/auth/auth-container'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Checkbox } from '@/components/ui/checkbox'
+import { extractErrorMessage } from '@/src/lib/helpers/error-handler'
+import { AuthContainer } from '@/src/features/auth/components/auth-container'
+import { Button } from '@/src/components/ui/button'
+import { Input } from '@/src/components/ui/input'
+import { Label } from '@/src/components/ui/label'
+import { Checkbox } from '@/src/components/ui/checkbox'
 import { Eye, EyeOff, Loader2, AlertCircle } from 'lucide-react'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { useAuth } from '@/hooks/use-auth'
-import type { ApiErrorResponse } from '@/types/auth'
+import { Alert, AlertDescription } from '@/src/components/ui/alert'
+import { useAuth } from '@/src/features/auth/hooks'
+
+import { loginSchema } from '@/src/features/auth/schemas'
 
 const REMEMBER_ME_KEY = 'rememberMe'
 const REMEMBERED_EMAIL_KEY = 'rememberedEmail'
@@ -46,42 +47,24 @@ export default function LoginPage() {
     }
   }, [])
 
-  const [fieldErrors, setFieldErrors] = useState({
-    email: '',
-    password: '',
-  })
-
-  const validateEmail = (email: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    return emailRegex.test(email)
-  }
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
-    setFieldErrors({ email: '', password: '' })
+    setFieldErrors({})
 
-    // Validation
-    const errors = { email: '', password: '' }
-    let hasError = false
+    // Validate with Zod schema
+    const result = loginSchema.safeParse({ ...formData, rememberMe })
 
-    if (!formData.email) {
-      errors.email = 'Vui lòng nhập email'
-      hasError = true
-    } else if (!validateEmail(formData.email)) {
-      errors.email = 'Email không hợp lệ'
-      hasError = true
-    }
-
-    if (!formData.password) {
-      errors.password = 'Vui lòng nhập mật khẩu'
-      hasError = true
-    } else if (formData.password.length < 8) {
-      errors.password = 'Mật khẩu phải có ít nhất 8 ký tự'
-      hasError = true
-    }
-
-    if (hasError) {
+    if (!result.success) {
+      const errors: Record<string, string> = {}
+      result.error.issues.forEach((issue) => {
+        const field = issue.path[0] as string
+        if (!errors[field]) {
+          errors[field] = issue.message
+        }
+      })
       setFieldErrors(errors)
       return
     }
@@ -103,21 +86,11 @@ export default function LoginPage() {
       await login({ ...formData, rememberMe })
       router.push('/admin/dashboard')
     } catch (err) {
-      const message = getErrorMessage(err)
-      setError(message)
+      setError(extractErrorMessage(err))
     }
   }
 
-  const getErrorMessage = (err: unknown) => {
-    if (isAxiosError<ApiErrorResponse>(err)) {
-      const data = err.response?.data
-      if (data?.message) {
-        return Array.isArray(data.message) ? data.message.join(', ') : data.message
-      }
-      if (data?.error) return data.error
-    }
-    return 'Có lỗi xảy ra. Vui lòng thử lại.'
-  }
+
 
   return (
     <AuthContainer>
@@ -148,7 +121,7 @@ export default function LoginPage() {
         )}
 
         {/* Login Form */}
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} noValidate className="space-y-5">
           {/* Email Field */}
           <div className="space-y-2">
             <Label htmlFor="email" className="text-sm font-medium text-slate-700 dark:text-white">

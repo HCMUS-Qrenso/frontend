@@ -1,13 +1,12 @@
 'use client'
 
 import { Suspense, useState } from 'react'
-import { CategoriesOverviewStats } from '@/components/admin/categories-overview-stats'
-import { CategoriesFilterToolbar } from '@/components/admin/categories-filter-toolbar'
-import { CategoriesTable } from '@/components/admin/categories-table'
-import { CategoryUpsertModal } from '@/components/admin/category-upsert-modal'
-import { CategoryDeleteDialog } from '@/components/admin/category-delete-dialog'
-import { Loader2 } from 'lucide-react'
-import { Category } from '@/types/categories'
+import { CategoriesOverviewStats } from '@/src/features/admin/menu/components/categories/categories-overview-stats'
+import { CategoriesFilterToolbar } from '@/src/features/admin/menu/components/categories/categories-filter-toolbar'
+import { CategoriesTable } from '@/src/features/admin/menu/components/categories/categories-table'
+import { CategoryUpsertModal } from '@/src/features/admin/menu/components/categories/category-upsert-modal'
+import { CategoryDeleteDialog } from '@/src/features/admin/menu/components/categories/category-delete-dialog'
+import { Category } from '@/src/features/admin/menu/types/categories'
 
 function CategoriesContent() {
   const [reorderMode, setReorderMode] = useState(false)
@@ -64,18 +63,11 @@ function CategoriesContent() {
   )
 }
 
-function LoadingFallback() {
-  return (
-    <div className="flex items-center justify-center py-12">
-      <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
-    </div>
-  )
-}
-
 export default function CategoriesPage() {
   return (
-    <Suspense fallback={<LoadingFallback />}>
+    <Suspense fallback={null}>
       <CategoriesContent />
     </Suspense>
   )
 }
+

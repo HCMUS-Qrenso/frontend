@@ -1,17 +1,17 @@
 'use client'
 
 import { Suspense, useState } from 'react'
-import { TablesOverviewStats } from '@/components/admin/tables-overview-stats'
-import { TablesFilterToolbar } from '@/components/admin/tables-filter-toolbar'
-import { TablesListTable } from '@/components/admin/tables-list-table'
-import { TableUpsertModal } from '@/components/admin/table-upsert-modal'
+import { TablesOverviewStats } from '@/src/features/admin/tables/components/list/tables-overview-stats'
+import { TablesFilterToolbar } from '@/src/features/admin/tables/components/list/tables-filter-toolbar'
+import { TablesListTable } from '@/src/features/admin/tables/components/list/tables-list-table'
+import { TableUpsertModal } from '@/src/features/admin/tables/components/list/table-upsert-modal'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { Loader2 } from 'lucide-react'
-import { cn } from '@/lib/utils'
-import { TableDeleteModal } from '@/components/admin/table-delete-modal'
-import { Table } from '@/types/tables'
-import { useZonesSimpleQuery } from '@/hooks/use-zones-query'
-import { SimpleZone } from '@/types/zones'
+import { cn } from '@/src/lib/utils'
+import { TableDeleteModal } from '@/src/features/admin/tables/components/list/table-delete-modal'
+import { Table } from '@/src/features/admin/tables/types/tables'
+import { useZonesSimpleQuery } from '@/src/features/admin/tables/queries/zones.queries'
+import { SimpleZone } from '@/src/features/admin/tables/types/zones'
 
 function TablesListContent() {
   const searchParams = useSearchParams()
@@ -115,18 +115,11 @@ function TablesListContent() {
   )
 }
 
-function LoadingFallback() {
-  return (
-    <div className="flex items-center justify-center py-12">
-      <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
-    </div>
-  )
-}
-
 export default function TablesListPage() {
   return (
-    <Suspense fallback={<LoadingFallback />}>
+    <Suspense fallback={null}>
       <TablesListContent />
     </Suspense>
   )
 }
+

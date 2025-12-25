@@ -4,15 +4,16 @@ import type React from 'react'
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { isAxiosError } from 'axios'
-import { AuthContainer } from '@/components/auth/auth-container'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { extractErrorMessage } from '@/src/lib/helpers/error-handler'
+import { AuthContainer } from '@/src/features/auth/components/auth-container'
+import { Button } from '@/src/components/ui/button'
+import { Input } from '@/src/components/ui/input'
+import { Label } from '@/src/components/ui/label'
 import { Loader2, CheckCircle2, AlertCircle } from 'lucide-react'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { useAuth } from '@/hooks/use-auth'
-import type { ApiErrorResponse } from '@/types/auth'
+import { Alert, AlertDescription } from '@/src/components/ui/alert'
+import { useAuth } from '@/src/features/auth/hooks'
+
+import { forgotPasswordSchema } from '@/src/features/auth/schemas'
 
 export default function ForgotPasswordPage() {
   const { forgotPassword, forgotPasswordPending } = useAuth()
@@ -21,24 +22,18 @@ export default function ForgotPasswordPage() {
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [generalError, setGeneralError] = useState<string | null>(null)
 
-  const validateEmail = (email: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    return emailRegex.test(email)
-  }
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setEmailError('')
     setGeneralError(null)
 
-    // Validation
-    if (!email) {
-      setEmailError('Vui lòng nhập email')
-      return
-    }
+    // Validate with Zod schema
+    const result = forgotPasswordSchema.safeParse({ email })
 
-    if (!validateEmail(email)) {
-      setEmailError('Email không hợp lệ')
+    if (!result.success) {
+      setEmailError(result.error.issues[0]?.message || 'Email không hợp lệ')
       return
     }
 
@@ -46,19 +41,11 @@ export default function ForgotPasswordPage() {
       await forgotPassword({ email })
       setIsSubmitted(true)
     } catch (err) {
-      setGeneralError(getErrorMessage(err))
+      setGeneralError(extractErrorMessage(err))
     }
   }
 
-  const getErrorMessage = (err: unknown) => {
-    if (isAxiosError<ApiErrorResponse>(err)) {
-      const data = err.response?.data
-      if (data?.message) {
-        return Array.isArray(data.message) ? data.message.join(', ') : data.message
-      }
-    }
-    return 'Có lỗi xảy ra, vui lòng thử lại sau.'
-  }
+
 
   // Success State
   if (isSubmitted) {
@@ -137,7 +124,7 @@ export default function ForgotPasswordPage() {
         )}
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} noValidate className="space-y-5">
           {/* Email Field */}
           <div className="space-y-2">
             <Label htmlFor="email" className="text-sm font-medium text-slate-700 dark:text-white">
