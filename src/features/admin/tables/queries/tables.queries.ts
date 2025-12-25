@@ -150,6 +150,8 @@ export const useGenerateQRMutation = () => {
         queryClient.invalidateQueries({ queryKey: tablesQueryKeys.qr.list() })
         // Invalidate list queries to update QR status
         queryClient.invalidateQueries({ queryKey: tablesQueryKeys.lists() })
+        // Invalidate stats queries
+        queryClient.invalidateQueries({ queryKey: tablesQueryKeys.qr.stats() })
       },
     },
   )
@@ -165,6 +167,8 @@ export const useBatchGenerateQRMutation = () => {
       queryClient.invalidateQueries({ queryKey: tablesQueryKeys.qr.all() })
       // Invalidate table list queries
       queryClient.invalidateQueries({ queryKey: tablesQueryKeys.lists() })
+      // Invalidate stats queries
+      queryClient.invalidateQueries({ queryKey: tablesQueryKeys.qr.stats() })
     },
   })
 }
