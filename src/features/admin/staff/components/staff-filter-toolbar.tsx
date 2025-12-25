@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { Button } from '@/src/components/ui/button'
 import { SearchInput } from '@/src/components/ui/search-input'
 import { FilterDropdown, type FilterOption } from '@/src/components/ui/filter-dropdown'
-import { Download, UserPlus, ArrowUpDown } from 'lucide-react'
+import { UserPlus, ArrowUpDown } from 'lucide-react'
 import { AdminFilterToolbarWrapper } from '../../shared/components/admin-filter-toolbar-wrapper'
 import { useRouter, useSearchParams } from 'next/navigation'
 
@@ -77,10 +77,6 @@ export function StaffFilterToolbar({ onInvite }: StaffFilterToolbarProps) {
     setLocalSearchQuery(searchQuery)
   }, [searchQuery])
 
-  const handleExportCSV = () => {
-    console.log('Exporting CSV')
-  }
-
   return (
     <AdminFilterToolbarWrapper>
       {/* Left: Filters + Sort */}
@@ -125,14 +121,6 @@ export function StaffFilterToolbar({ onInvite }: StaffFilterToolbarProps) {
 
       {/* Right: Action Buttons */}
       <div className="flex items-center gap-2">
-        <Button
-          variant="outline"
-          onClick={handleExportCSV}
-          className="h-8 gap-1 rounded-lg bg-transparent px-3"
-        >
-          <Download className="h-3 w-3" />
-          <span className="hidden text-sm sm:inline">Xuất CSV</span>
-        </Button>
         <Button
           onClick={onInvite}
           className="h-8 gap-1 rounded-lg bg-emerald-600 px-3 hover:bg-emerald-700"

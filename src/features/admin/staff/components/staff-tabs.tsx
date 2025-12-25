@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { StaffDataTable } from '@/src/features/admin/staff/components/staff-data-table'
-import { InviteStaffSheet } from '@/src/features/admin/staff/components/invite-staff-sheet'
+import { InviteStaffModal } from '@/src/features/admin/staff/components/invite-staff-modal'
 import { StaffFilterToolbar } from '@/src/features/admin/staff/components/staff-filter-toolbar'
 import { Users, UserCheck, UserX, UserMinus, Shield } from 'lucide-react'
 import { SkeletonStatCard } from '@/src/components/loading'
@@ -132,7 +132,7 @@ export function StaffTabs() {
       <StaffDataTable role={activeRole} />
 
       {/* Invite Staff Sheet */}
-      <InviteStaffSheet
+      <InviteStaffModal
         open={inviteSheetOpen}
         onOpenChange={setInviteSheetOpen}
         defaultRole={activeRole === 'admin' ? 'waiter' : activeRole}

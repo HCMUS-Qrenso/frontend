@@ -26,7 +26,7 @@ interface InviteStaffSheetProps {
   defaultRole: 'waiter' | 'kitchen_staff'
 }
 
-export function InviteStaffSheet({ open, onOpenChange, defaultRole }: InviteStaffSheetProps) {
+export function InviteStaffModal({ open, onOpenChange, defaultRole }: InviteStaffSheetProps) {
   const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')

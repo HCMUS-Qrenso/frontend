@@ -3,14 +3,12 @@
 import type React from 'react'
 import { useEffect, useState } from 'react'
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/src/components/ui/dialog'
-import { Button } from '@/src/components/ui/button'
+  FormDialog,
+  FormDialogField,
+  FormDialogSection,
+  FormDialogSectionGroup,
+  FormDialogDivider,
+} from '@/src/components/ui/form-dialog'
 import { Input } from '@/src/components/ui/input'
 import { Label } from '@/src/components/ui/label'
 import { Textarea } from '@/src/components/ui/textarea'
@@ -22,7 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/src/components/ui/select'
-import { Loader2, Upload, X } from 'lucide-react'
+import { Upload, X } from 'lucide-react'
 import Image from 'next/image'
 import {
   useCreateMenuItemMutation,
@@ -220,8 +218,7 @@ export function MenuItemUpsertModal({
     return payload
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleSubmit = async () => {
     setErrors({})
 
     // Validate with Zod schema
@@ -395,330 +392,261 @@ export function MenuItemUpsertModal({
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="flex max-h-[90vh] flex-col sm:max-w-175">
-        <DialogHeader>
-          <DialogTitle>{mode === 'create' ? 'Thêm món mới' : 'Chỉnh sửa món'}</DialogTitle>
-          <DialogDescription>
-            {mode === 'create' ? 'Tạo món ăn mới cho menu' : 'Cập nhật thông tin món ăn'}
-          </DialogDescription>
-        </DialogHeader>
+    <FormDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      title={mode === 'create' ? 'Thêm món mới' : 'Chỉnh sửa món'}
+      description={mode === 'create' ? 'Tạo món ăn mới cho menu' : 'Cập nhật thông tin món ăn'}
+      onSubmit={handleSubmit}
+      isSubmitting={isSubmitting}
+      submitText="Lưu"
+      loadingText={isUploading ? `Đang upload... ${uploadProgress}%` : 'Đang lưu...'}
+      size="3xl"
+      scrollable
+    >
+      {/* Section 1: Thông tin cơ bản */}
+      <FormDialogSectionGroup title="Thông tin cơ bản">
+        <div className="grid gap-4 sm:grid-cols-2">
+          <FormDialogField label="Tên món" required error={errors.name}>
+            <Input
+              id="name"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              placeholder="Ví dụ: Phở Bò Tái"
+              disabled={isSubmitting}
+            />
+          </FormDialogField>
 
-        {/* Scrollable content area - header and footer stay fixed */}
-        <div className="min-h-0 flex-1 overflow-y-auto px-6 py-4">
-          <form id="menu-item-upsert-form" onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-4">
-              <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
-                Thông tin cơ bản
-              </h3>
+          <FormDialogField label="Danh mục">
+            <Select
+              value={formData.category_id}
+              onValueChange={(value) => {
+                if (!value) return
+                setFormData((prev) => ({ ...prev, category_id: value }))
+              }}
+              disabled={isSubmitting}
+            >
+              <SelectTrigger id="category">
+                <SelectValue placeholder={'Chọn danh mục'} />
+              </SelectTrigger>
+              <SelectContent>
+                {categories.map((category) => (
+                  <SelectItem key={category.id} value={category.id}>
+                    {category.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </FormDialogField>
+        </div>
 
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="name">
-                    Tên món <span className="text-red-500">*</span>
-                  </Label>
-                  <Input
-                    id="name"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    placeholder="Ví dụ: Phở Bò Tái"
-                    disabled={isSubmitting}
-                  />
-                  {errors.name && <p className="text-xs text-red-600">{errors.name}</p>}
-                </div>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <FormDialogField label="Giá (VND)" required error={errors.base_price}>
+            <Input
+              id="price"
+              type="number"
+              value={formData.base_price}
+              onChange={(e) => setFormData({ ...formData, base_price: e.target.value })}
+              placeholder="85000"
+              disabled={isSubmitting}
+            />
+          </FormDialogField>
 
-                <div className="space-y-2">
-                  <Label htmlFor="category">Danh mục</Label>
-                  <Select
-                    value={formData.category_id}
-                    onValueChange={(value) => {
-                      if (!value) return
-                      setFormData((prev) => ({ ...prev, category_id: value }))
-                    }}
-                    disabled={isSubmitting}
-                  >
-                    <SelectTrigger id="category">
-                      <SelectValue placeholder={'Chọn danh mục'} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {categories.map((category) => (
-                        <SelectItem key={category.id} value={category.id}>
-                          {category.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
+          <FormDialogField label="Thời gian chuẩn bị (phút)">
+            <Input
+              id="prep_time"
+              type="number"
+              value={formData.preparation_time}
+              onChange={(e) => setFormData({ ...formData, preparation_time: e.target.value })}
+              placeholder="15"
+              disabled={isSubmitting}
+            />
+          </FormDialogField>
+        </div>
 
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="price">
-                    Giá (VND) <span className="text-red-500">*</span>
-                  </Label>
-                  <Input
-                    id="price"
-                    type="number"
-                    value={formData.base_price}
-                    onChange={(e) => setFormData({ ...formData, base_price: e.target.value })}
-                    placeholder="85000"
-                    disabled={isSubmitting}
-                  />
-                  {errors.base_price && <p className="text-xs text-red-600">{errors.base_price}</p>}
-                </div>
+        <FormDialogField label="Mô tả">
+          <Textarea
+            id="description"
+            value={formData.description}
+            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+            placeholder="Mô tả ngắn về món ăn..."
+            rows={3}
+            disabled={isSubmitting}
+          />
+        </FormDialogField>
+      </FormDialogSectionGroup>
 
-                <div className="space-y-2">
-                  <Label htmlFor="prep_time">Thời gian chuẩn bị (phút)</Label>
-                  <Input
-                    id="prep_time"
-                    type="number"
-                    value={formData.preparation_time}
-                    onChange={(e) => setFormData({ ...formData, preparation_time: e.target.value })}
-                    placeholder="15"
-                    disabled={isSubmitting}
-                  />
-                </div>
-              </div>
+      <FormDialogDivider />
 
-              <div className="space-y-2">
-                <Label htmlFor="description">Mô tả</Label>
-                <Textarea
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder="Mô tả ngắn về món ăn..."
-                  rows={3}
-                  disabled={isSubmitting}
-                />
-              </div>
-            </div>
+      {/* Section 2: Vận hành */}
+      <FormDialogSectionGroup title="Vận hành">
+        <FormDialogField label="Trạng thái bán" required>
+          <Select
+            value={formData.status}
+            onValueChange={(value: any) => setFormData({ ...formData, status: value })}
+          >
+            <SelectTrigger id="status">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="available">Đang bán</SelectItem>
+              <SelectItem value="unavailable">Tạm ẩn</SelectItem>
+              <SelectItem value="sold_out">Hết hàng</SelectItem>
+            </SelectContent>
+          </Select>
+        </FormDialogField>
 
-            {/* Divider */}
-            <hr className="border-slate-200 dark:border-slate-700" />
+        <FormDialogSection>
+          <div className="space-y-0.5">
+            <Label htmlFor="chef_pick" className="text-base">
+              Chef's recommendation
+            </Label>
+            <p className="text-sm text-slate-500 dark:text-slate-400">
+              Đánh dấu là món đặc biệt của đầu bếp
+            </p>
+          </div>
+          <Switch
+            id="chef_pick"
+            checked={formData.is_chef_recommendation}
+            onCheckedChange={(checked) =>
+              setFormData({ ...formData, is_chef_recommendation: checked })
+            }
+            disabled={isSubmitting}
+          />
+        </FormDialogSection>
+      </FormDialogSectionGroup>
 
-            {/* Section 2: Operations */}
-            <div className="space-y-4">
-              <h3 className="text-sm font-semibold text-slate-900 dark:text-white">Vận hành</h3>
+      <FormDialogDivider />
 
-              <div className="space-y-2">
-                <Label htmlFor="status">
-                  Trạng thái bán <span className="text-red-500">*</span>
-                </Label>
-                <Select
-                  value={formData.status}
-                  onValueChange={(value: any) => setFormData({ ...formData, status: value })}
-                >
-                  <SelectTrigger id="status">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="available">Đang bán</SelectItem>
-                    <SelectItem value="unavailable">Tạm ẩn</SelectItem>
-                    <SelectItem value="sold_out">Hết hàng</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="flex items-center justify-between rounded-lg border border-slate-200 p-4 dark:border-slate-800">
-                <div className="space-y-0.5">
-                  <Label htmlFor="chef_pick" className="text-base">
-                    Chef's recommendation
-                  </Label>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">
-                    Đánh dấu là món đặc biệt của đầu bếp
-                  </p>
-                </div>
-                <Switch
-                  id="chef_pick"
-                  checked={formData.is_chef_recommendation}
-                  onCheckedChange={(checked) =>
-                    setFormData({ ...formData, is_chef_recommendation: checked })
-                  }
-                  disabled={isSubmitting}
-                />
-              </div>
-            </div>
-
-            {/* Divider */}
-            <hr className="border-slate-200 dark:border-slate-700" />
-
-            {/* Section 3: Images */}
-            <div className="space-y-4">
-              <h3 className="text-sm font-semibold text-slate-900 dark:text-white">Ảnh món</h3>
-
-              <div className="flex flex-wrap gap-3">
-                {images.map((image, index) => {
-                  const isPrimary = index === selectedPrimaryIndex
-                  return (
-                    <div key={index} className="group relative">
-                      <button
-                        type="button"
-                        onClick={() => setSelectedPrimaryIndex(index)}
-                        className={`relative h-24 w-24 overflow-hidden rounded-lg border-2 transition-all duration-200 ${
-                          isPrimary
-                            ? 'border-emerald-500 ring-2 ring-emerald-500/20'
-                            : 'border-slate-200 hover:border-emerald-400 dark:border-slate-800 dark:hover:border-emerald-400'
-                        }`}
-                        title={isPrimary ? 'Ảnh chính (đã chọn)' : 'Nhấn để đặt làm ảnh chính'}
-                      >
-                        <Image
-                          src={image.url || '/placeholder.svg'}
-                          alt={`Image ${index + 1}`}
-                          fill
-                          unoptimized
-                          className="object-cover"
-                        />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveImage(index)}
-                        className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-white opacity-0 transition-opacity group-hover:opacity-100 hover:bg-red-600"
-                      >
-                        <X className="h-3 w-3" />
-                      </button>
-                      {isPrimary && (
-                        <div className="absolute -bottom-1 left-1/2 -translate-x-1/2">
-                          <span className="inline-flex items-center rounded-full bg-emerald-500 px-2 py-0.5 text-xs font-medium text-white">
-                            Chính
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  )
-                })}
-
+      {/* Section 3: Ảnh món */}
+      <FormDialogSectionGroup title="Ảnh món">
+        <div className="flex flex-wrap gap-3">
+          {images.map((image, index) => {
+            const isPrimary = index === selectedPrimaryIndex
+            return (
+              <div key={index} className="group relative">
                 <button
                   type="button"
-                  onClick={handleImageUpload}
-                  disabled={isSubmitting || images.length >= 10}
-                  className="flex h-24 w-24 flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-slate-300 bg-slate-50 text-slate-400 transition-all hover:border-emerald-500 hover:bg-emerald-50 hover:text-emerald-600 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-800 dark:hover:border-emerald-500 dark:hover:bg-emerald-500/10"
+                  onClick={() => setSelectedPrimaryIndex(index)}
+                  className={`relative h-24 w-24 overflow-hidden rounded-lg border-2 transition-all duration-200 ${
+                    isPrimary
+                      ? 'border-emerald-500 ring-2 ring-emerald-500/20'
+                      : 'border-slate-200 hover:border-emerald-400 dark:border-slate-800 dark:hover:border-emerald-400'
+                  }`}
+                  title={isPrimary ? 'Ảnh chính (đã chọn)' : 'Nhấn để đặt làm ảnh chính'}
                 >
-                  <Upload className="h-5 w-5" />
-                  <span className="text-xs">Tải ảnh</span>
+                  <Image
+                    src={image.url || '/placeholder.svg'}
+                    alt={`Image ${index + 1}`}
+                    fill
+                    unoptimized
+                    className="object-cover"
+                  />
                 </button>
+                <button
+                  type="button"
+                  onClick={() => handleRemoveImage(index)}
+                  className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-white opacity-0 transition-opacity group-hover:opacity-100 hover:bg-red-600"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+                {isPrimary && (
+                  <div className="absolute -bottom-1 left-1/2 -translate-x-1/2">
+                    <span className="inline-flex items-center rounded-full bg-emerald-500 px-2 py-0.5 text-xs font-medium text-white">
+                      Chính
+                    </span>
+                  </div>
+                )}
               </div>
+            )
+          })}
 
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Nhấn vào ảnh để đặt làm ảnh chính. Tải lên tối đa 10 ảnh (JPG, PNG, GIF). Kích thước
-                tối đa 5MB mỗi ảnh.
-              </p>
-            </div>
-
-            {/* Divider */}
-            <hr className="border-slate-200 dark:border-slate-700" />
-
-            {/* Section 4: Modifier Groups */}
-            <div className="space-y-4">
-              <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
-                Tuỳ chọn món ăn (Modifiers)
-              </h3>
-              <ModifierGroupSelector
-                selectedGroupIds={selectedModifierGroupIds}
-                onChange={setSelectedModifierGroupIds}
-                disabled={isSubmitting}
-              />
-            </div>
-
-            {/* Divider */}
-            <hr className="border-slate-200 dark:border-slate-700" />
-
-            {/* Section 5: Allergens & Nutrition */}
-            <div className="space-y-4">
-              <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
-                Allergens & Dinh dưỡng
-              </h3>
-
-              <div className="space-y-2">
-                <Label htmlFor="allergen">Dị ứng</Label>
-                <Textarea
-                  id="allergen"
-                  value={formData.allergen_info}
-                  onChange={(e) => setFormData({ ...formData, allergen_info: e.target.value })}
-                  placeholder="Ví dụ: Không chứa gluten, không chứa sữa..."
-                  rows={2}
-                  disabled={isSubmitting}
-                />
-              </div>
-
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="fat">Chất béo (g)</Label>
-                  <Input
-                    id="fat"
-                    type="number"
-                    value={formData.fat}
-                    onChange={(e) => setFormData({ ...formData, fat: e.target.value })}
-                    placeholder="0"
-                    disabled={isSubmitting}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="carbs">Carbs (g)</Label>
-                  <Input
-                    id="carbs"
-                    type="number"
-                    value={formData.carbs}
-                    onChange={(e) => setFormData({ ...formData, carbs: e.target.value })}
-                    placeholder="0"
-                    disabled={isSubmitting}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="protein">Protein (g)</Label>
-                  <Input
-                    id="protein"
-                    type="number"
-                    value={formData.protein}
-                    onChange={(e) => setFormData({ ...formData, protein: e.target.value })}
-                    placeholder="0"
-                    disabled={isSubmitting}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="calories">Calories</Label>
-                  <Input
-                    id="calories"
-                    type="number"
-                    value={formData.calories}
-                    onChange={(e) => setFormData({ ...formData, calories: e.target.value })}
-                    placeholder="0"
-                    disabled={isSubmitting}
-                  />
-                </div>
-              </div>
-            </div>
-          </form>
+          <button
+            type="button"
+            onClick={handleImageUpload}
+            disabled={isSubmitting || images.length >= 10}
+            className="flex h-24 w-24 flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-slate-300 bg-slate-50 text-slate-400 transition-all hover:border-emerald-500 hover:bg-emerald-50 hover:text-emerald-600 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-800 dark:hover:border-emerald-500 dark:hover:bg-emerald-500/10"
+          >
+            <Upload className="h-5 w-5" />
+            <span className="text-xs">Tải ảnh</span>
+          </button>
         </div>
 
-        {/* Fixed footer */}
-        <div className="px-6 pb-6">
-          <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
+        <p className="text-xs text-slate-500 dark:text-slate-400">
+          Nhấn vào ảnh để đặt làm ảnh chính. Tải lên tối đa 10 ảnh (JPG, PNG, GIF). Kích thước
+          tối đa 5MB mỗi ảnh.
+        </p>
+      </FormDialogSectionGroup>
+
+      <FormDialogDivider />
+
+      {/* Section 4: Modifier Groups */}
+      <FormDialogSectionGroup title="Tuỳ chọn món ăn (Modifiers)">
+        <ModifierGroupSelector
+          selectedGroupIds={selectedModifierGroupIds}
+          onChange={setSelectedModifierGroupIds}
+          disabled={isSubmitting}
+        />
+      </FormDialogSectionGroup>
+
+      <FormDialogDivider />
+
+      {/* Section 5: Allergens & Dinh dưỡng */}
+      <FormDialogSectionGroup title="Allergens & Dinh dưỡng">
+        <FormDialogField label="Dị ứng">
+          <Textarea
+            id="allergen"
+            value={formData.allergen_info}
+            onChange={(e) => setFormData({ ...formData, allergen_info: e.target.value })}
+            placeholder="Ví dụ: Không chứa gluten, không chứa sữa..."
+            rows={2}
+            disabled={isSubmitting}
+          />
+        </FormDialogField>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <FormDialogField label="Chất béo (g)">
+            <Input
+              id="fat"
+              type="number"
+              value={formData.fat}
+              onChange={(e) => setFormData({ ...formData, fat: e.target.value })}
+              placeholder="0"
               disabled={isSubmitting}
-            >
-              Hủy
-            </Button>
-            <Button
-              type="submit"
-              form="menu-item-upsert-form"
+            />
+          </FormDialogField>
+          <FormDialogField label="Carbs (g)">
+            <Input
+              id="carbs"
+              type="number"
+              value={formData.carbs}
+              onChange={(e) => setFormData({ ...formData, carbs: e.target.value })}
+              placeholder="0"
               disabled={isSubmitting}
-              className="bg-emerald-600 hover:bg-emerald-700"
-            >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {isUploading ? `Đang upload... ${uploadProgress}%` : 'Đang lưu...'}
-                </>
-              ) : (
-                'Lưu'
-              )}
-            </Button>
-          </DialogFooter>
+            />
+          </FormDialogField>
+          <FormDialogField label="Protein (g)">
+            <Input
+              id="protein"
+              type="number"
+              value={formData.protein}
+              onChange={(e) => setFormData({ ...formData, protein: e.target.value })}
+              placeholder="0"
+              disabled={isSubmitting}
+            />
+          </FormDialogField>
+          <FormDialogField label="Calories">
+            <Input
+              id="calories"
+              type="number"
+              value={formData.calories}
+              onChange={(e) => setFormData({ ...formData, calories: e.target.value })}
+              placeholder="0"
+              disabled={isSubmitting}
+            />
+          </FormDialogField>
         </div>
-      </DialogContent>
-    </Dialog>
+      </FormDialogSectionGroup>
+    </FormDialog>
   )
 }
