@@ -4,11 +4,7 @@
  * Tests for file download utilities.
  */
 
-import {
-  downloadBlob,
-  extractFilenameFromHeader,
-  downloadBlobWithHeaders,
-} from '../download'
+import { downloadBlob, extractFilenameFromHeader, downloadBlobWithHeaders } from '../download'
 
 describe('downloadBlob', () => {
   let mockLink: {

@@ -1,4 +1,7 @@
-import type { TableQueryParams, QRCodeListQueryParams } from '@/src/features/admin/tables/types/tables'
+import type {
+  TableQueryParams,
+  QRCodeListQueryParams,
+} from '@/src/features/admin/tables/types/tables'
 
 /**
  * Query key factory for tables

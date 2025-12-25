@@ -17,7 +17,10 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/src/components/ui/avatar'
 import { useSearchParams, usePathname } from 'next/navigation'
 import { ThemeToggle } from '@/src/components/theme-toggle'
 import { useAuth, useUserProfileQuery } from '@/src/features/auth/hooks'
-import { useOwnerTenantsQuery, useCurrentTenantQuery } from '@/src/features/admin/tenants/queries/tenants.queries'
+import {
+  useOwnerTenantsQuery,
+  useCurrentTenantQuery,
+} from '@/src/features/admin/tenants/queries/tenants.queries'
 import { useTenantStore } from '@/src/store/tenant-store'
 import { invalidateTenantQueries } from '@/src/features/admin/tenants/utils'
 import { AdminSidebar } from './admin-sidebar'

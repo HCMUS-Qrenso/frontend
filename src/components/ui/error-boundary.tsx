@@ -29,18 +29,18 @@ interface ErrorBoundaryState {
 
 /**
  * ErrorBoundary - Catches JavaScript errors in child component tree
- * 
+ *
  * Usage:
  * ```tsx
  * <ErrorBoundary>
  *   <SomeComponent />
  * </ErrorBoundary>
- * 
+ *
  * // With custom fallback
  * <ErrorBoundary fallback={<CustomError />}>
  *   <SomeComponent />
  * </ErrorBoundary>
- * 
+ *
  * // With error callback
  * <ErrorBoundary onError={(error) => logToService(error)}>
  *   <SomeComponent />
@@ -154,14 +154,10 @@ export function ErrorFallback({
       </div>
 
       {/* Title */}
-      <h2 className="mb-2 text-lg font-semibold text-slate-900 dark:text-white">
-        Có lỗi xảy ra
-      </h2>
+      <h2 className="mb-2 text-lg font-semibold text-slate-900 dark:text-white">Có lỗi xảy ra</h2>
 
       {/* Message */}
-      <p className="mb-6 max-w-md text-sm text-slate-500 dark:text-slate-400">
-        {message}
-      </p>
+      <p className="mb-6 max-w-md text-sm text-slate-500 dark:text-slate-400">{message}</p>
 
       {/* Actions */}
       <div className="flex flex-wrap items-center justify-center gap-3">
@@ -175,11 +171,7 @@ export function ErrorFallback({
           </Button>
         )}
         {onGoHome && (
-          <Button
-            variant="outline"
-            onClick={onGoHome}
-            className="gap-2 rounded-full"
-          >
+          <Button variant="outline" onClick={onGoHome} className="gap-2 rounded-full">
             <Home className="h-4 w-4" />
             Về trang chủ
           </Button>
@@ -209,7 +201,7 @@ export function ErrorFallback({
 
               {/* Stack Trace */}
               {error.stack && (
-                <pre className="overflow-x-auto whitespace-pre-wrap rounded-lg bg-slate-900 p-3 text-xs text-slate-100">
+                <pre className="overflow-x-auto rounded-lg bg-slate-900 p-3 text-xs whitespace-pre-wrap text-slate-100">
                   {error.stack}
                 </pre>
               )}
@@ -220,7 +212,7 @@ export function ErrorFallback({
                   <p className="mb-1 text-xs font-medium text-red-700 dark:text-red-400">
                     Component Stack:
                   </p>
-                  <pre className="overflow-x-auto whitespace-pre-wrap rounded-lg bg-slate-900 p-3 text-xs text-slate-100">
+                  <pre className="overflow-x-auto rounded-lg bg-slate-900 p-3 text-xs whitespace-pre-wrap text-slate-100">
                     {errorInfo.componentStack}
                   </pre>
                 </div>
@@ -235,7 +227,7 @@ export function ErrorFallback({
 
 /**
  * withErrorBoundary - HOC to wrap component with ErrorBoundary
- * 
+ *
  * Usage:
  * ```tsx
  * const SafeComponent = withErrorBoundary(DangerousComponent, {
@@ -245,7 +237,7 @@ export function ErrorFallback({
  */
 export function withErrorBoundary<P extends object>(
   Component: React.ComponentType<P>,
-  errorBoundaryProps?: Omit<ErrorBoundaryProps, 'children'>
+  errorBoundaryProps?: Omit<ErrorBoundaryProps, 'children'>,
 ): React.ComponentType<P> {
   const WrappedComponent = (props: P) => (
     <ErrorBoundary {...errorBoundaryProps}>

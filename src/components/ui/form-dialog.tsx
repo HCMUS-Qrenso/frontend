@@ -88,7 +88,7 @@ export function FormDialog({
           className={cn(
             'fixed inset-0 z-50 bg-black/80',
             'data-[state=open]:animate-in data-[state=closed]:animate-out',
-            'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0'
+            'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
           )}
         />
 
@@ -96,7 +96,7 @@ export function FormDialog({
         <DialogPrimitive.Content
           className={cn(
             // Positioning
-            'fixed left-1/2 top-1/2 z-50 -translate-x-1/2 -translate-y-1/2',
+            'fixed top-1/2 left-1/2 z-50 -translate-x-1/2 -translate-y-1/2',
             // Layout
             'flex w-full flex-col',
             sizeVariants[size],
@@ -109,7 +109,7 @@ export function FormDialog({
             'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
             'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
             'duration-200',
-            className
+            className,
           )}
         >
           {/* Header - Fixed */}
@@ -126,11 +126,11 @@ export function FormDialog({
             {/* Close button */}
             <DialogPrimitive.Close
               className={cn(
-                'absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background',
+                'ring-offset-background absolute top-4 right-4 rounded-sm opacity-70',
                 'transition-opacity hover:opacity-100',
-                'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
+                'focus:ring-ring focus:ring-2 focus:ring-offset-2 focus:outline-none',
                 'disabled:pointer-events-none',
-                'data-[state=open]:bg-accent data-[state=open]:text-muted-foreground'
+                'data-[state=open]:bg-accent data-[state=open]:text-muted-foreground',
               )}
             >
               <X className="h-4 w-4" />
@@ -165,7 +165,7 @@ export function FormDialog({
                 className={cn(
                   'rounded-full',
                   submitVariant === 'primary' && 'bg-emerald-600 hover:bg-emerald-700',
-                  submitVariant === 'danger' && 'bg-red-600 hover:bg-red-700'
+                  submitVariant === 'danger' && 'bg-red-600 hover:bg-red-700',
                 )}
               >
                 {isSubmitting ? (
@@ -199,7 +199,7 @@ export function FormDialogSection({ children, className }: FormDialogSectionProp
       className={cn(
         'flex items-center justify-between rounded-xl border border-slate-200 p-4',
         'dark:border-slate-800',
-        className
+        className,
       )}
     >
       {children}
@@ -235,9 +235,7 @@ export function FormDialogField({
       </label>
       {children}
       {error && <p className="text-xs text-red-600 dark:text-red-400">{error}</p>}
-      {hint && !error && (
-        <p className="text-xs text-slate-500 dark:text-slate-400">{hint}</p>
-      )}
+      {hint && !error && <p className="text-xs text-slate-500 dark:text-slate-400">{hint}</p>}
     </div>
   )
 }

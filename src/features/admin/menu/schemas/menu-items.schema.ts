@@ -37,15 +37,13 @@ export const menuItemBaseSchema = z.object({
     .max(200, 'Tên món không được vượt quá 200 ký tự')
     .transform((val) => val.trim()),
   category_id: z.string().min(1, 'Vui lòng chọn danh mục'),
-  base_price: z
-    .union([z.string(), z.number()])
-    .refine(
-      (val) => {
-        const num = typeof val === 'string' ? parseFloat(val) : val
-        return !isNaN(num) && num > 0
-      },
-      { message: 'Giá phải lớn hơn 0' }
-    ),
+  base_price: z.union([z.string(), z.number()]).refine(
+    (val) => {
+      const num = typeof val === 'string' ? parseFloat(val) : val
+      return !isNaN(num) && num > 0
+    },
+    { message: 'Giá phải lớn hơn 0' },
+  ),
   description: z
     .string()
     .max(1000, 'Mô tả không được vượt quá 1000 ký tự')
@@ -81,13 +79,16 @@ export const menuItemFormSchema = z.object({
     .min(1, 'Vui lòng nhập tên món')
     .max(200, 'Tên món không được vượt quá 200 ký tự'),
   category_id: z.string().min(1, 'Vui lòng chọn danh mục'),
-  base_price: z.string().min(1, 'Vui lòng nhập giá').refine(
-    (val) => {
-      const num = parseFloat(val)
-      return !isNaN(num) && num > 0
-    },
-    { message: 'Giá phải lớn hơn 0' }
-  ),
+  base_price: z
+    .string()
+    .min(1, 'Vui lòng nhập giá')
+    .refine(
+      (val) => {
+        const num = parseFloat(val)
+        return !isNaN(num) && num > 0
+      },
+      { message: 'Giá phải lớn hơn 0' },
+    ),
   description: z.string().optional(),
   preparation_time: z.string().optional(),
   status: menuItemStatusSchema.default('available'),

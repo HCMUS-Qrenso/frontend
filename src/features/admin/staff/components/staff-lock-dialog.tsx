@@ -67,7 +67,9 @@ export function StaffLockDialog({ open, onOpenChange, staff, action }: StaffLock
           <AlertDialogCancel disabled={updateStatusMutation.isPending}>Hủy</AlertDialogCancel>
           <AlertDialogAction
             onClick={handleConfirm}
-            className={isLocking ? 'bg-red-600 hover:bg-red-700' : 'bg-emerald-600 hover:bg-emerald-700'}
+            className={
+              isLocking ? 'bg-red-600 hover:bg-red-700' : 'bg-emerald-600 hover:bg-emerald-700'
+            }
             disabled={updateStatusMutation.isPending}
           >
             {updateStatusMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

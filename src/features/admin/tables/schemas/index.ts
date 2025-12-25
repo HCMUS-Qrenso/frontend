@@ -9,17 +9,17 @@ export {
   tableShapeSchema,
   tableStatusSchema,
   tablePositionSchema,
-  
+
   // Table form schemas
   tableFormSchema,
   createTableSchema,
   updateTableSchema,
-  
+
   // Zone form schemas
   zoneFormSchema,
   createZoneSchema,
   updateZoneSchema,
-  
+
   // Types
   type TableFormData,
   type CreateTableFormData,

@@ -7,15 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/src/components/ui/dropdown-menu'
-import {
-  ChevronDown,
-  Grid3x3,
-  Minus,
-  Plus,
-  RotateCcw,
-  Save,
-  Loader2,
-} from 'lucide-react'
+import { ChevronDown, Grid3x3, Minus, Plus, RotateCcw, Save, Loader2 } from 'lucide-react'
 
 interface FloorPlanToolbarProps {
   selectedArea: string

@@ -9,12 +9,12 @@ export {
   staffRoleSchema,
   staffStatusSchema,
   phoneSchema,
-  
+
   // Form schemas
   inviteStaffSchema,
   updateStaffSchema,
   updateStaffStatusSchema,
-  
+
   // Types
   type InviteStaffFormData,
   type UpdateStaffFormData,

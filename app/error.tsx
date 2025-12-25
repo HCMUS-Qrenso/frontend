@@ -2,11 +2,11 @@
 
 /**
  * Next.js Error Boundary for route segments
- * 
+ *
  * This file handles runtime errors that occur within the app directory.
  * It will catch errors in server components, client components, and
  * during rendering.
- * 
+ *
  * @see https://nextjs.org/docs/app/building-your-application/routing/error-handling
  */
 
@@ -25,7 +25,7 @@ export default function Error({ error, reset }: ErrorProps) {
     if (process.env.NODE_ENV === 'development') {
       console.error('Route Error:', error)
     }
-    
+
     // TODO: Log to error monitoring service (Sentry, etc.)
   }, [error])
 
@@ -37,9 +37,7 @@ export default function Error({ error, reset }: ErrorProps) {
       </div>
 
       {/* Title */}
-      <h1 className="mb-3 text-2xl font-bold text-slate-900 dark:text-white">
-        Đã xảy ra lỗi
-      </h1>
+      <h1 className="mb-3 text-2xl font-bold text-slate-900 dark:text-white">Đã xảy ra lỗi</h1>
 
       {/* Message */}
       <p className="mb-8 max-w-md text-slate-500 dark:text-slate-400">
@@ -48,16 +46,13 @@ export default function Error({ error, reset }: ErrorProps) {
 
       {/* Actions */}
       <div className="flex flex-wrap items-center justify-center gap-4">
-        <Button
-          onClick={reset}
-          className="gap-2 rounded-full bg-emerald-600 hover:bg-emerald-700"
-        >
+        <Button onClick={reset} className="gap-2 rounded-full bg-emerald-600 hover:bg-emerald-700">
           <RefreshCw className="h-4 w-4" />
           Thử lại
         </Button>
         <Button
           variant="outline"
-          onClick={() => window.location.href = '/'}
+          onClick={() => (window.location.href = '/')}
           className="gap-2 rounded-full"
         >
           <Home className="h-4 w-4" />
@@ -82,7 +77,7 @@ export default function Error({ error, reset }: ErrorProps) {
                 </p>
               )}
               {error.stack && (
-                <pre className="overflow-x-auto whitespace-pre-wrap rounded-lg bg-slate-900 p-3 text-xs text-slate-100">
+                <pre className="overflow-x-auto rounded-lg bg-slate-900 p-3 text-xs whitespace-pre-wrap text-slate-100">
                   {error.stack}
                 </pre>
               )}

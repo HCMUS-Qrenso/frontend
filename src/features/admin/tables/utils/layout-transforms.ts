@@ -1,6 +1,6 @@
 /**
  * Layout Transform Utilities
- * 
+ *
  * Utility functions and types for floor plan layout transformations.
  * Handles mapping between frontend TableItem and backend ZoneLayoutTable formats.
  */

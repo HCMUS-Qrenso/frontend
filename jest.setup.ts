@@ -1,6 +1,6 @@
 /**
  * Jest Setup File
- * 
+ *
  * This file runs before each test file.
  * Used to setup global mocks and extend Jest matchers.
  */
@@ -67,11 +67,11 @@ Object.defineProperty(window, 'sessionStorage', {
 class BroadcastChannelMock {
   name: string
   onmessage: ((event: MessageEvent) => void) | null = null
-  
+
   constructor(name: string) {
     this.name = name
   }
-  
+
   postMessage = jest.fn()
   close = jest.fn()
   addEventListener = jest.fn()

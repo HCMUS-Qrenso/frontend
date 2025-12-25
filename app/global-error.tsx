@@ -2,13 +2,13 @@
 
 /**
  * Next.js Global Error Boundary
- * 
+ *
  * This file handles errors in the root layout and is the last resort
  * error boundary. It must include its own <html> and <body> tags because
  * it replaces the root layout when triggered.
- * 
+ *
  * This catches errors that error.tsx cannot catch (e.g., root layout errors).
- * 
+ *
  * @see https://nextjs.org/docs/app/building-your-application/routing/error-handling#handling-errors-in-root-layouts
  */
 
@@ -24,7 +24,7 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
   useEffect(() => {
     // Log error to console
     console.error('Global Error:', error)
-    
+
     // TODO: Log to error monitoring service (Sentry, etc.)
   }, [error])
 
@@ -38,19 +38,18 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
           </div>
 
           {/* Title */}
-          <h1 className="mb-4 text-3xl font-bold text-slate-900 dark:text-white">
-            Lỗi hệ thống
-          </h1>
+          <h1 className="mb-4 text-3xl font-bold text-slate-900 dark:text-white">Lỗi hệ thống</h1>
 
           {/* Message */}
           <p className="mb-8 max-w-lg text-lg text-slate-600 dark:text-slate-400">
-            Đã xảy ra lỗi nghiêm trọng. Vui lòng tải lại trang hoặc liên hệ hỗ trợ nếu lỗi vẫn tiếp tục.
+            Đã xảy ra lỗi nghiêm trọng. Vui lòng tải lại trang hoặc liên hệ hỗ trợ nếu lỗi vẫn tiếp
+            tục.
           </p>
 
           {/* Retry Button */}
           <button
             onClick={reset}
-            className="inline-flex items-center gap-2 rounded-full bg-emerald-600 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+            className="inline-flex items-center gap-2 rounded-full bg-emerald-600 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-emerald-700 focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:outline-none"
           >
             <RefreshCw className="h-4 w-4" />
             Tải lại trang
@@ -76,7 +75,7 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
                     </p>
                   )}
                   {error.stack && (
-                    <pre className="overflow-x-auto whitespace-pre-wrap rounded-lg bg-slate-900 p-3 text-xs text-slate-100">
+                    <pre className="overflow-x-auto rounded-lg bg-slate-900 p-3 text-xs whitespace-pre-wrap text-slate-100">
                       {error.stack}
                     </pre>
                   )}

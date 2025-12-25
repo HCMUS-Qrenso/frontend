@@ -23,7 +23,7 @@ export const phoneSchema = z
       const phoneRegex = /^(\+84|84|0)?[1-9]\d{8,9}$/
       return phoneRegex.test(val.replace(/\s|-/g, ''))
     },
-    { message: 'Số điện thoại không hợp lệ' }
+    { message: 'Số điện thoại không hợp lệ' },
   )
   .transform((val) => val?.trim() || undefined)
 
@@ -34,10 +34,7 @@ export const inviteStaffSchema = z.object({
     .min(1, 'Vui lòng nhập họ và tên')
     .max(100, 'Họ và tên không được vượt quá 100 ký tự')
     .transform((val) => val.trim()),
-  email: z
-    .string()
-    .min(1, 'Vui lòng nhập email')
-    .email('Email không hợp lệ'),
+  email: z.string().min(1, 'Vui lòng nhập email').email('Email không hợp lệ'),
   phone: phoneSchema,
   role: staffRoleSchema.default('waiter'),
 })

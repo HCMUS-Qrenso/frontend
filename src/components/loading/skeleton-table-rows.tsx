@@ -8,15 +8,15 @@ import { TableRow, TableCell } from '@/src/components/ui/table'
  * Column type determines the skeleton shape
  */
 export type SkeletonColumnType =
-  | 'text'              // Simple text line
+  | 'text' // Simple text line
   | 'text-with-subtext' // Title + description
-  | 'badge'             // Status badge (pill shape)
-  | 'number'            // Small centered number
-  | 'actions'           // Action buttons (1-3 small squares)
-  | 'avatar'            // Circle avatar
-  | 'avatar-with-text'  // Avatar + text lines (for staff/user info)
-  | 'image'             // Square/rounded image
-  | 'image-with-text'   // Image + text lines (for menu items)
+  | 'badge' // Status badge (pill shape)
+  | 'number' // Small centered number
+  | 'actions' // Action buttons (1-3 small squares)
+  | 'avatar' // Circle avatar
+  | 'avatar-with-text' // Avatar + text lines (for staff/user info)
+  | 'image' // Square/rounded image
+  | 'image-with-text' // Image + text lines (for menu items)
 
 export interface SkeletonColumn {
   /**
@@ -84,7 +84,16 @@ function renderSkeletonCell(column: SkeletonColumn) {
       case 'actions':
         const count = column.actionCount || 1
         return (
-          <div className={cn('flex gap-1', column.align === 'right' ? 'justify-end' : column.align === 'center' ? 'justify-center' : '')}>
+          <div
+            className={cn(
+              'flex gap-1',
+              column.align === 'right'
+                ? 'justify-end'
+                : column.align === 'center'
+                  ? 'justify-center'
+                  : '',
+            )}
+          >
             {Array.from({ length: count }).map((_, i) => (
               <Skeleton key={i} className="h-8 w-8 rounded-full" />
             ))}
@@ -124,11 +133,7 @@ function renderSkeletonCell(column: SkeletonColumn) {
     }
   })()
 
-  return (
-    <TableCell className={cn('px-6 py-4', alignClass)}>
-      {content}
-    </TableCell>
-  )
+  return <TableCell className={cn('px-6 py-4', alignClass)}>{content}</TableCell>
 }
 
 /**
@@ -149,11 +154,7 @@ function renderSkeletonCell(column: SkeletonColumn) {
  * />
  * ```
  */
-export function SkeletonTableRows({
-  columns,
-  rowCount = 5,
-  className,
-}: SkeletonTableRowsProps) {
+export function SkeletonTableRows({ columns, rowCount = 5, className }: SkeletonTableRowsProps) {
   return (
     <>
       {Array.from({ length: rowCount }).map((_, rowIndex) => (
@@ -162,9 +163,7 @@ export function SkeletonTableRows({
           className={cn('border-b border-slate-100 dark:border-slate-800', className)}
         >
           {columns.map((column, colIndex) => (
-            <React.Fragment key={colIndex}>
-              {renderSkeletonCell(column)}
-            </React.Fragment>
+            <React.Fragment key={colIndex}>{renderSkeletonCell(column)}</React.Fragment>
           ))}
         </TableRow>
       ))}

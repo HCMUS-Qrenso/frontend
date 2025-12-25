@@ -57,9 +57,12 @@ function TemplatesContent() {
 
   return (
     <div className="space-y-6">
-      <TemplateGallery templates={templates} onSelectTemplate={(id: string) => {
-        router.push(`/admin/menu/templates?id=${id}`)
-      }} />
+      <TemplateGallery
+        templates={templates}
+        onSelectTemplate={(id: string) => {
+          router.push(`/admin/menu/templates?id=${id}`)
+        }}
+      />
     </div>
   )
 }

@@ -86,12 +86,7 @@ export function StaffEditDialog({ open, onOpenChange, staff }: StaffEditDialogPr
 
       {/* Email (read-only) */}
       <FormDialogField label="Email">
-        <Input
-          id="email"
-          value={staff.email}
-          disabled
-          className="bg-slate-50 dark:bg-slate-900"
-        />
+        <Input id="email" value={staff.email} disabled className="bg-slate-50 dark:bg-slate-900" />
       </FormDialogField>
 
       {/* Số điện thoại */}
@@ -109,7 +104,13 @@ export function StaffEditDialog({ open, onOpenChange, staff }: StaffEditDialogPr
       <FormDialogField label="Vai trò">
         <Input
           id="role"
-          value={staff.role === 'waiter' ? 'Phục vụ' : staff.role === 'admin' ? 'Quản trị viên' : 'Nhân viên bếp'}
+          value={
+            staff.role === 'waiter'
+              ? 'Phục vụ'
+              : staff.role === 'admin'
+                ? 'Quản trị viên'
+                : 'Nhân viên bếp'
+          }
           disabled
           className="bg-slate-50 dark:bg-slate-900"
         />

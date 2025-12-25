@@ -89,4 +89,3 @@ export interface ReorderCategoriesPayload {
 export interface ToggleCategoryStatusPayload {
   is_active: boolean
 }
-

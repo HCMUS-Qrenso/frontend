@@ -45,7 +45,7 @@ function TablesListContent() {
   return (
     <div className="space-y-6">
       {/* KPI Cards - Overview stats - Only show for active tables */}
-      <TablesOverviewStats /> 
+      <TablesOverviewStats />
 
       {/* Toggle Buttons - Like Staff Page */}
       <div className="flex gap-2">
@@ -122,4 +122,3 @@ export default function TablesListPage() {
     </Suspense>
   )
 }
-

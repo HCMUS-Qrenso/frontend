@@ -77,7 +77,9 @@ export function InviteStaffSheet({ open, onOpenChange, defaultRole }: InviteStaf
         role,
       })
 
-      toast.success('Đã gửi lời mời thành công! Nhân viên sẽ nhận được email để thiết lập mật khẩu.')
+      toast.success(
+        'Đã gửi lời mời thành công! Nhân viên sẽ nhận được email để thiết lập mật khẩu.',
+      )
       onOpenChange(false)
     } catch (error) {
       handleError(error, 'Không thể gửi lời mời')

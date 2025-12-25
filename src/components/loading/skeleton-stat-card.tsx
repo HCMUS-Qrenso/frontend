@@ -24,11 +24,7 @@ interface SkeletonStatCardProps {
  * Skeleton loading state for stat cards
  * Matches the layout of StatCard component to prevent layout shift
  */
-export function SkeletonStatCard({
-  count = 3,
-  columns = 3,
-  className,
-}: SkeletonStatCardProps) {
+export function SkeletonStatCard({ count = 3, columns = 3, className }: SkeletonStatCardProps) {
   const gridColsClass = {
     2: 'lg:grid-cols-2',
     3: 'lg:grid-cols-3',

@@ -75,7 +75,7 @@ describe('strongPasswordSchema', () => {
     const result = strongPasswordSchema.safeParse('password1')
     expect(result.success).toBe(false)
     if (!result.success) {
-      expect(result.error.issues.some(i => i.message.includes('chữ hoa'))).toBe(true)
+      expect(result.error.issues.some((i) => i.message.includes('chữ hoa'))).toBe(true)
     }
   })
 
@@ -83,7 +83,7 @@ describe('strongPasswordSchema', () => {
     const result = strongPasswordSchema.safeParse('PASSWORD1')
     expect(result.success).toBe(false)
     if (!result.success) {
-      expect(result.error.issues.some(i => i.message.includes('chữ thường'))).toBe(true)
+      expect(result.error.issues.some((i) => i.message.includes('chữ thường'))).toBe(true)
     }
   })
 
@@ -91,7 +91,7 @@ describe('strongPasswordSchema', () => {
     const result = strongPasswordSchema.safeParse('Passwordd')
     expect(result.success).toBe(false)
     if (!result.success) {
-      expect(result.error.issues.some(i => i.message.includes('số'))).toBe(true)
+      expect(result.error.issues.some((i) => i.message.includes('số'))).toBe(true)
     }
   })
 
@@ -182,7 +182,7 @@ describe('resetPasswordSchema', () => {
     })
     expect(result.success).toBe(false)
     if (!result.success) {
-      expect(result.error.issues.some(i => i.message.includes('không khớp'))).toBe(true)
+      expect(result.error.issues.some((i) => i.message.includes('không khớp'))).toBe(true)
     }
   })
 
@@ -225,7 +225,7 @@ describe('setupPasswordSchema', () => {
     })
     expect(result.success).toBe(false)
     if (!result.success) {
-      expect(result.error.issues.some(i => i.message.includes('không khớp'))).toBe(true)
+      expect(result.error.issues.some((i) => i.message.includes('không khớp'))).toBe(true)
     }
   })
 

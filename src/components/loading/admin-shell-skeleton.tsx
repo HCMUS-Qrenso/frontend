@@ -5,7 +5,7 @@ import { Skeleton, SkeletonText, SkeletonCircle } from '@/src/components/ui/skel
 /**
  * Skeleton for Admin Shell (sidebar + topbar + content area)
  * Used in app/admin/loading.tsx for route-level loading
- * 
+ *
  * IMPORTANT: This skeleton should NOT wrap AdminLayout.
  * In App Router, loading.tsx already lives inside the parent layout.
  */
@@ -13,7 +13,7 @@ export function AdminShellSkeleton() {
   return (
     <div className="flex min-h-screen bg-slate-50 dark:bg-slate-950">
       {/* Sidebar Skeleton */}
-      <aside className="hidden w-64 border-r border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900 lg:block">
+      <aside className="hidden w-64 border-r border-slate-200 bg-white p-4 lg:block dark:border-slate-800 dark:bg-slate-900">
         {/* Logo */}
         <div className="mb-8 flex items-center gap-3">
           <Skeleton className="h-10 w-10 rounded-lg" />
@@ -42,7 +42,7 @@ export function AdminShellSkeleton() {
       {/* Main Content Area */}
       <div className="flex flex-1 flex-col">
         {/* Topbar Skeleton */}
-        <header className="flex h-16 items-center justify-between border-b border-slate-200 bg-white px-4 dark:border-slate-800 dark:bg-slate-900 lg:px-6">
+        <header className="flex h-16 items-center justify-between border-b border-slate-200 bg-white px-4 lg:px-6 dark:border-slate-800 dark:bg-slate-900">
           {/* Left: Mobile menu + Tenant dropdown */}
           <div className="flex items-center gap-4">
             <Skeleton className="h-8 w-8 lg:hidden" /> {/* Mobile menu */}

@@ -3,11 +3,11 @@ import type { NextRequest } from 'next/server'
 
 /**
  * Next.js Middleware - Server-side route protection
- * 
+ *
  * Runs BEFORE page render to:
  * - Redirect unauthenticated users from protected routes
  * - Redirect authenticated users away from auth pages
- * 
+ *
  * Note: This middleware uses refresh_token cookie to check auth.
  * The actual access token is managed in memory (Zustand store).
  */
@@ -19,7 +19,13 @@ const PROTECTED_ROUTES = ['/admin']
 const AUTH_ROUTES = ['/auth/login', '/auth/signup', '/auth/forgot-password']
 
 // Public routes that don't need any checks
-const PUBLIC_ROUTES = ['/', '/contact', '/auth/reset-password', '/auth/setup-password', '/auth/verify-email']
+const PUBLIC_ROUTES = [
+  '/',
+  '/contact',
+  '/auth/reset-password',
+  '/auth/setup-password',
+  '/auth/verify-email',
+]
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl

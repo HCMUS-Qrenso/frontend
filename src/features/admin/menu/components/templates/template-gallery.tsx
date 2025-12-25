@@ -26,9 +26,7 @@ export function TemplateGallery({ templates, onSelectTemplate }: TemplateGallery
     <Card className="rounded-2xl border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h3 className="font-semibold text-slate-900 dark:text-white">
-            Chọn template thiết kế
-          </h3>
+          <h3 className="font-semibold text-slate-900 dark:text-white">Chọn template thiết kế</h3>
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
             Các mẫu menu đẹp, print-ready cho nhà hàng
           </p>
@@ -39,7 +37,7 @@ export function TemplateGallery({ templates, onSelectTemplate }: TemplateGallery
         {templates.map((template) => (
           <div
             key={template.id}
-            className="group overflow-hidden rounded-xl border border-slate-200 transition-all hover:border-emerald-500 hover:shadow-lg dark:border-slate-800 dark:hover:border-emerald-600 flex flex-col h-full"
+            className="group flex h-full flex-col overflow-hidden rounded-xl border border-slate-200 transition-all hover:border-emerald-500 hover:shadow-lg dark:border-slate-800 dark:hover:border-emerald-600"
           >
             <div className="relative aspect-3/4 overflow-hidden bg-slate-100 dark:bg-slate-800">
               <img
@@ -48,9 +46,9 @@ export function TemplateGallery({ templates, onSelectTemplate }: TemplateGallery
                 className="h-full w-full object-cover transition-transform group-hover:scale-105"
               />
             </div>
-            <div className="p-4 flex-1 flex flex-col">
+            <div className="flex flex-1 flex-col p-4">
               <h4 className="font-medium text-slate-900 dark:text-white">{template.name}</h4>
-              <p className="mt-1 text-xs text-slate-500 dark:text-slate-400 flex-1">
+              <p className="mt-1 flex-1 text-xs text-slate-500 dark:text-slate-400">
                 {template.description}
               </p>
               <div className="mt-3 flex flex-wrap gap-1">

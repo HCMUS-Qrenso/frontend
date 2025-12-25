@@ -134,5 +134,3 @@ export interface QueryModifiersParams {
   sort_by?: 'name' | 'display_order' | 'price_adjustment' | 'created_at'
   sort_order?: SortOrder
 }
-
-
