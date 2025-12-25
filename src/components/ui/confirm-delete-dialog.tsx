@@ -36,6 +36,10 @@ export interface ConfirmDeleteDialogProps {
   warningContent?: ReactNode
   /** Disable confirm button (e.g., when force delete required) */
   confirmDisabled?: boolean
+  /** Text for force delete button (when item has dependencies) */
+  forceDeleteText?: string
+  /** Callback when force delete is requested - if provided, shows force delete button */
+  onForceDelete?: () => void
 }
 
 /**
@@ -85,6 +89,8 @@ export function ConfirmDeleteDialog({
   cancelText = 'Hủy',
   warningContent,
   confirmDisabled = false,
+  forceDeleteText,
+  onForceDelete,
 }: ConfirmDeleteDialogProps) {
   const handleConfirm = () => {
     if (!isLoading && !confirmDisabled) {
@@ -92,10 +98,16 @@ export function ConfirmDeleteDialog({
     }
   }
 
+  const handleForceDelete = () => {
+    if (!isLoading && onForceDelete) {
+      onForceDelete()
+    }
+  }
+
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent className="rounded-2xl">
-        <AlertDialogHeader>
+        <AlertDialogHeader className="p-6 pb-0">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-50 dark:bg-red-500/10">
             <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-400" />
           </div>
@@ -125,6 +137,16 @@ export function ConfirmDeleteDialog({
           <AlertDialogCancel disabled={isLoading} className="m-0 rounded-lg">
             {cancelText}
           </AlertDialogCancel>
+          {onForceDelete && confirmDisabled && (
+            <AlertDialogAction
+              onClick={handleForceDelete}
+              disabled={isLoading}
+              className="m-0 gap-2 rounded-lg bg-amber-600 hover:bg-amber-700"
+            >
+              {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+              {forceDeleteText || 'Xóa buộc'}
+            </AlertDialogAction>
+          )}
           <AlertDialogAction
             onClick={handleConfirm}
             disabled={isLoading || confirmDisabled}
@@ -139,3 +161,4 @@ export function ConfirmDeleteDialog({
     </AlertDialog>
   )
 }
+

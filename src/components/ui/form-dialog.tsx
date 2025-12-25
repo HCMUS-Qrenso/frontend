@@ -23,6 +23,7 @@ const sizeVariants = {
   lg: 'max-w-xl', // 576px - complex forms
   xl: 'max-w-2xl', // 672px - very complex forms
   '2xl': 'max-w-3xl', // 768px - extra large forms
+  '3xl': 'max-w-4xl', // 896px - menu item forms
 }
 
 export interface FormDialogProps {
@@ -86,7 +87,7 @@ export function FormDialog({
         {/* Backdrop */}
         <DialogPrimitive.Overlay
           className={cn(
-            'fixed inset-0 z-50 bg-black/80',
+            'fixed inset-0 z-50 bg-black/50',
             'data-[state=open]:animate-in data-[state=closed]:animate-out',
             'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
           )}
@@ -114,7 +115,7 @@ export function FormDialog({
         >
           {/* Header - Fixed */}
           <div className="border-b border-slate-200 p-6 dark:border-slate-800">
-            <DialogPrimitive.Title className="text-xl font-semibold text-slate-900 dark:text-white">
+            <DialogPrimitive.Title className="text-lg font-semibold text-slate-900 dark:text-white">
               {title}
             </DialogPrimitive.Title>
             {description && (
@@ -155,7 +156,7 @@ export function FormDialog({
                 variant="ghost"
                 onClick={() => onOpenChange(false)}
                 disabled={isSubmitting}
-                className="rounded-full"
+                className="rounded-lg"
               >
                 {cancelText}
               </Button>
@@ -163,7 +164,7 @@ export function FormDialog({
                 type="submit"
                 disabled={isSubmitting || submitDisabled}
                 className={cn(
-                  'rounded-full',
+                  'rounded-lg',
                   submitVariant === 'primary' && 'bg-emerald-600 hover:bg-emerald-700',
                   submitVariant === 'danger' && 'bg-red-600 hover:bg-red-700',
                 )}
@@ -238,6 +239,35 @@ export function FormDialogField({
       {hint && !error && <p className="text-xs text-slate-500 dark:text-slate-400">{hint}</p>}
     </div>
   )
+}
+
+/**
+ * FormDialogSectionGroup - Groups related fields with a title header
+ */
+export interface FormDialogSectionGroupProps {
+  title: string
+  children: React.ReactNode
+  className?: string
+}
+
+export function FormDialogSectionGroup({
+  title,
+  children,
+  className,
+}: FormDialogSectionGroupProps) {
+  return (
+    <div className={cn('space-y-4', className)}>
+      <h3 className="text-sm font-semibold text-slate-900 dark:text-white">{title}</h3>
+      {children}
+    </div>
+  )
+}
+
+/**
+ * FormDialogDivider - Visual separator between sections
+ */
+export function FormDialogDivider() {
+  return <hr className="border-slate-200 dark:border-slate-700" />
 }
 
 export default FormDialog
