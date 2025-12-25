@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { setAccessToken, setTenantId } from '@/src/lib/axios'
+import { setAccessToken, setTenantId, setUserRole } from '@/src/lib/axios'
 import { authApi } from '@/src/features/auth/api/auth.api'
 import type { AuthResponse, User } from '@/src/features/auth/types/auth'
 import { useTenantStore } from './tenant-store'
@@ -29,6 +29,7 @@ if (logoutChannel) {
     // Clear auth state when receiving logout from another tab
     const tenantStore = useTenantStore.getState()
     setAccessToken(null)
+    setUserRole(null)  // Clear role
     setTenantId(null)
     tenantStore.resetTenant()
 
@@ -58,6 +59,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     const tenantStore = useTenantStore.getState()
 
     setAccessToken(payload.accessToken)
+    setUserRole(payload.user.role)  // Sync role với axios
 
     // Role-aware tenant handling
     if (payload.user.role === 'owner') {
@@ -65,8 +67,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       setTenantId(null)
       tenantStore.resetTenant()
     } else {
-      // Admin/staff belong to exactly one tenant
-      setTenantId(payload.user.tenantId)
+      // Admin/staff belong to exactly one tenant - backend extracts from JWT
+      setTenantId(null)  // Không set tenantId cho admin/staff
       tenantStore.resetTenant()
     }
 
@@ -84,11 +86,14 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
     if (!user) {
       // Logout: clear toàn bộ thông tin
+      setUserRole(null)
       setTenantId(null)
       tenantStore.resetTenant()
       set({ user: null })
       return
     }
+
+    setUserRole(user.role)  // Sync role với axios
 
     if (user.role === 'owner') {
       // Owner: tenant được chọn thông qua tenant-store (dropdown / auto-select).
@@ -98,8 +103,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       return
     }
 
-    // Admin/staff: luôn follow tenantId từ profile
-    setTenantId(user.tenantId ?? null)
+    // Admin/staff: không cần set tenantId - backend lấy từ JWT
+    setTenantId(null)
     tenantStore.resetTenant()
     set({ user })
   },
@@ -116,6 +121,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   clearAuth: () => {
     setAccessToken(null)
+    setUserRole(null)  // Clear role
     setTenantId(null)
     const tenantStore = useTenantStore.getState()
     tenantStore.resetTenant()
@@ -153,6 +159,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       // Thành công: set access token vào memory
       setAccessToken(authResponse.accessToken)
+      setUserRole(authResponse.user.role)  // Sync role với axios
       const tenantStore = useTenantStore.getState()
 
       // Role-aware tenant handling
@@ -162,7 +169,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         setTenantId(persistedTenantId)
         // Don't reset tenant store for owner to preserve selectedTenantId
       } else {
-        setTenantId(authResponse.user.tenantId)
+        // Admin/staff: không cần set tenantId - backend lấy từ JWT
+        setTenantId(null)
         tenantStore.resetTenant()
       }
 
@@ -176,6 +184,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     } catch (error) {
       // Thất bại: clear token và set unauthenticated
       setAccessToken(null)
+      setUserRole(null)  // Clear role
       setTenantId(null)
       const tenantStore = useTenantStore.getState()
       tenantStore.resetTenant()

@@ -7,7 +7,7 @@ import {
   useBatchUpdatePositionsMutation,
   useCreateTableMutation,
   useUpdateTableMutation,
-} from '@/src/features/admin/tables/queries/tables.queries'
+} from '@/src/features/admin/tables/queries'
 import { toast } from 'sonner'
 import { useErrorHandler } from '@/src/hooks/use-error-handler'
 import type { TablePosition } from '@/src/features/admin/tables/types/tables'
@@ -77,7 +77,7 @@ export function useTableLayout({
 
   // Queries
   const { data: zonesData } = useZonesQuery()
-  const zones = zonesData?.data?.zones || []
+  const zones = zonesData?.data || []
 
   // Derive current zone
   const currentZoneObj =

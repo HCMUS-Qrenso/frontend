@@ -19,7 +19,7 @@ import { ThemeToggle } from '@/src/components/theme-toggle'
 import { useAuth, useUserProfileQuery } from '@/src/features/auth/hooks'
 import { useOwnerTenantsQuery, useCurrentTenantQuery } from '@/src/features/admin/tenants/queries/tenants.queries'
 import { useTenantStore } from '@/src/store/tenant-store'
-import { invalidateTenantQueries } from '@/src/lib/query-utils'
+import { invalidateTenantQueries } from '@/src/features/admin/tenants/utils'
 import { AdminSidebar } from './admin-sidebar'
 import { getInitials } from '../utils'
 

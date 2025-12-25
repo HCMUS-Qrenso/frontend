@@ -186,19 +186,6 @@ export interface ZoneLayoutResponse {
   }
 }
 
-// Keep FloorLayoutResponse for backward compatibility
-/** @deprecated Use ZoneLayoutResponse instead */
-export interface FloorLayoutResponse {
-  success: boolean
-  data: {
-    floor: string
-    tables: FloorLayoutTable[]
-  }
-}
-
-/** @deprecated Use ZoneLayoutTable instead */
-export type FloorLayoutTable = ZoneLayoutTable
-
 export interface ZonesResponse {
   success: boolean
   data: {
@@ -206,15 +193,6 @@ export interface ZonesResponse {
       id: string
       name: string
     }>
-  }
-}
-
-// Keep FloorsResponse for backward compatibility
-/** @deprecated Use ZonesResponse instead */
-export interface FloorsResponse {
-  success: boolean
-  data: {
-    floors: string[]
   }
 }
 

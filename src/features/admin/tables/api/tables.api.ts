@@ -13,8 +13,6 @@ import type {
   QRTokenVerificationResponse,
   ZoneLayoutResponse,
   ZonesResponse,
-  FloorLayoutResponse,
-  FloorsResponse,
   BatchPositionUpdatePayload,
   BatchPositionUpdateResponse,
   QRCodeDetailResponse,
@@ -23,8 +21,8 @@ import type {
   BatchGenerateQRPayload,
   BatchGenerateQRResponse,
   QrStats,
-} from '@/src/features/admin/tables/types/tables'
-import type { MessageResponse } from '@/src/features/auth/types/auth'
+} from '@/src/features/admin/tables/types'
+import type { MessageResponse } from '@/src/features/auth/types'
 
 export const tablesApi = {
   // Table Management
@@ -120,21 +118,8 @@ export const tablesApi = {
     return data
   },
 
-  // Deprecated floor layout API kept only for type compatibility
-  /** @deprecated Use getZoneLayout instead */
-  getFloorLayout: async (_floor: string): Promise<FloorLayoutResponse> => {
-    throw new Error('getFloorLayout is deprecated. Use getZoneLayout instead.')
-  },
-
   getZones: async (): Promise<ZonesResponse> => {
     const { data } = await apiClient.get<ZonesResponse>('/tables/zones')
-    return data
-  },
-
-  // Keep getFloors for backward compatibility
-  /** @deprecated Use getZones instead */
-  getFloors: async (): Promise<FloorsResponse> => {
-    const { data } = await apiClient.get<FloorsResponse>('/tables/floors')
     return data
   },
 

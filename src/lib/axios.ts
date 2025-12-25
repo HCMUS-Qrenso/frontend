@@ -9,6 +9,7 @@ const baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
 
 let accessToken: string | null = null
 let tenantId: string | null = null
+let userRole: string | null = null // 'owner' | 'admin' | 'waiter' | 'chef' | null
 let refreshPromise: Promise<string | null> | null = null
 let failedRequestsQueue: Array<{
   resolve: (value?: any) => void
@@ -22,6 +23,10 @@ export const setAccessToken = (token: string | null) => {
 
 export const setTenantId = (tenant: string | null) => {
   tenantId = tenant
+}
+
+export const setUserRole = (role: string | null) => {
+  userRole = role
 }
 
 const rawClient: AxiosInstance = axios.create({
@@ -55,8 +60,10 @@ apiClient.interceptors.request.use((config: TenantAwareRequestConfig) => {
     (config as TenantAwareRequestConfig).withoutTenant ||
     (config.headers as Record<string, string | boolean | undefined>)['x-skip-tenant'] === 'true'
 
-  // Gắn x-tenant-id nếu đã có tenantId, không bị skip và request chưa override
-  if (!skipTenantHeader && tenantId && !('x-tenant-id' in config.headers)) {
+  // Chỉ gắn x-tenant-id cho OWNER (vì owner có thể switch giữa nhiều tenants)
+  // Admin/Staff không cần header này vì backend sẽ extract tenant từ JWT token
+  const isOwner = userRole === 'owner'
+  if (!skipTenantHeader && isOwner && tenantId && !('x-tenant-id' in config.headers)) {
     ;(config.headers as Record<string, string>)['x-tenant-id'] = tenantId
   }
 

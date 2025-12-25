@@ -12,8 +12,6 @@ export const tablesQueryKeys = {
   stats: () => [...tablesQueryKeys.all, 'stats'] as const,
   layout: (zone: string) => [...tablesQueryKeys.all, 'layout', zone] as const,
   zones: () => [...tablesQueryKeys.all, 'zones'] as const,
-  /** @deprecated Use zones() instead */
-  floors: () => [...tablesQueryKeys.all, 'floors'] as const,
   qr: {
     all: () => [...tablesQueryKeys.all, 'qr'] as const,
     list: (params?: QRCodeListQueryParams) =>

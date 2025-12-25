@@ -8,8 +8,6 @@ export {
   useDeleteTableMutation,
   useBatchUpdatePositionsMutation,
   useZoneLayoutQuery,
-  useFloorLayoutQuery,
-  useFloorsQuery,
   useQrStatsQuery,
   useQRCodeQuery,
   useQRCodesQuery,

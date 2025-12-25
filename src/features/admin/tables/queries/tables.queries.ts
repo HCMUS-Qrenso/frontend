@@ -12,9 +12,6 @@ import type {
   TableResponse,
   QRGenerationResponse,
   ZoneLayoutResponse,
-  ZonesResponse,
-  FloorLayoutResponse,
-  FloorsResponse,
   BatchPositionUpdateResponse,
   QRCodeDetailResponse,
   QRCodeListQueryParams,
@@ -29,7 +26,6 @@ import type { MessageResponse } from '@/src/features/auth/types/auth'
 export { tablesQueryKeys } from './tables.keys'
 import { tablesQueryKeys } from './tables.keys'
 
-// Query Hooks
 
 // Query Hooks
 export const useTablesQuery = (params?: TableQueryParams, enabled = true) => {
@@ -68,35 +64,6 @@ export const useZoneLayoutQuery = (zone: string | null, enabled = true) => {
   })
 }
 
-export const useZonesQuery = (enabled = true) => {
-  return useQuery<ZonesResponse>({
-    queryKey: tablesQueryKeys.zones(),
-    queryFn: () => tablesApi.getZones(),
-    enabled,
-    staleTime: 5 * 60 * 1000, // 5 minutes - zones don't change often
-  })
-}
-
-// Keep deprecated hooks for backward compatibility
-/** @deprecated Use useZoneLayoutQuery instead */
-export const useFloorLayoutQuery = (floor: string | null, enabled = true) => {
-  return useQuery<FloorLayoutResponse>({
-    queryKey: tablesQueryKeys.layout(floor!),
-    queryFn: () => tablesApi.getFloorLayout(floor!),
-    enabled: enabled && !!floor,
-    staleTime: 30 * 1000,
-  })
-}
-
-/** @deprecated Use useZonesQuery instead */
-export const useFloorsQuery = (enabled = true) => {
-  return useQuery<FloorsResponse>({
-    queryKey: tablesQueryKeys.floors(),
-    queryFn: () => tablesApi.getFloors(),
-    enabled,
-    staleTime: 5 * 60 * 1000, // 5 minutes - floors don't change often
-  })
-}
 
 // Mutation Hooks
 export const useCreateTableMutation = () => {
@@ -109,7 +76,6 @@ export const useCreateTableMutation = () => {
       queryClient.invalidateQueries({ queryKey: tablesQueryKeys.lists() })
       queryClient.invalidateQueries({ queryKey: tablesQueryKeys.stats() })
       queryClient.invalidateQueries({ queryKey: tablesQueryKeys.zones() })
-      queryClient.invalidateQueries({ queryKey: tablesQueryKeys.floors() }) // Deprecated
       queryClient.invalidateQueries({
         queryKey: tablesQueryKeys.layout(response.data.zone_id || ''),
       })
