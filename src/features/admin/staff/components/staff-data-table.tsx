@@ -18,6 +18,7 @@ import { EmptyState } from '@/src/components/ui/empty-state'
 import { CheckCircle2, XCircle, Users, ChevronLeft, ChevronRight } from 'lucide-react'
 import { cn } from '@/src/lib/utils'
 import { useStaffQuery } from '@/src/features/admin/staff/queries'
+import { SkeletonTableRows } from '@/src/components/loading'
 import { useSearchParams, useRouter } from 'next/navigation'
 import type { StaffQueryParams } from '@/src/features/admin/staff/types'
 
@@ -102,9 +103,55 @@ export function StaffDataTable({ role }: StaffDataTableProps) {
       .slice(0, 2)
   }
 
-  // Loading state
+  // Loading state - skeleton rows to avoid layout shift
   if (isLoading) {
-    return <LoadingState />
+    return (
+      <div className="space-y-4">
+        <div className="overflow-x-auto rounded-2xl border border-slate-100 bg-white/80 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
+          <Table>
+            <TableHeader>
+              <TableRow className="border-b border-slate-100 bg-slate-50/80 hover:bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900">
+                <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+                  Nhân viên
+                </TableHead>
+                <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+                  Liên hệ
+                </TableHead>
+                <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+                  Vai trò
+                </TableHead>
+                <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+                  Trạng thái
+                </TableHead>
+                <TableHead className="px-6 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+                  Xác thực
+                </TableHead>
+                <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+                  Đăng nhập cuối
+                </TableHead>
+                <TableHead className="px-6 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+                  Thao tác
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <SkeletonTableRows
+                rowCount={5}
+                columns={[
+                  { type: 'avatar-with-text' },
+                  { type: 'text-with-subtext' },
+                  { type: 'badge' },
+                  { type: 'badge' },
+                  { type: 'avatar', align: 'center' },
+                  { type: 'text' },
+                  { type: 'actions', align: 'right', actionCount: 1 },
+                ]}
+              />
+            </TableBody>
+          </Table>
+        </div>
+      </div>
+    )
   }
 
   // Error state

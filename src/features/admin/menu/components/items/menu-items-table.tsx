@@ -23,6 +23,7 @@ import { formatRelativeDate, formatPrice } from '@/src/lib/helpers/format'
 import { StatusBadge, MENU_ITEM_STATUS_CONFIG } from '@/src/components/ui/status-badge'
 import { ContainerLoadingState, ContainerErrorState } from '@/src/components/ui/loading-state'
 import { EmptyState } from '@/src/components/ui/empty-state'
+import { SkeletonTableRows } from '@/src/components/loading'
 import Image from 'next/image'
 import { useMenuItemsQuery } from '@/src/features/admin/menu/queries'
 import type { MenuItemSortBy, MenuItemSortOrder, MenuItemStatus } from '@/src/features/admin/menu/types'
@@ -81,9 +82,55 @@ export function MenuItemsTable({ onEditClick, onDeleteClick }: MenuItemsTablePro
     router.push(`/admin/menu/items?${params.toString()}`)
   }
 
-  // Loading state
+  // Loading state - skeleton rows to avoid layout shift
   if (isLoading) {
-    return <ContainerLoadingState />
+    return (
+      <div className="space-y-4">
+        <div className="overflow-hidden rounded-2xl border border-slate-100 bg-white/80 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
+          <Table>
+            <TableHeader>
+              <TableRow className="border-b border-slate-100 bg-slate-50/80 hover:bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900">
+                <TableHead className="min-w-50 px-2 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase md:px-4 dark:text-slate-400">
+                  Món ăn
+                </TableHead>
+                <TableHead className="w-24 px-2 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase md:w-32 md:px-4 dark:text-slate-400">
+                  Danh mục
+                </TableHead>
+                <TableHead className="w-20 px-2 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase md:w-28 md:px-4 dark:text-slate-400">
+                  Giá
+                </TableHead>
+                <TableHead className="w-24 px-2 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase md:w-28 md:px-4 dark:text-slate-400">
+                  Trạng thái
+                </TableHead>
+                <TableHead className="w-16 px-2 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase md:w-20 md:px-4 dark:text-slate-400">
+                  Phổ biến
+                </TableHead>
+                <TableHead className="w-20 px-2 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase md:w-24 md:px-4 dark:text-slate-400">
+                  Cập nhật
+                </TableHead>
+                <TableHead className="w-20 px-2 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase md:px-4 dark:text-slate-400">
+                  Thao tác
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <SkeletonTableRows
+                rowCount={5}
+                columns={[
+                  { type: 'image-with-text' },
+                  { type: 'text' },
+                  { type: 'text', align: 'right' },
+                  { type: 'badge', align: 'center' },
+                  { type: 'number', align: 'center' },
+                  { type: 'text' },
+                  { type: 'actions', align: 'right', actionCount: 1 },
+                ]}
+              />
+            </TableBody>
+          </Table>
+        </div>
+      </div>
+    )
   }
 
   // Error state

@@ -20,7 +20,6 @@ import { downloadBlobWithHeaders } from '@/src/lib/helpers/download'
 import { toast } from 'sonner'
 import { useErrorHandler } from '@/src/hooks/use-error-handler'
 import { QrStats, type QRStatus, type TableQR } from '@/src/features/admin/tables/types/tables'
-import { Loader2 } from 'lucide-react'
 
 // Helper function to map backend QR status to UI status
 // API returns title case: "Missing", "Ready", "Outdated"
@@ -302,18 +301,11 @@ function QRManagerContent() {
   )
 }
 
-function LoadingFallback() {
-  return (
-    <div className="flex items-center justify-center py-12">
-      <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
-    </div>
-  )
-}
-
 export default function QRManagerPage() {
   return (
-    <Suspense fallback={<LoadingFallback />}>
+    <Suspense fallback={null}>
       <QRManagerContent />
     </Suspense>
   )
 }
+

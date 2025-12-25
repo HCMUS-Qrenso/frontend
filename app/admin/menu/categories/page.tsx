@@ -6,7 +6,6 @@ import { CategoriesFilterToolbar } from '@/src/features/admin/menu/components/ca
 import { CategoriesTable } from '@/src/features/admin/menu/components/categories/categories-table'
 import { CategoryUpsertModal } from '@/src/features/admin/menu/components/categories/category-upsert-modal'
 import { CategoryDeleteDialog } from '@/src/features/admin/menu/components/categories/category-delete-dialog'
-import { Loader2 } from 'lucide-react'
 import { Category } from '@/src/features/admin/menu/types/categories'
 
 function CategoriesContent() {
@@ -64,18 +63,11 @@ function CategoriesContent() {
   )
 }
 
-function LoadingFallback() {
-  return (
-    <div className="flex items-center justify-center py-12">
-      <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
-    </div>
-  )
-}
-
 export default function CategoriesPage() {
   return (
-    <Suspense fallback={<LoadingFallback />}>
+    <Suspense fallback={null}>
       <CategoriesContent />
     </Suspense>
   )
 }
+

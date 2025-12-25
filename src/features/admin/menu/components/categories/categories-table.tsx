@@ -38,6 +38,7 @@ import {
 import { useErrorHandler } from '@/src/hooks/use-error-handler'
 import type { CategorySortBy, CategorySortOrder, Category } from '@/src/features/admin/menu/types'
 import { toast } from 'sonner'
+import { SkeletonTableRows } from '@/src/components/loading'
 
 
 interface CategoriesTableProps {
@@ -284,11 +285,47 @@ export function CategoriesTable({
     }
   }
 
-  // Loading state
+  // Loading state - skeleton rows to avoid layout shift
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center rounded-2xl border border-slate-100 bg-white/80 py-12 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
-        <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
+      <div className="overflow-hidden rounded-2xl border border-slate-100 bg-white/80 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
+        <Table>
+          <TableHeader>
+            <TableRow className="border-b border-slate-100 bg-slate-50/80 hover:bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900">
+              <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+                Danh mục
+              </TableHead>
+              <TableHead className="w-37.5 px-6 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+                Thứ tự
+              </TableHead>
+              <TableHead className="w-37.5 px-6 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+                Trạng thái
+              </TableHead>
+              <TableHead className="w-37.5 px-6 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+                # Món ăn
+              </TableHead>
+              <TableHead className="w-30 px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+                Cập nhật
+              </TableHead>
+              <TableHead className="w-37.5 px-6 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+                Thao tác
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <SkeletonTableRows
+              rowCount={5}
+              columns={[
+                { type: 'text-with-subtext' },
+                { type: 'number', align: 'center' },
+                { type: 'badge', align: 'center' },
+                { type: 'number', align: 'center' },
+                { type: 'text' },
+                { type: 'actions', align: 'right', actionCount: 1 },
+              ]}
+            />
+          </TableBody>
+        </Table>
       </div>
     )
   }

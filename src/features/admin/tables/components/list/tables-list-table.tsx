@@ -12,6 +12,7 @@ import {
 import { LoadingState } from '@/src/components/ui/loading-state'
 import { ContainerErrorState } from '@/src/components/ui/loading-state'
 import { EmptyState } from '@/src/components/ui/empty-state'
+import { SkeletonTableRows } from '@/src/components/loading'
 import { Edit2, MapPin, Trash2, RotateCcw, MoreVertical, TableProperties } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useTablesQuery, useUpdateTableMutation } from '@/src/features/admin/tables/queries'
@@ -123,8 +124,59 @@ export function TablesListTable({
     router.push(`/admin/tables/list?${params.toString()}`)
   }
 
+  // Loading state - skeleton rows to avoid layout shift
   if (isLoading) {
-    return <LoadingState />
+    return (
+      <div className="space-y-4">
+        <div className="overflow-x-auto rounded-2xl border border-slate-100 bg-white/80 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
+          <Table className="w-full min-w-250 table-fixed">
+            <colgroup>
+              <col className="w-[18%]" />
+              <col className="w-[22%]" />
+              <col className="w-[10%]" />
+              <col className="w-[18%]" />
+              <col className="w-[18%]" />
+              <col className="w-[14%]" />
+            </colgroup>
+            <TableHeader>
+              <TableRow className="border-b border-slate-100 bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900">
+                <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+                  Bàn
+                </TableHead>
+                <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+                  Khu vực / Tầng
+                </TableHead>
+                <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+                  Sức chứa
+                </TableHead>
+                <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+                  Trạng thái
+                </TableHead>
+                <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+                  Đơn hàng hiện tại
+                </TableHead>
+                <TableHead className="px-6 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
+                  Thao tác
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <SkeletonTableRows
+                rowCount={5}
+                columns={[
+                  { type: 'text-with-subtext' },
+                  { type: 'text' },
+                  { type: 'number' },
+                  { type: 'badge' },
+                  { type: 'text' },
+                  { type: 'actions', align: 'right', actionCount: 1 },
+                ]}
+              />
+            </TableBody>
+          </Table>
+        </div>
+      </div>
+    )
   }
 
   if (error) {

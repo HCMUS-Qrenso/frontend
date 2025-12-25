@@ -1,25 +1,15 @@
 'use client'
 
-import { UtensilsCrossed, CheckCircle2, XCircle, EyeOff, Award, Loader2 } from 'lucide-react'
+import { UtensilsCrossed, CheckCircle2, XCircle, EyeOff, Award } from 'lucide-react'
 import { useMenuItemsStatsQuery } from '@/src/features/admin/menu/queries'
 import { StatCard } from '../../../../../components/ui/stat-card'
+import { SkeletonStatCard } from '@/src/components/loading'
 
 export function MenuItemsOverviewStats() {
   const { data, isLoading } = useMenuItemsStatsQuery()
 
   if (isLoading) {
-    return (
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <div
-            key={i}
-            className="flex items-center justify-center rounded-2xl border border-slate-100 bg-white/80 p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900/80"
-          >
-            <Loader2 className="h-6 w-6 animate-spin text-emerald-600" />
-          </div>
-        ))}
-      </div>
-    )
+    return <SkeletonStatCard count={5} columns={5} />
   }
 
   const statsData = data?.data

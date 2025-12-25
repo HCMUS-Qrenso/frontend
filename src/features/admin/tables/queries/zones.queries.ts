@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query'
 import { zonesApi } from '@/src/features/admin/tables/api/zones.api'
 import type {
   Zone,
@@ -18,12 +18,12 @@ import { zonesQueryKeys } from './zones.keys'
 
 // Query Hooks
 
-// Query Hooks
 export const useZonesQuery = (params?: ZoneQueryParams, enabled = true) => {
   return useQuery<ZoneListResponse>({
     queryKey: zonesQueryKeys.list(params),
     queryFn: () => zonesApi.getZones(params),
     enabled,
+    placeholderData: keepPreviousData, // Keep previous data during pagination/filter
   })
 }
 

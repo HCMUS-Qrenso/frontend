@@ -6,7 +6,6 @@ import { OrderItemsList } from '@/src/features/admin/orders/components/order-ite
 import { OrderNotes } from '@/src/features/admin/orders/components/order-notes'
 import { OrderStatusTimeline } from '@/src/features/admin/orders/components/order-status-timeline'
 import { PaymentCard } from '@/src/features/admin/orders/components/payment-card'
-import { Loader2 } from 'lucide-react'
 
 function OrderDetailContent({ orderId }: { orderId: string }) {
   return (
@@ -32,18 +31,11 @@ function OrderDetailContent({ orderId }: { orderId: string }) {
   )
 }
 
-function LoadingFallback() {
-  return (
-    <div className="flex items-center justify-center py-12">
-      <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
-    </div>
-  )
-}
-
 export default function OrderDetailPage({ params }: { params: { orderId: string } }) {
   return (
-    <Suspense fallback={<LoadingFallback />}>
+    <Suspense fallback={null}>
       <OrderDetailContent orderId={params.orderId} />
     </Suspense>
   )
 }
+

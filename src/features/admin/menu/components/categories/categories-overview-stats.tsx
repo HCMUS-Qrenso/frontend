@@ -1,26 +1,16 @@
 'use client'
 
 import { cn } from '@/src/lib/utils'
-import { FolderOpen, Eye, EyeOff, Loader2 } from 'lucide-react'
+import { FolderOpen, Eye, EyeOff } from 'lucide-react'
 import { useCategoriesStatsQuery } from '@/src/features/admin/menu/queries'
 import { StatCard } from '../../../../../components/ui/stat-card'
+import { SkeletonStatCard } from '@/src/components/loading'
 
 export function CategoriesOverviewStats() {
   const { data, isLoading } = useCategoriesStatsQuery()
 
   if (isLoading) {
-    return (
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {[1, 2, 3, 4].map((i) => (
-          <div
-            key={i}
-            className="flex items-center justify-center rounded-2xl border border-slate-100 bg-white/80 p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900/80"
-          >
-            <Loader2 className="h-6 w-6 animate-spin text-emerald-600" />
-          </div>
-        ))}
-      </div>
-    )
+    return <SkeletonStatCard count={4} columns={4} />
   }
 
   const statsData = data?.data

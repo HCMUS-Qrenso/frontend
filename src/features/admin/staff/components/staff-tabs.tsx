@@ -4,7 +4,8 @@ import { useState } from 'react'
 import { StaffDataTable } from '@/src/features/admin/staff/components/staff-data-table'
 import { InviteStaffSheet } from '@/src/features/admin/staff/components/invite-staff-sheet'
 import { StaffFilterToolbar } from '@/src/features/admin/staff/components/staff-filter-toolbar'
-import { Users, UserCheck, UserX, UserMinus, Loader2, Shield } from 'lucide-react'
+import { Users, UserCheck, UserX, UserMinus, Shield } from 'lucide-react'
+import { SkeletonStatCard } from '@/src/components/loading'
 import { cn } from '@/src/lib/utils'
 import { StatCard } from '@/src/components/ui/stat-card'
 import { useStaffStatsQuery } from '@/src/features/admin/staff/queries'
@@ -41,25 +42,11 @@ export function StaffTabs() {
     router.push(`/admin/staff?${params.toString()}`)
   }
 
-  // Stats loading skeleton
-  const renderStatsSkeleton = () => (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      {[1, 2, 3, 4].map((i) => (
-        <div
-          key={i}
-          className="flex items-center justify-center rounded-2xl border border-slate-100 bg-white/80 p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900/80"
-        >
-          <Loader2 className="h-6 w-6 animate-spin text-emerald-600" />
-        </div>
-      ))}
-    </div>
-  )
-
   return (
     <div className="space-y-6">
       {/* Stat Cards */}
       {statsLoading ? (
-        renderStatsSkeleton()
+        <SkeletonStatCard count={4} columns={4} />
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard

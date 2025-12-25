@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query'
 import { categoriesApi } from '@/src/features/admin/menu/api'
 import type {
   Category,
@@ -18,14 +18,13 @@ export { categoriesQueryKeys } from './categories.keys'
 import { categoriesQueryKeys } from './categories.keys'
 
 // Query Hooks
-
-// Query Hooks
 export const useCategoriesQuery = (params?: CategoryQueryParams, enabled = true) => {
   return useQuery<CategoryListResponse>({
     queryKey: categoriesQueryKeys.list(params),
     queryFn: () => categoriesApi.getCategories(params),
     enabled,
-    staleTime: 30 * 1000, // 30 seconds
+    staleTime: 30 * 1000,
+    placeholderData: keepPreviousData,
   })
 }
 

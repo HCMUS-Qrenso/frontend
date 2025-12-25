@@ -13,7 +13,6 @@ import {
 import {
   Edit2,
   Trash2,
-  Loader2,
   ChevronLeft,
   ChevronRight,
   Eye,
@@ -33,6 +32,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/src/components/ui/table'
+import { SkeletonTableRows } from '@/src/components/loading'
 
 interface ZonesTableProps {
   onEdit: (zone: Zone) => void
@@ -110,29 +110,16 @@ export function ZonesTable({ onEdit, onDelete }: ZonesTableProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {[1, 2, 3].map((i) => (
-              <TableRow key={i}>
-                <TableCell className="px-6 py-4">
-                  <div className="h-4 animate-pulse rounded bg-slate-200 dark:bg-slate-700" />
-                </TableCell>
-                <TableCell className="px-6 py-4">
-                  <div className="h-3 animate-pulse rounded bg-slate-200 dark:bg-slate-700" />
-                </TableCell>
-                <TableCell className="px-6 py-4 text-center">
-                  <div className="mx-auto h-4 w-8 animate-pulse rounded bg-slate-200 dark:bg-slate-700" />
-                </TableCell>
-                <TableCell className="px-6 py-4 text-center">
-                  <div className="mx-auto h-5 w-16 animate-pulse rounded bg-slate-200 dark:bg-slate-700" />
-                </TableCell>
-                <TableCell className="px-6 py-4 text-right">
-                  <div className="flex justify-end gap-1">
-                    <div className="h-8 w-8 animate-pulse rounded bg-slate-200 dark:bg-slate-700" />
-                    <div className="h-8 w-8 animate-pulse rounded bg-slate-200 dark:bg-slate-700" />
-                    <div className="h-8 w-8 animate-pulse rounded bg-slate-200 dark:bg-slate-700" />
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
+            <SkeletonTableRows
+              rowCount={3}
+              columns={[
+                { type: 'text' },
+                { type: 'text' },
+                { type: 'number', align: 'center' },
+                { type: 'badge', align: 'center' },
+                { type: 'actions', align: 'right', actionCount: 1 },
+              ]}
+            />
           </TableBody>
         </Table>
       </div>

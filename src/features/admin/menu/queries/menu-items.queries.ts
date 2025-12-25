@@ -1,4 +1,4 @@
-import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { queryOptions, useMutation, useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query'
 import { menuItemsApi } from '@/src/features/admin/menu/api'
 import type {
   MenuItem,
@@ -21,14 +21,13 @@ export { menuItemsQueryKeys } from './menu-items.keys'
 import { menuItemsQueryKeys } from './menu-items.keys'
 
 // Query Hooks
-
-// Query Hooks
 export const useMenuItemsQuery = (params?: MenuItemQueryParams, enabled = true) => {
   return useQuery<MenuItemListResponse>({
     queryKey: menuItemsQueryKeys.list(params),
     queryFn: () => menuItemsApi.getMenuItems(params),
     enabled,
-    staleTime: 30 * 1000, // 30 seconds
+    staleTime: 30 * 1000,
+    placeholderData: keepPreviousData,
   })
 }
 

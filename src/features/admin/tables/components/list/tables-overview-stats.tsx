@@ -1,25 +1,15 @@
 'use client'
 
-import { LayoutGrid, CheckCircle2, Users2, Clock, Loader2 } from 'lucide-react'
+import { LayoutGrid, CheckCircle2, Users2, Clock } from 'lucide-react'
 import { useTableStatsQuery } from '@/src/features/admin/tables/queries'
 import { StatCard } from '../../../../../components/ui/stat-card'
+import { SkeletonStatCard } from '@/src/components/loading'
 
 export function TablesOverviewStats() {
   const { data, isLoading } = useTableStatsQuery()
 
   if (isLoading) {
-    return (
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {[1, 2, 3, 4].map((i) => (
-          <div
-            key={i}
-            className="flex items-center justify-center rounded-2xl border border-slate-100 bg-white/80 p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900/80"
-          >
-            <Loader2 className="h-6 w-6 animate-spin text-emerald-600" />
-          </div>
-        ))}
-      </div>
-    )
+    return <SkeletonStatCard count={4} columns={4} />
   }
 
   const statsData = data?.data

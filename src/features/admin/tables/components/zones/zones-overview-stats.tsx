@@ -1,25 +1,15 @@
 'use client'
 
-import { MapPin, CheckCircle2, EyeOff, Loader2 } from 'lucide-react'
+import { MapPin, CheckCircle2, EyeOff } from 'lucide-react'
 import { useZonesStatsQuery } from '@/src/features/admin/tables/queries'
 import { StatCard } from '../../../../../components/ui/stat-card'
+import { SkeletonStatCard } from '@/src/components/loading'
 
 export function ZonesOverviewStats() {
   const { data, isLoading } = useZonesStatsQuery()
 
   if (isLoading) {
-    return (
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {[1, 2, 3].map((i) => (
-          <div
-            key={i}
-            className="flex items-center justify-center rounded-2xl border border-slate-100 bg-white/80 p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900/80"
-          >
-            <Loader2 className="h-6 w-6 animate-spin text-emerald-600" />
-          </div>
-        ))}
-      </div>
-    )
+    return <SkeletonStatCard count={3} columns={3} />
   }
 
   const stats = [

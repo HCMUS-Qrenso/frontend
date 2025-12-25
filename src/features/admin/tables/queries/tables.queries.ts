@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query'
 import { tablesApi } from '@/src/features/admin/tables/api/tables.api'
 import type {
   Table,
@@ -33,7 +33,8 @@ export const useTablesQuery = (params?: TableQueryParams, enabled = true) => {
     queryKey: tablesQueryKeys.list(params),
     queryFn: () => tablesApi.getTables(params),
     enabled,
-    staleTime: 30 * 1000, // 30 seconds
+    staleTime: 30 * 1000,
+    placeholderData: keepPreviousData,
   })
 }
 

@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query'
 import { staffApi } from '@/src/features/admin/staff/api'
 import type {
   Staff,
@@ -19,10 +19,6 @@ import { staffQueryKeys } from './staff.keys'
 // Query Hooks
 // ============================================
 
-// ============================================
-// Query Hooks
-// ============================================
-
 /**
  * Get paginated list of staff with filtering
  */
@@ -31,6 +27,7 @@ export const useStaffQuery = (params?: StaffQueryParams, enabled = true) => {
     queryKey: staffQueryKeys.list(params),
     queryFn: () => staffApi.getStaff(params),
     enabled,
+    placeholderData: keepPreviousData,
   })
 }
 

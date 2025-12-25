@@ -7,7 +7,6 @@ import { ZonesTable } from '@/src/features/admin/tables/components/zones/zones-t
 import { ZoneUpsertModal } from '@/src/features/admin/tables/components/zones/zone-upsert-modal'
 import { ZoneDeleteModal } from '@/src/features/admin/tables/components/zones/zone-delete-modal'
 import { useSearchParams } from 'next/navigation'
-import { Loader2 } from 'lucide-react'
 import { Zone } from '@/src/features/admin/tables/types/zones'
 
 function ZonesContent() {
@@ -61,18 +60,11 @@ function ZonesContent() {
   )
 }
 
-function LoadingFallback() {
-  return (
-    <div className="flex items-center justify-center py-12">
-      <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
-    </div>
-  )
-}
-
 export default function ZonesPage() {
   return (
-    <Suspense fallback={<LoadingFallback />}>
+    <Suspense fallback={null}>
       <ZonesContent />
     </Suspense>
   )
 }
+

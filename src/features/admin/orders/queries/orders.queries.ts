@@ -10,7 +10,7 @@
  * - useUpdateOrderStatusMutation - Update order status
  */
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query'
 import { ordersApi } from '@/src/features/admin/orders/api'
 import type {
   Order,
@@ -36,7 +36,8 @@ export const useOrdersQuery = (params?: OrderQueryParams, enabled = true) => {
     queryKey: ordersQueryKeys.list(params),
     queryFn: () => ordersApi.getOrders(params),
     enabled,
-    staleTime: 10 * 1000, // 10 seconds - orders update frequently
+    staleTime: 10 * 1000,
+    placeholderData: keepPreviousData,
   })
 }
 
