@@ -1,5 +1,6 @@
 export * from './categories'
 export * from './menu-items'
+export * from './menu-template'
 // Export from modifiers excluding types already in menu-items
 // Note: Modifier and ModifierGroup in modifiers.ts have different types than menu-items.ts
 // modifiers.ts uses number for price_adjustment (backend admin API)
