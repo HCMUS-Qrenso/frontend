@@ -10,15 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/src/components/ui/dropdown-menu'
-import {
-  Edit2,
-  Trash2,
-  ChevronLeft,
-  ChevronRight,
-  Eye,
-  EyeOff,
-  MoreVertical,
-} from 'lucide-react'
+import { Edit2, Trash2, ChevronLeft, ChevronRight, Eye, EyeOff, MoreVertical } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useZonesQuery, useUpdateZoneMutation } from '@/src/features/admin/tables/queries'
 import { toast } from 'sonner'

@@ -26,7 +26,11 @@ import { EmptyState } from '@/src/components/ui/empty-state'
 import { SkeletonTableRows } from '@/src/components/loading'
 import Image from 'next/image'
 import { useMenuItemsQuery } from '@/src/features/admin/menu/queries'
-import type { MenuItemSortBy, MenuItemSortOrder, MenuItemStatus } from '@/src/features/admin/menu/types'
+import type {
+  MenuItemSortBy,
+  MenuItemSortOrder,
+  MenuItemStatus,
+} from '@/src/features/admin/menu/types'
 
 interface MenuItemsTableProps {
   onEditClick: (item: any) => void
@@ -199,9 +203,9 @@ export function MenuItemsTable({ onEditClick, onDeleteClick }: MenuItemsTablePro
                         {item.images && item.images.length > 0 ? (
                           <Image
                             src={
-                              typeof item.images[0] === 'string'
-                                ? item.images[0]
-                                : (item.images[0] as any)?.image_url || '/placeholder.svg'
+                              item.images.find((img: any) => img.is_primary)?.image_url ||
+                              item.images[0]?.image_url ||
+                              '/placeholder.svg'
                             }
                             alt={item.name}
                             fill

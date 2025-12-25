@@ -13,7 +13,13 @@ import {
 } from '@/src/components/ui/select'
 import { Switch } from '@/src/components/ui/switch'
 import { useCreateTableMutation, useUpdateTableMutation } from '@/src/features/admin/tables/queries'
-import type { SimpleZone, TableStatus, TableShape, TablePosition, Table } from '@/src/features/admin/tables/types'
+import type {
+  SimpleZone,
+  TableStatus,
+  TableShape,
+  TablePosition,
+  Table,
+} from '@/src/features/admin/tables/types'
 import { toast } from 'sonner'
 import { useErrorHandler } from '@/src/hooks/use-error-handler'
 import { tableFormSchema } from '@/src/features/admin/tables/schemas'
@@ -149,9 +155,15 @@ export function TableUpsertModal({
         const validationErrors = error?.response?.data?.message
         if (Array.isArray(validationErrors)) {
           validationErrors.forEach((msg: string) => {
-            if (msg.toLowerCase().includes('table_number') || msg.toLowerCase().includes('số bàn')) {
+            if (
+              msg.toLowerCase().includes('table_number') ||
+              msg.toLowerCase().includes('số bàn')
+            ) {
               setErrors((prev) => ({ ...prev, table_number: msg }))
-            } else if (msg.toLowerCase().includes('capacity') || msg.toLowerCase().includes('sức chứa')) {
+            } else if (
+              msg.toLowerCase().includes('capacity') ||
+              msg.toLowerCase().includes('sức chứa')
+            ) {
               setErrors((prev) => ({ ...prev, capacity: msg }))
             } else {
               toast.error(msg)
@@ -262,7 +274,9 @@ export function TableUpsertModal({
       >
         <Select
           value={formData.status}
-          onValueChange={(value) => setFormData({ ...formData, status: value as TableFormData['status'] })}
+          onValueChange={(value) =>
+            setFormData({ ...formData, status: value as TableFormData['status'] })
+          }
         >
           <SelectTrigger id="status">
             <SelectValue />
@@ -315,12 +329,8 @@ export function TableUpsertModal({
       {/* ID bàn (read-only) - Chỉ hiển thị ở chế độ chỉnh sửa */}
       {mode === 'edit' && table && (
         <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-800/50">
-          <Label className="text-xs text-slate-500 dark:text-slate-400">
-            ID bàn (read-only)
-          </Label>
-          <p className="mt-1 font-mono text-sm text-slate-700 dark:text-slate-300">
-            {table.id}
-          </p>
+          <Label className="text-xs text-slate-500 dark:text-slate-400">ID bàn (read-only)</Label>
+          <p className="mt-1 font-mono text-sm text-slate-700 dark:text-slate-300">{table.id}</p>
         </div>
       )}
     </FormDialog>

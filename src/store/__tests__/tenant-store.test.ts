@@ -14,7 +14,9 @@ jest.mock('@/src/lib/axios', () => ({
 }))
 
 // Helper to create a complete TenantSummary mock
-const createMockTenant = (overrides: Partial<TenantSummary> & { id: string; name: string }): TenantSummary => ({
+const createMockTenant = (
+  overrides: Partial<TenantSummary> & { id: string; name: string },
+): TenantSummary => ({
   slug: `${overrides.name.toLowerCase().replace(/\s+/g, '-')}`,
   address: null,
   image: null,
@@ -65,14 +67,14 @@ describe('useTenantStore', () => {
 
     it('should replace existing tenants', () => {
       // Set initial tenants
-      useTenantStore.getState().setTenants([
-        createMockTenant({ id: 'old-1', name: 'Old Restaurant' }),
-      ])
+      useTenantStore
+        .getState()
+        .setTenants([createMockTenant({ id: 'old-1', name: 'Old Restaurant' })])
 
       // Replace with new tenants
-      useTenantStore.getState().setTenants([
-        createMockTenant({ id: 'new-1', name: 'New Restaurant' }),
-      ])
+      useTenantStore
+        .getState()
+        .setTenants([createMockTenant({ id: 'new-1', name: 'New Restaurant' })])
 
       const { tenants } = useTenantStore.getState()
       expect(tenants).toHaveLength(1)
@@ -83,10 +85,12 @@ describe('useTenantStore', () => {
   describe('selectTenant', () => {
     beforeEach(() => {
       // Setup tenants for selection tests
-      useTenantStore.getState().setTenants([
-        createMockTenant({ id: 'tenant-1', name: 'Restaurant A' }),
-        createMockTenant({ id: 'tenant-2', name: 'Restaurant B' }),
-      ])
+      useTenantStore
+        .getState()
+        .setTenants([
+          createMockTenant({ id: 'tenant-1', name: 'Restaurant A' }),
+          createMockTenant({ id: 'tenant-2', name: 'Restaurant B' }),
+        ])
     })
 
     it('should select a valid tenant', () => {

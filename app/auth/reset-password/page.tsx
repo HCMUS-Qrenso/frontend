@@ -14,7 +14,6 @@ import { Loader2, CheckCircle2, Eye, EyeOff, AlertCircle, AlertTriangle } from '
 import { Alert, AlertDescription } from '@/src/components/ui/alert'
 import { useAuth } from '@/src/features/auth/hooks'
 
-
 type PasswordStrength = 'weak' | 'medium' | 'strong'
 
 function ResetPasswordContent() {
@@ -116,8 +115,6 @@ function ResetPasswordContent() {
       setFieldErrors((prev) => ({ ...prev, password: message }))
     }
   }
-
-
 
   // Loading State
   if (isValidatingToken) {

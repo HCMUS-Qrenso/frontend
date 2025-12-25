@@ -26,7 +26,12 @@ interface StaffPasswordDialogProps {
   action: 'reset' | 'resend'
 }
 
-export function StaffPasswordDialog({ open, onOpenChange, staff, action }: StaffPasswordDialogProps) {
+export function StaffPasswordDialog({
+  open,
+  onOpenChange,
+  staff,
+  action,
+}: StaffPasswordDialogProps) {
   const resetPasswordMutation = useResetPasswordMutation()
   const resendInviteMutation = useResendInviteMutation()
   const { handleError } = useErrorHandler()
@@ -47,7 +52,7 @@ export function StaffPasswordDialog({ open, onOpenChange, staff, action }: Staff
     } catch (error) {
       handleError(
         error,
-        isReset ? 'Không thể gửi email reset mật khẩu' : 'Không thể gửi lại email mời'
+        isReset ? 'Không thể gửi email reset mật khẩu' : 'Không thể gửi lại email mời',
       )
     }
   }
@@ -56,9 +61,7 @@ export function StaffPasswordDialog({ open, onOpenChange, staff, action }: Staff
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>
-            {isReset ? 'Reset mật khẩu?' : 'Gửi lại lời mời?'}
-          </AlertDialogTitle>
+          <AlertDialogTitle>{isReset ? 'Reset mật khẩu?' : 'Gửi lại lời mời?'}</AlertDialogTitle>
           <AlertDialogDescription>
             {isReset ? (
               <>
@@ -67,8 +70,8 @@ export function StaffPasswordDialog({ open, onOpenChange, staff, action }: Staff
               </>
             ) : (
               <>
-                Gửi lại email mời đến <strong>{staff.email}</strong>? Nhân viên sẽ nhận được link mới
-                để thiết lập mật khẩu.
+                Gửi lại email mời đến <strong>{staff.email}</strong>? Nhân viên sẽ nhận được link
+                mới để thiết lập mật khẩu.
               </>
             )}
           </AlertDialogDescription>

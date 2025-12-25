@@ -2,7 +2,7 @@
 
 /**
  * Error Boundary for Admin routes
- * 
+ *
  * Provides admin-specific error handling with navigation to dashboard.
  */
 
@@ -24,7 +24,7 @@ export default function AdminError({ error, reset }: ErrorProps) {
     if (process.env.NODE_ENV === 'development') {
       console.error('Admin Error:', error)
     }
-    
+
     // TODO: Log to error monitoring service
   }, [error])
 
@@ -47,10 +47,7 @@ export default function AdminError({ error, reset }: ErrorProps) {
 
       {/* Actions */}
       <div className="flex flex-wrap items-center justify-center gap-3">
-        <Button
-          onClick={reset}
-          className="gap-2 rounded-full bg-emerald-600 hover:bg-emerald-700"
-        >
+        <Button onClick={reset} className="gap-2 rounded-full bg-emerald-600 hover:bg-emerald-700">
           <RefreshCw className="h-4 w-4" />
           Thử lại
         </Button>
@@ -62,11 +59,7 @@ export default function AdminError({ error, reset }: ErrorProps) {
           <LayoutDashboard className="h-4 w-4" />
           Về tổng quan
         </Button>
-        <Button
-          variant="ghost"
-          onClick={() => router.back()}
-          className="gap-2 rounded-full"
-        >
+        <Button variant="ghost" onClick={() => router.back()} className="gap-2 rounded-full">
           <ArrowLeft className="h-4 w-4" />
           Quay lại
         </Button>
@@ -89,7 +82,7 @@ export default function AdminError({ error, reset }: ErrorProps) {
                 </p>
               )}
               {error.stack && (
-                <pre className="overflow-x-auto whitespace-pre-wrap rounded-lg bg-slate-900 p-3 text-xs text-slate-100">
+                <pre className="overflow-x-auto rounded-lg bg-slate-900 p-3 text-xs whitespace-pre-wrap text-slate-100">
                   {error.stack}
                 </pre>
               )}

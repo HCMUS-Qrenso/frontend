@@ -8,4 +8,8 @@ export {
 
 // Reusable skeleton components
 export { SkeletonStatCard } from './skeleton-stat-card'
-export { SkeletonTableRows, type SkeletonColumn, type SkeletonColumnType } from './skeleton-table-rows'
+export {
+  SkeletonTableRows,
+  type SkeletonColumn,
+  type SkeletonColumnType,
+} from './skeleton-table-rows'

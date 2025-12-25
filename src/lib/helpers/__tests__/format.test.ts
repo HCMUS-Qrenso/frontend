@@ -1,42 +1,37 @@
 /**
  * Format Helpers Unit Tests
- * 
+ *
  * Tests for date and price formatting utilities.
  */
 
-import {
-  formatRelativeDate,
-  formatPrice,
-  formatDateTime,
-  formatShortDate,
-} from '../format'
+import { formatRelativeDate, formatPrice, formatDateTime, formatShortDate } from '../format'
 
 describe('formatRelativeDate', () => {
   it('should return "Vừa xong" for dates less than 1 hour ago', () => {
     const now = new Date()
     const thirtyMinutesAgo = new Date(now.getTime() - 30 * 60 * 1000)
-    
+
     expect(formatRelativeDate(thirtyMinutesAgo.toISOString())).toBe('Vừa xong')
   })
 
   it('should return "Xh trước" for dates within 24 hours', () => {
     const now = new Date()
     const fiveHoursAgo = new Date(now.getTime() - 5 * 60 * 60 * 1000)
-    
+
     expect(formatRelativeDate(fiveHoursAgo.toISOString())).toBe('5h trước')
   })
 
   it('should return "1 ngày trước" for dates between 24 and 48 hours ago', () => {
     const now = new Date()
     const thirtyHoursAgo = new Date(now.getTime() - 30 * 60 * 60 * 1000)
-    
+
     expect(formatRelativeDate(thirtyHoursAgo.toISOString())).toBe('1 ngày trước')
   })
 
   it('should return localized date for dates older than 48 hours', () => {
     const now = new Date()
     const threeDaysAgo = new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000)
-    
+
     const result = formatRelativeDate(threeDaysAgo.toISOString())
     // Should be in Vietnamese date format (dd/MM/yyyy)
     expect(result).toMatch(/^\d{1,2}\/\d{1,2}\/\d{4}$/)

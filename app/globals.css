@@ -173,6 +173,6 @@
 }
 
 /* Hide default password reveal button in Microsoft Edge */
-input[type="password"]::-ms-reveal {
+input[type='password']::-ms-reveal {
   display: none;
 }

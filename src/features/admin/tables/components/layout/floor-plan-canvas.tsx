@@ -384,7 +384,7 @@ function FloorPlanCanvasComponent({
                 {/* Floating Reset Button */}
                 <button
                   onClick={handleResetChanges}
-                  className="absolute bottom-4 right-4 z-30 flex h-8 w-8 items-center justify-center rounded-full border border-slate-300 bg-white text-slate-600 shadow-lg hover:bg-slate-50 hover:border-slate-400 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:border-slate-500"
+                  className="absolute right-4 bottom-4 z-30 flex h-8 w-8 items-center justify-center rounded-full border border-slate-300 bg-white text-slate-600 shadow-lg hover:border-slate-400 hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-slate-500 dark:hover:bg-slate-700"
                   title="Đặt lại thay đổi chưa lưu"
                 >
                   <RotateCcw className="h-4 w-4" />

@@ -24,7 +24,10 @@ import {
 } from '@/src/components/ui/select'
 import { Loader2, Upload, X } from 'lucide-react'
 import Image from 'next/image'
-import { useCreateMenuItemMutation, useUpdateMenuItemMutation } from '@/src/features/admin/menu/queries'
+import {
+  useCreateMenuItemMutation,
+  useUpdateMenuItemMutation,
+} from '@/src/features/admin/menu/queries'
 import { useErrorHandler } from '@/src/hooks/use-error-handler'
 import { useUploadFiles } from '@/src/hooks/use-uploads'
 import { toast } from 'sonner'
@@ -56,6 +59,7 @@ export function MenuItemUpsertModal({
 
   const isSubmitting = createMutation.isPending || updateMutation.isPending || isUploading
   const [images, setImages] = useState<{ url: string; is_primary: boolean; file?: File }[]>([])
+  const [selectedPrimaryIndex, setSelectedPrimaryIndex] = useState<number>(0)
   const [selectedModifierGroupIds, setSelectedModifierGroupIds] = useState<string[]>([])
   const [formData, setFormData] = useState({
     name: '',
@@ -97,13 +101,15 @@ export function MenuItemUpsertModal({
         calories: item.nutritional_info?.calories?.toString() || '',
       })
 
-      // Handle images - support both string[] and object[] formats for backward compatibility
-      setImages(
-        item.images?.map((img: string | { image_url: string }, index: number) => ({
-          url: typeof img === 'string' ? img : img.image_url,
-          is_primary: index === 0,
-        })) || [],
-      )
+      // Handle images - now backend returns objects with is_primary
+      const loadedImages =
+        item.images?.map((img) => ({
+          url: img.image_url,
+          is_primary: img.is_primary,
+        })) || []
+      setImages(loadedImages)
+      const primaryIndex = loadedImages.findIndex((img) => img.is_primary)
+      setSelectedPrimaryIndex(primaryIndex >= 0 ? primaryIndex : 0)
 
       setSelectedModifierGroupIds(item.modifier_groups?.map((g) => g.id) || [])
     } else if (mode === 'create') {
@@ -205,6 +211,12 @@ export function MenuItemUpsertModal({
 
     // Images (image_urls) are handled separately in handleSubmit after S3 upload
 
+    // Check if primary image index changed
+    const originalPrimaryIndex = originalItemData.images?.findIndex((img) => img.is_primary) ?? 0
+    if (selectedPrimaryIndex !== originalPrimaryIndex) {
+      payload.primary_image_index = selectedPrimaryIndex
+    }
+
     return payload
   }
 
@@ -268,6 +280,7 @@ export function MenuItemUpsertModal({
           },
           modifier_group_ids: selectedModifierGroupIds,
           image_urls: allImageUrls,
+          primary_image_index: selectedPrimaryIndex,
         }
         await createMutation.mutateAsync(payload)
         toast.success('Đã tạo món ăn thành công')
@@ -275,11 +288,7 @@ export function MenuItemUpsertModal({
         const payload = buildUpdatePayload()
 
         // Check if images changed and add to payload
-        const originalUrls = (originalItemData?.images || [])
-          .map((img: string | { image_url: string }) =>
-            typeof img === 'string' ? img : img.image_url,
-          )
-          .sort()
+        const originalUrls = (originalItemData?.images || []).map((img) => img.image_url).sort()
         const hasNewFiles = newFiles.length > 0
         const existingUrlsChanged =
           JSON.stringify(existingUrls.sort()) !== JSON.stringify(originalUrls)
@@ -375,20 +384,14 @@ export function MenuItemUpsertModal({
     }
 
     const newImages = images.filter((_, i) => i !== index)
-    // If removed image was primary, set first image as primary
-    if (images[index].is_primary && newImages.length > 0) {
-      newImages[0].is_primary = true
-    }
     setImages(newImages)
-  }
 
-  const handleSetPrimaryImage = (index: number) => {
-    setImages(
-      images.map((img, i) => ({
-        ...img,
-        is_primary: i === index,
-      })),
-    )
+    // Adjust selectedPrimaryIndex
+    if (index < selectedPrimaryIndex) {
+      setSelectedPrimaryIndex(selectedPrimaryIndex - 1)
+    } else if (index === selectedPrimaryIndex) {
+      setSelectedPrimaryIndex(newImages.length > 0 ? 0 : 0)
+    }
   }
 
   return (
@@ -544,26 +547,45 @@ export function MenuItemUpsertModal({
               <h3 className="text-sm font-semibold text-slate-900 dark:text-white">Ảnh món</h3>
 
               <div className="flex flex-wrap gap-3">
-                {images.map((image, index) => (
-                  <div key={index} className="relative">
-                    <div className="relative h-24 w-24 overflow-hidden rounded-lg border-2 border-slate-200 dark:border-slate-800">
-                      <Image
-                        src={image.url || '/placeholder.svg'}
-                        alt={`Image ${index + 1}`}
-                        fill
-                        unoptimized
-                        className="object-cover"
-                      />
+                {images.map((image, index) => {
+                  const isPrimary = index === selectedPrimaryIndex
+                  return (
+                    <div key={index} className="group relative">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedPrimaryIndex(index)}
+                        className={`relative h-24 w-24 overflow-hidden rounded-lg border-2 transition-all duration-200 ${
+                          isPrimary
+                            ? 'border-emerald-500 ring-2 ring-emerald-500/20'
+                            : 'border-slate-200 hover:border-emerald-400 dark:border-slate-800 dark:hover:border-emerald-400'
+                        }`}
+                        title={isPrimary ? 'Ảnh chính (đã chọn)' : 'Nhấn để đặt làm ảnh chính'}
+                      >
+                        <Image
+                          src={image.url || '/placeholder.svg'}
+                          alt={`Image ${index + 1}`}
+                          fill
+                          unoptimized
+                          className="object-cover"
+                        />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveImage(index)}
+                        className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-white opacity-0 transition-opacity group-hover:opacity-100 hover:bg-red-600"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                      {isPrimary && (
+                        <div className="absolute -bottom-1 left-1/2 -translate-x-1/2">
+                          <span className="inline-flex items-center rounded-full bg-emerald-500 px-2 py-0.5 text-xs font-medium text-white">
+                            Chính
+                          </span>
+                        </div>
+                      )}
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveImage(index)}
-                      className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-white hover:bg-red-600"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </div>
-                ))}
+                  )
+                })}
 
                 <button
                   type="button"
@@ -575,8 +597,10 @@ export function MenuItemUpsertModal({
                   <span className="text-xs">Tải ảnh</span>
                 </button>
               </div>
+
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Tải lên tối đa 10 ảnh (JPG, PNG, GIF). Kích thước tối đa 5MB mỗi ảnh.
+                Nhấn vào ảnh để đặt làm ảnh chính. Tải lên tối đa 10 ảnh (JPG, PNG, GIF). Kích thước
+                tối đa 5MB mỗi ảnh.
               </p>
             </div>
 

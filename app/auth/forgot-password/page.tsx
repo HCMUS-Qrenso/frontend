@@ -22,8 +22,6 @@ export default function ForgotPasswordPage() {
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [generalError, setGeneralError] = useState<string | null>(null)
 
-
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setEmailError('')
@@ -44,8 +42,6 @@ export default function ForgotPasswordPage() {
       setGeneralError(extractErrorMessage(err))
     }
   }
-
-
 
   // Success State
   if (isSubmitted) {

@@ -1,4 +1,10 @@
-import { queryOptions, useMutation, useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query'
+import {
+  queryOptions,
+  useMutation,
+  useQuery,
+  useQueryClient,
+  keepPreviousData,
+} from '@tanstack/react-query'
 import { menuItemsApi } from '@/src/features/admin/menu/api'
 import type {
   MenuItem,

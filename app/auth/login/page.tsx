@@ -90,8 +90,6 @@ export default function LoginPage() {
     }
   }
 
-
-
   return (
     <AuthContainer>
       <div className="mx-auto w-full max-w-sm">

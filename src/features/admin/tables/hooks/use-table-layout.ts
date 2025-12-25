@@ -35,7 +35,7 @@ interface UseTableLayoutReturn {
   currentZoneName: string
   currentZoneId: string
   libraryTables: TableItem[]
-  
+
   // UI State
   zoom: number
   showGrid: boolean
@@ -43,7 +43,7 @@ interface UseTableLayoutReturn {
   isLoading: boolean
   hasPositionChanges: boolean
   isResetLoading: boolean
-  
+
   // Actions
   setSelectedTableId: (id: string | null) => void
   setZoom: (zoom: number) => void
@@ -319,9 +319,7 @@ export function useTableLayout({
 
   const handleResetLayout = useCallback(async () => {
     const { data } = await refetchLayout()
-    const freshTables = data?.data.tables
-      ? data.data.tables.map(transformTableToItem)
-      : []
+    const freshTables = data?.data.tables ? data.data.tables.map(transformTableToItem) : []
     setLocalTables(freshTables)
     setPositionChanges(new Map())
     setSelectedTableId(null)

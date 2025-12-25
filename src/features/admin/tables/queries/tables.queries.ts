@@ -26,7 +26,6 @@ import type { MessageResponse } from '@/src/features/auth/types/auth'
 export { tablesQueryKeys } from './tables.keys'
 import { tablesQueryKeys } from './tables.keys'
 
-
 // Query Hooks
 export const useTablesQuery = (params?: TableQueryParams, enabled = true) => {
   return useQuery<TableListResponse>({
@@ -64,7 +63,6 @@ export const useZoneLayoutQuery = (zone: string | null, enabled = true) => {
     staleTime: 30 * 1000,
   })
 }
-
 
 // Mutation Hooks
 export const useCreateTableMutation = () => {

@@ -42,9 +42,7 @@ describe('extractErrorMessage', () => {
       },
     }
 
-    expect(extractErrorMessage(error)).toBe(
-      'Field email is required, Field password is required'
-    )
+    expect(extractErrorMessage(error)).toBe('Field email is required, Field password is required')
   })
 
   it('should extract message from network error (error.message)', () => {

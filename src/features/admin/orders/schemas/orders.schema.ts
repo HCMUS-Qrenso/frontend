@@ -60,7 +60,7 @@ export const orderItemSchema = z.object({
       z.object({
         id: z.string().uuid(),
         price_adjustment: z.number(),
-      })
+      }),
     )
     .optional(),
 })

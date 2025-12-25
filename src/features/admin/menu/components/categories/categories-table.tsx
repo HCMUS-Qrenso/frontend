@@ -40,7 +40,6 @@ import type { CategorySortBy, CategorySortOrder, Category } from '@/src/features
 import { toast } from 'sonner'
 import { SkeletonTableRows } from '@/src/components/loading'
 
-
 interface CategoriesTableProps {
   reorderMode: boolean
   setReorderMode: (value: boolean) => void

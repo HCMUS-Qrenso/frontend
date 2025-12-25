@@ -56,7 +56,10 @@ export function StaffRowActions({ staff }: StaffRowActionsProps) {
           <DropdownMenuSeparator />
 
           {staff.status === 'suspended' ? (
-            <DropdownMenuItem onClick={() => setActiveDialog('unlock')} className="text-emerald-600">
+            <DropdownMenuItem
+              onClick={() => setActiveDialog('unlock')}
+              className="text-emerald-600"
+            >
               <Unlock className="mr-2 h-4 w-4" />
               Mở khóa
             </DropdownMenuItem>

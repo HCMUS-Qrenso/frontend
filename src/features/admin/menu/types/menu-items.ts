@@ -55,8 +55,10 @@ export interface ModifierGroup {
 
 // Image object for menu item
 export interface MenuItemImage {
-  url: string
-  is_primary?: boolean
+  id: string
+  image_url: string
+  display_order: number
+  is_primary: boolean
 }
 
 // Main Menu Item interface matching backend response
@@ -72,7 +74,7 @@ export interface MenuItem {
   nutritional_info: NutritionalInfo
   popularity_score: number
   category: MenuItemCategory
-  images: string[] // Array of image URLs
+  images: MenuItemImage[] // Array of image objects
   modifier_groups?: ModifierGroup[] // Only in detailed response
   pairings?: any[] // For future use
   review_count: number
@@ -88,8 +90,6 @@ export interface MenuItemStats {
   unavailable_items: number
   chef_recommendations: number
 }
-
-
 
 // Menu Item List Response
 export interface MenuItemListResponse {
@@ -152,8 +152,6 @@ export interface MenuItemQueryParams {
   sort_by?: MenuItemSortBy
   sort_order?: MenuItemSortOrder
 }
-
-
 
 // Export Menu Parameters
 export interface ExportMenuParams {

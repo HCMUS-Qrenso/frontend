@@ -63,4 +63,3 @@ export interface SetupPasswordPayload {
   token: string
   password: string
 }
-

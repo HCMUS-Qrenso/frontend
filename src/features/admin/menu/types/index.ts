@@ -25,4 +25,3 @@ export type {
   Modifier as ModifierAdmin,
   ModifierGroup as ModifierGroupAdmin,
 } from './modifiers'
-

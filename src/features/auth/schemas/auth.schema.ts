@@ -7,10 +7,7 @@ import { z } from 'zod'
  */
 
 // Email validation schema (reusable)
-export const emailSchema = z
-  .string()
-  .min(1, 'Vui lòng nhập email')
-  .email('Email không hợp lệ')
+export const emailSchema = z.string().min(1, 'Vui lòng nhập email').email('Email không hợp lệ')
 
 // Password validation schema (reusable)
 export const passwordSchema = z
@@ -39,25 +36,29 @@ export const forgotPasswordSchema = z.object({
 })
 
 // Reset password form schema
-export const resetPasswordSchema = z.object({
-  token: z.string().min(1, 'Token không hợp lệ'),
-  newPassword: strongPasswordSchema,
-  confirmPassword: z.string().min(1, 'Vui lòng xác nhận mật khẩu'),
-}).refine((data) => data.newPassword === data.confirmPassword, {
-  message: 'Mật khẩu xác nhận không khớp',
-  path: ['confirmPassword'],
-})
+export const resetPasswordSchema = z
+  .object({
+    token: z.string().min(1, 'Token không hợp lệ'),
+    newPassword: strongPasswordSchema,
+    confirmPassword: z.string().min(1, 'Vui lòng xác nhận mật khẩu'),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: 'Mật khẩu xác nhận không khớp',
+    path: ['confirmPassword'],
+  })
 
 // Setup password form schema (for invited staff)
-export const setupPasswordSchema = z.object({
-  email: emailSchema,
-  token: z.string().min(1, 'Token không hợp lệ'),
-  password: strongPasswordSchema,
-  confirmPassword: z.string().min(1, 'Vui lòng xác nhận mật khẩu'),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: 'Mật khẩu xác nhận không khớp',
-  path: ['confirmPassword'],
-})
+export const setupPasswordSchema = z
+  .object({
+    email: emailSchema,
+    token: z.string().min(1, 'Token không hợp lệ'),
+    password: strongPasswordSchema,
+    confirmPassword: z.string().min(1, 'Vui lòng xác nhận mật khẩu'),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: 'Mật khẩu xác nhận không khớp',
+    path: ['confirmPassword'],
+  })
 
 // Type inference
 export type LoginFormData = z.infer<typeof loginSchema>

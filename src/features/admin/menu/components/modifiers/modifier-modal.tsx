@@ -5,7 +5,10 @@ import { FormDialog, FormDialogField, FormDialogSection } from '@/src/components
 import { Input } from '@/src/components/ui/input'
 import { Switch } from '@/src/components/ui/switch'
 import { Label } from '@/src/components/ui/label'
-import { useCreateModifierMutation, useUpdateModifierMutation } from '@/src/features/admin/menu/queries'
+import {
+  useCreateModifierMutation,
+  useUpdateModifierMutation,
+} from '@/src/features/admin/menu/queries'
 import { useErrorHandler } from '@/src/hooks/use-error-handler'
 import { toast } from 'sonner'
 import type { Modifier } from '@/src/features/admin/menu/types/modifiers'
@@ -158,9 +161,7 @@ export function ModifierModal({
             disabled={isSubmitting}
             className="pr-12"
           />
-          <div className="absolute top-1/2 right-3 -translate-y-1/2 text-sm text-slate-500">
-            đ
-          </div>
+          <div className="absolute top-1/2 right-3 -translate-y-1/2 text-sm text-slate-500">đ</div>
         </div>
       </FormDialogField>
 
@@ -170,9 +171,7 @@ export function ModifierModal({
           <Label htmlFor="is_available" className="text-sm font-medium">
             Có sẵn
           </Label>
-          <p className="text-xs text-slate-500 dark:text-slate-400">
-            Tắt nếu tạm thời hết hàng
-          </p>
+          <p className="text-xs text-slate-500 dark:text-slate-400">Tắt nếu tạm thời hết hàng</p>
         </div>
         <Switch
           id="is_available"

@@ -1,6 +1,6 @@
 /**
  * Auth Fixture
- * 
+ *
  * Provides authenticated page for tests that require login.
  */
 
@@ -17,17 +17,17 @@ export const test = base.extend<{ authenticatedPage: Page }>({
   authenticatedPage: async ({ page }, use) => {
     // Navigate to login page
     await page.goto('/auth/login')
-    
+
     // Fill in login form
     await page.fill('input[name="email"]', TEST_USER.email)
     await page.fill('input[name="password"]', TEST_USER.password)
-    
+
     // Click login button
     await page.click('button[type="submit"]')
-    
+
     // Wait for redirect to admin dashboard
     await page.waitForURL(/\/admin/, { timeout: 10000 })
-    
+
     // Use the authenticated page in tests
     await use(page)
   },

@@ -38,4 +38,3 @@ export default function OrderDetailPage({ params }: { params: { orderId: string 
     </Suspense>
   )
 }
-

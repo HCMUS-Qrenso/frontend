@@ -42,7 +42,10 @@ export const ordersApi = {
    * Update order status
    * TODO: Implement when backend is ready
    */
-  updateOrderStatus: async (id: string, payload: UpdateOrderStatusPayload): Promise<OrderResponse> => {
+  updateOrderStatus: async (
+    id: string,
+    payload: UpdateOrderStatusPayload,
+  ): Promise<OrderResponse> => {
     const { data } = await apiClient.patch<OrderResponse>(`/orders/${id}/status`, payload)
     return data
   },

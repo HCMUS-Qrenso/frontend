@@ -9,13 +9,13 @@ export {
   emailSchema,
   passwordSchema,
   strongPasswordSchema,
-  
+
   // Form schemas
   loginSchema,
   forgotPasswordSchema,
   resetPasswordSchema,
   setupPasswordSchema,
-  
+
   // Types
   type LoginFormData,
   type ForgotPasswordFormData,

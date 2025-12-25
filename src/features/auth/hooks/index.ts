@@ -1,6 +1,6 @@
 /**
  * Auth Feature Hooks
- * 
+ *
  * Centralized hooks for authentication functionality.
  */
 

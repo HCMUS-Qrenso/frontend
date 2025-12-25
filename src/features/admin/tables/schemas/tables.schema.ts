@@ -10,7 +10,12 @@ import { z } from 'zod'
 export const tableShapeSchema = z.enum(['circle', 'rectangle', 'oval'])
 
 // Table status enum
-export const tableStatusSchema = z.enum(['available', 'occupied', 'waiting_for_payment', 'maintenance'])
+export const tableStatusSchema = z.enum([
+  'available',
+  'occupied',
+  'waiting_for_payment',
+  'maintenance',
+])
 
 // Table position schema
 export const tablePositionSchema = z.object({

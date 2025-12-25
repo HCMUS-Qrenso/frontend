@@ -14,7 +14,6 @@ import { Loader2, CheckCircle2, Eye, EyeOff, AlertCircle, AlertTriangle, Mail } 
 import { Alert, AlertDescription } from '@/src/components/ui/alert'
 import { authApi } from '@/src/features/auth/api/auth.api'
 
-
 type PasswordStrength = 'weak' | 'medium' | 'strong'
 
 function SetupPasswordContent() {
@@ -124,8 +123,6 @@ function SetupPasswordContent() {
       setIsLoading(false)
     }
   }
-
-
 
   // Loading State
   if (isValidatingParams) {
@@ -261,7 +258,10 @@ function SetupPasswordContent() {
         <form onSubmit={handleSubmit} noValidate className="space-y-5">
           {/* Password Field */}
           <div className="space-y-2">
-            <Label htmlFor="password" className="text-sm font-medium text-slate-700 dark:text-white">
+            <Label
+              htmlFor="password"
+              className="text-sm font-medium text-slate-700 dark:text-white"
+            >
               Mật khẩu
             </Label>
             <div className="relative">

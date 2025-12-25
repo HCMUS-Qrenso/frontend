@@ -6,7 +6,10 @@ import { Input } from '@/src/components/ui/input'
 import { Textarea } from '@/src/components/ui/textarea'
 import { Switch } from '@/src/components/ui/switch'
 import { Label } from '@/src/components/ui/label'
-import { useCreateCategoryMutation, useUpdateCategoryMutation } from '@/src/features/admin/menu/queries'
+import {
+  useCreateCategoryMutation,
+  useUpdateCategoryMutation,
+} from '@/src/features/admin/menu/queries'
 import { useErrorHandler } from '@/src/hooks/use-error-handler'
 import { toast } from 'sonner'
 import type { Category } from '@/src/features/admin/menu/types'
