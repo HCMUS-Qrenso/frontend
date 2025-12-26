@@ -120,7 +120,7 @@ export function FilterDropdown({
             </DropdownMenuItem>
           ))
         )}
-      </DropdownMenuContent>
+        </DropdownMenuContent>
     </DropdownMenu>
   )
 }

@@ -17,9 +17,11 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableHead,
   TableHeader,
-  TableRow,
+  AdminTableContainer,
+  AdminTableHeaderRow,
+  AdminTableHead,
+  AdminTableRow,
 } from '@/src/components/ui/table'
 
 interface QRTableListProps {
@@ -130,46 +132,32 @@ export function QRTableList({
       )}
 
       {/* Table */}
-      <div className="relative overflow-x-auto rounded-2xl border border-slate-100 bg-white/80 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
-        <Table>
-          <TableHeader>
-            <TableRow className="border-b border-slate-100 bg-slate-50/80 hover:bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900">
-              <TableHead className="px-6 py-3 text-left">
-                <Checkbox
-                  checked={selectedTables.length === tables.length}
-                  onCheckedChange={onSelectAll}
-                  aria-label="Chọn tất cả"
-                />
-              </TableHead>
-              <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Bàn
-              </TableHead>
-              <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Xem trước QR
-              </TableHead>
-              <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Liên kết / Đích đến
-              </TableHead>
-              <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Trạng thái
-              </TableHead>
-              <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Cập nhật lúc
-              </TableHead>
-              <TableHead className="px-6 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Thao tác
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {tables.map((table, index) => (
-              <TableRow
-                key={table.id}
-                className={cn(
-                  'border-b border-slate-100 transition-colors hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800',
-                  index === tables.length - 1 && 'border-b-0',
-                )}
-              >
+      <div className="relative">
+        <AdminTableContainer>
+          <Table>
+            <TableHeader>
+              <AdminTableHeaderRow>
+                <AdminTableHead>
+                  <Checkbox
+                    checked={selectedTables.length === tables.length}
+                    onCheckedChange={onSelectAll}
+                    aria-label="Chọn tất cả"
+                  />
+                </AdminTableHead>
+                <AdminTableHead>Bàn</AdminTableHead>
+                <AdminTableHead>Xem trước QR</AdminTableHead>
+                <AdminTableHead>Liên kết / Đích đến</AdminTableHead>
+                <AdminTableHead>Trạng thái</AdminTableHead>
+                <AdminTableHead>Cập nhật lúc</AdminTableHead>
+                <AdminTableHead align="right">Thao tác</AdminTableHead>
+              </AdminTableHeaderRow>
+            </TableHeader>
+            <TableBody>
+              {tables.map((table, index) => (
+                <AdminTableRow
+                  key={table.id}
+                  isLast={index === tables.length - 1}
+                >
                 <TableCell className="px-6 py-4">
                   <Checkbox
                     checked={selectedTables.includes(table.id)}
@@ -284,10 +272,11 @@ export function QRTableList({
                     </DropdownMenu>
                   </div>
                 </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+                </AdminTableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </AdminTableContainer>
 
         {/* Loading overlay */}
         {isDataLoading && (

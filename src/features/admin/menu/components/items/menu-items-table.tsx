@@ -5,9 +5,12 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableHead,
   TableHeader,
   TableRow,
+  AdminTableContainer,
+  AdminTableHeaderRow,
+  AdminTableHead,
+  AdminTableRow,
 } from '@/src/components/ui/table'
 import { Button } from '@/src/components/ui/button'
 import {
@@ -26,6 +29,7 @@ import { EmptyState } from '@/src/components/ui/empty-state'
 import { SkeletonTableRows } from '@/src/components/loading'
 import Image from 'next/image'
 import { useMenuItemsQuery } from '@/src/features/admin/menu/queries'
+import { TablePagination } from '@/src/components/ui/table-pagination'
 import type {
   MenuItemSortBy,
   MenuItemSortOrder,
@@ -90,32 +94,18 @@ export function MenuItemsTable({ onEditClick, onDeleteClick }: MenuItemsTablePro
   if (isLoading) {
     return (
       <div className="space-y-4">
-        <div className="overflow-hidden rounded-2xl border border-slate-100 bg-white/80 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
+        <AdminTableContainer>
           <Table>
             <TableHeader>
-              <TableRow className="border-b border-slate-100 bg-slate-50/80 hover:bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900">
-                <TableHead className="min-w-50 px-2 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase md:px-4 dark:text-slate-400">
-                  Món ăn
-                </TableHead>
-                <TableHead className="w-24 px-2 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase md:w-32 md:px-4 dark:text-slate-400">
-                  Danh mục
-                </TableHead>
-                <TableHead className="w-20 px-2 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase md:w-28 md:px-4 dark:text-slate-400">
-                  Giá
-                </TableHead>
-                <TableHead className="w-24 px-2 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase md:w-28 md:px-4 dark:text-slate-400">
-                  Trạng thái
-                </TableHead>
-                <TableHead className="w-16 px-2 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase md:w-20 md:px-4 dark:text-slate-400">
-                  Phổ biến
-                </TableHead>
-                <TableHead className="w-20 px-2 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase md:w-24 md:px-4 dark:text-slate-400">
-                  Cập nhật
-                </TableHead>
-                <TableHead className="w-20 px-2 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase md:px-4 dark:text-slate-400">
-                  Thao tác
-                </TableHead>
-              </TableRow>
+              <AdminTableHeaderRow>
+                <AdminTableHead className="min-w-50 px-2 md:px-4">Món ăn</AdminTableHead>
+                <AdminTableHead className="w-24 px-2 md:w-32 md:px-4">Danh mục</AdminTableHead>
+                <AdminTableHead className="w-20 px-2 md:w-28 md:px-4" align="right">Giá</AdminTableHead>
+                <AdminTableHead className="w-24 px-2 md:w-28 md:px-4" align="center">Trạng thái</AdminTableHead>
+                <AdminTableHead className="w-16 px-2 md:w-20 md:px-4" align="center">Phổ biến</AdminTableHead>
+                <AdminTableHead className="w-20 px-2 md:w-24 md:px-4">Cập nhật</AdminTableHead>
+                <AdminTableHead className="w-20 px-2 md:px-4" align="right">Thao tác</AdminTableHead>
+              </AdminTableHeaderRow>
             </TableHeader>
             <TableBody>
               <SkeletonTableRows
@@ -132,7 +122,7 @@ export function MenuItemsTable({ onEditClick, onDeleteClick }: MenuItemsTablePro
               />
             </TableBody>
           </Table>
-        </div>
+        </AdminTableContainer>
       </div>
     )
   }
@@ -149,32 +139,18 @@ export function MenuItemsTable({ onEditClick, onDeleteClick }: MenuItemsTablePro
 
   return (
     <div className="space-y-4">
-      <div className="overflow-hidden rounded-2xl border border-slate-100 bg-white/80 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
+      <AdminTableContainer>
         <Table>
           <TableHeader>
-            <TableRow className="border-b border-slate-100 bg-slate-50/80 hover:bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900">
-              <TableHead className="min-w-50 px-2 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase md:px-4 dark:text-slate-400">
-                Món ăn
-              </TableHead>
-              <TableHead className="w-24 px-2 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase md:w-32 md:px-4 dark:text-slate-400">
-                Danh mục
-              </TableHead>
-              <TableHead className="w-20 px-2 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase md:w-28 md:px-4 dark:text-slate-400">
-                Giá
-              </TableHead>
-              <TableHead className="w-24 px-2 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase md:w-28 md:px-4 dark:text-slate-400">
-                Trạng thái
-              </TableHead>
-              <TableHead className="w-16 px-2 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase md:w-20 md:px-4 dark:text-slate-400">
-                Phổ biến
-              </TableHead>
-              <TableHead className="w-20 px-2 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase md:w-24 md:px-4 dark:text-slate-400">
-                Cập nhật
-              </TableHead>
-              <TableHead className="w-20 px-2 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase md:px-4 dark:text-slate-400">
-                Thao tác
-              </TableHead>
-            </TableRow>
+            <AdminTableHeaderRow>
+              <AdminTableHead className="min-w-50 px-2 md:px-4">Món ăn</AdminTableHead>
+              <AdminTableHead className="w-24 px-2 md:w-32 md:px-4">Danh mục</AdminTableHead>
+              <AdminTableHead className="w-20 px-2 md:w-28 md:px-4" align="right">Giá</AdminTableHead>
+              <AdminTableHead className="w-24 px-2 md:w-28 md:px-4" align="center">Trạng thái</AdminTableHead>
+              <AdminTableHead className="w-16 px-2 md:w-20 md:px-4" align="center">Phổ biến</AdminTableHead>
+              <AdminTableHead className="w-20 px-2 md:w-24 md:px-4">Cập nhật</AdminTableHead>
+              <AdminTableHead className="w-20 px-2 md:px-4" align="right">Thao tác</AdminTableHead>
+            </AdminTableHeaderRow>
           </TableHeader>
           <TableBody>
             {menuItems.length === 0 ? (
@@ -189,12 +165,10 @@ export function MenuItemsTable({ onEditClick, onDeleteClick }: MenuItemsTablePro
               </TableRow>
             ) : (
               menuItems.map((item, index) => (
-                <TableRow
+                <AdminTableRow
                   key={item.id}
-                  className={cn(
-                    'cursor-pointer border-b border-slate-100 transition-colors hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800',
-                    index === menuItems.length - 1 && 'border-b-0',
-                  )}
+                  isLast={index === menuItems.length - 1}
+                  className="cursor-pointer"
                   onClick={() => onEditClick(item)}
                 >
                   <TableCell className="px-2 py-3 md:px-4">
@@ -300,56 +274,23 @@ export function MenuItemsTable({ onEditClick, onDeleteClick }: MenuItemsTablePro
                       </DropdownMenu>
                     </div>
                   </TableCell>
-                </TableRow>
+                </AdminTableRow>
               ))
             )}
           </TableBody>
         </Table>
-      </div>
+      </AdminTableContainer>
 
       {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="flex items-center justify-between">
-          <p className="text-sm text-slate-500 dark:text-slate-400">
-            Hiển thị {startItem}-{endItem} trên {total} món
-          </p>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              className="rounded-full bg-transparent"
-              disabled={currentPage === 1}
-              onClick={() => handlePageChange(currentPage - 1)}
-            >
-              Trước
-            </Button>
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
-              <Button
-                key={pageNum}
-                variant="outline"
-                size="sm"
-                className={cn(
-                  'h-8 w-8 rounded-full',
-                  pageNum === currentPage
-                    ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10'
-                    : 'bg-transparent',
-                )}
-                onClick={() => handlePageChange(pageNum)}
-              >
-                {pageNum}
-              </Button>
-            ))}
-            <Button
-              variant="outline"
-              size="sm"
-              className="rounded-full bg-transparent"
-              disabled={currentPage === totalPages}
-              onClick={() => handlePageChange(currentPage + 1)}
-            >
-              Sau
-            </Button>
-          </div>
-        </div>
+      {pagination && (
+        <TablePagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          total={total}
+          limit={limit}
+          itemLabel="món"
+          onPageChange={handlePageChange}
+        />
       )}
     </div>
   )

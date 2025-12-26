@@ -10,12 +10,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/src/components/ui/dropdown-menu'
-import { Edit2, Trash2, ChevronLeft, ChevronRight, Eye, EyeOff, MoreVertical } from 'lucide-react'
+import { Edit2, Trash2, Eye, EyeOff, MoreVertical } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useZonesQuery, useUpdateZoneMutation } from '@/src/features/admin/tables/queries'
 import { toast } from 'sonner'
 import type { Zone } from '@/src/features/admin/tables/types'
 import { useErrorHandler } from '@/src/hooks/use-error-handler'
+import { TablePagination } from '@/src/components/ui/table-pagination'
 import {
   Table,
   TableBody,
@@ -23,6 +24,10 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  AdminTableContainer,
+  AdminTableHeaderRow,
+  AdminTableHead,
+  AdminTableRow,
 } from '@/src/components/ui/table'
 import { SkeletonTableRows } from '@/src/components/loading'
 
@@ -80,26 +85,16 @@ export function ZonesTable({ onEdit, onDelete }: ZonesTableProps) {
 
   if (isLoading) {
     return (
-      <div className="overflow-x-auto rounded-2xl border border-slate-100 bg-white/80 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
+      <AdminTableContainer>
         <Table className="w-full min-w-250 table-fixed">
           <TableHeader>
-            <TableRow className="border-b border-slate-100 bg-slate-50/80 hover:bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900">
-              <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Tên khu vực
-              </TableHead>
-              <TableHead className="w-50 px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Mô tả
-              </TableHead>
-              <TableHead className="w-30 px-6 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Thứ tự
-              </TableHead>
-              <TableHead className="w-30 px-6 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Trạng thái
-              </TableHead>
-              <TableHead className="w-37.5 px-6 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Thao tác
-              </TableHead>
-            </TableRow>
+            <AdminTableHeaderRow>
+              <AdminTableHead>Tên khu vực</AdminTableHead>
+              <AdminTableHead className="w-50">Mô tả</AdminTableHead>
+              <AdminTableHead className="w-30" align="center">Thứ tự</AdminTableHead>
+              <AdminTableHead className="w-30" align="center">Trạng thái</AdminTableHead>
+              <AdminTableHead className="w-37.5" align="right">Thao tác</AdminTableHead>
+            </AdminTableHeaderRow>
           </TableHeader>
           <TableBody>
             <SkeletonTableRows
@@ -114,7 +109,7 @@ export function ZonesTable({ onEdit, onDelete }: ZonesTableProps) {
             />
           </TableBody>
         </Table>
-      </div>
+      </AdminTableContainer>
     )
   }
 
@@ -130,7 +125,7 @@ export function ZonesTable({ onEdit, onDelete }: ZonesTableProps) {
 
   return (
     <div className="space-y-4">
-      <div className="overflow-x-auto rounded-2xl border border-slate-100 bg-white/80 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
+      <AdminTableContainer>
         <Table className="w-full min-w-250 table-fixed">
           <colgroup>
             <col className="w-[28%]" />
@@ -140,23 +135,13 @@ export function ZonesTable({ onEdit, onDelete }: ZonesTableProps) {
             <col className="w-[14%]" />
           </colgroup>
           <TableHeader>
-            <TableRow className="border-b border-slate-100 bg-slate-50/80 hover:bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900">
-              <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Tên khu vực
-              </TableHead>
-              <TableHead className="w-50 px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Mô tả
-              </TableHead>
-              <TableHead className="w-30 px-6 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Thứ tự
-              </TableHead>
-              <TableHead className="w-30 px-6 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Trạng thái
-              </TableHead>
-              <TableHead className="w-37.5 px-6 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Thao tác
-              </TableHead>
-            </TableRow>
+            <AdminTableHeaderRow>
+              <AdminTableHead>Tên khu vực</AdminTableHead>
+              <AdminTableHead className="w-50">Mô tả</AdminTableHead>
+              <AdminTableHead className="w-30" align="center">Thứ tự</AdminTableHead>
+              <AdminTableHead className="w-30" align="center">Trạng thái</AdminTableHead>
+              <AdminTableHead className="w-37.5" align="right">Thao tác</AdminTableHead>
+            </AdminTableHeaderRow>
           </TableHeader>
           <TableBody>
             {zones.length === 0 ? (
@@ -166,13 +151,11 @@ export function ZonesTable({ onEdit, onDelete }: ZonesTableProps) {
                 </TableCell>
               </TableRow>
             ) : (
-              zones.map((zone) => (
-                <TableRow
+              zones.map((zone, index) => (
+                <AdminTableRow
                   key={zone.id}
-                  className={cn(
-                    'border-b border-slate-100 transition-colors hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800',
-                    !zone.is_active && 'opacity-60',
-                  )}
+                  isLast={index === zones.length - 1}
+                  className={cn(!zone.is_active && 'opacity-60')}
                 >
                   <TableCell className="px-6 py-4">
                     <div className="flex flex-col gap-1">
@@ -237,60 +220,23 @@ export function ZonesTable({ onEdit, onDelete }: ZonesTableProps) {
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
-                </TableRow>
+                </AdminTableRow>
               ))
             )}
           </TableBody>
         </Table>
-      </div>
+      </AdminTableContainer>
 
       {/* Pagination */}
-      {pagination && pagination.total_pages > 1 && (
-        <div className="flex items-center justify-between">
-          <p className="text-sm text-slate-500 dark:text-slate-400">
-            Hiển thị {(pagination.page - 1) * pagination.limit + 1}-
-            {Math.min(pagination.page * pagination.limit, pagination.total)} trên {pagination.total}{' '}
-            khu vực
-          </p>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              className="rounded-full bg-transparent"
-              disabled={pagination.page === 1}
-              onClick={() => handlePageChange(pagination.page - 1)}
-            >
-              <ChevronLeft className="h-4 w-4" />
-              Trước
-            </Button>
-            {Array.from({ length: pagination.total_pages }, (_, i) => i + 1).map((pageNum) => (
-              <Button
-                key={pageNum}
-                variant="outline"
-                size="sm"
-                className={cn(
-                  'h-8 w-8 rounded-full',
-                  pageNum === pagination.page
-                    ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10'
-                    : 'bg-transparent',
-                )}
-                onClick={() => handlePageChange(pageNum)}
-              >
-                {pageNum}
-              </Button>
-            ))}
-            <Button
-              variant="outline"
-              size="sm"
-              className="rounded-full bg-transparent"
-              disabled={pagination.page === pagination.total_pages}
-              onClick={() => handlePageChange(pagination.page + 1)}
-            >
-              Sau
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
+      {pagination && (
+        <TablePagination
+          currentPage={pagination.page}
+          totalPages={pagination.total_pages}
+          total={pagination.total}
+          limit={pagination.limit}
+          itemLabel="khu vực"
+          onPageChange={handlePageChange}
+        />
       )}
     </div>
   )

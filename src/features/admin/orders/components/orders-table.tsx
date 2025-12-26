@@ -6,9 +6,12 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableHead,
   TableHeader,
   TableRow,
+  AdminTableContainer,
+  AdminTableHeaderRow,
+  AdminTableHead,
+  AdminTableRow,
 } from '@/src/components/ui/table'
 import { Badge } from '@/src/components/ui/badge'
 import { Button } from '@/src/components/ui/button'
@@ -27,6 +30,7 @@ import { EmptyState } from '@/src/components/ui/empty-state'
 import { SkeletonTableRows } from '@/src/components/loading'
 import { formatDistanceToNow } from 'date-fns'
 import { vi } from 'date-fns/locale'
+import { TablePagination } from '@/src/components/ui/table-pagination'
 
 // Mock data
 const MOCK_ORDERS = [
@@ -248,35 +252,19 @@ export function OrdersTable() {
   if (isLoading) {
     return (
       <div className="space-y-4">
-        <div className="overflow-x-auto rounded-2xl border border-slate-100 bg-white/80 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
+        <AdminTableContainer>
           <Table>
             <TableHeader>
-              <TableRow className="border-b border-slate-100 bg-slate-50/80 hover:bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900">
-                <TableHead className="px-4 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                  Mã đơn
-                </TableHead>
-                <TableHead className="px-4 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                  Bàn
-                </TableHead>
-                <TableHead className="px-4 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                  Món
-                </TableHead>
-                <TableHead className="px-4 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                  Trạng thái
-                </TableHead>
-                <TableHead className="px-4 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                  Thanh toán
-                </TableHead>
-                <TableHead className="px-4 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                  Tổng tiền
-                </TableHead>
-                <TableHead className="px-4 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                  Thời gian
-                </TableHead>
-                <TableHead className="px-4 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                  Thao tác
-                </TableHead>
-              </TableRow>
+              <AdminTableHeaderRow>
+                <AdminTableHead className="px-4">Mã đơn</AdminTableHead>
+                <AdminTableHead className="px-4">Bàn</AdminTableHead>
+                <AdminTableHead className="px-4">Món</AdminTableHead>
+                <AdminTableHead className="px-4">Trạng thái</AdminTableHead>
+                <AdminTableHead className="px-4">Thanh toán</AdminTableHead>
+                <AdminTableHead className="px-4" align="right">Tổng tiền</AdminTableHead>
+                <AdminTableHead className="px-4" align="center">Thời gian</AdminTableHead>
+                <AdminTableHead className="px-4" align="right">Thao tác</AdminTableHead>
+              </AdminTableHeaderRow>
             </TableHeader>
             <TableBody>
               <SkeletonTableRows
@@ -294,7 +282,7 @@ export function OrdersTable() {
               />
             </TableBody>
           </Table>
-        </div>
+        </AdminTableContainer>
       </div>
     )
   }
@@ -302,35 +290,19 @@ export function OrdersTable() {
   return (
     <div className="space-y-4">
       {/* Table */}
-      <div className="overflow-x-auto rounded-2xl border border-slate-100 bg-white/80 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
+      <AdminTableContainer>
         <Table>
           <TableHeader>
-            <TableRow className="border-b border-slate-100 bg-slate-50/80 hover:bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900">
-              <TableHead className="px-4 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Mã đơn
-              </TableHead>
-              <TableHead className="px-4 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Bàn
-              </TableHead>
-              <TableHead className="px-4 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Món
-              </TableHead>
-              <TableHead className="px-4 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Trạng thái
-              </TableHead>
-              <TableHead className="px-4 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Thanh toán
-              </TableHead>
-              <TableHead className="px-4 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Tổng tiền
-              </TableHead>
-              <TableHead className="px-4 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Thời gian
-              </TableHead>
-              <TableHead className="px-4 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Thao tác
-              </TableHead>
-            </TableRow>
+            <AdminTableHeaderRow>
+              <AdminTableHead className="px-4">Mã đơn</AdminTableHead>
+              <AdminTableHead className="px-4">Bàn</AdminTableHead>
+              <AdminTableHead className="px-4">Món</AdminTableHead>
+              <AdminTableHead className="px-4">Trạng thái</AdminTableHead>
+              <AdminTableHead className="px-4">Thanh toán</AdminTableHead>
+              <AdminTableHead className="px-4" align="right">Tổng tiền</AdminTableHead>
+              <AdminTableHead className="px-4" align="center">Thời gian</AdminTableHead>
+              <AdminTableHead className="px-4" align="right">Thao tác</AdminTableHead>
+            </AdminTableHeaderRow>
           </TableHeader>
           <TableBody>
             {orders.length === 0 ? (
@@ -349,12 +321,10 @@ export function OrdersTable() {
                 const isOverdue = isAging(order.createdAt)
 
                 return (
-                  <TableRow
+                  <AdminTableRow
                     key={order.id}
-                    className={cn(
-                      'cursor-pointer border-b border-slate-100 transition-colors hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800',
-                      index === orders.length - 1 && 'border-b-0',
-                    )}
+                    isLast={index === orders.length - 1}
+                    className="cursor-pointer"
                     onClick={() => handleViewOrder(order.id)}
                   >
                     <TableCell className="px-4 py-4">
@@ -486,55 +456,23 @@ export function OrdersTable() {
                         </DropdownMenu>
                       </div>
                     </TableCell>
-                  </TableRow>
+                  </AdminTableRow>
                 )
               })
             )}
           </TableBody>
         </Table>
-      </div>
+      </AdminTableContainer>
 
       {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="flex items-center justify-between">
-          <p className="text-sm text-slate-500 dark:text-slate-400">
-            Hiển thị 1-{total} trên {total} đơn
-          </p>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              className="rounded-full bg-transparent"
-              disabled={page === 1}
-            >
-              Trước
-            </Button>
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
-              <Button
-                key={pageNum}
-                variant="outline"
-                size="sm"
-                className={cn(
-                  'h-8 w-8 rounded-full',
-                  pageNum === page
-                    ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10'
-                    : 'bg-transparent',
-                )}
-              >
-                {pageNum}
-              </Button>
-            ))}
-            <Button
-              variant="outline"
-              size="sm"
-              className="rounded-full bg-transparent"
-              disabled={page === totalPages}
-            >
-              Sau
-            </Button>
-          </div>
-        </div>
-      )}
+      <TablePagination
+        currentPage={page}
+        totalPages={totalPages}
+        total={total}
+        limit={10}
+        itemLabel="đơn"
+        onPageChange={() => {}}
+      />
     </div>
   )
 }

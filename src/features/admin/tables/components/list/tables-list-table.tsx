@@ -17,6 +17,7 @@ import { Edit2, MapPin, Trash2, RotateCcw, MoreVertical, TableProperties } from 
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useTablesQuery, useUpdateTableMutation } from '@/src/features/admin/tables/queries'
 import { toast } from 'sonner'
+import { TablePagination } from '@/src/components/ui/table-pagination'
 import type {
   Table as TableType,
   TableStatus,
@@ -29,9 +30,12 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableHead,
   TableHeader,
   TableRow,
+  AdminTableContainer,
+  AdminTableHeaderRow,
+  AdminTableHead,
+  AdminTableRow,
 } from '@/src/components/ui/table'
 
 interface TablesListTableProps {
@@ -128,7 +132,7 @@ export function TablesListTable({
   if (isLoading) {
     return (
       <div className="space-y-4">
-        <div className="overflow-x-auto rounded-2xl border border-slate-100 bg-white/80 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
+        <AdminTableContainer>
           <Table className="w-full min-w-250 table-fixed">
             <colgroup>
               <col className="w-[18%]" />
@@ -139,26 +143,14 @@ export function TablesListTable({
               <col className="w-[14%]" />
             </colgroup>
             <TableHeader>
-              <TableRow className="border-b border-slate-100 bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900">
-                <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                  Bàn
-                </TableHead>
-                <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                  Khu vực / Tầng
-                </TableHead>
-                <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                  Sức chứa
-                </TableHead>
-                <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                  Trạng thái
-                </TableHead>
-                <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                  Đơn hàng hiện tại
-                </TableHead>
-                <TableHead className="px-6 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                  Thao tác
-                </TableHead>
-              </TableRow>
+              <AdminTableHeaderRow>
+                <AdminTableHead>Bàn</AdminTableHead>
+                <AdminTableHead>Khu vực / Tầng</AdminTableHead>
+                <AdminTableHead>Sức chứa</AdminTableHead>
+                <AdminTableHead>Trạng thái</AdminTableHead>
+                <AdminTableHead>Đơn hàng hiện tại</AdminTableHead>
+                <AdminTableHead align="right">Thao tác</AdminTableHead>
+              </AdminTableHeaderRow>
             </TableHeader>
             <TableBody>
               <SkeletonTableRows
@@ -174,7 +166,7 @@ export function TablesListTable({
               />
             </TableBody>
           </Table>
-        </div>
+        </AdminTableContainer>
       </div>
     )
   }
@@ -191,7 +183,7 @@ export function TablesListTable({
   return (
     <div className="space-y-4">
       {/* Table */}
-      <div className="overflow-x-auto rounded-2xl border border-slate-100 bg-white/80 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
+      <AdminTableContainer>
         <Table className="w-full min-w-250 table-fixed">
           <colgroup>
             <col className="w-[18%]" />
@@ -202,26 +194,14 @@ export function TablesListTable({
             <col className="w-[14%]" />
           </colgroup>
           <TableHeader>
-            <TableRow className="border-b border-slate-100 bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900">
-              <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Bàn
-              </TableHead>
-              <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Khu vực / Tầng
-              </TableHead>
-              <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Sức chứa
-              </TableHead>
-              <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Trạng thái
-              </TableHead>
-              <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Đơn hàng hiện tại
-              </TableHead>
-              <TableHead className="px-6 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Thao tác
-              </TableHead>
-            </TableRow>
+            <AdminTableHeaderRow>
+              <AdminTableHead>Bàn</AdminTableHead>
+              <AdminTableHead>Khu vực / Tầng</AdminTableHead>
+              <AdminTableHead>Sức chứa</AdminTableHead>
+              <AdminTableHead>Trạng thái</AdminTableHead>
+              <AdminTableHead>Đơn hàng hiện tại</AdminTableHead>
+              <AdminTableHead align="right">Thao tác</AdminTableHead>
+            </AdminTableHeaderRow>
           </TableHeader>
           <TableBody>
             {tables.length === 0 ? (
@@ -236,12 +216,9 @@ export function TablesListTable({
               </TableRow>
             ) : (
               tables.map((table, index) => (
-                <TableRow
+                <AdminTableRow
                   key={table.id}
-                  className={cn(
-                    'border-b border-slate-100 transition-colors hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800',
-                    index === tables.length - 1 && 'border-b-0',
-                  )}
+                  isLast={index === tables.length - 1}
                 >
                   <TableCell className="px-6 py-4">
                     <div>
@@ -314,58 +291,23 @@ export function TablesListTable({
                       )}
                     </div>
                   </TableCell>
-                </TableRow>
+                </AdminTableRow>
               ))
             )}
           </TableBody>
         </Table>
-      </div>
+      </AdminTableContainer>
 
       {/* Pagination */}
-      {pagination && pagination.total_pages > 1 && (
-        <div className="flex items-center justify-between">
-          <p className="text-sm text-slate-500 dark:text-slate-400">
-            Hiển thị {(pagination.page - 1) * pagination.limit + 1}-
-            {Math.min(pagination.page * pagination.limit, pagination.total)} trên {pagination.total}{' '}
-            bàn
-          </p>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              className="rounded-full bg-transparent"
-              disabled={pagination.page === 1}
-              onClick={() => handlePageChange(pagination.page - 1)}
-            >
-              Trước
-            </Button>
-            {Array.from({ length: pagination.total_pages }, (_, i) => i + 1).map((pageNum) => (
-              <Button
-                key={pageNum}
-                variant="outline"
-                size="sm"
-                className={cn(
-                  'h-8 w-8 rounded-full',
-                  pageNum === pagination.page
-                    ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10'
-                    : 'bg-transparent',
-                )}
-                onClick={() => handlePageChange(pageNum)}
-              >
-                {pageNum}
-              </Button>
-            ))}
-            <Button
-              variant="outline"
-              size="sm"
-              className="rounded-full bg-transparent"
-              disabled={pagination.page === pagination.total_pages}
-              onClick={() => handlePageChange(pagination.page + 1)}
-            >
-              Sau
-            </Button>
-          </div>
-        </div>
+      {pagination && (
+        <TablePagination
+          currentPage={pagination.page}
+          totalPages={pagination.total_pages}
+          total={pagination.total}
+          limit={pagination.limit}
+          itemLabel="bàn"
+          onPageChange={handlePageChange}
+        />
       )}
     </div>
   )
