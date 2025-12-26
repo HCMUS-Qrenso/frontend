@@ -39,6 +39,7 @@ import { useErrorHandler } from '@/src/hooks/use-error-handler'
 import type { CategorySortBy, CategorySortOrder, Category } from '@/src/features/admin/menu/types'
 import { toast } from 'sonner'
 import { SkeletonTableRows } from '@/src/components/loading'
+import { TablePagination } from '@/src/components/ui/table-pagination'
 
 interface CategoriesTableProps {
   reorderMode: boolean
@@ -234,6 +235,12 @@ export function CategoriesTable({
 
   const handleViewItems = (categoryId: string) => {
     router.push(`/admin/menu/items?category_id=${categoryId}`)
+  }
+
+  const handlePageChange = (newPage: number) => {
+    const params = new URLSearchParams(searchParams.toString())
+    params.set('page', newPage.toString())
+    router.push(`/admin/menu/categories?${params.toString()}`)
   }
 
   const handleToggleActive = async (categoryId: string) => {
@@ -485,39 +492,53 @@ export function CategoriesTable({
   )
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-slate-100 bg-white/80 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
-      {reorderMode ? (
-        <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-          {tableContent}
-        </DndContext>
-      ) : (
-        tableContent
-      )}
+    <div className="space-y-4">
+      <div className="overflow-hidden rounded-2xl border border-slate-100 bg-white/80 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
+        {reorderMode ? (
+          <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+            {tableContent}
+          </DndContext>
+        ) : (
+          tableContent
+        )}
 
-      {reorderMode && (
-        <div className="sticky bottom-0 flex items-center justify-end gap-3 border-t border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
-          <Button
-            variant="outline"
-            onClick={() => setReorderMode(false)}
-            disabled={reorderMutation.isPending}
-          >
-            Hủy
-          </Button>
-          <Button
-            onClick={handleSaveOrder}
-            disabled={reorderMutation.isPending}
-            className="bg-emerald-600 hover:bg-emerald-700"
-          >
-            {reorderMutation.isPending ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Đang lưu...
-              </>
-            ) : (
-              'Lưu thứ tự'
-            )}
-          </Button>
-        </div>
+        {reorderMode && (
+          <div className="sticky bottom-0 flex items-center justify-end gap-3 border-t border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
+            <Button
+              variant="outline"
+              onClick={() => setReorderMode(false)}
+              disabled={reorderMutation.isPending}
+            >
+              Hủy
+            </Button>
+            <Button
+              onClick={handleSaveOrder}
+              disabled={reorderMutation.isPending}
+              className="bg-emerald-600 hover:bg-emerald-700"
+            >
+              {reorderMutation.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Đang lưu...
+                </>
+              ) : (
+                'Lưu thứ tự'
+              )}
+            </Button>
+          </div>
+        )}
+      </div>
+
+      {/* Pagination - only show when not in reorder mode */}
+      {!reorderMode && pagination && (
+        <TablePagination
+          currentPage={pagination.page}
+          totalPages={pagination.total_pages}
+          total={pagination.total}
+          limit={pagination.limit}
+          itemLabel="danh mục"
+          onPageChange={handlePageChange}
+        />
       )}
     </div>
   )

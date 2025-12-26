@@ -15,12 +15,13 @@ import { StatusBadge, USER_ROLE_CONFIG, USER_STATUS_CONFIG } from '@/src/compone
 import { StaffRowActions } from '@/src/features/admin/staff/components/staff-row-actions'
 import { LoadingState } from '@/src/components/ui/loading-state'
 import { EmptyState } from '@/src/components/ui/empty-state'
-import { CheckCircle2, XCircle, Users, ChevronLeft, ChevronRight } from 'lucide-react'
+import { CheckCircle2, XCircle, Users } from 'lucide-react'
 import { cn } from '@/src/lib/utils'
 import { useStaffQuery } from '@/src/features/admin/staff/queries'
 import { SkeletonTableRows } from '@/src/components/loading'
 import { useSearchParams, useRouter } from 'next/navigation'
 import type { StaffQueryParams } from '@/src/features/admin/staff/types'
+import { TablePagination } from '@/src/components/ui/table-pagination'
 
 interface StaffDataTableProps {
   role: 'admin' | 'waiter' | 'kitchen_staff'
@@ -289,54 +290,15 @@ export function StaffDataTable({ role }: StaffDataTableProps) {
       </div>
 
       {/* Pagination */}
-      {pagination && pagination.totalPages > 1 && (
-        <div className="flex items-center justify-between">
-          <p className="text-sm text-slate-500 dark:text-slate-400">
-            Hiển thị {(pagination.page - 1) * pagination.limit + 1}-
-            {Math.min(pagination.page * pagination.limit, pagination.total)} trên {pagination.total}{' '}
-            nhân viên
-          </p>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              className="rounded-full bg-transparent"
-              disabled={pagination.page === 1}
-              onClick={() => handlePageChange(pagination.page - 1)}
-            >
-              <ChevronLeft className="h-4 w-4" />
-              Trước
-            </Button>
-            {Array.from({ length: Math.min(pagination.totalPages, 5) }, (_, i) => i + 1).map(
-              (pageNum) => (
-                <Button
-                  key={pageNum}
-                  variant="outline"
-                  size="sm"
-                  className={cn(
-                    'h-8 w-8 rounded-full',
-                    pageNum === pagination.page
-                      ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10'
-                      : 'bg-transparent',
-                  )}
-                  onClick={() => handlePageChange(pageNum)}
-                >
-                  {pageNum}
-                </Button>
-              ),
-            )}
-            <Button
-              variant="outline"
-              size="sm"
-              className="rounded-full bg-transparent"
-              disabled={pagination.page === pagination.totalPages}
-              onClick={() => handlePageChange(pagination.page + 1)}
-            >
-              Sau
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
+      {pagination && (
+        <TablePagination
+          currentPage={pagination.page}
+          totalPages={pagination.totalPages}
+          total={pagination.total}
+          limit={pagination.limit}
+          itemLabel="nhân viên"
+          onPageChange={handlePageChange}
+        />
       )}
     </div>
   )
