@@ -5,9 +5,12 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableHead,
   TableHeader,
   TableRow,
+  AdminTableContainer,
+  AdminTableHeaderRow,
+  AdminTableHead,
+  AdminTableRow,
 } from '@/src/components/ui/table'
 import { Avatar, AvatarFallback, AvatarImage } from '@/src/components/ui/avatar'
 import { Button } from '@/src/components/ui/button'
@@ -108,32 +111,18 @@ export function StaffDataTable({ role }: StaffDataTableProps) {
   if (isLoading) {
     return (
       <div className="space-y-4">
-        <div className="overflow-x-auto rounded-2xl border border-slate-100 bg-white/80 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
+        <AdminTableContainer>
           <Table>
             <TableHeader>
-              <TableRow className="border-b border-slate-100 bg-slate-50/80 hover:bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900">
-                <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                  Nhân viên
-                </TableHead>
-                <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                  Liên hệ
-                </TableHead>
-                <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                  Vai trò
-                </TableHead>
-                <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                  Trạng thái
-                </TableHead>
-                <TableHead className="px-6 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                  Xác thực
-                </TableHead>
-                <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                  Đăng nhập cuối
-                </TableHead>
-                <TableHead className="px-6 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                  Thao tác
-                </TableHead>
-              </TableRow>
+              <AdminTableHeaderRow>
+                <AdminTableHead>Nhân viên</AdminTableHead>
+                <AdminTableHead>Liên hệ</AdminTableHead>
+                <AdminTableHead>Vai trò</AdminTableHead>
+                <AdminTableHead>Trạng thái</AdminTableHead>
+                <AdminTableHead align="center">Xác thực</AdminTableHead>
+                <AdminTableHead>Đăng nhập cuối</AdminTableHead>
+                <AdminTableHead align="right">Thao tác</AdminTableHead>
+              </AdminTableHeaderRow>
             </TableHeader>
             <TableBody>
               <SkeletonTableRows
@@ -150,7 +139,7 @@ export function StaffDataTable({ role }: StaffDataTableProps) {
               />
             </TableBody>
           </Table>
-        </div>
+        </AdminTableContainer>
       </div>
     )
   }
@@ -169,32 +158,18 @@ export function StaffDataTable({ role }: StaffDataTableProps) {
   return (
     <div className="space-y-4">
       {/* Table */}
-      <div className="overflow-x-auto rounded-2xl border border-slate-100 bg-white/80 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
+      <AdminTableContainer>
         <Table>
           <TableHeader>
-            <TableRow className="border-b border-slate-100 bg-slate-50/80 hover:bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900">
-              <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Nhân viên
-              </TableHead>
-              <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Liên hệ
-              </TableHead>
-              <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Vai trò
-              </TableHead>
-              <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Trạng thái
-              </TableHead>
-              <TableHead className="px-6 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Xác thực
-              </TableHead>
-              <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Đăng nhập cuối
-              </TableHead>
-              <TableHead className="px-6 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Thao tác
-              </TableHead>
-            </TableRow>
+            <AdminTableHeaderRow>
+              <AdminTableHead>Nhân viên</AdminTableHead>
+              <AdminTableHead>Liên hệ</AdminTableHead>
+              <AdminTableHead>Vai trò</AdminTableHead>
+              <AdminTableHead>Trạng thái</AdminTableHead>
+              <AdminTableHead align="center">Xác thực</AdminTableHead>
+              <AdminTableHead>Đăng nhập cuối</AdminTableHead>
+              <AdminTableHead align="right">Thao tác</AdminTableHead>
+            </AdminTableHeaderRow>
           </TableHeader>
           <TableBody>
             {staffList.length === 0 ? (
@@ -213,12 +188,9 @@ export function StaffDataTable({ role }: StaffDataTableProps) {
               </TableRow>
             ) : (
               staffList.map((staff, index) => (
-                <TableRow
+                <AdminTableRow
                   key={staff.id}
-                  className={cn(
-                    'border-b border-slate-100 transition-colors hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800',
-                    index === staffList.length - 1 && 'border-b-0',
-                  )}
+                  isLast={index === staffList.length - 1}
                 >
                   {/* Staff Info */}
                   <TableCell className="px-6 py-4">
@@ -282,12 +254,12 @@ export function StaffDataTable({ role }: StaffDataTableProps) {
                       <StaffRowActions staff={staff} />
                     </div>
                   </TableCell>
-                </TableRow>
+                </AdminTableRow>
               ))
             )}
           </TableBody>
         </Table>
-      </div>
+      </AdminTableContainer>
 
       {/* Pagination */}
       {pagination && (

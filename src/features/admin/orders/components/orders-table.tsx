@@ -6,9 +6,12 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableHead,
   TableHeader,
   TableRow,
+  AdminTableContainer,
+  AdminTableHeaderRow,
+  AdminTableHead,
+  AdminTableRow,
 } from '@/src/components/ui/table'
 import { Badge } from '@/src/components/ui/badge'
 import { Button } from '@/src/components/ui/button'
@@ -249,35 +252,19 @@ export function OrdersTable() {
   if (isLoading) {
     return (
       <div className="space-y-4">
-        <div className="overflow-x-auto rounded-2xl border border-slate-100 bg-white/80 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
+        <AdminTableContainer>
           <Table>
             <TableHeader>
-              <TableRow className="border-b border-slate-100 bg-slate-50/80 hover:bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900">
-                <TableHead className="px-4 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                  Mã đơn
-                </TableHead>
-                <TableHead className="px-4 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                  Bàn
-                </TableHead>
-                <TableHead className="px-4 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                  Món
-                </TableHead>
-                <TableHead className="px-4 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                  Trạng thái
-                </TableHead>
-                <TableHead className="px-4 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                  Thanh toán
-                </TableHead>
-                <TableHead className="px-4 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                  Tổng tiền
-                </TableHead>
-                <TableHead className="px-4 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                  Thời gian
-                </TableHead>
-                <TableHead className="px-4 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                  Thao tác
-                </TableHead>
-              </TableRow>
+              <AdminTableHeaderRow>
+                <AdminTableHead className="px-4">Mã đơn</AdminTableHead>
+                <AdminTableHead className="px-4">Bàn</AdminTableHead>
+                <AdminTableHead className="px-4">Món</AdminTableHead>
+                <AdminTableHead className="px-4">Trạng thái</AdminTableHead>
+                <AdminTableHead className="px-4">Thanh toán</AdminTableHead>
+                <AdminTableHead className="px-4" align="right">Tổng tiền</AdminTableHead>
+                <AdminTableHead className="px-4" align="center">Thời gian</AdminTableHead>
+                <AdminTableHead className="px-4" align="right">Thao tác</AdminTableHead>
+              </AdminTableHeaderRow>
             </TableHeader>
             <TableBody>
               <SkeletonTableRows
@@ -295,7 +282,7 @@ export function OrdersTable() {
               />
             </TableBody>
           </Table>
-        </div>
+        </AdminTableContainer>
       </div>
     )
   }
@@ -303,35 +290,19 @@ export function OrdersTable() {
   return (
     <div className="space-y-4">
       {/* Table */}
-      <div className="overflow-x-auto rounded-2xl border border-slate-100 bg-white/80 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
+      <AdminTableContainer>
         <Table>
           <TableHeader>
-            <TableRow className="border-b border-slate-100 bg-slate-50/80 hover:bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900">
-              <TableHead className="px-4 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Mã đơn
-              </TableHead>
-              <TableHead className="px-4 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Bàn
-              </TableHead>
-              <TableHead className="px-4 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Món
-              </TableHead>
-              <TableHead className="px-4 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Trạng thái
-              </TableHead>
-              <TableHead className="px-4 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Thanh toán
-              </TableHead>
-              <TableHead className="px-4 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Tổng tiền
-              </TableHead>
-              <TableHead className="px-4 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Thời gian
-              </TableHead>
-              <TableHead className="px-4 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Thao tác
-              </TableHead>
-            </TableRow>
+            <AdminTableHeaderRow>
+              <AdminTableHead className="px-4">Mã đơn</AdminTableHead>
+              <AdminTableHead className="px-4">Bàn</AdminTableHead>
+              <AdminTableHead className="px-4">Món</AdminTableHead>
+              <AdminTableHead className="px-4">Trạng thái</AdminTableHead>
+              <AdminTableHead className="px-4">Thanh toán</AdminTableHead>
+              <AdminTableHead className="px-4" align="right">Tổng tiền</AdminTableHead>
+              <AdminTableHead className="px-4" align="center">Thời gian</AdminTableHead>
+              <AdminTableHead className="px-4" align="right">Thao tác</AdminTableHead>
+            </AdminTableHeaderRow>
           </TableHeader>
           <TableBody>
             {orders.length === 0 ? (
@@ -350,12 +321,10 @@ export function OrdersTable() {
                 const isOverdue = isAging(order.createdAt)
 
                 return (
-                  <TableRow
+                  <AdminTableRow
                     key={order.id}
-                    className={cn(
-                      'cursor-pointer border-b border-slate-100 transition-colors hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800',
-                      index === orders.length - 1 && 'border-b-0',
-                    )}
+                    isLast={index === orders.length - 1}
+                    className="cursor-pointer"
                     onClick={() => handleViewOrder(order.id)}
                   >
                     <TableCell className="px-4 py-4">
@@ -487,13 +456,13 @@ export function OrdersTable() {
                         </DropdownMenu>
                       </div>
                     </TableCell>
-                  </TableRow>
+                  </AdminTableRow>
                 )
               })
             )}
           </TableBody>
         </Table>
-      </div>
+      </AdminTableContainer>
 
       {/* Pagination */}
       <TablePagination

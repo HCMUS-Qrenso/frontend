@@ -89,4 +89,115 @@ function TableCaption({ className, ...props }: React.ComponentProps<'caption'>) 
   )
 }
 
-export { Table, TableHeader, TableBody, TableFooter, TableHead, TableRow, TableCell, TableCaption }
+// =============================================================================
+// Admin Styled Variants
+// Pre-styled components for consistent admin table appearance
+// =============================================================================
+
+/**
+ * Container wrapper for admin tables with rounded borders and shadow
+ */
+function AdminTableContainer({
+  className,
+  children,
+  ...props
+}: React.ComponentProps<'div'>) {
+  return (
+    <div
+      className={cn(
+        'overflow-x-auto rounded-2xl border border-slate-100 bg-white/80 shadow-sm dark:border-slate-800 dark:bg-slate-900/80',
+        className,
+      )}
+      {...props}
+    >
+      {children}
+    </div>
+  )
+}
+
+/**
+ * Header row with admin styling (slate background, no hover change)
+ */
+function AdminTableHeaderRow({
+  className,
+  ...props
+}: React.ComponentProps<'tr'>) {
+  return (
+    <tr
+      data-slot="table-row"
+      className={cn(
+        'border-b border-slate-100 bg-slate-50/80 hover:bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900',
+        className,
+      )}
+      {...props}
+    />
+  )
+}
+
+interface AdminTableHeadProps extends React.ComponentProps<'th'> {
+  align?: 'left' | 'center' | 'right'
+}
+
+/**
+ * Table header cell with admin styling (uppercase, tracking-wide)
+ */
+function AdminTableHead({
+  className,
+  align = 'left',
+  ...props
+}: AdminTableHeadProps) {
+  return (
+    <th
+      data-slot="table-head"
+      className={cn(
+        'px-6 py-3 text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400',
+        align === 'left' && 'text-left',
+        align === 'center' && 'text-center',
+        align === 'right' && 'text-right',
+        className,
+      )}
+      {...props}
+    />
+  )
+}
+
+interface AdminTableRowProps extends React.ComponentProps<'tr'> {
+  isLast?: boolean
+}
+
+/**
+ * Data row with admin styling (hover state, border)
+ */
+function AdminTableRow({
+  className,
+  isLast = false,
+  ...props
+}: AdminTableRowProps) {
+  return (
+    <tr
+      data-slot="table-row"
+      className={cn(
+        'border-b border-slate-100 transition-colors hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800',
+        isLast && 'border-b-0',
+        className,
+      )}
+      {...props}
+    />
+  )
+}
+
+export {
+  Table,
+  TableHeader,
+  TableBody,
+  TableFooter,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableCaption,
+  // Admin styled variants
+  AdminTableContainer,
+  AdminTableHeaderRow,
+  AdminTableHead,
+  AdminTableRow,
+}

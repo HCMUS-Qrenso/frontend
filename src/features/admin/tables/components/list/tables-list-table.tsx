@@ -30,9 +30,12 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableHead,
   TableHeader,
   TableRow,
+  AdminTableContainer,
+  AdminTableHeaderRow,
+  AdminTableHead,
+  AdminTableRow,
 } from '@/src/components/ui/table'
 
 interface TablesListTableProps {
@@ -129,7 +132,7 @@ export function TablesListTable({
   if (isLoading) {
     return (
       <div className="space-y-4">
-        <div className="overflow-x-auto rounded-2xl border border-slate-100 bg-white/80 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
+        <AdminTableContainer>
           <Table className="w-full min-w-250 table-fixed">
             <colgroup>
               <col className="w-[18%]" />
@@ -140,26 +143,14 @@ export function TablesListTable({
               <col className="w-[14%]" />
             </colgroup>
             <TableHeader>
-              <TableRow className="border-b border-slate-100 bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900">
-                <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                  Bàn
-                </TableHead>
-                <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                  Khu vực / Tầng
-                </TableHead>
-                <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                  Sức chứa
-                </TableHead>
-                <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                  Trạng thái
-                </TableHead>
-                <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                  Đơn hàng hiện tại
-                </TableHead>
-                <TableHead className="px-6 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                  Thao tác
-                </TableHead>
-              </TableRow>
+              <AdminTableHeaderRow>
+                <AdminTableHead>Bàn</AdminTableHead>
+                <AdminTableHead>Khu vực / Tầng</AdminTableHead>
+                <AdminTableHead>Sức chứa</AdminTableHead>
+                <AdminTableHead>Trạng thái</AdminTableHead>
+                <AdminTableHead>Đơn hàng hiện tại</AdminTableHead>
+                <AdminTableHead align="right">Thao tác</AdminTableHead>
+              </AdminTableHeaderRow>
             </TableHeader>
             <TableBody>
               <SkeletonTableRows
@@ -175,7 +166,7 @@ export function TablesListTable({
               />
             </TableBody>
           </Table>
-        </div>
+        </AdminTableContainer>
       </div>
     )
   }
@@ -192,7 +183,7 @@ export function TablesListTable({
   return (
     <div className="space-y-4">
       {/* Table */}
-      <div className="overflow-x-auto rounded-2xl border border-slate-100 bg-white/80 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
+      <AdminTableContainer>
         <Table className="w-full min-w-250 table-fixed">
           <colgroup>
             <col className="w-[18%]" />
@@ -203,26 +194,14 @@ export function TablesListTable({
             <col className="w-[14%]" />
           </colgroup>
           <TableHeader>
-            <TableRow className="border-b border-slate-100 bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900">
-              <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Bàn
-              </TableHead>
-              <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Khu vực / Tầng
-              </TableHead>
-              <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Sức chứa
-              </TableHead>
-              <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Trạng thái
-              </TableHead>
-              <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Đơn hàng hiện tại
-              </TableHead>
-              <TableHead className="px-6 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Thao tác
-              </TableHead>
-            </TableRow>
+            <AdminTableHeaderRow>
+              <AdminTableHead>Bàn</AdminTableHead>
+              <AdminTableHead>Khu vực / Tầng</AdminTableHead>
+              <AdminTableHead>Sức chứa</AdminTableHead>
+              <AdminTableHead>Trạng thái</AdminTableHead>
+              <AdminTableHead>Đơn hàng hiện tại</AdminTableHead>
+              <AdminTableHead align="right">Thao tác</AdminTableHead>
+            </AdminTableHeaderRow>
           </TableHeader>
           <TableBody>
             {tables.length === 0 ? (
@@ -237,12 +216,9 @@ export function TablesListTable({
               </TableRow>
             ) : (
               tables.map((table, index) => (
-                <TableRow
+                <AdminTableRow
                   key={table.id}
-                  className={cn(
-                    'border-b border-slate-100 transition-colors hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800',
-                    index === tables.length - 1 && 'border-b-0',
-                  )}
+                  isLast={index === tables.length - 1}
                 >
                   <TableCell className="px-6 py-4">
                     <div>
@@ -315,12 +291,12 @@ export function TablesListTable({
                       )}
                     </div>
                   </TableCell>
-                </TableRow>
+                </AdminTableRow>
               ))
             )}
           </TableBody>
         </Table>
-      </div>
+      </AdminTableContainer>
 
       {/* Pagination */}
       {pagination && (

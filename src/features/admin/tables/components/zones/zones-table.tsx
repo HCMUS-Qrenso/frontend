@@ -24,6 +24,10 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  AdminTableContainer,
+  AdminTableHeaderRow,
+  AdminTableHead,
+  AdminTableRow,
 } from '@/src/components/ui/table'
 import { SkeletonTableRows } from '@/src/components/loading'
 
@@ -81,26 +85,16 @@ export function ZonesTable({ onEdit, onDelete }: ZonesTableProps) {
 
   if (isLoading) {
     return (
-      <div className="overflow-x-auto rounded-2xl border border-slate-100 bg-white/80 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
+      <AdminTableContainer>
         <Table className="w-full min-w-250 table-fixed">
           <TableHeader>
-            <TableRow className="border-b border-slate-100 bg-slate-50/80 hover:bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900">
-              <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Tên khu vực
-              </TableHead>
-              <TableHead className="w-50 px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Mô tả
-              </TableHead>
-              <TableHead className="w-30 px-6 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Thứ tự
-              </TableHead>
-              <TableHead className="w-30 px-6 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Trạng thái
-              </TableHead>
-              <TableHead className="w-37.5 px-6 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Thao tác
-              </TableHead>
-            </TableRow>
+            <AdminTableHeaderRow>
+              <AdminTableHead>Tên khu vực</AdminTableHead>
+              <AdminTableHead className="w-50">Mô tả</AdminTableHead>
+              <AdminTableHead className="w-30" align="center">Thứ tự</AdminTableHead>
+              <AdminTableHead className="w-30" align="center">Trạng thái</AdminTableHead>
+              <AdminTableHead className="w-37.5" align="right">Thao tác</AdminTableHead>
+            </AdminTableHeaderRow>
           </TableHeader>
           <TableBody>
             <SkeletonTableRows
@@ -115,7 +109,7 @@ export function ZonesTable({ onEdit, onDelete }: ZonesTableProps) {
             />
           </TableBody>
         </Table>
-      </div>
+      </AdminTableContainer>
     )
   }
 
@@ -131,7 +125,7 @@ export function ZonesTable({ onEdit, onDelete }: ZonesTableProps) {
 
   return (
     <div className="space-y-4">
-      <div className="overflow-x-auto rounded-2xl border border-slate-100 bg-white/80 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
+      <AdminTableContainer>
         <Table className="w-full min-w-250 table-fixed">
           <colgroup>
             <col className="w-[28%]" />
@@ -141,23 +135,13 @@ export function ZonesTable({ onEdit, onDelete }: ZonesTableProps) {
             <col className="w-[14%]" />
           </colgroup>
           <TableHeader>
-            <TableRow className="border-b border-slate-100 bg-slate-50/80 hover:bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900">
-              <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Tên khu vực
-              </TableHead>
-              <TableHead className="w-50 px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Mô tả
-              </TableHead>
-              <TableHead className="w-30 px-6 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Thứ tự
-              </TableHead>
-              <TableHead className="w-30 px-6 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Trạng thái
-              </TableHead>
-              <TableHead className="w-37.5 px-6 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Thao tác
-              </TableHead>
-            </TableRow>
+            <AdminTableHeaderRow>
+              <AdminTableHead>Tên khu vực</AdminTableHead>
+              <AdminTableHead className="w-50">Mô tả</AdminTableHead>
+              <AdminTableHead className="w-30" align="center">Thứ tự</AdminTableHead>
+              <AdminTableHead className="w-30" align="center">Trạng thái</AdminTableHead>
+              <AdminTableHead className="w-37.5" align="right">Thao tác</AdminTableHead>
+            </AdminTableHeaderRow>
           </TableHeader>
           <TableBody>
             {zones.length === 0 ? (
@@ -167,13 +151,11 @@ export function ZonesTable({ onEdit, onDelete }: ZonesTableProps) {
                 </TableCell>
               </TableRow>
             ) : (
-              zones.map((zone) => (
-                <TableRow
+              zones.map((zone, index) => (
+                <AdminTableRow
                   key={zone.id}
-                  className={cn(
-                    'border-b border-slate-100 transition-colors hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800',
-                    !zone.is_active && 'opacity-60',
-                  )}
+                  isLast={index === zones.length - 1}
+                  className={cn(!zone.is_active && 'opacity-60')}
                 >
                   <TableCell className="px-6 py-4">
                     <div className="flex flex-col gap-1">
@@ -238,12 +220,12 @@ export function ZonesTable({ onEdit, onDelete }: ZonesTableProps) {
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
-                </TableRow>
+                </AdminTableRow>
               ))
             )}
           </TableBody>
         </Table>
-      </div>
+      </AdminTableContainer>
 
       {/* Pagination */}
       {pagination && (
