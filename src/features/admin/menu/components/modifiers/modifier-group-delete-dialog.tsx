@@ -59,7 +59,8 @@ export function ModifierGroupDeleteDialog({
           </p>
           {usedByCount > 0 && (
             <p className="text-amber-700 dark:text-amber-300">
-              Nhóm này đang được dùng bởi {usedByCount} món. Nhóm sẽ tự động bị gỡ khỏi các món.
+              Nhóm này đang được dùng bởi {usedByCount} món. Nhóm sẽ tự động bị gỡ khỏi
+              các món.
             </p>
           )}
         </div>
