@@ -573,8 +573,8 @@ export function MenuItemUpsertModal({
         </div>
 
         <p className="text-xs text-slate-500 dark:text-slate-400">
-          Nhấn vào ảnh để đặt làm ảnh chính. Tải lên tối đa 10 ảnh (JPG, PNG, GIF). Kích thước
-          tối đa 5MB mỗi ảnh.
+          Nhấn vào ảnh để đặt làm ảnh chính. Tải lên tối đa 10 ảnh (JPG, PNG, GIF). Kích thước tối
+          đa 5MB mỗi ảnh.
         </p>
       </FormDialogSectionGroup>
 

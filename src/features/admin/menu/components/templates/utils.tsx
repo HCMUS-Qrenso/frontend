@@ -36,25 +36,25 @@ Font.registerEmojiSource({
 // Helper function to load image as PNG data URI
 const loadImageAsDataURI = async (url: string): Promise<string> => {
   return new Promise((resolve, reject) => {
-    const img = document.createElement('img');
-    img.crossOrigin = 'anonymous';
+    const img = document.createElement('img')
+    img.crossOrigin = 'anonymous'
     img.onload = () => {
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')
       if (!ctx) {
-        reject(new Error('Canvas context not available'));
-        return;
+        reject(new Error('Canvas context not available'))
+        return
       }
-      canvas.width = img.width;
-      canvas.height = img.height;
-      ctx.drawImage(img, 0, 0);
-      const dataURI = canvas.toDataURL('image/png');
-      resolve(dataURI);
-    };
-    img.onerror = reject;
-    img.src = url;
-  });
-};
+      canvas.width = img.width
+      canvas.height = img.height
+      ctx.drawImage(img, 0, 0)
+      const dataURI = canvas.toDataURL('image/png')
+      resolve(dataURI)
+    }
+    img.onerror = reject
+    img.src = url
+  })
+}
 
 // Helper function to generate PDF blob
 export const generatePDFBlob = async (
@@ -68,34 +68,35 @@ export const generatePDFBlob = async (
   fontSize: 'small' | 'medium' | 'large' = 'medium',
   chefIcon: string = '⭐',
 ): Promise<Blob> => {
-  
   // Collect all unique image URLs that need conversion (unsupported formats)
-  const allItems = Object.values(menuItemsByCategory).flat();
-  const unsupportedUrls = new Set<string>();
-  allItems.forEach(item => {
+  const allItems = Object.values(menuItemsByCategory).flat()
+  const unsupportedUrls = new Set<string>()
+  allItems.forEach((item) => {
     if (item.images && item.images.length > 0) {
-      const primary = item.images.find((img: any) => img.is_primary)?.image_url;
-      const first = item.images[0]?.image_url;
-      [primary, first].forEach(url => {
+      const primary = item.images.find((img: any) => img.is_primary)?.image_url
+      const first = item.images[0]?.image_url
+      ;[primary, first].forEach((url) => {
         if (url && url.startsWith(S3_PUBLIC_URL) && !/\.(jpg|jpeg|png)$/i.test(url)) {
-          unsupportedUrls.add(url);
+          unsupportedUrls.add(url)
         }
-      });
+      })
     }
-  });
+  })
 
   // Load unsupported images as PNG data URIs
-  const imageData: Record<string, string> = {};
-  await Promise.all(Array.from(unsupportedUrls).map(async (url) => {
-    try {
-      const loadUrl = url.replace(`${S3_PUBLIC_URL}`, '/s3-storage');
-      const dataURI = await loadImageAsDataURI(loadUrl);
-      imageData[url] = dataURI;
-    } catch (error) {
-      console.error('Failed to convert image:', url, error);
-      // Will fall back to placeholder
-    }
-  }));
+  const imageData: Record<string, string> = {}
+  await Promise.all(
+    Array.from(unsupportedUrls).map(async (url) => {
+      try {
+        const loadUrl = url.replace(`${S3_PUBLIC_URL}`, '/s3-storage')
+        const dataURI = await loadImageAsDataURI(loadUrl)
+        imageData[url] = dataURI
+      } catch (error) {
+        console.error('Failed to convert image:', url, error)
+        // Will fall back to placeholder
+      }
+    }),
+  )
 
   const doc = (
     <MenuPDFDocument
@@ -140,23 +141,23 @@ const MenuPDFDocument = ({
   imageData?: Record<string, string>
 }) => {
   const getSelectedImageUrl = (images: any[]) => {
-    const primary = images.find((img: any) => img.is_primary);
-    return primary?.image_url || images[0]?.image_url || '/placeholder.jpg';
-  };
+    const primary = images.find((img: any) => img.is_primary)
+    return primary?.image_url || images[0]?.image_url || '/placeholder.jpg'
+  }
 
   const transformImageUrl = (url: string) => {
     // Unsupported format converted to data URI
     if (imageData[url]) {
-      return imageData[url];
+      return imageData[url]
     }
 
     // Transform S3 URL to local rewrite path
     if (url.startsWith(S3_PUBLIC_URL)) {
-      const transformed = url.replace(`${S3_PUBLIC_URL}`, '/s3-storage');
-      return transformed;
+      const transformed = url.replace(`${S3_PUBLIC_URL}`, '/s3-storage')
+      return transformed
     }
-    return url;
-  };
+    return url
+  }
 
   const accentColors = {
     emerald: { light: '#059669', dark: '#34d399' },
@@ -197,6 +198,14 @@ const MenuPDFDocument = ({
       truncationText: 13,
     },
   }
+
+  const baseImageSizes = {
+    small: 60,
+    medium: 88,
+    large: 108,
+  }
+
+  const imageSize = baseImageSizes[fontSize]
 
   const fontSizes = {
     title: baseFontSizes[fontSize].title,
@@ -285,491 +294,124 @@ const MenuPDFDocument = ({
     const effectiveTheme = theme
     const effectiveAccent = categoryColor
 
-    // Calculate pagination
-    const getMaxItemsPerPage = (templateId: string) => {
-      switch (templateId) {
-        case '1':
-          return 16 // 2 columns, ~8 per column
-        case '2':
-          return 8 // Photo-forward, larger items
-        case '3':
-          return 20 // Simple layout
-        case '4':
-          return Infinity // Already paginated by categories
-        default:
-          return 15
+    /// Calculate approximate items per page based on template and font size
+    const getMaxItemsPerPage = (templateId: string, fontSize: 'small' | 'medium' | 'large') => {
+      const fontMultiplier = {
+        small: 1.2, // More items fit with smaller font
+        medium: 1,
+        large: 0.8, // Fewer items with larger font
       }
+      const baseItems = {
+        '1': 20,
+        '2': 5,
+        '3': 13,
+        '4': 15,
+        default: 10,
+      }
+      const base = baseItems[templateId as keyof typeof baseItems] || baseItems.default
+      return Math.floor(base * fontMultiplier[fontSize])
     }
 
-    const maxItemsPerPage = getMaxItemsPerPage(templateId || '')
+    const maxItemsPerPage = getMaxItemsPerPage(templateId || '', fontSize)
 
     // Flatten all items for pagination
     const allItems = Object.entries(menuItemsByCategory).flatMap(([categoryId, items]) =>
       items.map((item) => ({ ...item, categoryId })),
     )
 
+    const totalItems = allItems.length
+    const itemsPerPage = maxItemsPerPage
+
     switch (templateId) {
-      case '1': // Minimal A4 2-Column
-        const totalItems1 = allItems.length
-        if (totalItems1 > maxItemsPerPage) {
-          // Create multiple pages
-          const pages = []
-          const itemsPerPage = Math.ceil(totalItems1 / Math.ceil(totalItems1 / maxItemsPerPage))
+      case '1': { // Minimal A4 2-Column
+        // Create multiple pages
+        const pages = []
 
-          for (let pageIndex = 0; pageIndex < Math.ceil(totalItems1 / itemsPerPage); pageIndex++) {
-            const startItem = pageIndex * itemsPerPage
-            const endItem = startItem + itemsPerPage
-            const pageItems = allItems.slice(startItem, endItem)
+        for (let pageIndex = 0; pageIndex < Math.ceil(totalItems / itemsPerPage); pageIndex++) {
+          const startItem = pageIndex * itemsPerPage
+          const endItem = startItem + itemsPerPage
+          const pageItems = allItems.slice(startItem, endItem)
 
-            // Group by category for this page
-            const pageCategories: Record<string, MenuItem[]> = pageItems.reduce(
-              (acc, item) => {
-                if (!acc[item.categoryId]) acc[item.categoryId] = []
-                acc[item.categoryId].push(item)
-                return acc
-              },
-              {} as Record<string, MenuItem[]>,
-            )
-
-            pages.push(
-              <Page key={pageIndex} size={[595, 842]} style={styles.page}>
-                {pageIndex === 0 && (
-                  <View style={styles.header}>
-                    <Text
-                      style={[
-                        styles.title,
-                        { color: effectiveTheme === 'light' ? '#0f172a' : '#ffffff' },
-                      ]}
-                    >
-                      {restaurantInfo.name}
-                    </Text>
-                    <Text
-                      style={[
-                        styles.subtitle,
-                        { color: effectiveTheme === 'light' ? '#475569' : '#cbd5e1' },
-                      ]}
-                    >
-                      {restaurantInfo.address} • {restaurantInfo.phone}
-                    </Text>
-                  </View>
-                )}
-                <View
-                  style={{ flexDirection: 'row', gap: 20, marginTop: pageIndex === 0 ? 0 : 40 }}
-                >
-                  <View style={{ flex: 1 }}>
-                    {Object.entries(pageCategories)
-                      .slice(0, Math.ceil(Object.keys(pageCategories).length / 2))
-                      .map(([categoryId, items]) => {
-                        const category = categories.find((c) => c.id === categoryId)
-                        if (!category) return null
-                        return (
-                          <View key={categoryId} style={styles.category}>
-                            <Text style={[styles.categoryHeader, { color: effectiveAccent }]}>
-                              {category.name}
-                            </Text>
-                            <View>
-                              {items.map((item) => (
-                                <View
-                                  key={item.id}
-                                  style={[
-                                    styles.menuItem,
-                                    { flexDirection: 'row', alignItems: 'center' },
-                                  ]}
-                                >
-                                  <View style={styles.itemLeft}>
-                                    <Text
-                                      style={[
-                                        styles.itemName,
-                                        {
-                                          color: effectiveTheme === 'light' ? '#0f172a' : '#ffffff',
-                                        },
-                                      ]}
-                                    >
-                                      {item.name}
-                                      {displayOptions.showChefRecommendations &&
-                                      item.is_chef_recommendation
-                                        ? chefIcon
-                                        : ''}
-                                    </Text>
-                                    {displayOptions.showDescriptions && item.description && (
-                                      <Text
-                                        style={[
-                                          styles.itemDescription,
-                                          {
-                                            color:
-                                              effectiveTheme === 'light' ? '#64748b' : '#94a3b8',
-                                          },
-                                        ]}
-                                      >
-                                        {item.description}
-                                      </Text>
-                                    )}
-                                  </View>
-                                  {displayOptions.showPrices && (
-                                    <Text
-                                      style={[
-                                        styles.itemPrice,
-                                        {
-                                          color: effectiveTheme === 'light' ? '#0f172a' : '#ffffff',
-                                        },
-                                      ]}
-                                    >
-                                      {new Intl.NumberFormat('vi-VN').format(
-                                        parseInt(item.base_price),
-                                      )}
-                                      đ
-                                    </Text>
-                                  )}
-                                </View>
-                              ))}
-                            </View>
-                          </View>
-                        )
-                      })}
-                  </View>
-                  <View style={{ flex: 1 }}>
-                    {Object.entries(pageCategories)
-                      .slice(Math.ceil(Object.keys(pageCategories).length / 2))
-                      .map(([categoryId, items]) => {
-                        const category = categories.find((c) => c.id === categoryId)
-                        if (!category) return null
-                        return (
-                          <View key={categoryId} style={styles.category}>
-                            <Text style={[styles.categoryHeader, { color: effectiveAccent }]}>
-                              {category.name}
-                            </Text>
-                            <View>
-                              {items.map((item) => (
-                                <View
-                                  key={item.id}
-                                  style={[
-                                    styles.menuItem,
-                                    { flexDirection: 'row', alignItems: 'center' },
-                                  ]}
-                                >
-                                  <View style={styles.itemLeft}>
-                                    <Text
-                                      style={[
-                                        styles.itemName,
-                                        {
-                                          color: effectiveTheme === 'light' ? '#0f172a' : '#ffffff',
-                                        },
-                                      ]}
-                                    >
-                                      {item.name}
-                                      {displayOptions.showChefRecommendations &&
-                                      item.is_chef_recommendation
-                                        ? chefIcon
-                                        : ''}
-                                    </Text>
-                                    {displayOptions.showDescriptions && item.description && (
-                                      <Text
-                                        style={[
-                                          styles.itemDescription,
-                                          {
-                                            color:
-                                              effectiveTheme === 'light' ? '#64748b' : '#94a3b8',
-                                          },
-                                        ]}
-                                      >
-                                        {item.description}
-                                      </Text>
-                                    )}
-                                  </View>
-                                  {displayOptions.showPrices && (
-                                    <Text
-                                      style={[
-                                        styles.itemPrice,
-                                        {
-                                          color: effectiveTheme === 'light' ? '#0f172a' : '#ffffff',
-                                        },
-                                      ]}
-                                    >
-                                      {new Intl.NumberFormat('vi-VN').format(
-                                        parseInt(item.base_price),
-                                      )}
-                                      đ
-                                    </Text>
-                                  )}
-                                </View>
-                              ))}
-                            </View>
-                          </View>
-                        )
-                      })}
-                  </View>
-                </View>
-              </Page>,
-            )
-          }
-          return pages
-        } else {
-          // Single page - original logic
-          return (
-            <Page size={[595, 842]} style={styles.page}>
-              <View style={styles.header}>
-                <Text
-                  style={[
-                    styles.title,
-                    { color: effectiveTheme === 'light' ? '#0f172a' : '#ffffff' },
-                  ]}
-                >
-                  {restaurantInfo.name}
-                </Text>
-                <Text
-                  style={[
-                    styles.subtitle,
-                    { color: effectiveTheme === 'light' ? '#475569' : '#cbd5e1' },
-                  ]}
-                >
-                  {restaurantInfo.address} • {restaurantInfo.phone}
-                </Text>
-              </View>
-              <View style={{ flexDirection: 'row', gap: 20 }}>
-                <View style={{ flex: 1 }}>
-                  {Object.entries(menuItemsByCategory)
-                    .slice(0, Math.ceil(Object.keys(menuItemsByCategory).length / 2))
-                    .map(([categoryId, items]) => {
-                      const category = categories.find((c) => c.id === categoryId)
-                      if (!category) return null
-                      return (
-                        <View key={categoryId} style={styles.category}>
-                          <Text style={[styles.categoryHeader, { color: effectiveAccent }]}>
-                            {category.name}
-                          </Text>
-                          <View>
-                            {items.map((item) => (
-                              <View
-                                key={item.id}
-                                style={[
-                                  styles.menuItem,
-                                  { flexDirection: 'row', alignItems: 'center' },
-                                ]}
-                              >
-                                <View style={styles.itemLeft}>
-                                  <Text
-                                    style={[
-                                      styles.itemName,
-                                      { color: effectiveTheme === 'light' ? '#0f172a' : '#ffffff' },
-                                    ]}
-                                  >
-                                    {item.name}
-                                    {displayOptions.showChefRecommendations &&
-                                    item.is_chef_recommendation
-                                      ? chefIcon
-                                      : ''}
-                                  </Text>
-                                  {displayOptions.showDescriptions && item.description && (
-                                    <Text
-                                      style={[
-                                        styles.itemDescription,
-                                        {
-                                          color: effectiveTheme === 'light' ? '#64748b' : '#94a3b8',
-                                        },
-                                      ]}
-                                    >
-                                      {item.description}
-                                    </Text>
-                                  )}
-                                </View>
-                                {displayOptions.showPrices && (
-                                  <Text
-                                    style={[
-                                      styles.itemPrice,
-                                      { color: effectiveTheme === 'light' ? '#0f172a' : '#ffffff' },
-                                    ]}
-                                  >
-                                    {new Intl.NumberFormat('vi-VN').format(
-                                      parseInt(item.base_price),
-                                    )}
-                                    đ
-                                  </Text>
-                                )}
-                              </View>
-                            ))}
-                          </View>
-                        </View>
-                      )
-                    })}
-                </View>
-                <View style={{ flex: 1 }}>
-                  {Object.entries(menuItemsByCategory)
-                    .slice(Math.ceil(Object.keys(menuItemsByCategory).length / 2))
-                    .map(([categoryId, items]) => {
-                      const category = categories.find((c) => c.id === categoryId)
-                      if (!category) return null
-                      return (
-                        <View key={categoryId} style={styles.category}>
-                          <Text style={[styles.categoryHeader, { color: effectiveAccent }]}>
-                            {category.name}
-                          </Text>
-                          <View>
-                            {items.map((item) => (
-                              <View
-                                key={item.id}
-                                style={[
-                                  styles.menuItem,
-                                  { flexDirection: 'row', alignItems: 'center' },
-                                ]}
-                              >
-                                <View style={styles.itemLeft}>
-                                  <Text
-                                    style={[
-                                      styles.itemName,
-                                      { color: effectiveTheme === 'light' ? '#0f172a' : '#ffffff' },
-                                    ]}
-                                  >
-                                    {item.name}
-                                    {displayOptions.showChefRecommendations &&
-                                    item.is_chef_recommendation
-                                      ? chefIcon
-                                      : ''}
-                                  </Text>
-                                  {displayOptions.showDescriptions && item.description && (
-                                    <Text
-                                      style={[
-                                        styles.itemDescription,
-                                        {
-                                          color: effectiveTheme === 'light' ? '#64748b' : '#94a3b8',
-                                        },
-                                      ]}
-                                    >
-                                      {item.description}
-                                    </Text>
-                                  )}
-                                </View>
-                                {displayOptions.showPrices && (
-                                  <Text
-                                    style={[
-                                      styles.itemPrice,
-                                      { color: effectiveTheme === 'light' ? '#0f172a' : '#ffffff' },
-                                    ]}
-                                  >
-                                    {new Intl.NumberFormat('vi-VN').format(
-                                      parseInt(item.base_price),
-                                    )}
-                                    đ
-                                  </Text>
-                                )}
-                              </View>
-                            ))}
-                          </View>
-                        </View>
-                      )
-                    })}
-                </View>
-              </View>
-            </Page>
+          // Group by category for this page
+          const pageCategories: Record<string, MenuItem[]> = pageItems.reduce(
+            (acc, item) => {
+              if (!acc[item.categoryId]) acc[item.categoryId] = []
+              acc[item.categoryId].push(item)
+              return acc
+            },
+            {} as Record<string, MenuItem[]>,
           )
-        }
 
-      case '2': // Photo-Forward Premium
-        const totalItems2 = allItems.length
-        if (totalItems2 > maxItemsPerPage) {
-          // Create multiple pages
-          const pages = []
-          const itemsPerPage = Math.ceil(totalItems2 / Math.ceil(totalItems2 / maxItemsPerPage))
+          // Distribute categories into 2 columns, balancing total items
+          const distributeCategories2Col = (
+            categories: [string, MenuItem[]][],
+            numColumns: number,
+          ) => {
+            // Sort categories by item count descending
+            const sortedCategories = categories.sort((a, b) => b[1].length - a[1].length)
+            const columns: [string, MenuItem[]][][] = Array.from({ length: numColumns }, () => [])
+            const columnTotals = Array(numColumns).fill(0)
 
-          for (let pageIndex = 0; pageIndex < Math.ceil(totalItems2 / itemsPerPage); pageIndex++) {
-            const startItem = pageIndex * itemsPerPage
-            const endItem = startItem + itemsPerPage
-            const pageItems = allItems.slice(startItem, endItem)
+            for (const category of sortedCategories) {
+              // Find column with least items
+              const minIndex = columnTotals.indexOf(Math.min(...columnTotals))
+              columns[minIndex].push(category)
+              columnTotals[minIndex] += category[1].length
+            }
 
-            // Group by category for this page
-            const pageCategories: Record<string, MenuItem[]> = pageItems.reduce(
-              (acc, item) => {
-                if (!acc[item.categoryId]) acc[item.categoryId] = []
-                acc[item.categoryId].push(item)
-                return acc
-              },
-              {} as Record<string, MenuItem[]>,
-            )
+            return columns
+          }
 
-            pages.push(
-              <Page
-                key={pageIndex}
-                size={[595, 842]}
-                style={[
-                  styles.page,
-                  { backgroundColor: effectiveTheme === 'light' ? '#ffffff' : '#1e293b' },
-                ]}
-              >
-                {pageIndex === 0 && (
-                  <View style={[styles.header, { marginBottom: 32 }]}>
-                    <Text
-                      style={[
-                        styles.title,
-                        { color: effectiveTheme === 'light' ? '#0f172a' : '#ffffff' },
-                      ]}
-                    >
-                      {restaurantInfo.name}
-                    </Text>
-                    <Text
-                      style={[
-                        styles.subtitle,
-                        { color: effectiveTheme === 'light' ? '#475569' : '#cbd5e1' },
-                      ]}
-                    >
-                      {restaurantInfo.address} • {restaurantInfo.phone}
-                    </Text>
-                  </View>
-                )}
-                {Object.entries(pageCategories).map(([categoryId, items]) => {
-                  const category = categories.find((c) => c.id === categoryId)
-                  if (!category) return null
-                  return (
-                    <View key={categoryId} style={[styles.category, { marginBottom: 12 }]}>
-                      <Text
-                        style={[styles.categoryHeader, { color: effectiveAccent, marginBottom: 8 }]}
-                      >
-                        {category.name}
-                      </Text>
-                      <View>
-                        {items.map((item) => (
-                          <View
-                            key={item.id}
-                            style={[
-                              styles.menuItem,
-                              {
-                                marginBottom: 12,
-                                padding: 12,
-                                backgroundColor: effectiveTheme === 'light' ? '#ffffff' : '#334155',
-                                borderRadius: 6,
-                                borderWidth: 1,
-                                borderColor: effectiveTheme === 'light' ? '#e5e7eb' : '#475569',
-                                flexDirection: 'row',
-                                alignItems: 'flex-start',
-                              },
-                            ]}
-                          >
-                            {item.images && item.images.length > 0 && (
-                              <View style={{ width: 60, height: 60, marginRight: 12 }}>
-                                <Image
-                                  src={
-                                    transformImageUrl(getSelectedImageUrl(item.images))
-                                  }
-                                  style={{
-                                    width: 60,
-                                    height: 60,
-                                    borderRadius: 4,
-                                    objectFit: 'cover',
-                                  }}
-                                />
-                              </View>
-                            )}
-                            <View style={{ flex: 1 }}>
-                              <View
-                                style={{
-                                  flexDirection: 'row',
-                                  justifyContent: 'space-between',
-                                  alignItems: 'flex-start',
-                                  marginBottom: 4,
-                                }}
-                              >
+          const columns = distributeCategories2Col(Object.entries(pageCategories), 2)
+
+          pages.push(
+            <Page key={pageIndex} size={[595, 842]} style={styles.page}>
+              {pageIndex === 0 && (
+                <View style={styles.header}>
+                  <Text
+                    style={[
+                      styles.title,
+                      { color: effectiveTheme === 'light' ? '#0f172a' : '#ffffff' },
+                    ]}
+                  >
+                    {restaurantInfo.name}
+                  </Text>
+                  <Text
+                    style={[
+                      styles.subtitle,
+                      { color: effectiveTheme === 'light' ? '#475569' : '#cbd5e1' },
+                    ]}
+                  >
+                    {restaurantInfo.address} • {restaurantInfo.phone}
+                  </Text>
+                </View>
+              )}
+              <View style={{ flexDirection: 'row', gap: 20, marginTop: pageIndex === 0 ? 0 : 40 }}>
+                <View style={{ flex: 1 }}>
+                  {columns[0].map(([categoryId, items]) => {
+                    const category = categories.find((c) => c.id === categoryId)
+                    if (!category) return null
+                    return (
+                      <View key={categoryId} style={styles.category}>
+                        <Text style={[styles.categoryHeader, { color: effectiveAccent }]}>
+                          {category.name}
+                        </Text>
+                        <View>
+                          {items.map((item) => (
+                            <View
+                              key={item.id}
+                              style={[
+                                styles.menuItem,
+                                { flexDirection: 'row', alignItems: 'center' },
+                              ]}
+                            >
+                              <View style={styles.itemLeft}>
                                 <Text
                                   style={[
                                     styles.itemName,
-                                    { color: effectiveTheme === 'light' ? '#0f172a' : '#ffffff' },
+                                    {
+                                      color: effectiveTheme === 'light' ? '#0f172a' : '#ffffff',
+                                    },
                                   ]}
                                 >
                                   {item.name}
@@ -778,77 +420,165 @@ const MenuPDFDocument = ({
                                     ? chefIcon
                                     : ''}
                                 </Text>
-                                {displayOptions.showPrices && (
+                                {displayOptions.showDescriptions && item.description && (
                                   <Text
                                     style={[
-                                      styles.itemPrice,
+                                      styles.itemDescription,
                                       {
-                                        color: effectiveTheme === 'light' ? '#0f172a' : '#ffffff',
-                                        fontWeight: 'bold',
+                                        color: effectiveTheme === 'light' ? '#64748b' : '#94a3b8',
                                       },
                                     ]}
                                   >
-                                    {new Intl.NumberFormat('vi-VN').format(
-                                      parseInt(item.base_price),
-                                    )}
-                                    đ
+                                    {item.description}
                                   </Text>
                                 )}
                               </View>
-                              {displayOptions.showDescriptions && item.description && (
+                              {displayOptions.showPrices && (
                                 <Text
                                   style={[
-                                    styles.itemDescription,
-                                    { color: effectiveTheme === 'light' ? '#64748b' : '#94a3b8' },
+                                    styles.itemPrice,
+                                    {
+                                      color: effectiveTheme === 'light' ? '#0f172a' : '#ffffff',
+                                    },
                                   ]}
                                 >
-                                  {item.description}
+                                  {new Intl.NumberFormat('vi-VN').format(parseInt(item.base_price))}
+                                  đ
                                 </Text>
                               )}
                             </View>
-                          </View>
-                        ))}
+                          ))}
+                        </View>
                       </View>
-                    </View>
-                  )
-                })}
-              </Page>,
-            )
-          }
-          return pages
-        } else {
-          // Single page - original logic
-          return (
+                    )
+                  })}
+                </View>
+                <View style={{ flex: 1 }}>
+                  {columns[1].map(([categoryId, items]) => {
+                    const category = categories.find((c) => c.id === categoryId)
+                    if (!category) return null
+                    return (
+                      <View key={categoryId} style={styles.category}>
+                        <Text style={[styles.categoryHeader, { color: effectiveAccent }]}>
+                          {category.name}
+                        </Text>
+                        <View>
+                          {items.map((item) => (
+                            <View
+                              key={item.id}
+                              style={[
+                                styles.menuItem,
+                                { flexDirection: 'row', alignItems: 'center' },
+                              ]}
+                            >
+                              <View style={styles.itemLeft}>
+                                <Text
+                                  style={[
+                                    styles.itemName,
+                                    {
+                                      color: effectiveTheme === 'light' ? '#0f172a' : '#ffffff',
+                                    },
+                                  ]}
+                                >
+                                  {item.name}
+                                  {displayOptions.showChefRecommendations &&
+                                  item.is_chef_recommendation
+                                    ? chefIcon
+                                    : ''}
+                                </Text>
+                                {displayOptions.showDescriptions && item.description && (
+                                  <Text
+                                    style={[
+                                      styles.itemDescription,
+                                      {
+                                        color: effectiveTheme === 'light' ? '#64748b' : '#94a3b8',
+                                      },
+                                    ]}
+                                  >
+                                    {item.description}
+                                  </Text>
+                                )}
+                              </View>
+                              {displayOptions.showPrices && (
+                                <Text
+                                  style={[
+                                    styles.itemPrice,
+                                    {
+                                      color: effectiveTheme === 'light' ? '#0f172a' : '#ffffff',
+                                    },
+                                  ]}
+                                >
+                                  {new Intl.NumberFormat('vi-VN').format(parseInt(item.base_price))}
+                                  đ
+                                </Text>
+                              )}
+                            </View>
+                          ))}
+                        </View>
+                      </View>
+                    )
+                  })}
+                </View>
+              </View>
+            </Page>,
+          )
+        }
+        return pages
+      }
+
+      case '2': { // Photo-Forward Premium
+        // Create multiple pages
+        const pages = []
+
+        for (let pageIndex = 0; pageIndex < Math.ceil(totalItems / itemsPerPage); pageIndex++) {
+          const startItem = pageIndex * itemsPerPage
+          const endItem = startItem + itemsPerPage
+          const pageItems = allItems.slice(startItem, endItem)
+
+          // Group by category for this page
+          const pageCategories: Record<string, MenuItem[]> = pageItems.reduce(
+            (acc, item) => {
+              if (!acc[item.categoryId]) acc[item.categoryId] = []
+              acc[item.categoryId].push(item)
+              return acc
+            },
+            {} as Record<string, MenuItem[]>,
+          )
+
+          pages.push(
             <Page
-              size={[1200, 1600]}
+              key={pageIndex}
+              size={[595, 842]}
               style={[
                 styles.page,
-                { backgroundColor: effectiveTheme === 'light' ? '#fafafa' : '#0f172a' },
+                { backgroundColor: effectiveTheme === 'light' ? '#ffffff' : '#1e293b' },
               ]}
             >
-              <View style={[styles.header, { marginBottom: 32 }]}>
-                <Text
-                  style={[
-                    styles.title,
-                    { color: effectiveTheme === 'light' ? '#0f172a' : '#ffffff' },
-                  ]}
-                >
-                  {restaurantInfo.name}
-                </Text>
-                <Text
-                  style={[
-                    styles.subtitle,
-                    { color: effectiveTheme === 'light' ? '#475569' : '#cbd5e1' },
-                  ]}
-                >
-                  {restaurantInfo.address} • {restaurantInfo.phone}
-                </Text>
-              </View>
-              {Object.entries(menuItemsByCategory).map(([categoryId, items]) => {
+              {pageIndex === 0 && (
+                <View style={[styles.header, { marginBottom: 32 }]}>
+                  <Text
+                    style={[
+                      styles.title,
+                      { color: effectiveTheme === 'light' ? '#0f172a' : '#ffffff' },
+                    ]}
+                  >
+                    {restaurantInfo.name}
+                  </Text>
+                  <Text
+                    style={[
+                      styles.subtitle,
+                      { color: effectiveTheme === 'light' ? '#475569' : '#cbd5e1' },
+                    ]}
+                  >
+                    {restaurantInfo.address} • {restaurantInfo.phone}
+                  </Text>
+                </View>
+              )}
+              {Object.entries(pageCategories).map(([categoryId, items]) => {
                 const category = categories.find((c) => c.id === categoryId)
                 if (!category) return null
                 return (
-                  <View key={categoryId} style={[styles.category, { marginBottom: 24 }]}>
+                  <View key={categoryId} style={[styles.category, { marginBottom: 12 }]}>
                     <Text
                       style={[styles.categoryHeader, { color: effectiveAccent, marginBottom: 8 }]}
                     >
@@ -863,22 +593,22 @@ const MenuPDFDocument = ({
                             {
                               marginBottom: 12,
                               padding: 12,
-                              backgroundColor: effectiveTheme === 'light' ? '#ffffff' : '#334155',
+                              backgroundColor: effectiveTheme === 'light' ? '#f1f5f9' : '#334155',
                               borderRadius: 6,
+                              borderWidth: 1,
+                              borderColor: effectiveTheme === 'light' ? '#e5e7eb' : '#475569',
                               flexDirection: 'row',
                               alignItems: 'flex-start',
                             },
                           ]}
                         >
                           {item.images && item.images.length > 0 && (
-                            <View style={{ width: 80, height: 80, marginRight: 12 }}>
+                            <View style={{ width: imageSize, height: imageSize, marginRight: 12 }}>
                               <Image
-                                src={
-                                  transformImageUrl(getSelectedImageUrl(item.images))
-                                }
+                                src={transformImageUrl(getSelectedImageUrl(item.images))}
                                 style={{
-                                  width: 80,
-                                  height: 80,
+                                  width: imageSize,
+                                  height: imageSize,
                                   borderRadius: 4,
                                   objectFit: 'cover',
                                 }}
@@ -938,160 +668,68 @@ const MenuPDFDocument = ({
                   </View>
                 )
               })}
-            </Page>
+            </Page>,
           )
         }
+        return pages
+      }
 
-      case '3': // Chalkboard Dark
-        const totalItems3 = allItems.length
-        if (totalItems3 > maxItemsPerPage) {
-          // Create multiple pages
-          const pages = []
-          const itemsPerPage = Math.ceil(totalItems3 / Math.ceil(totalItems3 / maxItemsPerPage))
+      case '3': { // Chalkboard Dark
+        // Create multiple pages
+        const pages = []
 
-          for (let pageIndex = 0; pageIndex < Math.ceil(totalItems3 / itemsPerPage); pageIndex++) {
-            const startItem = pageIndex * itemsPerPage
-            const endItem = startItem + itemsPerPage
-            const pageItems = allItems.slice(startItem, endItem)
+        for (let pageIndex = 0; pageIndex < Math.ceil(totalItems / itemsPerPage); pageIndex++) {
+          const startItem = pageIndex * itemsPerPage
+          const endItem = startItem + itemsPerPage
+          const pageItems = allItems.slice(startItem, endItem)
 
-            // Group by category for this page
-            const pageCategories: Record<string, MenuItem[]> = pageItems.reduce(
-              (acc, item) => {
-                if (!acc[item.categoryId]) acc[item.categoryId] = []
-                acc[item.categoryId].push(item)
-                return acc
-              },
-              {} as Record<string, MenuItem[]>,
-            )
+          // Group by category for this page
+          const pageCategories: Record<string, MenuItem[]> = pageItems.reduce(
+            (acc, item) => {
+              if (!acc[item.categoryId]) acc[item.categoryId] = []
+              acc[item.categoryId].push(item)
+              return acc
+            },
+            {} as Record<string, MenuItem[]>,
+          )
 
-            pages.push(
-              <Page
-                key={pageIndex}
-                size={[595, 842]}
-                style={[
-                  styles.page,
-                  { backgroundColor: effectiveTheme === 'light' ? '#ffffff' : '#1e293b' },
-                ]}
-              >
-                {pageIndex === 0 && (
-                  <View style={styles.header}>
-                    <Text
-                      style={[
-                        styles.title,
-                        { color: effectiveTheme === 'light' ? '#0f172a' : '#ffffff' },
-                      ]}
-                    >
-                      {restaurantInfo.name}
-                    </Text>
-                    <Text
-                      style={[
-                        styles.subtitle,
-                        { color: effectiveTheme === 'light' ? '#475569' : '#cbd5e1' },
-                      ]}
-                    >
-                      {restaurantInfo.address} • {restaurantInfo.phone}
-                    </Text>
-                  </View>
-                )}
-                {Object.entries(pageCategories).map(([categoryId, items]) => {
-                  const category = categories.find((c) => c.id === categoryId)
-                  if (!category) return null
-                  return (
-                    <View
-                      key={categoryId}
-                      style={[styles.category, { marginTop: pageIndex === 0 ? 0 : 32 }]}
-                    >
-                      <Text
-                        style={[
-                          styles.categoryHeader,
-                          {
-                            color: effectiveAccent,
-                            borderBottomColor: effectiveTheme === 'light' ? '#e2e8f0' : '#475569',
-                          },
-                        ]}
-                      >
-                        {category.name}
-                      </Text>
-                      <View>
-                        {items.map((item) => (
-                          <View key={item.id} style={styles.menuItem}>
-                            <View style={styles.itemLeft}>
-                              <Text
-                                style={[
-                                  styles.itemName,
-                                  { color: effectiveTheme === 'light' ? '#0f172a' : '#ffffff' },
-                                ]}
-                              >
-                                {item.name}
-                                {displayOptions.showChefRecommendations &&
-                                item.is_chef_recommendation
-                                  ? chefIcon
-                                  : ''}
-                              </Text>
-                              {displayOptions.showDescriptions && item.description && (
-                                <Text
-                                  style={[
-                                    styles.itemDescription,
-                                    { color: effectiveTheme === 'light' ? '#64748b' : '#94a3b8' },
-                                  ]}
-                                >
-                                  {item.description}
-                                </Text>
-                              )}
-                            </View>
-                            {displayOptions.showPrices && (
-                              <Text
-                                style={[
-                                  styles.itemPrice,
-                                  { color: effectiveTheme === 'light' ? '#0f172a' : '#ffffff' },
-                                ]}
-                              >
-                                {new Intl.NumberFormat('vi-VN').format(parseInt(item.base_price))}đ
-                              </Text>
-                            )}
-                          </View>
-                        ))}
-                      </View>
-                    </View>
-                  )
-                })}
-              </Page>,
-            )
-          }
-          return pages
-        } else {
-          // Single page - original logic
-          return (
+          pages.push(
             <Page
+              key={pageIndex}
               size={[595, 842]}
               style={[
                 styles.page,
                 { backgroundColor: effectiveTheme === 'light' ? '#ffffff' : '#1e293b' },
               ]}
             >
-              <View style={styles.header}>
-                <Text
-                  style={[
-                    styles.title,
-                    { color: effectiveTheme === 'light' ? '#0f172a' : '#ffffff' },
-                  ]}
-                >
-                  {restaurantInfo.name}
-                </Text>
-                <Text
-                  style={[
-                    styles.subtitle,
-                    { color: effectiveTheme === 'light' ? '#475569' : '#cbd5e1' },
-                  ]}
-                >
-                  {restaurantInfo.address} • {restaurantInfo.phone}
-                </Text>
-              </View>
-              {Object.entries(menuItemsByCategory).map(([categoryId, items]) => {
+              {pageIndex === 0 && (
+                <View style={styles.header}>
+                  <Text
+                    style={[
+                      styles.title,
+                      { color: effectiveTheme === 'light' ? '#0f172a' : '#ffffff' },
+                    ]}
+                  >
+                    {restaurantInfo.name}
+                  </Text>
+                  <Text
+                    style={[
+                      styles.subtitle,
+                      { color: effectiveTheme === 'light' ? '#475569' : '#cbd5e1' },
+                    ]}
+                  >
+                    {restaurantInfo.address} • {restaurantInfo.phone}
+                  </Text>
+                </View>
+              )}
+              {Object.entries(pageCategories).map(([categoryId, items]) => {
                 const category = categories.find((c) => c.id === categoryId)
                 if (!category) return null
                 return (
-                  <View key={categoryId} style={styles.category}>
+                  <View
+                    key={categoryId}
+                    style={[styles.category, { marginTop: pageIndex === 0 ? 0 : 32 }]}
+                  >
                     <Text
                       style={[
                         styles.categoryHeader,
@@ -1145,13 +783,33 @@ const MenuPDFDocument = ({
                   </View>
                 )
               })}
-            </Page>
+            </Page>,
           )
         }
+        return pages
+      }
 
-      case '4': // Tri-Fold Classic - Horizontal A4 with separators
+      case '4': { // Tri-Fold Classic - Horizontal A4 with separators
         const categoriesArray = Object.entries(menuItemsByCategory)
-        const itemsPerSection = Math.ceil(categoriesArray.length / 3)
+
+        // Distribute categories into 3 columns, balancing total items
+        const distributeCategories = (categories: [string, any[]][], numColumns: number) => {
+          // Sort categories by item count descending
+          const sortedCategories = categories.sort((a, b) => b[1].length - a[1].length)
+          const columns: [string, any[]][][] = Array.from({ length: numColumns }, () => [])
+          const columnTotals = Array(numColumns).fill(0)
+
+          for (const category of sortedCategories) {
+            // Find column with least items
+            const minIndex = columnTotals.indexOf(Math.min(...columnTotals))
+            columns[minIndex].push(category)
+            columnTotals[minIndex] += category[1].length
+          }
+
+          return columns
+        }
+
+        const columns = distributeCategories(categoriesArray, 3)
 
         return (
           <Page size={[842, 595]} style={styles.page}>
@@ -1185,7 +843,7 @@ const MenuPDFDocument = ({
                   borderRightColor: effectiveTheme === 'light' ? '#e2e8f0' : '#475569',
                 }}
               >
-                {categoriesArray.slice(0, itemsPerSection).map(([categoryId, items]) => {
+                {columns[0].map(([categoryId, items]) => {
                   const category = categories.find((c) => c.id === categoryId)
                   if (!category) return null
                   return (
@@ -1194,7 +852,7 @@ const MenuPDFDocument = ({
                         {category.name}
                       </Text>
                       <View>
-                        {items.slice(0, 15).map((item) => (
+                        {items.slice(0, maxItemsPerPage).map((item) => (
                           <View key={item.id} style={styles.menuItem}>
                             <View style={styles.itemLeft}>
                               <Text
@@ -1247,65 +905,7 @@ const MenuPDFDocument = ({
                   borderRightColor: effectiveTheme === 'light' ? '#e2e8f0' : '#475569',
                 }}
               >
-                {categoriesArray
-                  .slice(itemsPerSection, itemsPerSection * 2)
-                  .map(([categoryId, items]) => {
-                    const category = categories.find((c) => c.id === categoryId)
-                    if (!category) return null
-                    return (
-                      <View key={categoryId} style={styles.category}>
-                        <Text style={[styles.categoryHeader, { color: effectiveAccent }]}>
-                          {category.name}
-                        </Text>
-                        <View>
-                          {items.slice(0, 15).map((item) => (
-                            <View key={item.id} style={styles.menuItem}>
-                              <View style={styles.itemLeft}>
-                                <Text
-                                  style={[
-                                    styles.itemName,
-                                    { color: effectiveTheme === 'light' ? '#0f172a' : '#ffffff' },
-                                  ]}
-                                >
-                                  {item.name}
-                                  {displayOptions.showChefRecommendations &&
-                                  item.is_chef_recommendation
-                                    ? chefIcon
-                                    : ''}
-                                </Text>
-                                {displayOptions.showDescriptions && item.description && (
-                                  <Text
-                                    style={[
-                                      styles.itemDescription,
-                                      { color: effectiveTheme === 'light' ? '#64748b' : '#94a3b8' },
-                                    ]}
-                                  >
-                                    {item.description}
-                                  </Text>
-                                )}
-                              </View>
-                              {displayOptions.showPrices && (
-                                <Text
-                                  style={[
-                                    styles.itemPrice,
-                                    { color: effectiveTheme === 'light' ? '#0f172a' : '#ffffff' },
-                                  ]}
-                                >
-                                  {new Intl.NumberFormat('vi-VN').format(parseInt(item.base_price))}
-                                  đ
-                                </Text>
-                              )}
-                            </View>
-                          ))}
-                        </View>
-                      </View>
-                    )
-                  })}
-              </View>
-
-              {/* Section 3 */}
-              <View style={{ flex: 1, paddingLeft: 10 }}>
-                {categoriesArray.slice(itemsPerSection * 2).map(([categoryId, items]) => {
+                {columns[1].map(([categoryId, items]) => {
                   const category = categories.find((c) => c.id === categoryId)
                   if (!category) return null
                   return (
@@ -1314,7 +914,62 @@ const MenuPDFDocument = ({
                         {category.name}
                       </Text>
                       <View>
-                        {items.slice(0, 15).map((item) => (
+                        {items.slice(0, maxItemsPerPage).map((item) => (
+                          <View key={item.id} style={styles.menuItem}>
+                            <View style={styles.itemLeft}>
+                              <Text
+                                style={[
+                                  styles.itemName,
+                                  { color: effectiveTheme === 'light' ? '#0f172a' : '#ffffff' },
+                                ]}
+                              >
+                                {item.name}
+                                {displayOptions.showChefRecommendations &&
+                                item.is_chef_recommendation
+                                  ? chefIcon
+                                  : ''}
+                              </Text>
+                              {displayOptions.showDescriptions && item.description && (
+                                <Text
+                                  style={[
+                                    styles.itemDescription,
+                                    { color: effectiveTheme === 'light' ? '#64748b' : '#94a3b8' },
+                                  ]}
+                                >
+                                  {item.description}
+                                </Text>
+                              )}
+                            </View>
+                            {displayOptions.showPrices && (
+                              <Text
+                                style={[
+                                  styles.itemPrice,
+                                  { color: effectiveTheme === 'light' ? '#0f172a' : '#ffffff' },
+                                ]}
+                              >
+                                {new Intl.NumberFormat('vi-VN').format(parseInt(item.base_price))}đ
+                              </Text>
+                            )}
+                          </View>
+                        ))}
+                      </View>
+                    </View>
+                  )
+                })}
+              </View>
+
+              {/* Section 3 */}
+              <View style={{ flex: 1, paddingLeft: 10 }}>
+                {columns[2].map(([categoryId, items]) => {
+                  const category = categories.find((c) => c.id === categoryId)
+                  if (!category) return null
+                  return (
+                    <View key={categoryId} style={styles.category}>
+                      <Text style={[styles.categoryHeader, { color: effectiveAccent }]}>
+                        {category.name}
+                      </Text>
+                      <View>
+                        {items.slice(0, maxItemsPerPage).map((item) => (
                           <View key={item.id} style={styles.menuItem}>
                             <View style={styles.itemLeft}>
                               <Text
@@ -1360,115 +1015,52 @@ const MenuPDFDocument = ({
             </View>
           </Page>
         )
+      }
 
-      default: // Default single column
-        const totalItemsDefault = allItems.length
-        if (totalItemsDefault > maxItemsPerPage) {
-          // Create multiple pages
-          const pages = []
-          const itemsPerPage = Math.ceil(
-            totalItemsDefault / Math.ceil(totalItemsDefault / maxItemsPerPage),
+      default: {
+        // Create multiple pages
+        const pages = []
+
+        for (let pageIndex = 0; pageIndex < Math.ceil(totalItems / itemsPerPage); pageIndex++) {
+          const startItem = pageIndex * itemsPerPage
+          const endItem = startItem + itemsPerPage
+          const pageItems = allItems.slice(startItem, endItem)
+
+          // Group by category for this page
+          const pageCategories: Record<string, MenuItem[]> = pageItems.reduce(
+            (acc, item) => {
+              if (!acc[item.categoryId]) acc[item.categoryId] = []
+              acc[item.categoryId].push(item)
+              return acc
+            },
+            {} as Record<string, MenuItem[]>,
           )
 
-          for (
-            let pageIndex = 0;
-            pageIndex < Math.ceil(totalItemsDefault / itemsPerPage);
-            pageIndex++
-          ) {
-            const startItem = pageIndex * itemsPerPage
-            const endItem = startItem + itemsPerPage
-            const pageItems = allItems.slice(startItem, endItem)
+          pages.push(
+            <Page key={pageIndex} size={[595, 842]} style={styles.page}>
+              {pageIndex === 0 && (
+                <View style={styles.header}>
+                  <Text style={styles.title}>{restaurantInfo.name}</Text>
+                  <Text style={styles.subtitle}>
+                    {restaurantInfo.address} • {restaurantInfo.phone}
+                  </Text>
+                </View>
+              )}
 
-            // Group by category for this page
-            const pageCategories: Record<string, MenuItem[]> = pageItems.reduce(
-              (acc, item) => {
-                if (!acc[item.categoryId]) acc[item.categoryId] = []
-                acc[item.categoryId].push(item)
-                return acc
-              },
-              {} as Record<string, MenuItem[]>,
-            )
-
-            pages.push(
-              <Page key={pageIndex} size={[595, 842]} style={styles.page}>
-                {pageIndex === 0 && (
-                  <View style={styles.header}>
-                    <Text style={styles.title}>{restaurantInfo.name}</Text>
-                    <Text style={styles.subtitle}>
-                      {restaurantInfo.address} • {restaurantInfo.phone}
-                    </Text>
-                  </View>
-                )}
-
-                {Object.keys(pageCategories).length === 0 ? (
-                  <View style={styles.emptyState}>
-                    <Text>Chọn danh mục để xem trước</Text>
-                  </View>
-                ) : (
-                  Object.entries(pageCategories).map(([categoryId, items]) => {
-                    const category = categories.find((c) => c.id === categoryId)
-                    if (!category) return null
-
-                    return (
-                      <View
-                        key={categoryId}
-                        style={[styles.category, { marginTop: pageIndex === 0 ? 0 : 32 }]}
-                      >
-                        <Text style={styles.categoryHeader}>{category.name}</Text>
-                        <View>
-                          {items.map((item) => (
-                            <View key={item.id} style={styles.menuItem}>
-                              <View style={styles.itemLeft}>
-                                <Text style={styles.itemName}>
-                                  {item.name}
-                                  {displayOptions.showChefRecommendations &&
-                                  item.is_chef_recommendation
-                                    ? chefIcon
-                                    : ''}
-                                </Text>
-                                {displayOptions.showDescriptions && item.description && (
-                                  <Text style={styles.itemDescription}>{item.description}</Text>
-                                )}
-                              </View>
-                              {displayOptions.showPrices && (
-                                <Text style={styles.itemPrice}>
-                                  {new Intl.NumberFormat('vi-VN').format(parseInt(item.base_price))}
-                                  đ
-                                </Text>
-                              )}
-                            </View>
-                          ))}
-                        </View>
-                      </View>
-                    )
-                  })
-                )}
-              </Page>,
-            )
-          }
-          return pages
-        } else {
-          // Single page - original logic
-          return (
-            <Page size={[595, 842]} style={styles.page}>
-              <View style={styles.header}>
-                <Text style={styles.title}>{restaurantInfo.name}</Text>
-                <Text style={styles.subtitle}>
-                  {restaurantInfo.address} • {restaurantInfo.phone}
-                </Text>
-              </View>
-
-              {Object.keys(menuItemsByCategory).length === 0 ? (
+              {Object.keys(pageCategories).length === 0 ? (
                 <View style={styles.emptyState}>
                   <Text>Chọn danh mục để xem trước</Text>
                 </View>
               ) : (
-                Object.entries(menuItemsByCategory).map(([categoryId, items]) => {
+                Object.entries(pageCategories).map(([categoryId, items]) => {
                   const category = categories.find((c) => c.id === categoryId)
                   if (!category) return null
 
                   return (
-                    <View key={categoryId} style={styles.category}>
+                    <View
+                      key={categoryId}
+                      style={[styles.category, { marginTop: pageIndex === 0 ? 0 : 32 }]}
+                    >
                       <Text style={styles.categoryHeader}>{category.name}</Text>
                       <View>
                         {items.map((item) => (
@@ -1497,9 +1089,11 @@ const MenuPDFDocument = ({
                   )
                 })
               )}
-            </Page>
+            </Page>,
           )
         }
+        return pages
+      }
     }
   }
 
