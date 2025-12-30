@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import {
   Table,
@@ -25,14 +24,13 @@ import {
 import { Eye, MoreVertical, Printer, ChevronRight, AlertCircle, ClipboardList } from 'lucide-react'
 import { cn } from '@/src/lib/utils'
 import { StatusBadge, type StatusConfig } from '@/src/components/ui/status-badge'
-import { ContainerLoadingState } from '@/src/components/ui/loading-state'
 import { EmptyState } from '@/src/components/ui/empty-state'
 import { SkeletonTableRows } from '@/src/components/loading'
 import { formatDistanceToNow } from 'date-fns'
 import { vi } from 'date-fns/locale'
 import { TablePagination } from '@/src/components/ui/table-pagination'
-
-// Mock data
+import { useOrdersQuery, useUpdateOrderStatusMutation } from '../queries'
+import type { Order, OrderItem, OrderStatus } from '../types/orders'
 const MOCK_ORDERS = [
   {
     id: 'ORD-1024',
@@ -218,22 +216,34 @@ const NEXT_STATUS_MAP: Record<string, string> = {
 export function OrdersTable() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const [orders, setOrders] = useState(MOCK_ORDERS)
-  const [isLoading, setIsLoading] = useState(false)
 
-  // Pagination state (mock)
-  const page = 1
-  const totalPages = 1
-  const total = orders.length
+  // Build query params from URL
+  const queryParams = {
+    page: Number(searchParams.get('page')) || 1,
+    limit: 10,
+    status: searchParams.get('status') !== 'all' ? (searchParams.get('status') as OrderStatus) : undefined,
+    search: searchParams.get('q') || undefined,
+  }
+
+  // Fetch orders from API
+  const { data, isLoading, error } = useOrdersQuery(queryParams)
+  const orders = data?.data?.orders || []
+  const pagination = data?.data?.pagination
+
+  // Update status mutation
+  const updateStatusMutation = useUpdateOrderStatusMutation()
 
   const handleBumpStatus = (orderId: string) => {
-    setOrders((prev) =>
-      prev.map((order) =>
-        order.id === orderId
-          ? { ...order, status: NEXT_STATUS_MAP[order.status] || order.status }
-          : order,
-      ),
-    )
+    const order = orders.find((o: Order) => o.id === orderId)
+    if (!order) return
+
+    const nextStatus = NEXT_STATUS_MAP[order.status]
+    if (!nextStatus) return
+
+    updateStatusMutation.mutate({
+      id: orderId,
+      payload: { status: nextStatus as OrderStatus },
+    })
   }
 
   const handleViewOrder = (orderId: string) => {
@@ -316,9 +326,9 @@ export function OrdersTable() {
                 </TableCell>
               </TableRow>
             ) : (
-              orders.map((order, index) => {
-                const aging = getAgingMinutes(order.createdAt)
-                const isOverdue = isAging(order.createdAt)
+              orders.map((order: Order, index: number) => {
+                const aging = getAgingMinutes(new Date(order.createdAt))
+                const isOverdue = isAging(new Date(order.createdAt))
 
                 return (
                   <AdminTableRow
@@ -330,19 +340,19 @@ export function OrdersTable() {
                     <TableCell className="px-4 py-4">
                       <div>
                         <p className="font-mono text-sm font-semibold text-slate-900 dark:text-white">
-                          {order.id}
+                          {order.orderNumber}
                         </p>
                         <p className="text-xs text-slate-500 dark:text-slate-400">
-                          {formatDistanceToNow(order.createdAt, { addSuffix: true, locale: vi })}
+                          {formatDistanceToNow(new Date(order.createdAt), { addSuffix: true, locale: vi })}
                         </p>
                       </div>
                     </TableCell>
                     <TableCell className="px-4 py-4">
                       <div>
                         <p className="text-sm font-medium text-slate-900 dark:text-white">
-                          {order.tableName}
+                          Bàn {order.table?.tableNumber || 'N/A'}
                         </p>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">{order.floor}</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">{order.table?.zone?.name || ''}</p>
                       </div>
                     </TableCell>
                     <TableCell className="px-4 py-4">
@@ -356,9 +366,9 @@ export function OrdersTable() {
                             Chi tiết món:
                           </p>
                           <ul className="space-y-1">
-                            {order.items.slice(0, 3).map((item, idx) => (
+                            {order.items.slice(0, 3).map((item: OrderItem, idx: number) => (
                               <li key={idx} className="text-xs text-slate-600 dark:text-slate-400">
-                                {item.quantity}x {item.name}
+                                {item.quantity}x {item.menuItem?.name || 'N/A'}
                               </li>
                             ))}
                             {order.items.length > 3 && (
@@ -378,7 +388,7 @@ export function OrdersTable() {
                     </TableCell>
                     <TableCell className="px-4 py-4 text-right">
                       <p className="font-semibold text-slate-900 dark:text-white">
-                        {order.total.toLocaleString('vi-VN')}₫
+                        {order.totalAmount?.toLocaleString('vi-VN')}₫
                       </p>
                     </TableCell>
                     <TableCell className="px-4 py-4">
@@ -465,14 +475,16 @@ export function OrdersTable() {
       </AdminTableContainer>
 
       {/* Pagination */}
-      <TablePagination
-        currentPage={page}
-        totalPages={totalPages}
-        total={total}
-        limit={10}
-        itemLabel="đơn"
-        onPageChange={() => {}}
-      />
+      {pagination && (
+        <TablePagination
+          currentPage={pagination.page || 1}
+          totalPages={pagination.total_pages || 1}
+          total={pagination.total || 0}
+          limit={pagination.limit || 10}
+          itemLabel="đơn"
+          onPageChange={() => {}}
+        />
+      )}
     </div>
   )
 }

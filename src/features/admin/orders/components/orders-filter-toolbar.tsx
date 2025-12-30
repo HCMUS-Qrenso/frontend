@@ -9,6 +9,7 @@ import { Download } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { AdminFilterToolbarWrapper } from '../../shared/components/admin-filter-toolbar-wrapper'
 import { cn } from '@/src/lib/utils'
+import { useOrdersSocket } from '../hooks'
 
 const STATUS_OPTIONS = [
   { value: 'all', label: 'Tất cả' },
@@ -48,7 +49,12 @@ export function OrdersFilterToolbar() {
   const [tableId, setTableId] = useState(searchParams.get('tableId') || 'all')
   const [timeRange, setTimeRange] = useState(searchParams.get('timeRange') || 'today')
   const [autoRefresh, setAutoRefresh] = useState(true)
-  const [isConnected, setIsConnected] = useState(true)
+
+  // Connect to WebSocket for real-time updates
+  const { isConnected } = useOrdersSocket({
+    enabled: autoRefresh,
+    showNotifications: true,
+  })
 
   // Update URL params when filters change
   const updateFilter = (key: string, value: string) => {

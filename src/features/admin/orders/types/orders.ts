@@ -1,18 +1,6 @@
 /**
  * Order Types for Admin Dashboard
- *
- * TODO: Implement when backend order endpoints are ready
- *
- * Expected types to implement:
- * - Order (main entity)
- * - OrderItem
- * - OrderStatus
- * - OrderQueryParams
- * - OrderListResponse
- * - OrderResponse
- * - CreateOrderPayload
- * - UpdateOrderPayload
- * - UpdateOrderStatusPayload
+ * Updated to match backend API response format
  */
 
 import type { PaginationMeta } from '@/src/types/common'
@@ -20,47 +8,73 @@ import type { PaginationMeta } from '@/src/types/common'
 // Re-export for convenience
 export type { PaginationMeta }
 
-// Order Status Types
+// Order Status Types (matching backend)
 export type OrderStatus =
   | 'pending'
-  | 'confirmed'
+  | 'accepted'
+  | 'rejected'
   | 'preparing'
+  | 'in_progress'
   | 'ready'
   | 'served'
   | 'completed'
   | 'cancelled'
+  | 'abandoned'
 
-// Order Item interface
+// Payment Status Types
+export type PaymentStatus = 'unpaid' | 'paid' | 'partial'
+
+// Order Priority Types
+export type OrderPriority = 'normal' | 'high' | 'rush'
+
+// Order Item interface (matching backend response)
 export interface OrderItem {
   id: string
-  menu_item_id: string
-  menu_item_name: string
-  quantity: number
-  unit_price: number
-  total_price: number
-  notes?: string
-  modifiers?: Array<{
+  menuItem: {
     id: string
     name: string
-    price_adjustment: number
+    description?: string
+    images?: Array<{ imageUrl: string }>
+  }
+  quantity: number
+  unitPrice: number
+  modifiersTotal: number
+  subtotal: number
+  status: string
+  specialInstructions?: string
+  modifiers?: Array<{
+    id: string
+    modifierName: string
+    priceAdjustment: number
   }>
 }
 
-// Main Order interface (placeholder - update based on backend API)
+// Table info in order
+export interface OrderTable {
+  id: string
+  tableNumber: string
+  zone?: {
+    id: string
+    name: string
+  }
+}
+
+// Main Order interface (matching backend response)
 export interface Order {
   id: string
-  tenant_id: string
-  table_id: string
-  table_number: string
-  order_number: string
+  orderNumber: string
   status: OrderStatus
+  priority: OrderPriority
+  paymentStatus: PaymentStatus
+  table: OrderTable
   items: OrderItem[]
   subtotal: number
-  tax: number
-  total: number
-  notes?: string
-  created_at: string
-  updated_at: string
+  taxAmount: number
+  discountAmount: number
+  totalAmount: number
+  specialInstructions?: string
+  createdAt: string
+  updatedAt: string
 }
 
 // Query parameters for GET /orders
@@ -69,14 +83,15 @@ export interface OrderQueryParams {
   limit?: number
   search?: string
   status?: OrderStatus
+  payment_status?: PaymentStatus
   table_id?: string
   date_from?: string
   date_to?: string
-  sort_by?: 'created_at' | 'updated_at' | 'total'
+  sort_by?: 'createdAt' | 'updatedAt' | 'totalAmount' | 'orderNumber'
   sort_order?: 'asc' | 'desc'
 }
 
-// API Response Types (placeholder - update based on backend API)
+// API Response Types
 export interface OrderListResponse {
   success: boolean
   data: {
@@ -91,7 +106,27 @@ export interface OrderResponse {
   data: Order
 }
 
-// Mutation payloads (placeholder - update based on backend API)
+export interface OrderStatsResponse {
+  success: boolean
+  data: {
+    pending: number
+    accepted: number
+    preparing: number
+    ready: number
+    served: number
+    completed: number
+    cancelled: number
+    totalToday: number
+    revenueToday: number
+  }
+}
+
+// Mutation payloads
 export interface UpdateOrderStatusPayload {
   status: OrderStatus
+  notes?: string
+}
+
+export interface UpdateOrderItemStatusPayload {
+  status: string
 }
