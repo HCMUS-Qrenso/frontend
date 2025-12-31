@@ -16,7 +16,9 @@ import type {
   Order,
   OrderQueryParams,
   OrderListResponse,
-  OrderResponse,
+  OrderDetailResponse,
+  OrderStatsResponse,
+  OrderDetail,
   UpdateOrderStatusPayload,
 } from '@/src/features/admin/orders/types'
 
@@ -45,11 +47,23 @@ export const useOrdersQuery = (params?: OrderQueryParams, enabled = true) => {
  * Get single order by ID
  */
 export const useOrderQuery = (id: string | null, enabled = true) => {
-  return useQuery<OrderResponse>({
+  return useQuery<OrderDetailResponse>({
     queryKey: ordersQueryKeys.detail(id!),
     queryFn: () => ordersApi.getOrderById(id!),
     enabled: enabled && !!id,
     staleTime: 10 * 1000,
+  })
+}
+
+/**
+ * Get order statistics
+ */
+export const useOrderStatsQuery = (enabled = true) => {
+  return useQuery<OrderStatsResponse>({
+    queryKey: ordersQueryKeys.stats(),
+    queryFn: () => ordersApi.getOrderStats(),
+    enabled,
+    staleTime: 30 * 1000,
   })
 }
 
@@ -63,7 +77,7 @@ export const useOrderQuery = (id: string | null, enabled = true) => {
 export const useUpdateOrderStatusMutation = () => {
   const queryClient = useQueryClient()
 
-  return useMutation<OrderResponse, Error, { id: string; payload: UpdateOrderStatusPayload }>({
+  return useMutation<OrderDetailResponse, Error, { id: string; payload: UpdateOrderStatusPayload }>({
     mutationFn: ({ id, payload }) => ordersApi.updateOrderStatus(id, payload),
     onSuccess: (_, { id }) => {
       // Invalidate order list and detail queries

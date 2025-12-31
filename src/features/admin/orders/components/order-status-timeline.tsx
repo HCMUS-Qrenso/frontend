@@ -4,38 +4,12 @@ import { cn } from '@/src/lib/utils'
 import { format } from 'date-fns'
 import { vi } from 'date-fns/locale'
 import { Check, Clock, XCircle, AlertCircle } from 'lucide-react'
-
-// Mock data
-const MOCK_HISTORY = [
-  {
-    id: '1',
-    from_status: 'accepted',
-    to_status: 'preparing',
-    changed_by: 'Nguyễn Văn A',
-    notes: 'Bắt đầu nấu',
-    created_at: new Date(Date.now() - 10 * 60 * 1000),
-  },
-  {
-    id: '2',
-    from_status: 'pending',
-    to_status: 'accepted',
-    changed_by: 'Trần Thị B',
-    notes: 'Đã xác nhận đơn',
-    created_at: new Date(Date.now() - 15 * 60 * 1000),
-  },
-  {
-    id: '3',
-    from_status: null,
-    to_status: 'pending',
-    changed_by: 'Hệ thống',
-    notes: 'Đơn hàng được tạo',
-    created_at: new Date(Date.now() - 18 * 60 * 1000),
-  },
-]
+import type { StatusHistoryEntry } from '../types/orders'
 
 const STATUS_ICON_MAP: Record<string, any> = {
   pending: Clock,
   accepted: Check,
+  in_progress: Clock,
   preparing: Clock,
   ready: Check,
   served: Check,
@@ -47,6 +21,7 @@ const STATUS_ICON_MAP: Record<string, any> = {
 const STATUS_COLOR_MAP: Record<string, string> = {
   pending: 'bg-slate-500',
   accepted: 'bg-purple-500',
+  in_progress: 'bg-blue-500',
   preparing: 'bg-amber-500',
   ready: 'bg-emerald-500',
   served: 'bg-teal-500',
@@ -56,11 +31,20 @@ const STATUS_COLOR_MAP: Record<string, string> = {
 }
 
 interface OrderStatusTimelineProps {
-  orderId: string
+  history: StatusHistoryEntry[]
 }
 
-export function OrderStatusTimeline({ orderId }: OrderStatusTimelineProps) {
-  const history = MOCK_HISTORY
+export function OrderStatusTimeline({ history }: OrderStatusTimelineProps) {
+  if (!history || history.length === 0) {
+    return (
+      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
+        <h2 className="mb-4 text-lg font-semibold text-slate-900 dark:text-white">
+          Lịch sử trạng thái
+        </h2>
+        <p className="text-sm text-slate-500 dark:text-slate-400">Chưa có lịch sử</p>
+      </div>
+    )
+  }
 
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
@@ -70,8 +54,8 @@ export function OrderStatusTimeline({ orderId }: OrderStatusTimelineProps) {
 
       <div className="space-y-4">
         {history.map((entry, idx) => {
-          const Icon = STATUS_ICON_MAP[entry.to_status] || AlertCircle
-          const dotColor = STATUS_COLOR_MAP[entry.to_status] || 'bg-slate-500'
+          const Icon = STATUS_ICON_MAP[entry.toStatus] || AlertCircle
+          const dotColor = STATUS_COLOR_MAP[entry.toStatus] || 'bg-slate-500'
           const isLast = idx === history.length - 1
 
           return (
@@ -97,22 +81,24 @@ export function OrderStatusTimeline({ orderId }: OrderStatusTimelineProps) {
                 <div className="flex-1 pb-4">
                   <div className="flex items-center justify-between">
                     <p className="font-medium text-slate-900 dark:text-white">
-                      {entry.from_status ? (
+                      {entry.fromStatus ? (
                         <>
-                          <span className="capitalize">{entry.from_status}</span>
+                          <span className="capitalize">{entry.fromStatus}</span>
                           <span className="mx-2">→</span>
-                          <span className="capitalize">{entry.to_status}</span>
+                          <span className="capitalize">{entry.toStatus}</span>
                         </>
                       ) : (
-                        <span className="capitalize">{entry.to_status}</span>
+                        <span className="capitalize">{entry.toStatus}</span>
                       )}
                     </p>
                   </div>
-                  <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">{entry.notes}</p>
+                  {entry.notes && (
+                    <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">{entry.notes}</p>
+                  )}
                   <div className="mt-1 flex items-center gap-2 text-xs text-slate-500 dark:text-slate-500">
-                    <span>{entry.changed_by}</span>
+                    <span>{entry.user?.fullName || 'Hệ thống'}</span>
                     <span>•</span>
-                    <span>{format(entry.created_at, 'HH:mm, dd/MM', { locale: vi })}</span>
+                    <span>{format(new Date(entry.createdAt), 'HH:mm, dd/MM', { locale: vi })}</span>
                   </div>
                 </div>
               </div>

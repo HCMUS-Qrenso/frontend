@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Button } from '@/src/components/ui/button'
 import { Switch } from '@/src/components/ui/switch'
 import { SearchInput } from '@/src/components/ui/search-input'
@@ -10,34 +10,27 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { AdminFilterToolbarWrapper } from '../../shared/components/admin-filter-toolbar-wrapper'
 import { cn } from '@/src/lib/utils'
 import { useOrdersSocket } from '../hooks'
+import { useTablesQuery } from '@/src/features/admin/tables/queries'
+import { useZonesSimpleQuery } from '@/src/features/admin/tables/queries/zones.queries'
 
 const STATUS_OPTIONS = [
   { value: 'all', label: 'Tất cả' },
-  { value: 'new', label: 'Mới/Chờ xử lý' },
+  { value: 'pending', label: 'Chờ xử lý' },
   { value: 'accepted', label: 'Đã nhận' },
-  { value: 'preparing', label: 'Đang chuẩn bị' },
+  { value: 'in_progress', label: 'Đang chuẩn bị' },
   { value: 'ready', label: 'Sẵn sàng' },
   { value: 'served', label: 'Đã phục vụ' },
   { value: 'completed', label: 'Hoàn thành' },
+  { value: 'rejected', label: 'Từ chối' },
   { value: 'cancelled', label: 'Đã hủy' },
+  { value: 'abandoned', label: 'Bỏ dở' },
 ]
 
 const TIME_RANGE_OPTIONS: FilterOption[] = [
+  { value: 'all', label: 'Tất cả' },
   { value: 'today', label: 'Hôm nay' },
   { value: 'last24h', label: '24h qua' },
   { value: 'last7d', label: '7 ngày qua' },
-  { value: 'custom', label: 'Tùy chỉnh' },
-]
-
-// Table options - currently mock data, will be from API later
-const TABLE_OPTIONS: FilterOption[] = [
-  { value: 'all', label: 'Tất cả' },
-  { value: '1', label: 'Bàn 1' },
-  { value: '2', label: 'Bàn 2' },
-  { value: '3', label: 'Bàn 3' },
-  { value: '5', label: 'Bàn 5' },
-  { value: '7', label: 'Bàn 7' },
-  { value: '12', label: 'Bàn 12' },
 ]
 
 export function OrdersFilterToolbar() {
@@ -46,8 +39,9 @@ export function OrdersFilterToolbar() {
 
   const [search, setSearch] = useState(searchParams.get('q') || '')
   const [status, setStatus] = useState(searchParams.get('status') || 'all')
+  const [zoneId, setZoneId] = useState(searchParams.get('zoneId') || 'all')
   const [tableId, setTableId] = useState(searchParams.get('tableId') || 'all')
-  const [timeRange, setTimeRange] = useState(searchParams.get('timeRange') || 'today')
+  const [timeRange, setTimeRange] = useState(searchParams.get('timeRange') || 'all')
   const [autoRefresh, setAutoRefresh] = useState(true)
 
   // Connect to WebSocket for real-time updates
@@ -56,11 +50,51 @@ export function OrdersFilterToolbar() {
     showNotifications: true,
   })
 
+  // Fetch zones for filter dropdown
+  const { data: zonesData } = useZonesSimpleQuery()
+
+  // Fetch tables for filter dropdown (filtered by zone if selected)
+  const { data: tablesData } = useTablesQuery({ 
+    limit: 100,
+    ...(zoneId !== 'all' && { zone_id: zoneId }),
+  })
+
+  // Build zone options from API data
+  const zoneOptions = useMemo((): FilterOption[] => {
+    const options: FilterOption[] = [{ value: 'all', label: 'Tất cả' }]
+    
+    if (zonesData?.zones) {
+      zonesData.zones.forEach((zone) => {
+        options.push({
+          value: zone.id,
+          label: zone.name,
+        })
+      })
+    }
+    
+    return options
+  }, [zonesData])
+
+  // Build table options from API data
+  const tableOptions = useMemo((): FilterOption[] => {
+    const options: FilterOption[] = [{ value: 'all', label: 'Tất cả' }]
+    
+    if (tablesData?.data?.tables) {
+      tablesData.data.tables.forEach((table) => {
+        options.push({
+          value: table.id,
+          label: `Bàn ${table.table_number}`,
+        })
+      })
+    }
+    
+    return options
+  }, [tablesData])
+
   // Update URL params when filters change
   const updateFilter = (key: string, value: string) => {
     const params = new URLSearchParams(searchParams.toString())
-    const isDefaultValue =
-      value === '' || value === 'all' || (key === 'timeRange' && value === 'today')
+    const isDefaultValue = value === '' || value === 'all'
 
     if (isDefaultValue) {
       params.delete(key)
@@ -82,6 +116,16 @@ export function OrdersFilterToolbar() {
   const handleStatusChange = (value: string) => {
     setStatus(value)
     updateFilter('status', value)
+  }
+
+  const handleZoneChange = (value: string) => {
+    setZoneId(value)
+    updateFilter('zoneId', value)
+    // Reset table when zone changes
+    if (tableId !== 'all') {
+      setTableId('all')
+      updateFilter('tableId', 'all')
+    }
   }
 
   const handleTableChange = (value: string) => {
@@ -125,9 +169,17 @@ export function OrdersFilterToolbar() {
           />
 
           <FilterDropdown
+            label="Khu vực:"
+            value={zoneId}
+            options={zoneOptions}
+            onChange={handleZoneChange}
+            placeholder="Tất cả"
+          />
+
+          <FilterDropdown
             label="Bàn:"
             value={tableId}
-            options={TABLE_OPTIONS}
+            options={tableOptions}
             onChange={handleTableChange}
             placeholder="Tất cả"
           />

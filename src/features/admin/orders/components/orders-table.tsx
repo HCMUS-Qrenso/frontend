@@ -31,127 +31,10 @@ import { vi } from 'date-fns/locale'
 import { TablePagination } from '@/src/components/ui/table-pagination'
 import { useOrdersQuery, useUpdateOrderStatusMutation } from '../queries'
 import type { Order, OrderItem, OrderStatus } from '../types/orders'
-const MOCK_ORDERS = [
-  {
-    id: 'ORD-1024',
-    tableId: '5',
-    tableName: 'Bàn 5',
-    floor: 'Tầng 1',
-    items: [
-      { name: 'Phở bò', quantity: 2 },
-      { name: 'Bánh xèo', quantity: 1 },
-      { name: 'Cà phê sữa', quantity: 2 },
-    ],
-    status: 'new',
-    paymentStatus: 'unpaid',
-    total: 285000,
-    createdAt: new Date(Date.now() - 12 * 60 * 1000), // 12 minutes ago
-    customerName: 'Nguyễn Văn A',
-    note: 'Không hành',
-  },
-  {
-    id: 'ORD-1023',
-    tableId: '3',
-    tableName: 'Bàn 3',
-    floor: 'Tầng 1',
-    items: [
-      { name: 'Bún chả', quantity: 3 },
-      { name: 'Nem rán', quantity: 1 },
-    ],
-    status: 'preparing',
-    paymentStatus: 'unpaid',
-    total: 420000,
-    createdAt: new Date(Date.now() - 25 * 60 * 1000), // 25 minutes ago
-    customerName: 'Trần Thị B',
-    note: '',
-  },
-  {
-    id: 'ORD-1022',
-    tableId: '7',
-    tableName: 'Bàn 7',
-    floor: 'Tầng 2',
-    items: [
-      { name: 'Cơm gà', quantity: 2 },
-      { name: 'Canh chua', quantity: 1 },
-      { name: 'Trà đá', quantity: 2 },
-    ],
-    status: 'ready',
-    paymentStatus: 'unpaid',
-    total: 350000,
-    createdAt: new Date(Date.now() - 8 * 60 * 1000), // 8 minutes ago
-    customerName: 'Lê Văn C',
-    note: '',
-  },
-  {
-    id: 'ORD-1021',
-    tableId: '2',
-    tableName: 'Bàn 2',
-    floor: 'Tầng 1',
-    items: [
-      { name: 'Phở gà', quantity: 1 },
-      { name: 'Gỏi cuốn', quantity: 2 },
-    ],
-    status: 'served',
-    paymentStatus: 'unpaid',
-    total: 185000,
-    createdAt: new Date(Date.now() - 45 * 60 * 1000), // 45 minutes ago
-    customerName: 'Phạm Thị D',
-    note: '',
-  },
-  {
-    id: 'ORD-1020',
-    tableId: '12',
-    tableName: 'Bàn 12',
-    floor: 'Tầng 2',
-    items: [
-      { name: 'Lẩu thái', quantity: 1 },
-      { name: 'Rau củ', quantity: 1 },
-      { name: 'Nước ngọt', quantity: 4 },
-    ],
-    status: 'preparing',
-    paymentStatus: 'unpaid',
-    total: 580000,
-    createdAt: new Date(Date.now() - 18 * 60 * 1000), // 18 minutes ago
-    customerName: 'Hoàng Văn E',
-    note: 'Không cay',
-  },
-  {
-    id: 'ORD-1019',
-    tableId: '1',
-    tableName: 'Bàn 1',
-    floor: 'Tầng 1',
-    items: [
-      { name: 'Bún bò Huế', quantity: 2 },
-      { name: 'Chả giò', quantity: 1 },
-    ],
-    status: 'new',
-    paymentStatus: 'unpaid',
-    total: 260000,
-    createdAt: new Date(Date.now() - 5 * 60 * 1000), // 5 minutes ago
-    customerName: 'Đỗ Thị F',
-    note: '',
-  },
-  {
-    id: 'ORD-1018',
-    tableId: '5',
-    tableName: 'Bàn 5',
-    floor: 'Tầng 1',
-    items: [
-      { name: 'Cơm chiên dương châu', quantity: 1 },
-      { name: 'Canh chua cá', quantity: 1 },
-    ],
-    status: 'completed',
-    paymentStatus: 'paid',
-    total: 180000,
-    createdAt: new Date(Date.now() - 120 * 60 * 1000), // 2 hours ago
-    customerName: 'Vũ Văn G',
-    note: '',
-  },
-]
 
 const STATUS_CONFIG: Record<string, StatusConfig> = {
-  new: {
-    label: 'Mới',
+  pending: {
+    label: 'Chờ xử lý',
     className:
       'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20',
   },
@@ -160,7 +43,7 @@ const STATUS_CONFIG: Record<string, StatusConfig> = {
     className:
       'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-500/10 dark:text-purple-400 dark:border-purple-500/20',
   },
-  preparing: {
+  in_progress: {
     label: 'Đang chuẩn bị',
     className:
       'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20',
@@ -180,10 +63,20 @@ const STATUS_CONFIG: Record<string, StatusConfig> = {
     className:
       'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-500/10 dark:text-slate-400 dark:border-slate-500/20',
   },
+  rejected: {
+    label: 'Từ chối',
+    className:
+      'bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-500/10 dark:text-orange-400 dark:border-orange-500/20',
+  },
   cancelled: {
     label: 'Đã hủy',
     className:
       'bg-red-50 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20',
+  },
+  abandoned: {
+    label: 'Bỏ dở',
+    className:
+      'bg-gray-50 text-gray-700 border-gray-200 dark:bg-gray-500/10 dark:text-gray-400 dark:border-gray-500/20',
   },
 }
 
@@ -206,9 +99,9 @@ const PAYMENT_STATUS_CONFIG: Record<string, StatusConfig> = {
 }
 
 const NEXT_STATUS_MAP: Record<string, string> = {
-  new: 'accepted',
-  accepted: 'preparing',
-  preparing: 'ready',
+  pending: 'accepted',
+  accepted: 'in_progress',
+  in_progress: 'ready',
   ready: 'served',
   served: 'completed',
 }
@@ -218,17 +111,52 @@ export function OrdersTable() {
   const searchParams = useSearchParams()
 
   // Build query params from URL
+  const timeRange = searchParams.get('timeRange') || 'all'
+  
+  // Calculate date_from and date_to based on timeRange
+  const getDateRange = (range: string) => {
+    const now = new Date()
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+    
+    switch (range) {
+      case 'today':
+        return {
+          date_from: today.toISOString().split('T')[0],
+          date_to: today.toISOString().split('T')[0],
+        }
+      case 'last24h':
+        const last24h = new Date(now.getTime() - 24 * 60 * 60 * 1000)
+        return {
+          date_from: last24h.toISOString().split('T')[0],
+          date_to: today.toISOString().split('T')[0],
+        }
+      case 'last7d':
+        const last7d = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000)
+        return {
+          date_from: last7d.toISOString().split('T')[0],
+          date_to: today.toISOString().split('T')[0],
+        }
+      default:
+        return {}
+    }
+  }
+  
+  const dateRange = getDateRange(timeRange)
+  
   const queryParams = {
     page: Number(searchParams.get('page')) || 1,
     limit: 10,
     status: searchParams.get('status') !== 'all' ? (searchParams.get('status') as OrderStatus) : undefined,
     search: searchParams.get('q') || undefined,
+    zone_id: searchParams.get('zoneId') || undefined,
+    table_id: searchParams.get('tableId') || undefined,
+    ...dateRange,
   }
 
   // Fetch orders from API
   const { data, isLoading, error } = useOrdersQuery(queryParams)
-  const orders = data?.data?.orders || []
-  const pagination = data?.data?.pagination
+  const orders = data?.data || []
+  const meta = data?.meta
 
   // Update status mutation
   const updateStatusMutation = useUpdateOrderStatusMutation()
@@ -368,7 +296,7 @@ export function OrdersTable() {
                           <ul className="space-y-1">
                             {order.items.slice(0, 3).map((item: OrderItem, idx: number) => (
                               <li key={idx} className="text-xs text-slate-600 dark:text-slate-400">
-                                {item.quantity}x {item.menuItem?.name || 'N/A'}
+                                {item.quantity}x {item.name}
                               </li>
                             ))}
                             {order.items.length > 3 && (
@@ -475,12 +403,12 @@ export function OrdersTable() {
       </AdminTableContainer>
 
       {/* Pagination */}
-      {pagination && (
+      {meta && (
         <TablePagination
-          currentPage={pagination.page || 1}
-          totalPages={pagination.total_pages || 1}
-          total={pagination.total || 0}
-          limit={pagination.limit || 10}
+          currentPage={meta.page || 1}
+          totalPages={meta.totalPages || 1}
+          total={meta.total || 0}
+          limit={meta.limit || 10}
           itemLabel="đơn"
           onPageChange={() => {}}
         />

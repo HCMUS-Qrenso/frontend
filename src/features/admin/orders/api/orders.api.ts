@@ -1,8 +1,7 @@
 /**
  * Orders API Layer
  *
- * TODO: Implement when backend order endpoints are ready
- *
+ * Handles all HTTP calls for orders feature.
  * Expected endpoints:
  * - GET /orders - List orders with filtering
  * - GET /orders/:id - Get order by ID
@@ -12,17 +11,16 @@
 
 import { apiClient } from '@/src/lib/axios'
 import type {
-  Order,
   OrderQueryParams,
   OrderListResponse,
-  OrderResponse,
+  OrderDetailResponse,
+  OrderStatsResponse,
   UpdateOrderStatusPayload,
 } from '@/src/features/admin/orders/types'
 
 export const ordersApi = {
   /**
    * Get paginated list of orders
-   * TODO: Implement when backend is ready
    */
   getOrders: async (params?: OrderQueryParams): Promise<OrderListResponse> => {
     const { data } = await apiClient.get<OrderListResponse>('/orders', { params })
@@ -30,23 +28,29 @@ export const ordersApi = {
   },
 
   /**
-   * Get single order by ID
-   * TODO: Implement when backend is ready
+   * Get single order by ID (returns full detail with statusHistory and payments)
    */
-  getOrderById: async (id: string): Promise<OrderResponse> => {
-    const { data } = await apiClient.get<OrderResponse>(`/orders/${id}`)
+  getOrderById: async (id: string): Promise<OrderDetailResponse> => {
+    const { data } = await apiClient.get<OrderDetailResponse>(`/orders/${id}`)
+    return data
+  },
+
+  /**
+   * Get order statistics
+   */
+  getOrderStats: async (): Promise<OrderStatsResponse> => {
+    const { data } = await apiClient.get<OrderStatsResponse>('/orders/stats')
     return data
   },
 
   /**
    * Update order status
-   * TODO: Implement when backend is ready
    */
   updateOrderStatus: async (
     id: string,
     payload: UpdateOrderStatusPayload,
-  ): Promise<OrderResponse> => {
-    const { data } = await apiClient.patch<OrderResponse>(`/orders/${id}/status`, payload)
+  ): Promise<OrderDetailResponse> => {
+    const { data } = await apiClient.patch<OrderDetailResponse>(`/orders/${id}/status`, payload)
     return data
   },
 }

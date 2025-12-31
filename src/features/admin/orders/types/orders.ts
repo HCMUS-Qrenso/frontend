@@ -27,20 +27,16 @@ export type PaymentStatus = 'unpaid' | 'paid' | 'partial'
 // Order Priority Types
 export type OrderPriority = 'normal' | 'high' | 'rush'
 
-// Order Item interface (matching backend response)
+// Order Item interface (matching actual backend response)
 export interface OrderItem {
   id: string
-  menuItem: {
-    id: string
-    name: string
-    description?: string
-    images?: Array<{ imageUrl: string }>
-  }
+  name: string // Direct name field from API
   quantity: number
-  unitPrice: number
-  modifiersTotal: number
-  subtotal: number
   status: string
+  subtotal: number
+  // Optional fields that may be present
+  unitPrice?: number
+  modifiersTotal?: number
   specialInstructions?: string
   modifiers?: Array<{
     id: string
@@ -59,7 +55,20 @@ export interface OrderTable {
   }
 }
 
-// Main Order interface (matching backend response)
+// Waiter info in order
+export interface OrderWaiter {
+  id: string
+  fullName: string
+}
+
+// Customer info in order
+export interface OrderCustomer {
+  id: string
+  fullName: string
+  email?: string
+}
+
+// Main Order interface (matching actual backend response)
 export interface Order {
   id: string
   orderNumber: string
@@ -67,7 +76,10 @@ export interface Order {
   priority: OrderPriority
   paymentStatus: PaymentStatus
   table: OrderTable
+  waiter?: OrderWaiter
+  customer?: OrderCustomer
   items: OrderItem[]
+  itemCount: number
   subtotal: number
   taxAmount: number
   discountAmount: number
@@ -91,12 +103,15 @@ export interface OrderQueryParams {
   sort_order?: 'asc' | 'desc'
 }
 
-// API Response Types
+// API Response Types - matching actual backend structure
 export interface OrderListResponse {
   success: boolean
-  data: {
-    orders: Order[]
-    pagination: PaginationMeta
+  data: Order[] // Direct array, not nested
+  meta: {
+    page: number
+    limit: number
+    total: number
+    totalPages: number
   }
 }
 
@@ -109,15 +124,11 @@ export interface OrderResponse {
 export interface OrderStatsResponse {
   success: boolean
   data: {
-    pending: number
-    accepted: number
-    preparing: number
-    ready: number
-    served: number
-    completed: number
-    cancelled: number
-    totalToday: number
-    revenueToday: number
+    totalOrders: number
+    pendingOrders: number
+    inProgressOrders: number
+    completedToday: number
+    todayRevenue: number
   }
 }
 
@@ -130,3 +141,103 @@ export interface UpdateOrderStatusPayload {
 export interface UpdateOrderItemStatusPayload {
   status: string
 }
+
+// ============================================
+// Order Detail Types (for GET /orders/:id)
+// ============================================
+
+// Order Item with full details for detail page
+export interface OrderDetailItem {
+  id: string
+  menuItem: {
+    id: string
+    name: string
+    description?: string
+    image?: string
+  }
+  quantity: number
+  unitPrice: number
+  modifiersTotal: number
+  subtotal: number
+  status: string
+  specialInstructions?: string
+  modifiers: Array<{
+    id: string
+    name: string
+    priceAdjustment: number
+  }>
+  preparationStartedAt?: string
+  preparationCompletedAt?: string
+  servedAt?: string
+  createdAt: string
+}
+
+// Status history entry
+export interface StatusHistoryEntry {
+  id: string
+  fromStatus?: string
+  toStatus: string
+  notes?: string
+  user?: {
+    id: string
+    fullName: string
+  }
+  createdAt: string
+}
+
+// Payment record
+export interface PaymentRecord {
+  id: string
+  status: string
+  method?: string
+  amount: number
+  currency?: string
+  transactionId?: string
+  paidAt?: string
+  refundedAt?: string
+  refundAmount?: number
+  createdAt: string
+}
+
+// Full Order Detail (for detail page)
+export interface OrderDetail {
+  id: string
+  orderNumber: string
+  status: OrderStatus
+  priority: OrderPriority
+  paymentStatus: PaymentStatus
+  table: OrderTable
+  tableSession?: {
+    id: string
+    startedAt: string
+    status: string
+  }
+  waiter?: OrderWaiter
+  customer?: {
+    id: string
+    fullName: string
+    email?: string
+    phone?: string
+  }
+  items: OrderDetailItem[]
+  subtotal: number
+  taxAmount: number
+  discountAmount: number
+  totalAmount: number
+  specialInstructions?: string
+  rejectionReason?: string
+  acceptedAt?: string
+  completedAt?: string
+  statusHistory: StatusHistoryEntry[]
+  payments: PaymentRecord[]
+  createdAt: string
+  updatedAt: string
+}
+
+// API Response for order detail
+export interface OrderDetailResponse {
+  success: boolean
+  message?: string
+  data: OrderDetail
+}
+

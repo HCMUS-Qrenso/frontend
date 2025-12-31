@@ -7,29 +7,9 @@ import { Copy, CreditCard, Check } from 'lucide-react'
 import { useState } from 'react'
 import { format } from 'date-fns'
 import { vi } from 'date-fns/locale'
+import type { PaymentRecord } from '../types/orders'
 
-// Mock data
-const MOCK_PAYMENT: {
-  status: string
-  payment_method: string
-  amount: number
-  currency: string
-  transaction_id: string
-  paid_at: Date | null
-  refunded_at: Date | null
-  refund_amount: number | null
-} = {
-  status: 'completed',
-  payment_method: 'momo',
-  amount: 285000,
-  currency: 'VND',
-  transaction_id: 'TXN-20240118-ABC123',
-  paid_at: new Date(Date.now() - 5 * 60 * 1000),
-  refunded_at: null,
-  refund_amount: null,
-}
-
-const PAYMENT_STATUS_CONFIG = {
+const PAYMENT_STATUS_CONFIG: Record<string, { label: string; color: string }> = {
   pending: {
     label: 'Chưa thanh toán',
     color: 'bg-slate-100 text-slate-700 dark:bg-slate-500/10 dark:text-slate-400',
@@ -62,17 +42,24 @@ const PAYMENT_METHOD_LABELS: Record<string, string> = {
 }
 
 interface PaymentCardProps {
-  orderId: string
+  payments: PaymentRecord[]
+  totalAmount: number
 }
 
-export function PaymentCard({ orderId }: PaymentCardProps) {
+export function PaymentCard({ payments, totalAmount }: PaymentCardProps) {
   const [copied, setCopied] = useState(false)
-  const payment = MOCK_PAYMENT
+  
+  // Get the most recent completed payment, or first payment
+  const payment = payments.find(p => p.status === 'completed') || payments[0]
+  const hasPayment = payments.length > 0 && payment
+  const paymentStatus = hasPayment ? payment.status : 'pending'
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(payment.transaction_id)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
+    if (payment?.transactionId) {
+      navigator.clipboard.writeText(payment.transactionId)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    }
   }
 
   return (
@@ -82,10 +69,10 @@ export function PaymentCard({ orderId }: PaymentCardProps) {
         <Badge
           className={cn(
             'text-xs font-medium',
-            PAYMENT_STATUS_CONFIG[payment.status as keyof typeof PAYMENT_STATUS_CONFIG]?.color,
+            PAYMENT_STATUS_CONFIG[paymentStatus]?.color,
           )}
         >
-          {PAYMENT_STATUS_CONFIG[payment.status as keyof typeof PAYMENT_STATUS_CONFIG]?.label}
+          {PAYMENT_STATUS_CONFIG[paymentStatus]?.label || paymentStatus}
         </Badge>
       </div>
 
@@ -98,7 +85,9 @@ export function PaymentCard({ orderId }: PaymentCardProps) {
           <div className="flex-1">
             <p className="text-sm text-slate-500 dark:text-slate-400">Phương thức</p>
             <p className="font-medium text-slate-900 dark:text-white">
-              {PAYMENT_METHOD_LABELS[payment.payment_method] || payment.payment_method}
+              {hasPayment && payment.method
+                ? PAYMENT_METHOD_LABELS[payment.method] || payment.method
+                : 'Chưa xác định'}
             </p>
           </div>
         </div>
@@ -110,48 +99,50 @@ export function PaymentCard({ orderId }: PaymentCardProps) {
         <div className="flex items-center justify-between">
           <p className="text-sm text-slate-500 dark:text-slate-400">Tổng tiền</p>
           <p className="text-xl font-bold text-slate-900 dark:text-white">
-            {payment.amount.toLocaleString('vi-VN')} {payment.currency}
+            {totalAmount.toLocaleString('vi-VN')} VND
           </p>
         </div>
 
         {/* Transaction ID */}
-        <div className="space-y-1">
-          <p className="text-sm text-slate-500 dark:text-slate-400">Mã giao dịch</p>
-          <div className="flex items-center gap-2">
-            <p className="flex-1 font-mono text-sm text-slate-900 dark:text-white">
-              {payment.transaction_id}
-            </p>
-            <Button variant="ghost" size="sm" onClick={handleCopy}>
-              {copied ? (
-                <Check className="h-4 w-4 text-emerald-600" />
-              ) : (
-                <Copy className="h-4 w-4" />
-              )}
-            </Button>
+        {hasPayment && payment.transactionId && (
+          <div className="space-y-1">
+            <p className="text-sm text-slate-500 dark:text-slate-400">Mã giao dịch</p>
+            <div className="flex items-center gap-2">
+              <p className="flex-1 font-mono text-sm text-slate-900 dark:text-white">
+                {payment.transactionId}
+              </p>
+              <Button variant="ghost" size="sm" onClick={handleCopy}>
+                {copied ? (
+                  <Check className="h-4 w-4 text-emerald-600" />
+                ) : (
+                  <Copy className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Paid At */}
-        {payment.paid_at && (
+        {hasPayment && payment.paidAt && (
           <div className="space-y-1">
             <p className="text-sm text-slate-500 dark:text-slate-400">Thời gian thanh toán</p>
             <p className="text-sm text-slate-900 dark:text-white">
-              {format(payment.paid_at, 'HH:mm, dd/MM/yyyy', { locale: vi })}
+              {format(new Date(payment.paidAt), 'HH:mm, dd/MM/yyyy', { locale: vi })}
             </p>
           </div>
         )}
 
         {/* Refund Info */}
-        {payment.refunded_at && payment.refund_amount && (
+        {hasPayment && payment.refundedAt && payment.refundAmount && (
           <>
             <div className="border-t border-slate-200 dark:border-slate-700" />
             <div className="rounded-lg bg-amber-50 p-3 dark:bg-amber-500/10">
               <p className="text-sm font-medium text-amber-900 dark:text-amber-400">Đã hoàn tiền</p>
               <p className="mt-1 text-sm text-amber-700 dark:text-amber-300">
-                Số tiền: {payment.refund_amount.toLocaleString('vi-VN')} {payment.currency}
+                Số tiền: {payment.refundAmount.toLocaleString('vi-VN')} VND
               </p>
               <p className="text-xs text-amber-600 dark:text-amber-400">
-                {format(payment.refunded_at, 'HH:mm, dd/MM/yyyy', { locale: vi })}
+                {format(new Date(payment.refundedAt), 'HH:mm, dd/MM/yyyy', { locale: vi })}
               </p>
             </div>
           </>
