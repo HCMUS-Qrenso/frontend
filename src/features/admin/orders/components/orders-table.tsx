@@ -161,6 +161,9 @@ export function OrdersTable() {
   // Update status mutation
   const updateStatusMutation = useUpdateOrderStatusMutation()
 
+  // NOTE: WebSocket connection is managed by OrdersFilterToolbar with auto-refresh toggle
+  // The socket invalidates queries automatically, so this table will update in real-time
+
   const handleBumpStatus = (orderId: string) => {
     const order = orders.find((o: Order) => o.id === orderId)
     if (!order) return

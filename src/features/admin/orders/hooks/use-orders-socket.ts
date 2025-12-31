@@ -5,7 +5,7 @@
 
 import { useEffect, useCallback, useRef, useState } from 'react'
 import { io, Socket } from 'socket.io-client'
-import { useQueryClient } from '@tanstack/react-query'
+import { useQueryClient, QueryClient } from '@tanstack/react-query'
 import { ordersQueryKeys } from '../queries/orders.keys'
 import { useAuthStore } from '@/src/store/auth-store'
 import { toast } from 'sonner'
@@ -74,6 +74,16 @@ export function useOrdersSocket(
   const queryClient = useQueryClient()
   const accessToken = useAuthStore((state) => state.accessToken)
 
+  // Use refs and keep callbacks stable to avoid dependency changes causing reconnect loops
+  const queryClientRef = useRef<QueryClient>(queryClient)
+  const showNotificationsRef = useRef(showNotifications)
+
+  // Update refs when values change (without causing re-renders)
+  useEffect(() => {
+    queryClientRef.current = queryClient
+    showNotificationsRef.current = showNotifications
+  }, [queryClient, showNotifications])
+
   const connect = useCallback(() => {
     // Don't connect if disabled or no token
     if (!enabled || !accessToken) {
@@ -85,8 +95,11 @@ export function useOrdersSocket(
       return
     }
 
+    console.log('[AdminSocket] Connecting to', WS_URL + WS_NAMESPACE)
+
     const socket = io(WS_URL + WS_NAMESPACE, {
-      auth: { token: accessToken },
+      // Backend checks client.handshake.query.accessToken, not auth
+      query: { accessToken },
       transports: ['websocket', 'polling'],
       reconnection: true,
       reconnectionAttempts: 5,
@@ -94,20 +107,26 @@ export function useOrdersSocket(
     })
 
     socket.on('connect', () => {
-      console.log('[AdminSocket] Connected')
+      console.log('[AdminSocket] Connected, socket.id=', socket.id)
       setIsConnected(true)
     })
 
-    socket.on('disconnect', () => {
+    socket.on('disconnect', (reason) => {
+      console.log('[AdminSocket] Disconnected:', reason)
       setIsConnected(false)
+    })
+
+    socket.on('connect_error', (error) => {
+      console.error('[AdminSocket] Connection error:', error.message)
     })
 
     // New order created
     socket.on('order:created', (event: OrderEvent) => {
-      queryClient.invalidateQueries({ queryKey: ordersQueryKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: ordersQueryKeys.stats() })
+      console.log('[AdminSocket] Order created:', event.data.orderNumber)
+      queryClientRef.current.invalidateQueries({ queryKey: ordersQueryKeys.lists() })
+      queryClientRef.current.invalidateQueries({ queryKey: ordersQueryKeys.stats() })
 
-      if (showNotifications) {
+      if (showNotificationsRef.current) {
         toast.success(`Đơn hàng mới: ${event.data.orderNumber}`, {
           description: `Bàn ${event.data.table?.tableNumber || 'N/A'}`,
           duration: 5000,
@@ -117,20 +136,22 @@ export function useOrdersSocket(
 
     // Order updated
     socket.on('order:updated', (event: OrderEvent) => {
-      queryClient.invalidateQueries({ queryKey: ordersQueryKeys.lists() })
-      queryClient.invalidateQueries({
+      console.log('[AdminSocket] Order updated:', event.data.orderNumber)
+      queryClientRef.current.invalidateQueries({ queryKey: ordersQueryKeys.lists() })
+      queryClientRef.current.invalidateQueries({
         queryKey: ordersQueryKeys.detail(event.data.id),
       })
     })
 
     // Items added to order
     socket.on('order:items:added', (event: OrderEvent) => {
-      queryClient.invalidateQueries({ queryKey: ordersQueryKeys.lists() })
-      queryClient.invalidateQueries({
+      console.log('[AdminSocket] Items added:', event.data.orderNumber)
+      queryClientRef.current.invalidateQueries({ queryKey: ordersQueryKeys.lists() })
+      queryClientRef.current.invalidateQueries({
         queryKey: ordersQueryKeys.detail(event.data.id),
       })
 
-      if (showNotifications) {
+      if (showNotificationsRef.current) {
         toast.info(`Thêm món vào đơn: ${event.data.orderNumber}`, {
           duration: 3000,
         })
@@ -139,11 +160,12 @@ export function useOrdersSocket(
 
     // Item ready notification
     socket.on('item:ready', (event: ItemStatusEvent) => {
-      queryClient.invalidateQueries({
+      console.log('[AdminSocket] Item ready:', event.data.itemName)
+      queryClientRef.current.invalidateQueries({
         queryKey: ordersQueryKeys.detail(event.data.orderId),
       })
 
-      if (showNotifications) {
+      if (showNotificationsRef.current) {
         toast.success(`Món sẵn sàng: ${event.data.itemName}`, {
           duration: 4000,
         })
@@ -151,10 +173,11 @@ export function useOrdersSocket(
     })
 
     socketRef.current = socket
-  }, [enabled, accessToken, queryClient, showNotifications])
+  }, [enabled, accessToken])
 
   const disconnect = useCallback(() => {
     if (socketRef.current) {
+      console.log('[AdminSocket] Disconnecting')
       socketRef.current.disconnect()
       socketRef.current = null
       setIsConnected(false)
@@ -166,10 +189,15 @@ export function useOrdersSocket(
     setTimeout(connect, 100)
   }, [disconnect, connect])
 
+  // Connect on mount, disconnect on unmount
+  // Only re-run when enabled or accessToken changes
   useEffect(() => {
     connect()
-    return disconnect
-  }, [connect, disconnect])
+    return () => {
+      disconnect()
+    }
+  }, [enabled, accessToken])
 
   return { isConnected, disconnect, reconnect }
 }
+
