@@ -216,10 +216,7 @@ export function TablesListTable({
               </TableRow>
             ) : (
               tables.map((table, index) => (
-                <AdminTableRow
-                  key={table.id}
-                  isLast={index === tables.length - 1}
-                >
+                <AdminTableRow key={table.id} isLast={index === tables.length - 1}>
                   <TableCell className="px-6 py-4">
                     <div>
                       <p className="text-sm font-medium text-slate-900 dark:text-white">

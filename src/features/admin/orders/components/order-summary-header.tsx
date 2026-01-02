@@ -145,20 +145,12 @@ export function OrderSummaryHeader({ order }: OrderSummaryHeaderProps) {
 
               {/* Meta Chips */}
               <div className="flex flex-wrap items-center gap-2">
-                <Badge
-                  className={cn(
-                    'text-xs font-medium',
-                    STATUS_CONFIG[order.status]?.color,
-                  )}
-                >
+                <Badge className={cn('text-xs font-medium', STATUS_CONFIG[order.status]?.color)}>
                   {STATUS_CONFIG[order.status]?.label || order.status}
                 </Badge>
 
                 <Badge
-                  className={cn(
-                    'text-xs font-medium',
-                    PRIORITY_CONFIG[order.priority]?.color,
-                  )}
+                  className={cn('text-xs font-medium', PRIORITY_CONFIG[order.priority]?.color)}
                 >
                   {PRIORITY_CONFIG[order.priority]?.label || order.priority}
                 </Badge>

@@ -48,9 +48,9 @@ interface PaymentCardProps {
 
 export function PaymentCard({ payments, totalAmount }: PaymentCardProps) {
   const [copied, setCopied] = useState(false)
-  
+
   // Get the most recent completed payment, or first payment
-  const payment = payments.find(p => p.status === 'completed') || payments[0]
+  const payment = payments.find((p) => p.status === 'completed') || payments[0]
   const hasPayment = payments.length > 0 && payment
   const paymentStatus = hasPayment ? payment.status : 'pending'
 
@@ -66,12 +66,7 @@ export function PaymentCard({ payments, totalAmount }: PaymentCardProps) {
     <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Thanh toán</h2>
-        <Badge
-          className={cn(
-            'text-xs font-medium',
-            PAYMENT_STATUS_CONFIG[paymentStatus]?.color,
-          )}
-        >
+        <Badge className={cn('text-xs font-medium', PAYMENT_STATUS_CONFIG[paymentStatus]?.color)}>
           {PAYMENT_STATUS_CONFIG[paymentStatus]?.label || paymentStatus}
         </Badge>
       </div>

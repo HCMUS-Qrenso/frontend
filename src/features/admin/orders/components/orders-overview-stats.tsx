@@ -20,7 +20,7 @@ export function OrdersOverviewStats() {
             <div className="flex items-center gap-4">
               <Skeleton className="h-12 w-12 rounded-xl" />
               <div className="flex-1">
-                <Skeleton className="h-4 w-20 mb-2" />
+                <Skeleton className="mb-2 h-4 w-20" />
                 <Skeleton className="h-6 w-12" />
               </div>
             </div>
@@ -66,9 +66,9 @@ export function OrdersOverviewStats() {
     {
       icon: CreditCard,
       title: 'Doanh thu hôm nay',
-      value: stats?.todayRevenue 
-        ? stats.todayRevenue >= 1000000 
-          ? `${(stats.todayRevenue / 1000000).toFixed(1)}M` 
+      value: stats?.todayRevenue
+        ? stats.todayRevenue >= 1000000
+          ? `${(stats.todayRevenue / 1000000).toFixed(1)}M`
           : `${(stats.todayRevenue / 1000).toFixed(0)}K`
         : '0',
       subtext: 'VND',

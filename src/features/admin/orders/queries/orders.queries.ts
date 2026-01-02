@@ -77,13 +77,15 @@ export const useOrderStatsQuery = (enabled = true) => {
 export const useUpdateOrderStatusMutation = () => {
   const queryClient = useQueryClient()
 
-  return useMutation<OrderDetailResponse, Error, { id: string; payload: UpdateOrderStatusPayload }>({
-    mutationFn: ({ id, payload }) => ordersApi.updateOrderStatus(id, payload),
-    onSuccess: (_, { id }) => {
-      // Invalidate order list and detail queries
-      queryClient.invalidateQueries({ queryKey: ordersQueryKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: ordersQueryKeys.detail(id) })
-      queryClient.invalidateQueries({ queryKey: ordersQueryKeys.stats() })
+  return useMutation<OrderDetailResponse, Error, { id: string; payload: UpdateOrderStatusPayload }>(
+    {
+      mutationFn: ({ id, payload }) => ordersApi.updateOrderStatus(id, payload),
+      onSuccess: (_, { id }) => {
+        // Invalidate order list and detail queries
+        queryClient.invalidateQueries({ queryKey: ordersQueryKeys.lists() })
+        queryClient.invalidateQueries({ queryKey: ordersQueryKeys.detail(id) })
+        queryClient.invalidateQueries({ queryKey: ordersQueryKeys.stats() })
+      },
     },
-  })
+  )
 }

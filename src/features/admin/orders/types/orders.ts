@@ -240,4 +240,3 @@ export interface OrderDetailResponse {
   message?: string
   data: OrderDetail
 }
-

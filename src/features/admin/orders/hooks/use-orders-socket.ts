@@ -64,9 +64,7 @@ export interface UseOrdersSocketReturn {
 // Hook
 // ============================================
 
-export function useOrdersSocket(
-  options: UseOrdersSocketOptions = {}
-): UseOrdersSocketReturn {
+export function useOrdersSocket(options: UseOrdersSocketOptions = {}): UseOrdersSocketReturn {
   const { enabled = true, showNotifications = true } = options
 
   const socketRef = useRef<Socket | null>(null)
@@ -200,4 +198,3 @@ export function useOrdersSocket(
 
   return { isConnected, disconnect, reconnect }
 }
-

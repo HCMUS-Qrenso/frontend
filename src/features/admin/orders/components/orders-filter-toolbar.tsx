@@ -54,7 +54,7 @@ export function OrdersFilterToolbar() {
   const { data: zonesData } = useZonesSimpleQuery()
 
   // Fetch tables for filter dropdown (filtered by zone if selected)
-  const { data: tablesData } = useTablesQuery({ 
+  const { data: tablesData } = useTablesQuery({
     limit: 100,
     ...(zoneId !== 'all' && { zone_id: zoneId }),
   })
@@ -62,7 +62,7 @@ export function OrdersFilterToolbar() {
   // Build zone options from API data
   const zoneOptions = useMemo((): FilterOption[] => {
     const options: FilterOption[] = [{ value: 'all', label: 'Tất cả' }]
-    
+
     if (zonesData?.zones) {
       zonesData.zones.forEach((zone) => {
         options.push({
@@ -71,14 +71,14 @@ export function OrdersFilterToolbar() {
         })
       })
     }
-    
+
     return options
   }, [zonesData])
 
   // Build table options from API data
   const tableOptions = useMemo((): FilterOption[] => {
     const options: FilterOption[] = [{ value: 'all', label: 'Tất cả' }]
-    
+
     if (tablesData?.data?.tables) {
       tablesData.data.tables.forEach((table) => {
         options.push({
@@ -87,7 +87,7 @@ export function OrdersFilterToolbar() {
         })
       })
     }
-    
+
     return options
   }, [tablesData])
 

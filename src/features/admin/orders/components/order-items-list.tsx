@@ -131,16 +131,20 @@ export function OrderItemsList({ items, orderId }: OrderItemsListProps) {
                   <div className="ml-11 flex flex-wrap items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
                     {item.preparationStartedAt && (
                       <span>
-                        Bắt đầu: {format(new Date(item.preparationStartedAt), 'HH:mm', { locale: vi })}
+                        Bắt đầu:{' '}
+                        {format(new Date(item.preparationStartedAt), 'HH:mm', { locale: vi })}
                       </span>
                     )}
                     {item.preparationCompletedAt && (
                       <span>
-                        Xong: {format(new Date(item.preparationCompletedAt), 'HH:mm', { locale: vi })}
+                        Xong:{' '}
+                        {format(new Date(item.preparationCompletedAt), 'HH:mm', { locale: vi })}
                       </span>
                     )}
                     {item.servedAt && (
-                      <span>Phục vụ: {format(new Date(item.servedAt), 'HH:mm', { locale: vi })}</span>
+                      <span>
+                        Phục vụ: {format(new Date(item.servedAt), 'HH:mm', { locale: vi })}
+                      </span>
                     )}
                   </div>
                 </div>
@@ -163,12 +167,7 @@ export function OrderItemsList({ items, orderId }: OrderItemsListProps) {
                   </div>
 
                   {/* Status Badge */}
-                  <Badge
-                    className={cn(
-                      'gap-1 text-xs font-medium',
-                      statusConfig?.color,
-                    )}
-                  >
+                  <Badge className={cn('gap-1 text-xs font-medium', statusConfig?.color)}>
                     {StatusIcon && <StatusIcon className="h-3 w-3" />}
                     {statusConfig?.label || item.status}
                   </Badge>

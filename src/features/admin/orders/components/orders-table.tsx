@@ -112,12 +112,12 @@ export function OrdersTable() {
 
   // Build query params from URL
   const timeRange = searchParams.get('timeRange') || 'all'
-  
+
   // Calculate date_from and date_to based on timeRange
   const getDateRange = (range: string) => {
     const now = new Date()
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
-    
+
     switch (range) {
       case 'today':
         return {
@@ -140,13 +140,16 @@ export function OrdersTable() {
         return {}
     }
   }
-  
+
   const dateRange = getDateRange(timeRange)
-  
+
   const queryParams = {
     page: Number(searchParams.get('page')) || 1,
     limit: 10,
-    status: searchParams.get('status') !== 'all' ? (searchParams.get('status') as OrderStatus) : undefined,
+    status:
+      searchParams.get('status') !== 'all'
+        ? (searchParams.get('status') as OrderStatus)
+        : undefined,
     search: searchParams.get('q') || undefined,
     zone_id: searchParams.get('zoneId') || undefined,
     table_id: searchParams.get('tableId') || undefined,
@@ -202,9 +205,15 @@ export function OrdersTable() {
                 <AdminTableHead className="px-4">Món</AdminTableHead>
                 <AdminTableHead className="px-4">Trạng thái</AdminTableHead>
                 <AdminTableHead className="px-4">Thanh toán</AdminTableHead>
-                <AdminTableHead className="px-4" align="right">Tổng tiền</AdminTableHead>
-                <AdminTableHead className="px-4" align="center">Thời gian</AdminTableHead>
-                <AdminTableHead className="px-4" align="right">Thao tác</AdminTableHead>
+                <AdminTableHead className="px-4" align="right">
+                  Tổng tiền
+                </AdminTableHead>
+                <AdminTableHead className="px-4" align="center">
+                  Thời gian
+                </AdminTableHead>
+                <AdminTableHead className="px-4" align="right">
+                  Thao tác
+                </AdminTableHead>
               </AdminTableHeaderRow>
             </TableHeader>
             <TableBody>
@@ -240,9 +249,15 @@ export function OrdersTable() {
               <AdminTableHead className="px-4">Món</AdminTableHead>
               <AdminTableHead className="px-4">Trạng thái</AdminTableHead>
               <AdminTableHead className="px-4">Thanh toán</AdminTableHead>
-              <AdminTableHead className="px-4" align="right">Tổng tiền</AdminTableHead>
-              <AdminTableHead className="px-4" align="center">Thời gian</AdminTableHead>
-              <AdminTableHead className="px-4" align="right">Thao tác</AdminTableHead>
+              <AdminTableHead className="px-4" align="right">
+                Tổng tiền
+              </AdminTableHead>
+              <AdminTableHead className="px-4" align="center">
+                Thời gian
+              </AdminTableHead>
+              <AdminTableHead className="px-4" align="right">
+                Thao tác
+              </AdminTableHead>
             </AdminTableHeaderRow>
           </TableHeader>
           <TableBody>
@@ -274,7 +289,10 @@ export function OrdersTable() {
                           {order.orderNumber}
                         </p>
                         <p className="text-xs text-slate-500 dark:text-slate-400">
-                          {formatDistanceToNow(new Date(order.createdAt), { addSuffix: true, locale: vi })}
+                          {formatDistanceToNow(new Date(order.createdAt), {
+                            addSuffix: true,
+                            locale: vi,
+                          })}
                         </p>
                       </div>
                     </TableCell>
@@ -283,7 +301,9 @@ export function OrdersTable() {
                         <p className="text-sm font-medium text-slate-900 dark:text-white">
                           Bàn {order.table?.tableNumber || 'N/A'}
                         </p>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">{order.table?.zone?.name || ''}</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">
+                          {order.table?.zone?.name || ''}
+                        </p>
                       </div>
                     </TableCell>
                     <TableCell className="px-4 py-4">

@@ -97,11 +97,7 @@ function TableCaption({ className, ...props }: React.ComponentProps<'caption'>) 
 /**
  * Container wrapper for admin tables with rounded borders and shadow
  */
-function AdminTableContainer({
-  className,
-  children,
-  ...props
-}: React.ComponentProps<'div'>) {
+function AdminTableContainer({ className, children, ...props }: React.ComponentProps<'div'>) {
   return (
     <div
       className={cn(
@@ -118,10 +114,7 @@ function AdminTableContainer({
 /**
  * Header row with admin styling (slate background, no hover change)
  */
-function AdminTableHeaderRow({
-  className,
-  ...props
-}: React.ComponentProps<'tr'>) {
+function AdminTableHeaderRow({ className, ...props }: React.ComponentProps<'tr'>) {
   return (
     <tr
       data-slot="table-row"
@@ -141,11 +134,7 @@ interface AdminTableHeadProps extends React.ComponentProps<'th'> {
 /**
  * Table header cell with admin styling (uppercase, tracking-wide)
  */
-function AdminTableHead({
-  className,
-  align = 'left',
-  ...props
-}: AdminTableHeadProps) {
+function AdminTableHead({ className, align = 'left', ...props }: AdminTableHeadProps) {
   return (
     <th
       data-slot="table-head"
@@ -168,11 +157,7 @@ interface AdminTableRowProps extends React.ComponentProps<'tr'> {
 /**
  * Data row with admin styling (hover state, border)
  */
-function AdminTableRow({
-  className,
-  isLast = false,
-  ...props
-}: AdminTableRowProps) {
+function AdminTableRow({ className, isLast = false, ...props }: AdminTableRowProps) {
   return (
     <tr
       data-slot="table-row"

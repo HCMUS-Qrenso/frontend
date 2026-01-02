@@ -323,7 +323,8 @@ const MenuPDFDocument = ({
     const itemsPerPage = maxItemsPerPage
 
     switch (templateId) {
-      case '1': { // Minimal A4 2-Column
+      case '1': {
+        // Minimal A4 2-Column
         // Create multiple pages
         const pages = []
 
@@ -526,7 +527,8 @@ const MenuPDFDocument = ({
         return pages
       }
 
-      case '2': { // Photo-Forward Premium
+      case '2': {
+        // Photo-Forward Premium
         // Create multiple pages
         const pages = []
 
@@ -674,7 +676,8 @@ const MenuPDFDocument = ({
         return pages
       }
 
-      case '3': { // Chalkboard Dark
+      case '3': {
+        // Chalkboard Dark
         // Create multiple pages
         const pages = []
 
@@ -789,7 +792,8 @@ const MenuPDFDocument = ({
         return pages
       }
 
-      case '4': { // Tri-Fold Classic - Horizontal A4 with separators
+      case '4': {
+        // Tri-Fold Classic - Horizontal A4 with separators
         const categoriesArray = Object.entries(menuItemsByCategory)
 
         // Distribute categories into 3 columns, balancing total items

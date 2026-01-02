@@ -100,11 +100,19 @@ export function MenuItemsTable({ onEditClick, onDeleteClick }: MenuItemsTablePro
               <AdminTableHeaderRow>
                 <AdminTableHead className="min-w-50 px-2 md:px-4">Món ăn</AdminTableHead>
                 <AdminTableHead className="w-24 px-2 md:w-32 md:px-4">Danh mục</AdminTableHead>
-                <AdminTableHead className="w-20 px-2 md:w-28 md:px-4" align="right">Giá</AdminTableHead>
-                <AdminTableHead className="w-24 px-2 md:w-28 md:px-4" align="center">Trạng thái</AdminTableHead>
-                <AdminTableHead className="w-16 px-2 md:w-20 md:px-4" align="center">Phổ biến</AdminTableHead>
+                <AdminTableHead className="w-20 px-2 md:w-28 md:px-4" align="right">
+                  Giá
+                </AdminTableHead>
+                <AdminTableHead className="w-24 px-2 md:w-28 md:px-4" align="center">
+                  Trạng thái
+                </AdminTableHead>
+                <AdminTableHead className="w-16 px-2 md:w-20 md:px-4" align="center">
+                  Phổ biến
+                </AdminTableHead>
                 <AdminTableHead className="w-20 px-2 md:w-24 md:px-4">Cập nhật</AdminTableHead>
-                <AdminTableHead className="w-20 px-2 md:px-4" align="right">Thao tác</AdminTableHead>
+                <AdminTableHead className="w-20 px-2 md:px-4" align="right">
+                  Thao tác
+                </AdminTableHead>
               </AdminTableHeaderRow>
             </TableHeader>
             <TableBody>
@@ -145,11 +153,19 @@ export function MenuItemsTable({ onEditClick, onDeleteClick }: MenuItemsTablePro
             <AdminTableHeaderRow>
               <AdminTableHead className="min-w-50 px-2 md:px-4">Món ăn</AdminTableHead>
               <AdminTableHead className="w-24 px-2 md:w-32 md:px-4">Danh mục</AdminTableHead>
-              <AdminTableHead className="w-20 px-2 md:w-28 md:px-4" align="right">Giá</AdminTableHead>
-              <AdminTableHead className="w-24 px-2 md:w-28 md:px-4" align="center">Trạng thái</AdminTableHead>
-              <AdminTableHead className="w-16 px-2 md:w-20 md:px-4" align="center">Phổ biến</AdminTableHead>
+              <AdminTableHead className="w-20 px-2 md:w-28 md:px-4" align="right">
+                Giá
+              </AdminTableHead>
+              <AdminTableHead className="w-24 px-2 md:w-28 md:px-4" align="center">
+                Trạng thái
+              </AdminTableHead>
+              <AdminTableHead className="w-16 px-2 md:w-20 md:px-4" align="center">
+                Phổ biến
+              </AdminTableHead>
               <AdminTableHead className="w-20 px-2 md:w-24 md:px-4">Cập nhật</AdminTableHead>
-              <AdminTableHead className="w-20 px-2 md:px-4" align="right">Thao tác</AdminTableHead>
+              <AdminTableHead className="w-20 px-2 md:px-4" align="right">
+                Thao tác
+              </AdminTableHead>
             </AdminTableHeaderRow>
           </TableHeader>
           <TableBody>

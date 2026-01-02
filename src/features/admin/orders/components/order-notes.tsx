@@ -25,9 +25,7 @@ export function OrderNotes({ specialInstructions, rejectionReason }: OrderNotesP
               <h3 className="mb-1 font-semibold text-slate-900 dark:text-white">
                 Ghi chú đơn hàng
               </h3>
-              <p className="text-sm text-slate-600 dark:text-slate-400">
-                {specialInstructions}
-              </p>
+              <p className="text-sm text-slate-600 dark:text-slate-400">{specialInstructions}</p>
             </div>
           </div>
         </div>
