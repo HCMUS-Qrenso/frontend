@@ -241,7 +241,7 @@ export function TablesListTable({
                   <TableCell className="px-6 py-4">
                     {table.current_order ? (
                       <p className="max-w-45 truncate text-sm font-medium text-emerald-600 dark:text-emerald-400">
-                        {table.current_order}
+                        {table.current_order.order_number}
                       </p>
                     ) : (
                       <span className="text-sm text-slate-400">—</span>
