@@ -227,6 +227,14 @@ export function AdminLayout({ children }: AdminLayoutProps) {
       }
     }
 
+    // KDS
+    if (path === '/admin/kds' || path.startsWith('/admin/kds/')) {
+      return {
+        title: 'KDS - Global View',
+        description: 'Màn hình theo dõi và xử lý đơn bếp theo thời gian thực',
+      }
+    }
+
     // Fallback: dashboard-style default
     return {
       title: 'Bảng điều khiển',

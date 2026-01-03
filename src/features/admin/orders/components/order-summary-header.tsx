@@ -14,7 +14,6 @@ import {
   ArrowLeft,
   Copy,
   Printer,
-  FileDown,
   MoreVertical,
   AlertTriangle,
   Check,
@@ -167,21 +166,6 @@ export function OrderSummaryHeader({ order }: OrderSummaryHeaderProps) {
                 <Printer className="h-4 w-4" />
                 In bill
               </Button>
-
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="gap-2 bg-transparent">
-                    <FileDown className="h-4 w-4" />
-                    Xuất
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => handleExport('json')}>
-                    Xuất JSON
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleExport('pdf')}>Xuất PDF</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
 
               <Button
                 variant="default"

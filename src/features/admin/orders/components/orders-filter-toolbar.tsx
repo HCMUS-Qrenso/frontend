@@ -1,11 +1,9 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
-import { Button } from '@/src/components/ui/button'
 import { Switch } from '@/src/components/ui/switch'
 import { SearchInput } from '@/src/components/ui/search-input'
 import { FilterDropdown, type FilterOption } from '@/src/components/ui/filter-dropdown'
-import { Download } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { AdminFilterToolbarWrapper } from '../../shared/components/admin-filter-toolbar-wrapper'
 import { cn } from '@/src/lib/utils'
@@ -209,12 +207,6 @@ export function OrdersFilterToolbar() {
               title={isConnected ? 'Đã kết nối' : 'Mất kết nối'}
             />
           </div>
-
-          {/* Export Button */}
-          <Button variant="outline" className="h-8 gap-1 rounded-lg bg-transparent px-3">
-            <Download className="h-3 w-3" />
-            <span className="hidden text-sm sm:inline">Xuất báo cáo</span>
-          </Button>
         </div>
       </AdminFilterToolbarWrapper>
     </div>

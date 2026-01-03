@@ -2,6 +2,7 @@
 
 import { Suspense, use } from 'react'
 import { useOrderQuery } from '@/src/features/admin/orders/queries'
+import { useOrdersSocket } from '@/src/features/admin/orders/hooks'
 import { OrderSummaryHeader } from '@/src/features/admin/orders/components/order-summary-header'
 import { OrderItemsList } from '@/src/features/admin/orders/components/order-items-list'
 import { OrderNotes } from '@/src/features/admin/orders/components/order-notes'
@@ -36,6 +37,9 @@ function ErrorState() {
 function OrderDetailContent({ orderId }: { orderId: string }) {
   const { data, isLoading, error } = useOrderQuery(orderId)
   const order = data?.data
+
+  // Enable socket for real-time updates from KDS
+  useOrdersSocket({ enabled: true, showNotifications: true })
 
   if (isLoading) {
     return <LoadingState />
