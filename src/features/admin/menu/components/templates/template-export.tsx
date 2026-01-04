@@ -15,7 +15,7 @@ import {
 import { useCategoriesQuery, useMenuItemsQuery } from '../../queries'
 import { useCurrentTenantQuery } from '../../../tenants/queries/tenants.queries'
 import type { MenuItem, Template } from '../../types'
-import { generatePDFBlob } from './utils'
+import { generatePDFBlob, getMaxItemsPerPage } from './utils'
 import { useRouter } from 'next/navigation'
 import { ContainerLoadingState, ContainerErrorState } from '@/components/ui/loading-state'
 
@@ -73,6 +73,7 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
   const [isExporting, setIsExporting] = useState(false)
   const [activeTab, setActiveTab] = useState<'data' | 'style'>('data')
   const [fontSize, setFontSize] = useState<'small' | 'medium' | 'large'>('medium')
+  const [maxItemsPerPage, setMaxItemsPerPage] = useState(() => getMaxItemsPerPage(selectedTemplate || '1', 'medium'))
 
   // Fetch data
   const {
@@ -116,6 +117,11 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
     }
   }, [categories])
 
+  // Update maxItemsPerPage when template or font size changes
+  useEffect(() => {
+    setMaxItemsPerPage(getMaxItemsPerPage(selectedTemplate || '1', fontSize))
+  }, [selectedTemplate, fontSize])
+
   // Pan and zoom handlers
   const handleMouseDown = (e: React.MouseEvent) => {
     setIsDragging(true)
@@ -155,24 +161,6 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
     router.push(`/admin/menu/templates?id=${templateId}`)
   }
 
-  // Calculate approximate items per page based on template and font size
-  const getMaxItemsPerPage = (templateId: string, fontSize: 'small' | 'medium' | 'large') => {
-    const fontMultiplier = {
-      small: 1.2, // More items fit with smaller font
-      medium: 1,
-      large: 0.8, // Fewer items with larger font
-    }
-    const baseItems = {
-      '1': 20,
-      '2': 5,
-      '3': 13,
-      '4': 15,
-      default: 10,
-    }
-    const base = baseItems[templateId as keyof typeof baseItems] || baseItems.default
-    return Math.floor(base * fontMultiplier[fontSize])
-  }
-
   // Helper function to render menu content for preview
   const renderMenuContent = () => {
     const fontSizeClasses = {
@@ -201,8 +189,6 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
       rose: effectiveTheme === 'light' ? 'text-rose-600' : 'text-rose-400',
     }
     const categoryAccentClass = accentColorClasses[accentColor as keyof typeof accentColorClasses]
-
-    const maxItemsPerPage = getMaxItemsPerPage(selectedTemplate || '', fontSize)
 
     // Flatten all items for pagination
     const allItems = Object.entries(menuItemsByCategory).flatMap(([categoryId, items]) =>
@@ -278,7 +264,7 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
                 </p>
               </div>
             )}
-            <div className="mt-20 flex-1 pr-4">
+            <div className={cn("flex-1 pr-4", pageIndex === 0 ? "mt-20" : "")}>
               {columns[0].map(([categoryId, items]) => {
                 const category = categories.find((c) => c.id === categoryId)
                 if (!category) return null
@@ -337,7 +323,7 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
                 )
               })}
             </div>
-            <div className="mt-20 flex-1 pl-4">
+            <div className={cn("flex-1 pl-4", pageIndex === 0 ? "mt-20" : "")}>
               {columns[1].map(([categoryId, items]) => {
                 const category = categories.find((c) => c.id === categoryId)
                 if (!category) return null
@@ -1019,6 +1005,7 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
         selectedTemplate,
         fontSize,
         chefIcon,
+        maxItemsPerPage,
       )
 
       const url = URL.createObjectURL(pdfBlob)
@@ -1392,6 +1379,49 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
                     </label>
                   </div>
                 </div>
+
+                {/* Max Items Per Page */}
+                <div className="space-y-2">
+                  <p className="text-xs font-medium text-slate-700 dark:text-slate-300">
+                    {selectedTemplate !== '4' ? 'Số món tối đa mỗi trang' : 'Số món tối đa mỗi danh mục'}
+                  </p>
+                  <input
+                    type="number"
+                    min="1"
+                    max="100"
+                    value={maxItemsPerPage}
+                    onChange={(e) => setMaxItemsPerPage(parseInt(e.target.value) || 15)}
+                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+                  />
+                </div>
+
+                {/* Font Size */}
+                <div className="space-y-2">
+                  <p className="text-xs font-medium text-slate-700 dark:text-slate-300">
+                    Kích thước chữ
+                  </p>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { value: 'small', label: 'Nhỏ' },
+                      { value: 'medium', label: 'Trung bình' },
+                      { value: 'large', label: 'Lớn' },
+                    ].map((size) => (
+                      <button
+                        key={size.value}
+                        onClick={() => setFontSize(size.value as 'small' | 'medium' | 'large')}
+                        className={cn(
+                          'rounded-lg border-2 p-2 text-sm transition-all',
+                          fontSize === size.value
+                            ? 'border-emerald-500 bg-emerald-50 dark:border-emerald-600 dark:bg-emerald-500/10'
+                            : 'border-slate-200 dark:border-slate-700',
+                        )}
+                      >
+                        {size.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
                 {/* Chef Icon Selection */}
                 {displayOptions.showChefRecommendations && (
                   <div className="space-y-2">
@@ -1436,7 +1466,6 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
                     const allItems = Object.entries(menuItemsByCategory).flatMap(
                       ([categoryId, items]) => items.map((item) => ({ ...item, categoryId })),
                     )
-                    const maxItemsPerPage = getMaxItemsPerPage(selectedTemplate || '', fontSize)
                     return allItems.length <= maxItemsPerPage
                       ? 1
                       : Math.ceil(allItems.length / maxItemsPerPage)
