@@ -89,3 +89,25 @@ export const useUpdateOrderStatusMutation = () => {
     },
   )
 }
+
+/**
+ * Update order item status (mark as served)
+ * Backend auto-updates order status when all items are served
+ */
+export const useUpdateOrderItemStatusMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation<
+    { success: boolean; data: { id: string; status: string } },
+    Error,
+    { orderId: string; itemId: string; status: string }
+  >({
+    mutationFn: ({ orderId, itemId, status }) =>
+      ordersApi.updateItemStatus(orderId, itemId, status),
+    onSuccess: (_, { orderId }) => {
+      // Invalidate order detail to refresh items and potentially order status
+      queryClient.invalidateQueries({ queryKey: ordersQueryKeys.detail(orderId) })
+      queryClient.invalidateQueries({ queryKey: ordersQueryKeys.lists() })
+    },
+  })
+}

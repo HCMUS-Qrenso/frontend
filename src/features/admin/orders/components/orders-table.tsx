@@ -98,12 +98,11 @@ const PAYMENT_STATUS_CONFIG: Record<string, StatusConfig> = {
   },
 }
 
+// Waiter-only transitions - KDS handles accepted->in_progress->ready
 const NEXT_STATUS_MAP: Record<string, string> = {
-  pending: 'accepted',
-  accepted: 'in_progress',
-  in_progress: 'ready',
-  ready: 'served',
-  served: 'completed',
+  pending: 'accepted',    // Waiter accepts order
+  ready: 'served',        // Waiter serves ready items
+  served: 'completed',    // Waiter completes order
 }
 
 export function OrdersTable() {
@@ -311,8 +310,8 @@ export function OrdersTable() {
                         <p className="text-sm text-slate-700 dark:text-slate-300">
                           {order.items.length} món
                         </p>
-                        {/* Tooltip */}
-                        <div className="invisible absolute bottom-full left-0 z-10 mb-2 w-64 rounded-lg border border-slate-200 bg-white p-3 opacity-0 shadow-lg transition-all group-hover:visible group-hover:opacity-100 dark:border-slate-700 dark:bg-slate-800">
+                        {/* Tooltip - position below to avoid overflow clipping */}
+                        <div className="invisible absolute top-full left-0 z-50 mt-2 w-64 rounded-lg border border-slate-200 bg-white p-3 opacity-0 shadow-lg transition-all group-hover:visible group-hover:opacity-100 dark:border-slate-700 dark:bg-slate-800">
                           <p className="mb-2 text-xs font-semibold text-slate-900 dark:text-white">
                             Chi tiết món:
                           </p>

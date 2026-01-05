@@ -30,6 +30,32 @@ const STATUS_COLOR_MAP: Record<string, string> = {
   cancelled: 'bg-red-500',
 }
 
+// Vietnamese status labels
+const STATUS_LABEL_VI: Record<string, string> = {
+  pending: 'Chờ xử lý',
+  accepted: 'Đã nhận',
+  in_progress: 'Đang xử lý',
+  preparing: 'Đang chuẩn bị',
+  ready: 'Sẵn sàng',
+  served: 'Đã phục vụ',
+  completed: 'Hoàn thành',
+  rejected: 'Từ chối',
+  cancelled: 'Đã hủy',
+}
+
+// Localize notes that come from backend
+const localizeNotes = (notes: string | null): string | null => {
+  if (!notes) return null
+  const notesMap: Record<string, string> = {
+    'Order placed by customer': 'Đơn hàng được đặt bởi khách hàng',
+    'Order accepted': 'Đơn hàng đã được nhận',
+    'Order completed': 'Đơn hàng hoàn thành',
+    'Order cancelled': 'Đơn hàng đã hủy',
+    'Order rejected': 'Đơn hàng bị từ chối',
+  }
+  return notesMap[notes] || notes
+}
+
 interface OrderStatusTimelineProps {
   history: StatusHistoryEntry[]
 }
@@ -58,6 +84,13 @@ export function OrderStatusTimeline({ history }: OrderStatusTimelineProps) {
           const dotColor = STATUS_COLOR_MAP[entry.toStatus] || 'bg-slate-500'
           const isLast = idx === history.length - 1
 
+          // Get localized status labels
+          const fromLabel = entry.fromStatus
+            ? STATUS_LABEL_VI[entry.fromStatus] || entry.fromStatus
+            : null
+          const toLabel = STATUS_LABEL_VI[entry.toStatus] || entry.toStatus
+          const localizedNotes = localizeNotes(entry.notes ?? null)
+
           return (
             <div key={entry.id} className="relative">
               {/* Timeline Line */}
@@ -81,19 +114,19 @@ export function OrderStatusTimeline({ history }: OrderStatusTimelineProps) {
                 <div className="flex-1 pb-4">
                   <div className="flex items-center justify-between">
                     <p className="font-medium text-slate-900 dark:text-white">
-                      {entry.fromStatus ? (
+                      {fromLabel ? (
                         <>
-                          <span className="capitalize">{entry.fromStatus}</span>
+                          <span>{fromLabel}</span>
                           <span className="mx-2">→</span>
-                          <span className="capitalize">{entry.toStatus}</span>
+                          <span>{toLabel}</span>
                         </>
                       ) : (
-                        <span className="capitalize">{entry.toStatus}</span>
+                        <span>{toLabel}</span>
                       )}
                     </p>
                   </div>
-                  {entry.notes && (
-                    <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">{entry.notes}</p>
+                  {localizedNotes && (
+                    <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">{localizedNotes}</p>
                   )}
                   <div className="mt-1 flex items-center gap-2 text-xs text-slate-500 dark:text-slate-500">
                     <span>{entry.user?.fullName || 'Hệ thống'}</span>
@@ -109,3 +142,4 @@ export function OrderStatusTimeline({ history }: OrderStatusTimelineProps) {
     </div>
   )
 }
+

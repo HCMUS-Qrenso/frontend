@@ -43,7 +43,7 @@ import { getInitials, getRoleLabel } from '../utils'
 const menuItems = [
   { icon: LayoutDashboard, label: 'Tổng quan', href: '/admin/dashboard', wip: true },
   { icon: ClipboardList, label: 'Đơn hàng', href: '/admin/orders'},
-  { icon: ShipIcon, label: 'KDS', href: '/admin/kds', wip: true },
+  { icon: ShipIcon, label: 'KDS', href: '/admin/kds'},
   {
     icon: UtensilsCrossed,
     label: 'Thực đơn',
