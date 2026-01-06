@@ -74,11 +74,11 @@ function OrderStatusCard({
   isLoading?: boolean 
 }) {
   const statuses = data ? [
-    { name: 'Pending', count: data.pending, color: 'bg-amber-400' },
-    { name: 'Preparing', count: data.preparing, color: 'bg-sky-400' },
-    { name: 'Ready', count: data.ready, color: 'bg-emerald-400' },
-    { name: 'Served', count: data.served, color: 'bg-slate-400' },
-    { name: 'Completed', count: data.completed, color: 'bg-green-600' },
+    { name: 'Chờ xử lý', count: data.pending, color: 'bg-amber-400' },
+    { name: 'Đang làm', count: data.preparing, color: 'bg-sky-400' },
+    { name: 'Sẵn sàng', count: data.ready, color: 'bg-emerald-400' },
+    { name: 'Đã phục vụ', count: data.served, color: 'bg-slate-400' },
+    { name: 'Hoàn thành', count: data.completed, color: 'bg-green-600' },
   ] : []
   const total = statuses.reduce((sum, s) => sum + s.count, 0)
 
@@ -143,7 +143,7 @@ export function TodayStats() {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
       <StatCard
-        title="Orders hôm nay"
+        title="Đơn hàng hôm nay"
         value={data?.orders_today.toString() || '0'}
         subtext="so với hôm qua"
         trend={data ? { 
@@ -154,7 +154,7 @@ export function TodayStats() {
         isLoading={isLoading}
       />
       <StatCard
-        title="Revenue hôm nay"
+        title="Doanh thu hôm nay"
         value={data ? formatCurrency(data.revenue_today) : '0'}
         subtext={data ? `Giá trị TB: ${formatCurrency(data.avg_order_value)}` : ''}
         trend={data ? { 

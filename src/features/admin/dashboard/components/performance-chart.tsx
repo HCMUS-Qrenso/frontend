@@ -79,7 +79,7 @@ export function PerformanceChart() {
                     : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white',
                 )}
               >
-                {type === 'revenue' ? 'Doanh thu' : 'Orders'}
+                {type === 'revenue' ? 'Doanh thu' : 'Đơn hàng'}
               </button>
             ))}
           </div>
@@ -139,8 +139,8 @@ export function PerformanceChart() {
                         style: 'currency',
                         currency: 'VND',
                       }).format(value)
-                    : `${value} orders`,
-                  dataType === 'revenue' ? 'Doanh thu' : 'Orders',
+                    : `${value} đơn hàng`,
+                  dataType === 'revenue' ? 'Doanh thu' : 'Đơn hàng',
                 ]}
               />
               <Area
@@ -191,7 +191,7 @@ export function PerformanceChart() {
           )}
         </div>
         <div>
-          <p className="text-sm text-slate-500 dark:text-slate-400">Orders TB/ngày</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">Đơn hàng TB/ngày</p>
           {isLoading ? (
             <Skeleton className="mt-1 h-7 w-16" />
           ) : (

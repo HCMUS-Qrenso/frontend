@@ -2,16 +2,14 @@ import type React from 'react'
 import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
-import { QueryProvider } from '@/src/providers/query-provider'
-import { ThemeProvider } from '@/src/components/theme-provider'
-import { Toaster } from '@/src/components/ui/sonner'
-import './globals.css'
+import './[locale]/globals.css'
 
-const _inter = Inter({ subsets: ['latin', 'vietnamese'] })
+const inter = Inter({ subsets: ['latin', 'vietnamese'] })
 
 export const metadata: Metadata = {
   title: 'Qrenso - Admin Dashboard',
-  description: 'Hệ thống quản lý nhà hàng thông minh với QR Menu & Dine-in Ordering',
+  description:
+    'Hệ thống quản lý nhà hàng thông minh với QR Menu & Dine-in Ordering',
   generator: 'v0.app',
   icons: {
     icon: [
@@ -44,21 +42,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  return (
-    <html lang="vi" suppressHydrationWarning>
-      <body className={`font-sans antialiased ${_inter.className}`}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          storageKey="theme"
-          disableTransitionOnChange
-        >
-          <QueryProvider>{children}</QueryProvider>
-          <Toaster />
-          <Analytics />
-        </ThemeProvider>
-      </body>
-    </html>
-  )
+  // Root layout chỉ trả về children
+  // Locale layout sẽ xử lý html và body tags
+  return children
 }

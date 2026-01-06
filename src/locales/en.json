@@ -1,0 +1,497 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "search": "Search",
+    "filter": "Filter",
+    "actions": "Actions",
+    "confirm": "Confirm",
+    "success": "Success",
+    "error": "Error",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "close": "Close",
+    "open": "Open",
+    "yes": "Yes",
+    "no": "No",
+    "all": "All",
+    "none": "None",
+    "select": "Select",
+    "clear": "Clear",
+    "reset": "Reset",
+    "apply": "Apply",
+    "noData": "No data",
+    "noResults": "No results found"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "menu": "Menu",
+    "orders": "Orders",
+    "tables": "Tables",
+    "staff": "Staff",
+    "kds": "Kitchen Display",
+    "settings": "Settings"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "totalRevenue": "Total Revenue",
+    "totalOrders": "Total Orders",
+    "activeOrders": "Active Orders",
+    "avgOrderValue": "Avg Order Value",
+    "todayOrders": "Today's Orders",
+    "pendingOrders": "Pending Orders",
+    "completedOrders": "Completed Orders",
+    "cancelledOrders": "Cancelled Orders",
+    "revenueChart": "Revenue Chart",
+    "topItems": "Top Items",
+    "recentOrders": "Recent Orders"
+  },
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot password?",
+    "rememberMe": "Remember me",
+    "loginSuccess": "Login successful",
+    "loginError": "Login failed",
+    "invalidCredentials": "Invalid email or password",
+    "sessionExpired": "Session expired"
+  },
+  "menu": {
+    "title": "Menu Management",
+    "addItem": "Add Item",
+    "editItem": "Edit Item",
+    "deleteItem": "Delete Item",
+    "itemName": "Item Name",
+    "description": "Description",
+    "price": "Price",
+    "category": "Category",
+    "categories": "Categories",
+    "addCategory": "Add Category",
+    "image": "Image",
+    "available": "Available",
+    "unavailable": "Unavailable",
+    "soldOut": "Sold Out",
+    "popular": "Popular",
+    "new": "New",
+    "recommended": "Recommended"
+  },
+  "orders": {
+    "title": "Orders Management",
+    "orderId": "Order ID",
+    "orderDate": "Order Date",
+    "orderTime": "Order Time",
+    "status": "Status",
+    "total": "Total",
+    "items": "Items",
+    "quantity": "Quantity",
+    "notes": "Notes",
+    "table": "Table",
+    "customer": "Customer",
+    "pending": "Pending",
+    "confirmed": "Confirmed",
+    "preparing": "Preparing",
+    "ready": "Ready",
+    "served": "Served",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+    "viewDetails": "View Details",
+    "confirmOrder": "Confirm Order",
+    "cancelOrder": "Cancel Order"
+  },
+  "tables": {
+    "title": "Tables Management",
+    "tableName": "Table Name",
+    "tableNumber": "Table Number",
+    "zone": "Zone",
+    "capacity": "Capacity",
+    "status": "Status",
+    "available": "Available",
+    "occupied": "Occupied",
+    "reserved": "Reserved",
+    "addTable": "Add Table",
+    "editTable": "Edit Table",
+    "deleteTable": "Delete Table",
+    "qrCode": "QR Code",
+    "generateQR": "Generate QR",
+    "printQR": "Print QR"
+  },
+  "staff": {
+    "title": "Staff Management",
+    "name": "Name",
+    "email": "Email",
+    "phone": "Phone",
+    "role": "Role",
+    "status": "Status",
+    "active": "Active",
+    "inactive": "Inactive",
+    "addStaff": "Add Staff",
+    "editStaff": "Edit Staff",
+    "deleteStaff": "Delete Staff",
+    "inviteStaff": "Invite Staff",
+    "owner": "Owner",
+    "admin": "Admin",
+    "manager": "Manager",
+    "waiter": "Waiter",
+    "cashier": "Cashier",
+    "chef": "Chef"
+  },
+  "kds": {
+    "title": "Kitchen Display",
+    "newOrders": "New Orders",
+    "inProgress": "In Progress",
+    "ready": "Ready",
+    "markReady": "Mark Ready",
+    "markInProgress": "Start",
+    "timer": "Timer",
+    "priority": "Priority"
+  },
+  "errors": {
+    "required": "This field is required",
+    "invalidEmail": "Invalid email address",
+    "minLength": "Minimum {min} characters",
+    "maxLength": "Maximum {max} characters",
+    "networkError": "Network error",
+    "serverError": "Server error",
+    "unauthorized": "Unauthorized",
+    "notFound": "Not found",
+    "somethingWentWrong": "Something went wrong"
+  },
+  "landing": {
+    "nav": {
+      "features": "Features",
+      "howItWorks": "How It Works",
+      "pricing": "Pricing",
+      "faq": "FAQ",
+      "contact": "Contact"
+    },
+    "auth": {
+      "login": "Login"
+    },
+    "cta": {
+      "bookDemo": "Book a Demo",
+      "bookDemoFree": "Book a Free Demo",
+      "getStarted": "Get Started",
+      "learnMore": "Learn More",
+      "viewProduct": "View Product",
+      "contactUs": "Contact Us",
+      "startTrial": "Start Free Trial",
+      "contactConsult": "Contact for Consultation"
+    },
+    "hero": {
+      "headline1": "Speed up service, reduce errors with",
+      "headline2": "QR Ordering",
+      "headline3": "and realtime management",
+      "subheadline": "Complete restaurant system: Customers order via QR, kitchen receives orders instantly, comprehensive management dashboard, flexible payment.",
+      "socialProof": "Trusted by leading restaurants",
+      "logo": "Logo",
+      "stats": {
+        "orderTime": "Order processing time",
+        "orderErrors": "Order errors",
+        "tableSpeed": "Table service speed"
+      }
+    },
+    "productShowcase": {
+      "title": "One platform, complete features",
+      "subtitle": "From ordering to payment, everything is connected",
+      "tabs": {
+        "dashboard": {
+          "label": "Dashboard",
+          "description": "Monitor all restaurant activities in realtime"
+        },
+        "kds": {
+          "label": "Kitchen Display",
+          "description": "Kitchen screen receives orders instantly, never miss an order"
+        },
+        "customer": {
+          "label": "Customer Order",
+          "description": "Customers scan QR and order directly on their phone"
+        },
+        "tables": {
+          "label": "Tables & QR",
+          "description": "Manage tables, create QR codes, floor plan layout"
+        }
+      },
+      "images": {
+        "tableList": "Table List",
+        "tableCanvas": "Floor Plan",
+        "tableQR": "QR Management",
+        "dashboardOverview": "Dashboard Overview",
+        "dashboardAnalytics": "Dashboard Analytics"
+      },
+      "placeholder": "Screenshot will be added later"
+    },
+    "features": {
+      "title": "Complete features for modern restaurants",
+      "subtitle": "From ordering to payment, from kitchen to management",
+      "items": {
+        "dashboard": {
+          "title": "Operations Dashboard",
+          "description": "Track orders, revenue, available tables in realtime. Detailed analytics by day/week/month."
+        },
+        "tables": {
+          "title": "Tables & QR Manager",
+          "description": "Create QR for each table, manage floor plan layout, track table status visually."
+        },
+        "kds": {
+          "title": "Realtime KDS",
+          "description": "Kitchen screen receives orders instantly, auto priority sorting, never miss a dish."
+        },
+        "customerOrdering": {
+          "title": "Customer Ordering",
+          "description": "Customers scan QR and order on their phone, view full menu, order easily."
+        },
+        "payment": {
+          "title": "Flexible Payment",
+          "description": "Integrate with VNPay, MoMo, ZaloPay, Stripe. Pay after meal or online."
+        },
+        "analytics": {
+          "title": "Analytics & Reports",
+          "description": "Revenue reports, best sellers, service performance. Export to Excel/PDF."
+        },
+        "roles": {
+          "title": "Roles & Permissions",
+          "description": "Detailed permissions: Admin, Cashier, Waiter, Kitchen. Multi-level security."
+        },
+        "multiLang": {
+          "title": "Multi-language & Branch",
+          "description": "Multi-language support, manage multiple branches on one account."
+        }
+      }
+    },
+    "howItWorks": {
+      "title": "Simple workflow",
+      "subtitle": "4 steps to digitize your restaurant",
+      "steps": {
+        "step1": {
+          "title": "Setup menu & tables",
+          "description": "Create menu items, categories, prices. Set up tables and create QR codes."
+        },
+        "step2": {
+          "title": "Customer scans QR",
+          "description": "Customers scan QR on the table, view menu and order directly on their phone."
+        },
+        "step3": {
+          "title": "Kitchen & Waiter receive realtime",
+          "description": "Orders appear immediately on kitchen KDS and waiter dashboard. Instant processing."
+        },
+        "step4": {
+          "title": "Serve & Payment",
+          "description": "Serve dishes in order. Customers pay after the meal, flexible options."
+        }
+      }
+    },
+    "builtForRoles": {
+      "title": "Designed for every role",
+      "subtitle": "Solving the right problems for everyone in the restaurant",
+      "painPointsTitle": "Common Problems",
+      "solutionsTitle": "Qrenso Solutions",
+      "roles": {
+        "owner": {
+          "label": "Restaurant Owner",
+          "painPoints": [
+            "Hard to track realtime revenue",
+            "Order errors causing complaints",
+            "Difficult to manage multiple tables"
+          ],
+          "solutions": [
+            "Comprehensive overview dashboard",
+            "Detailed analytics over time",
+            "Automatic reports, easy export"
+          ]
+        },
+        "cashier": {
+          "label": "Cashier",
+          "painPoints": [
+            "Handwritten orders prone to errors",
+            "Slow billing, customers wait long",
+            "Hard to reconcile at end of shift"
+          ],
+          "solutions": [
+            "Automatic orders from customers",
+            "Instant, accurate billing",
+            "Automatic end-of-shift reports"
+          ]
+        },
+        "waiter": {
+          "label": "Waiter",
+          "painPoints": [
+            "Running back and forth to take orders",
+            "Too many customers calling, can't keep up",
+            "Forget orders, which table ordered what"
+          ],
+          "solutions": [
+            "Customers order via QR themselves",
+            "Realtime new order notifications",
+            "View order history per table"
+          ]
+        },
+        "chef": {
+          "label": "Kitchen",
+          "painPoints": [
+            "Handwritten orders hard to read",
+            "Don't know which dish to prioritize",
+            "Miss orders when overwhelmed"
+          ],
+          "solutions": [
+            "Clear KDS display",
+            "Automatic priority sorting",
+            "Cooking time countdown"
+          ]
+        }
+      }
+    },
+    "testimonials": {
+      "title": "What customers say about Qrenso",
+      "subtitle": "Hundreds of restaurants trust and are satisfied",
+      "items": [
+        {
+          "name": "Nguyen Minh Tuan",
+          "role": "Restaurant Owner",
+          "restaurant": "Pho Co Restaurant",
+          "quote": "After using Qrenso, revenue increased 30% due to faster service. Order errors reduced to nearly zero. Very satisfied!"
+        },
+        {
+          "name": "Tran Thi Huong",
+          "role": "Manager",
+          "restaurant": "Ngon Eatery",
+          "quote": "KDS helps the kitchen not miss any dish. Realtime dashboard lets me monitor everything remotely. Extremely convenient!"
+        },
+        {
+          "name": "Le Hoang Nam",
+          "role": "Restaurant Chain Owner",
+          "restaurant": "Food Chain Co.",
+          "quote": "Managing 5 branches on one account. Summary reports help me make quick decisions. Worth the investment!"
+        }
+      ]
+    },
+    "pricing": {
+      "title": "Transparent Pricing",
+      "subtitle": "Choose the plan that fits your restaurant size",
+      "perMonth": "month",
+      "trialNote": "All plans include 14-day free trial. No credit card required.",
+      "plans": {
+        "starter": {
+          "name": "Starter",
+          "price": "1,990,000",
+          "description": "Perfect for small restaurants, just starting",
+          "cta": "Start Free Trial",
+          "features": [
+            "1 branch",
+            "Up to 20 tables",
+            "Basic QR Ordering",
+            "Dashboard & KDS",
+            "Basic reports",
+            "Email support"
+          ]
+        },
+        "pro": {
+          "name": "Pro",
+          "price": "3,990,000",
+          "description": "For medium & large restaurants",
+          "cta": "Book a Demo",
+          "features": [
+            "Up to 3 branches",
+            "Unlimited tables",
+            "Full QR Ordering",
+            "Realtime Dashboard & KDS",
+            "Advanced analytics",
+            "Payment gateway",
+            "Multi-language",
+            "Priority 24/7 support"
+          ]
+        },
+        "enterprise": {
+          "name": "Enterprise",
+          "price": "Contact Us",
+          "description": "Solution for restaurant chains",
+          "cta": "Contact for Consultation",
+          "features": [
+            "Unlimited branches",
+            "Unlimited tables",
+            "All Pro features",
+            "Custom development",
+            "Dedicated API",
+            "On-site training",
+            "Dedicated account manager"
+          ]
+        }
+      }
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "subtitle": "Common questions about Qrenso answered",
+      "items": [
+        {
+          "question": "How long does QR ordering setup take?",
+          "answer": "Average 2-3 hours. You just need to add menu, create tables and QR codes. We provide detailed guides and video tutorials."
+        },
+        {
+          "question": "Are there payment transaction fees?",
+          "answer": "Gateway fees are set by payment partners (VNPay, MoMo, ZaloPay), typically 1-3%. Qrenso charges no additional fees."
+        },
+        {
+          "question": "What devices does it run on?",
+          "answer": "Qrenso is a web app, runs on any device with a browser: laptop, tablet, phone. KDS should use tablet or large screen."
+        },
+        {
+          "question": "Does it support multiple branches?",
+          "answer": "Yes. Pro plan supports up to 3 branches, Enterprise is unlimited. Each branch has its own dashboard."
+        },
+        {
+          "question": "How to import menu quickly?",
+          "answer": "You can import from Excel file using our template. Or enter manually quickly through simple forms."
+        },
+        {
+          "question": "Is data secure?",
+          "answer": "Data is encrypted and automatically backed up daily. We comply with international security standard ISO 27001."
+        },
+        {
+          "question": "Is there support when issues occur?",
+          "answer": "Starter has email support, Pro has 24/7 chat/phone support. Enterprise has dedicated account manager."
+        },
+        {
+          "question": "Can I cancel anytime?",
+          "answer": "Yes. No long-term commitment. You can cancel anytime, data is kept for 30 days for export."
+        }
+      ]
+    },
+    "finalCta": {
+      "title": "Ready to digitize your restaurant?",
+      "subtitle": "Over 500+ restaurants have sped up service and reduced errors with Qrenso. Start today!",
+      "trustBadge": "14-day free trial • No credit card required • 24/7 support"
+    },
+    "footer": {
+      "tagline": "Complete QR Ordering & restaurant management solution",
+      "product": {
+        "title": "Product",
+        "features": "Features",
+        "pricing": "Pricing",
+        "caseStudies": "Case Studies",
+        "roadmap": "Roadmap"
+      },
+      "company": {
+        "title": "Company",
+        "about": "About Us",
+        "blog": "Blog",
+        "careers": "Careers",
+        "contact": "Contact"
+      },
+      "legal": {
+        "title": "Legal",
+        "terms": "Terms of Service",
+        "privacy": "Privacy Policy",
+        "refund": "Refund Policy"
+      },
+      "copyright": "© 2025 Qrenso. All rights reserved."
+    }
+  }
+}
+
+

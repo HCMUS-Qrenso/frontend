@@ -6,7 +6,7 @@ import { TopItems } from '@/src/features/admin/dashboard/components/top-items'
 
 export default function AdminDashboardPage() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<div>Đang tải...</div>}>
       <div className="space-y-6">
         {/* KPI Cards */}
         <TodayStats />

@@ -1,4 +1,10 @@
+'use client'
+
+import { useTranslations } from 'next-intl'
+
 export function Footer() {
+  const t = useTranslations('landing.footer')
+
   return (
     <footer id="contact" className="bg-white py-12 dark:bg-slate-950">
       <div className="container mx-auto px-4">
@@ -12,32 +18,34 @@ export function Footer() {
               <span className="text-xl font-bold text-slate-900 dark:text-white">Qrenso</span>
             </div>
             <p className="mt-4 text-sm text-slate-500 dark:text-slate-400">
-              Giải pháp QR Ordering & quản lý nhà hàng toàn diện
+              {t('tagline')}
             </p>
           </div>
 
           {/* Product */}
           <div>
-            <h3 className="mb-4 font-semibold text-slate-900 dark:text-white">Sản phẩm</h3>
+            <h3 className="mb-4 font-semibold text-slate-900 dark:text-white">
+              {t('product.title')}
+            </h3>
             <ul className="space-y-2 text-sm text-slate-500 dark:text-slate-400">
               <li>
                 <a href="#features" className="hover:text-slate-900 dark:hover:text-white">
-                  Tính năng
+                  {t('product.features')}
                 </a>
               </li>
               <li>
                 <a href="#pricing" className="hover:text-slate-900 dark:hover:text-white">
-                  Bảng giá
+                  {t('product.pricing')}
                 </a>
               </li>
               <li>
                 <a href="#" className="hover:text-slate-900 dark:hover:text-white">
-                  Case studies
+                  {t('product.caseStudies')}
                 </a>
               </li>
               <li>
                 <a href="#" className="hover:text-slate-900 dark:hover:text-white">
-                  Roadmap
+                  {t('product.roadmap')}
                 </a>
               </li>
             </ul>
@@ -45,26 +53,28 @@ export function Footer() {
 
           {/* Company */}
           <div>
-            <h3 className="mb-4 font-semibold text-slate-900 dark:text-white">Công ty</h3>
+            <h3 className="mb-4 font-semibold text-slate-900 dark:text-white">
+              {t('company.title')}
+            </h3>
             <ul className="space-y-2 text-sm text-slate-500 dark:text-slate-400">
               <li>
                 <a href="#" className="hover:text-slate-900 dark:hover:text-white">
-                  Về chúng tôi
+                  {t('company.about')}
                 </a>
               </li>
               <li>
                 <a href="#" className="hover:text-slate-900 dark:hover:text-white">
-                  Blog
+                  {t('company.blog')}
                 </a>
               </li>
               <li>
                 <a href="#" className="hover:text-slate-900 dark:hover:text-white">
-                  Careers
+                  {t('company.careers')}
                 </a>
               </li>
               <li>
                 <a href="#contact" className="hover:text-slate-900 dark:hover:text-white">
-                  Liên hệ
+                  {t('company.contact')}
                 </a>
               </li>
             </ul>
@@ -72,21 +82,23 @@ export function Footer() {
 
           {/* Legal */}
           <div>
-            <h3 className="mb-4 font-semibold text-slate-900 dark:text-white">Pháp lý</h3>
+            <h3 className="mb-4 font-semibold text-slate-900 dark:text-white">
+              {t('legal.title')}
+            </h3>
             <ul className="space-y-2 text-sm text-slate-500 dark:text-slate-400">
               <li>
                 <a href="#" className="hover:text-slate-900 dark:hover:text-white">
-                  Điều khoản sử dụng
+                  {t('legal.terms')}
                 </a>
               </li>
               <li>
                 <a href="#" className="hover:text-slate-900 dark:hover:text-white">
-                  Chính sách bảo mật
+                  {t('legal.privacy')}
                 </a>
               </li>
               <li>
                 <a href="#" className="hover:text-slate-900 dark:hover:text-white">
-                  Chính sách hoàn tiền
+                  {t('legal.refund')}
                 </a>
               </li>
             </ul>
@@ -95,9 +107,10 @@ export function Footer() {
 
         {/* Bottom */}
         <div className="mt-12 border-t border-slate-200 pt-8 text-center text-sm text-slate-500 dark:border-slate-800 dark:text-slate-400">
-          <p>© 2025 Qrenso. All rights reserved.</p>
+          <p>{t('copyright')}</p>
         </div>
       </div>
     </footer>
   )
 }
+

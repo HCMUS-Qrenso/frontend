@@ -76,7 +76,7 @@ export function RecentOrders({ className }: RecentOrdersProps) {
           <thead>
             <tr className="border-b border-slate-100 dark:border-slate-800">
               <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-slate-500 uppercase dark:text-slate-400">
-                Order ID
+                Mã đơn
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-slate-500 uppercase dark:text-slate-400">
                 Bàn
