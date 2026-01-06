@@ -100,10 +100,7 @@ export function KdsBoardClient() {
             {error instanceof Error ? error.message : 'Đã có lỗi xảy ra'}
           </p>
         </div>
-        <Button
-          onClick={() => window.location.reload()}
-          className="bg-red-600 hover:bg-red-700"
-        >
+        <Button onClick={() => window.location.reload()} className="bg-red-600 hover:bg-red-700">
           Thử lại
         </Button>
       </div>

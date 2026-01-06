@@ -57,22 +57,22 @@ const loadImageAsDataURI = async (url: string): Promise<string> => {
 }
 
 /// Calculate approximate items per page based on template and font size
-  export const getMaxItemsPerPage = (templateId: string, fontSize: 'small' | 'medium' | 'large') => {
-      const fontMultiplier = {
-        small: 1.2, // More items fit with smaller font
-        medium: 1,
-        large: 0.8, // Fewer items with larger font
-      }
-      const baseItems = {
-        '1': 20,
-        '2': 5,
-        '3': 13,
-        '4': 3,
-        default: 10,
-      }
-      const base = baseItems[templateId as keyof typeof baseItems] || baseItems.default
-      return Math.floor(base * fontMultiplier[fontSize])
-    }
+export const getMaxItemsPerPage = (templateId: string, fontSize: 'small' | 'medium' | 'large') => {
+  const fontMultiplier = {
+    small: 1.2, // More items fit with smaller font
+    medium: 1,
+    large: 0.8, // Fewer items with larger font
+  }
+  const baseItems = {
+    '1': 20,
+    '2': 5,
+    '3': 13,
+    '4': 3,
+    default: 10,
+  }
+  const base = baseItems[templateId as keyof typeof baseItems] || baseItems.default
+  return Math.floor(base * fontMultiplier[fontSize])
+}
 
 // Helper function to generate PDF blob
 export const generatePDFBlob = async (

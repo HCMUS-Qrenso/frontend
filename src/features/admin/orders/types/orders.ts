@@ -27,6 +27,23 @@ export type PaymentStatus = 'unpaid' | 'paid' | 'partial'
 // Order Priority Types
 export type OrderPriority = 'normal' | 'high' | 'rush'
 
+// Payment record (forward declaration for Order type)
+export interface PaymentRecord {
+  id: string
+  status: string
+  paymentMethod?: string
+  amount: number
+  currency?: string
+  transactionId?: string
+  orderCode?: number
+  qrCode?: string
+  qrCodeData?: string
+  paidAt?: string
+  refundedAt?: string
+  refundAmount?: number
+  createdAt: string
+}
+
 // Order Item interface (matching actual backend response)
 export interface OrderItem {
   id: string
@@ -85,6 +102,7 @@ export interface Order {
   discountAmount: number
   totalAmount: number
   specialInstructions?: string
+  payments?: PaymentRecord[] // Added to support payment actions in list view
   createdAt: string
   updatedAt: string
 }
@@ -182,20 +200,6 @@ export interface StatusHistoryEntry {
     id: string
     fullName: string
   }
-  createdAt: string
-}
-
-// Payment record
-export interface PaymentRecord {
-  id: string
-  status: string
-  method?: string
-  amount: number
-  currency?: string
-  transactionId?: string
-  paidAt?: string
-  refundedAt?: string
-  refundAmount?: number
   createdAt: string
 }
 

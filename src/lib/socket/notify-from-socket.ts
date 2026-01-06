@@ -31,23 +31,19 @@ export interface NotifyOptions {
 
 /**
  * Show toast notification for a socket event
- * 
+ *
  * @param eventType - The socket event type (e.g., 'order:created', 'item:status')
  * @param data - Event data to populate the notification
  * @param options - Optional overrides
- * 
+ *
  * @example
  * // Basic usage
  * notifyFromSocket('order:created', event.data)
- * 
+ *
  * // For item status changes
  * notifyFromSocket('item:status', { ...event.data }, { useItemStatus: true })
  */
-export function notifyFromSocket(
-  eventType: string,
-  data: any,
-  options: NotifyOptions = {}
-): void {
+export function notifyFromSocket(eventType: string, data: any, options: NotifyOptions = {}): void {
   // For item:status events, get specific config based on status
   let configKey = eventType
   if (eventType === 'item:status' && data?.status) {
@@ -55,7 +51,7 @@ export function notifyFromSocket(
   }
 
   const config = SOCKET_EVENT_NOTIFICATIONS[configKey]
-  
+
   // If no config found, skip notification (not all events need toast)
   if (!config) {
     return

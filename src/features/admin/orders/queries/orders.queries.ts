@@ -8,10 +8,15 @@
  * - useOrderQuery - Fetch single order by ID
  * - useOrderStatsQuery - Fetch order statistics
  * - useUpdateOrderStatusMutation - Update order status
+ * - useCreatePaymentMutation - Create payment for order
  */
 
 import { useMutation, useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query'
-import { ordersApi } from '@/src/features/admin/orders/api'
+import {
+  ordersApi,
+  type CreatePaymentPayload,
+  type PaymentResponse,
+} from '@/src/features/admin/orders/api'
 import type {
   Order,
   OrderQueryParams,
@@ -88,4 +93,69 @@ export const useUpdateOrderStatusMutation = () => {
       },
     },
   )
+}
+
+/**
+ * Create payment for order
+ */
+export const useCreatePaymentMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation<PaymentResponse, Error, CreatePaymentPayload>({
+    mutationFn: (payload) => ordersApi.createPayment(payload),
+    onSuccess: (data, variables) => {
+      // Invalidate order queries to refresh payment status
+      queryClient.invalidateQueries({ queryKey: ordersQueryKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: ordersQueryKeys.detail(variables.orderId) })
+      queryClient.invalidateQueries({ queryKey: ordersQueryKeys.stats() })
+
+      // Note: Cash payments are NOT auto-completed
+      // Waiter must manually complete after receiving money
+    },
+  })
+}
+
+/**
+ * Complete cash payment
+ */
+export const useCompletePaymentMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation<PaymentResponse, Error, string>({
+    mutationFn: (paymentId) => ordersApi.completePayment(paymentId),
+    onSuccess: () => {
+      // Invalidate order queries to refresh payment status
+      queryClient.invalidateQueries({ queryKey: ordersQueryKeys.all })
+    },
+  })
+}
+
+/**
+ * Cancel payment
+ */
+export const useCancelPaymentMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation<PaymentResponse, Error, { paymentId: string; reason?: string }>({
+    mutationFn: ({ paymentId, reason }) => ordersApi.cancelPayment(paymentId, reason),
+    onSuccess: () => {
+      // Invalidate order queries to refresh payment status
+      queryClient.invalidateQueries({ queryKey: ordersQueryKeys.all })
+    },
+  })
+}
+
+/**
+ * Check payment status
+ */
+export const useCheckPaymentStatusMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation<PaymentResponse, Error, number>({
+    mutationFn: (orderCode) => ordersApi.checkPaymentStatus(orderCode),
+    onSuccess: () => {
+      // Invalidate order queries to refresh payment status
+      queryClient.invalidateQueries({ queryKey: ordersQueryKeys.all })
+    },
+  })
 }

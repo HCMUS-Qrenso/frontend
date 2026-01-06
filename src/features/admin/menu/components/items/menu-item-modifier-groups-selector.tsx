@@ -56,7 +56,9 @@ export function ModifierGroupSelector({
   }
 
   // Apply changes when user clicks "Xong"
-  const handleSubmit = () => {
+  const handleSubmit = (e?: React.FormEvent) => {
+    e?.preventDefault()
+    e?.stopPropagation()
     onChange(tempSelectedIds)
     setOpen(false)
   }

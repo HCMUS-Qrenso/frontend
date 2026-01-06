@@ -30,6 +30,18 @@ const STATUS_COLOR_MAP: Record<string, string> = {
   cancelled: 'bg-red-500',
 }
 
+const STATUS_DISPLAY_MAP: Record<string, string> = {
+  pending: 'Đang chờ',
+  accepted: 'Đã chấp nhận',
+  in_progress: 'Đang xử lý',
+  preparing: 'Đang chuẩn bị',
+  ready: 'Sẵn sàng',
+  served: 'Đã phục vụ',
+  completed: 'Hoàn thành',
+  rejected: 'Từ chối',
+  cancelled: 'Đã hủy',
+}
+
 interface OrderStatusTimelineProps {
   history: StatusHistoryEntry[]
 }
@@ -83,12 +95,12 @@ export function OrderStatusTimeline({ history }: OrderStatusTimelineProps) {
                     <p className="font-medium text-slate-900 dark:text-white">
                       {entry.fromStatus ? (
                         <>
-                          <span className="capitalize">{entry.fromStatus}</span>
+                          <span className="capitalize">{STATUS_DISPLAY_MAP[entry.fromStatus]}</span>
                           <span className="mx-2">→</span>
-                          <span className="capitalize">{entry.toStatus}</span>
+                          <span className="capitalize">{STATUS_DISPLAY_MAP[entry.toStatus]}</span>
                         </>
                       ) : (
-                        <span className="capitalize">{entry.toStatus}</span>
+                        <span className="capitalize">{STATUS_DISPLAY_MAP[entry.toStatus]}</span>
                       )}
                     </p>
                   </div>

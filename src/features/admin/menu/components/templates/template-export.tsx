@@ -73,7 +73,9 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
   const [isExporting, setIsExporting] = useState(false)
   const [activeTab, setActiveTab] = useState<'data' | 'style'>('data')
   const [fontSize, setFontSize] = useState<'small' | 'medium' | 'large'>('medium')
-  const [maxItemsPerPage, setMaxItemsPerPage] = useState(() => getMaxItemsPerPage(selectedTemplate || '1', 'medium'))
+  const [maxItemsPerPage, setMaxItemsPerPage] = useState(() =>
+    getMaxItemsPerPage(selectedTemplate || '1', 'medium'),
+  )
 
   // Fetch data
   const {
@@ -264,7 +266,7 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
                 </p>
               </div>
             )}
-            <div className={cn("flex-1 pr-4", pageIndex === 0 ? "mt-20" : "")}>
+            <div className={cn('flex-1 pr-4', pageIndex === 0 ? 'mt-20' : '')}>
               {columns[0].map(([categoryId, items]) => {
                 const category = categories.find((c) => c.id === categoryId)
                 if (!category) return null
@@ -323,7 +325,7 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
                 )
               })}
             </div>
-            <div className={cn("flex-1 pl-4", pageIndex === 0 ? "mt-20" : "")}>
+            <div className={cn('flex-1 pl-4', pageIndex === 0 ? 'mt-20' : '')}>
               {columns[1].map(([categoryId, items]) => {
                 const category = categories.find((c) => c.id === categoryId)
                 if (!category) return null
@@ -1383,7 +1385,9 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
                 {/* Max Items Per Page */}
                 <div className="space-y-2">
                   <p className="text-xs font-medium text-slate-700 dark:text-slate-300">
-                    {selectedTemplate !== '4' ? 'Số món tối đa mỗi trang' : 'Số món tối đa mỗi danh mục'}
+                    {selectedTemplate !== '4'
+                      ? 'Số món tối đa mỗi trang'
+                      : 'Số món tối đa mỗi danh mục'}
                   </p>
                   <input
                     type="number"

@@ -173,6 +173,20 @@ export function useOrdersSocket(options: UseOrdersSocketOptions = {}): UseOrders
       }
     })
 
+    // Payment status updated (e.g., QR payment confirmed)
+    socket.on('payment:updated', (event: any) => {
+      console.log('[AdminSocket] Payment updated:', event.data.orderId, '->', event.data.status)
+      console.log('[AdminSocket] Invalidating queries with key:', ordersQueryKeys.all)
+
+      // Invalidate queries to refresh payment status
+      queryClientRef.current.invalidateQueries({ queryKey: ordersQueryKeys.all })
+
+      // Show toast notification
+      if (showNotificationsRef.current && event.data.status === 'paid') {
+        notifyFromSocket('payment:updated', event.data)
+      }
+    })
+
     socketRef.current = socket
   }, [enabled, accessToken])
 
