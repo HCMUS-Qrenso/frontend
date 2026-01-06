@@ -1,13 +1,13 @@
 import QRCode from 'qrcode'
-import type { Order } from '../types/orders'
+import type { Order, OrderDetail } from '../types/orders'
 
 interface PrintBillOptions {
-  order: Order
+  order: Order | OrderDetail
   billType: 'temporary' | 'final'
   paymentMethod?: 'cash' | 'qr'
   description?: string
   qrCodeData?: string
-  tenantName?: string
+  tenantName?: string | null
   tenantAddress?: string | null
 }
 
@@ -80,14 +80,14 @@ export async function printBill(options: PrintBillOptions): Promise<void> {
 }
 
 interface GenerateBillHTMLOptions {
-  order: Order
+  order: Order | OrderDetail
   billTitle: string
   isPaid: boolean
   paymentMethod?: 'cash' | 'qr'
   description?: string
   qrCodeDataUrl?: string
-  tenantName?: string
-  tenantAddress?: string
+  tenantName?: string | null
+  tenantAddress?: string | null
 }
 
 function generateBillHTML(options: GenerateBillHTMLOptions): string {
@@ -265,7 +265,7 @@ function generateBillHTML(options: GenerateBillHTMLOptions): string {
             .map(
               (item) => `
             <div class="item">
-              <div class="item-name">${item.name || (item as any).menuItem?.name}</div>
+              <div class="item-name">${(item as any).name || (item as any).menuItem?.name}</div>
               <div class="item-qty">x${item.quantity}</div>
               <div class="item-price">${item.subtotal.toLocaleString('vi-VN')}₫</div>
             </div>

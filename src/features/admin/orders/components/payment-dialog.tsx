@@ -19,13 +19,13 @@ import { cn } from '@/src/lib/utils'
 import { useCreatePaymentMutation } from '../queries'
 import { printBill } from '../utils/print-bill'
 import { toast } from 'sonner'
-import type { Order } from '../types/orders'
+import type { Order, OrderDetail } from '../types/orders'
 import { QrPaymentModal } from './qr-payment-modal'
 
 interface PaymentDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  order: Order | null
+  order: Order | OrderDetail | null
   tenantName?: string | null
   tenantAddress?: string | null
 }
@@ -322,7 +322,7 @@ export function PaymentDialog({
               {order.items.slice(0, 3).map((item, idx) => (
                 <div key={idx} className="flex justify-between">
                   <span className="text-muted-foreground">
-                    {item.quantity}x {item.name}
+                    {item.quantity}x {(item as any).name || (item as any).menuItem?.name}
                   </span>
                   <span className="font-medium">{item.subtotal.toLocaleString('vi-VN')}₫</span>
                 </div>
