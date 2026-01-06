@@ -28,6 +28,7 @@ import type { ModifierGroup } from '@/src/features/admin/menu/types/modifiers'
 import { useReorderModifierGroupsMutation } from '@/src/features/admin/menu/queries'
 import { useErrorHandler } from '@/src/hooks/use-error-handler'
 import { toast } from 'sonner'
+import { useTranslations } from 'next-intl'
 
 interface ModifierGroupsPanelProps {
   groups: ModifierGroup[]
@@ -48,6 +49,7 @@ export function ModifierGroupsPanel({
 }: ModifierGroupsPanelProps) {
   const [searchQuery, setSearchQuery] = useState('')
   const { handleErrorWithStatus } = useErrorHandler()
+  const t = useTranslations('menu')
 
   // Mutation for reordering
   const reorderMutation = useReorderModifierGroupsMutation()
@@ -71,11 +73,11 @@ export function ModifierGroupsPanel({
         { modifier_groups: reordered },
         {
           onSuccess: () => {
-            toast.success('Đã cập nhật thứ tự nhóm')
+            toast.success(t('orderUpdatedSuccess'))
           },
           onError: (error) => {
             handleErrorWithStatus(error)
-            toast.error('Không thể cập nhật thứ tự')
+            toast.error(t('cannotUpdateOrder'))
           },
         },
       )
@@ -87,10 +89,10 @@ export function ModifierGroupsPanel({
       {/* Header */}
       <div className="border-b border-slate-200 p-6 dark:border-slate-800">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Nhóm tuỳ chọn</h2>
+          <h2 className="text-lg font-semibold text-slate-900 dark:text-white">{t('modifierGroups')}</h2>
           <Button onClick={onCreateGroup} size="sm" className="bg-emerald-600 hover:bg-emerald-700">
             <Plus className="mr-2 h-4 w-4" />
-            Tạo nhóm
+            {t('createGroup')}
           </Button>
         </div>
 
@@ -98,7 +100,7 @@ export function ModifierGroupsPanel({
         <div className="relative mt-4">
           <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400" />
           <Input
-            placeholder="Tìm nhóm..."
+            placeholder={t('searchGroups')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10"
@@ -122,6 +124,7 @@ export function ModifierGroupsPanel({
                   onSelect={() => onSelectGroup(group.id)}
                   onDelete={onDeleteGroup}
                   onEdit={onEditGroup}
+                  t={t}
                 />
               ))}
             </div>
@@ -130,7 +133,7 @@ export function ModifierGroupsPanel({
 
         {filteredGroups.length === 0 && (
           <div className="py-12 text-center">
-            <p className="text-sm text-slate-500 dark:text-slate-400">Không tìm thấy nhóm nào</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400">{t('noModifierGroups')}</p>
           </div>
         )}
       </div>
@@ -144,12 +147,14 @@ function SortableGroupItem({
   onSelect,
   onDelete,
   onEdit,
+  t,
 }: {
   group: ModifierGroup
   isSelected: boolean
   onSelect: () => void
   onDelete: () => void
   onEdit: () => void
+  t: (key: string) => string
 }) {
   const router = useRouter()
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
@@ -202,11 +207,11 @@ function SortableGroupItem({
                 variant={group.type === 'single_choice' ? 'default' : 'secondary'}
                 className="text-xs"
               >
-                {group.type === 'single_choice' ? 'Single' : 'Multiple'}
+                {group.type === 'single_choice' ? t('single') : t('multiple')}
               </Badge>
               {group.is_required && (
                 <Badge variant="destructive" className="text-xs">
-                  Required
+                  {t('required')}
                 </Badge>
               )}
             </div>
@@ -220,11 +225,11 @@ function SortableGroupItem({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={onEdit}>Chỉnh sửa</DropdownMenuItem>
-              <DropdownMenuItem onClick={handleDuplicate}>Nhân bản</DropdownMenuItem>
+              <DropdownMenuItem onClick={onEdit}>{t('editModifier')}</DropdownMenuItem>
+              <DropdownMenuItem onClick={handleDuplicate}>{t('duplicate')}</DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={onDelete} className="text-red-600">
-                Xoá
+                {t('delete')}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -237,7 +242,7 @@ function SortableGroupItem({
             className="mt-3 flex items-center gap-1.5 text-xs text-emerald-600 hover:text-emerald-700 dark:text-emerald-400"
           >
             <Users className="h-3.5 w-3.5" />
-            Đang dùng bởi {group.used_by_count} món
+            {t('usageCount').replace('{count}', String(group.used_by_count))}
           </button>
         )}
       </div>

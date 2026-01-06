@@ -6,49 +6,47 @@ import { Button } from '@/src/components/ui/button'
 import { useRecentOrdersQuery } from '../queries'
 import { Skeleton } from '@/src/components/ui/skeleton'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 
-const statusConfig: Record<string, { label: string; className: string }> = {
-  pending: {
-    label: 'Chờ xử lý',
-    className: 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400',
-  },
-  accepted: {
-    label: 'Đã nhận',
-    className: 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400',
-  },
-  in_progress: {
-    label: 'Đang làm',
-    className: 'bg-sky-100 text-sky-700 dark:bg-sky-500/20 dark:text-sky-400',
-  },
-  preparing: {
-    label: 'Chuẩn bị',
-    className: 'bg-sky-100 text-sky-700 dark:bg-sky-500/20 dark:text-sky-400',
-  },
-  ready: {
-    label: 'Sẵn sàng',
-    className: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400',
-  },
-  served: {
-    label: 'Đã phục vụ',
-    className: 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300',
-  },
-  completed: {
-    label: 'Hoàn thành',
-    className: 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400',
-  },
-}
-
-interface RecentOrdersProps {
-  className?: string
-}
-
-function formatTime(dateString: string): string {
-  const date = new Date(dateString)
-  return date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
-}
-
-export function RecentOrders({ className }: RecentOrdersProps) {
+export function RecentOrders({ className }: { className?: string }) {
   const { data: orders, isLoading } = useRecentOrdersQuery(7)
+  const t = useTranslations('dashboard')
+
+  const statusConfig: Record<string, { label: string; className: string }> = {
+    pending: {
+      label: t('pending'),
+      className: 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400',
+    },
+    accepted: {
+      label: t('accepted'),
+      className: 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400',
+    },
+    in_progress: {
+      label: t('inProgress'),
+      className: 'bg-sky-100 text-sky-700 dark:bg-sky-500/20 dark:text-sky-400',
+    },
+    preparing: {
+      label: t('preparing'),
+      className: 'bg-sky-100 text-sky-700 dark:bg-sky-500/20 dark:text-sky-400',
+    },
+    ready: {
+      label: t('ready'),
+      className: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400',
+    },
+    served: {
+      label: t('served'),
+      className: 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300',
+    },
+    completed: {
+      label: t('completed'),
+      className: 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400',
+    },
+  }
+
+  function formatTime(dateString: string): string {
+    const date = new Date(dateString)
+    return date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
+  }
 
   return (
     <div
@@ -60,12 +58,12 @@ export function RecentOrders({ className }: RecentOrdersProps) {
       {/* Header */}
       <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4 dark:border-slate-800">
         <div>
-          <h3 className="font-semibold text-slate-900 dark:text-white">Đơn hàng gần đây</h3>
-          <p className="text-sm text-slate-500 dark:text-slate-400">Theo dõi đơn hàng mới nhất</p>
+          <h3 className="font-semibold text-slate-900 dark:text-white">{t('recentOrdersTitle')}</h3>
+          <p className="text-sm text-slate-500 dark:text-slate-400">{t('trackLatestOrders')}</p>
         </div>
         <Link href="/admin/orders">
           <Button variant="ghost" size="sm" className="text-emerald-600 hover:text-emerald-700">
-            Xem tất cả
+            {t('viewAll')}
           </Button>
         </Link>
       </div>
@@ -76,19 +74,19 @@ export function RecentOrders({ className }: RecentOrdersProps) {
           <thead>
             <tr className="border-b border-slate-100 dark:border-slate-800">
               <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-slate-500 uppercase dark:text-slate-400">
-                Mã đơn
+                {t('orderId')}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-slate-500 uppercase dark:text-slate-400">
-                Bàn
+                {t('table')}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-slate-500 uppercase dark:text-slate-400">
-                Thời gian
+                {t('time')}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-slate-500 uppercase dark:text-slate-400">
-                Tổng tiền
+                {t('total')}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-slate-500 uppercase dark:text-slate-400">
-                Trạng thái
+                {t('status')}
               </th>
               <th className="px-6 py-3 text-right text-xs font-medium tracking-wider text-slate-500 uppercase dark:text-slate-400"></th>
             </tr>
@@ -109,7 +107,7 @@ export function RecentOrders({ className }: RecentOrdersProps) {
             ) : orders?.length === 0 ? (
               <tr>
                 <td colSpan={6} className="px-6 py-8 text-center text-slate-500">
-                  Chưa có đơn hàng nào hôm nay
+                  {t('noOrdersToday')}
                 </td>
               </tr>
             ) : (
@@ -124,7 +122,7 @@ export function RecentOrders({ className }: RecentOrdersProps) {
                       {order.order_number}
                     </td>
                     <td className="px-6 py-4 text-sm whitespace-nowrap text-slate-600 dark:text-slate-300">
-                      Bàn {order.table_number}
+                      {t('table')} {order.table_number}
                     </td>
                     <td className="px-6 py-4 text-sm whitespace-nowrap text-slate-600 dark:text-slate-300">
                       {formatTime(order.created_at)}

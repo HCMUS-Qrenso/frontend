@@ -5,6 +5,7 @@ import { cn } from '@/src/lib/utils'
 import { TrendingUp, TrendingDown, ShoppingBag, DollarSign, Users, Clock } from 'lucide-react'
 import { useTodayStatsQuery } from '../queries'
 import { Skeleton } from '@/src/components/ui/skeleton'
+import { useTranslations } from 'next-intl'
 
 interface StatCardProps {
   title: string
@@ -68,23 +69,25 @@ function StatCard({ title, value, subtext, trend, icon, className, isLoading }: 
 // Order Status Card with progress bar
 function OrderStatusCard({ 
   data, 
-  isLoading 
+  isLoading,
+  t
 }: { 
   data?: { pending: number; preparing: number; ready: number; served: number; completed: number };
-  isLoading?: boolean 
+  isLoading?: boolean;
+  t: (key: string) => string;
 }) {
   const statuses = data ? [
-    { name: 'Chờ xử lý', count: data.pending, color: 'bg-amber-400' },
-    { name: 'Đang làm', count: data.preparing, color: 'bg-sky-400' },
-    { name: 'Sẵn sàng', count: data.ready, color: 'bg-emerald-400' },
-    { name: 'Đã phục vụ', count: data.served, color: 'bg-slate-400' },
-    { name: 'Hoàn thành', count: data.completed, color: 'bg-green-600' },
+    { name: t('pending'), count: data.pending, color: 'bg-amber-400' },
+    { name: t('preparing'), count: data.preparing, color: 'bg-sky-400' },
+    { name: t('ready'), count: data.ready, color: 'bg-emerald-400' },
+    { name: t('served'), count: data.served, color: 'bg-slate-400' },
+    { name: t('completed'), count: data.completed, color: 'bg-green-600' },
   ] : []
   const total = statuses.reduce((sum, s) => sum + s.count, 0)
 
   return (
     <div className="group rounded-2xl border border-slate-100 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-      <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Trạng thái order</p>
+      <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{t('orderStatus')}</p>
       {isLoading ? (
         <Skeleton className="mt-2 h-9 w-16" />
       ) : (
@@ -139,13 +142,14 @@ function formatCurrency(value: number): string {
 
 export function TodayStats() {
   const { data, isLoading } = useTodayStatsQuery()
+  const t = useTranslations('dashboard')
 
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
       <StatCard
-        title="Đơn hàng hôm nay"
+        title={t('ordersToday')}
         value={data?.orders_today.toString() || '0'}
-        subtext="so với hôm qua"
+        subtext={t('comparedToYesterday')}
         trend={data ? { 
           value: `${data.orders_change_percent >= 0 ? '+' : ''}${data.orders_change_percent}%`, 
           isPositive: data.orders_change_percent >= 0 
@@ -154,9 +158,9 @@ export function TodayStats() {
         isLoading={isLoading}
       />
       <StatCard
-        title="Doanh thu hôm nay"
+        title={t('revenueToday')}
         value={data ? formatCurrency(data.revenue_today) : '0'}
-        subtext={data ? `Giá trị TB: ${formatCurrency(data.avg_order_value)}` : ''}
+        subtext={data ? `${t('avgValue')}: ${formatCurrency(data.avg_order_value)}` : ''}
         trend={data ? { 
           value: `${data.revenue_change_percent >= 0 ? '+' : ''}${data.revenue_change_percent}%`, 
           isPositive: data.revenue_change_percent >= 0 
@@ -165,16 +169,16 @@ export function TodayStats() {
         isLoading={isLoading}
       />
       <StatCard
-        title="Bàn đang phục vụ"
+        title={t('tablesServing')}
         value={data?.tables_occupied.toString() || '0'}
-        subtext={data ? `${data.tables_available} bàn trống` : ''}
+        subtext={data ? `${data.tables_available} ${t('tablesAvailable')}` : ''}
         icon={<Users className="h-6 w-6" />}
         isLoading={isLoading}
       />
       <StatCard
-        title="Thời gian phục vụ TB"
-        value={data ? `${data.avg_service_time_minutes} phút` : '0 phút'}
-        subtext="Từ order đến served"
+        title={t('avgServiceTime')}
+        value={data ? `${data.avg_service_time_minutes} ${t('minutes')}` : `0 ${t('minutes')}`}
+        subtext={t('fromOrderToServed')}
         icon={<Clock className="h-6 w-6" />}
         isLoading={isLoading}
       />
@@ -187,6 +191,7 @@ export function TodayStats() {
           completed: data.order_status_breakdown.completed,
         } : undefined}
         isLoading={isLoading}
+        t={t}
       />
     </div>
   )

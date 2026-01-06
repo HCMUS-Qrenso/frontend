@@ -12,10 +12,12 @@ import { TableDeleteModal } from '@/src/features/admin/tables/components/list/ta
 import { Table } from '@/src/features/admin/tables/types/tables'
 import { useZonesSimpleQuery } from '@/src/features/admin/tables/queries/zones.queries'
 import { SimpleZone } from '@/src/features/admin/tables/types/zones'
+import { useTranslations } from 'next-intl'
 
 function TablesListContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
+  const t = useTranslations('tables')
 
   // Get current tab from URL, default to 'active'
   const currentTab = searchParams.get('tab') || 'active'
@@ -58,7 +60,7 @@ function TablesListContent() {
               : 'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700',
           )}
         >
-          Danh sách bàn
+          {t('tableList')}
         </button>
         <button
           onClick={() => handleTabChange('trash')}
@@ -69,7 +71,7 @@ function TablesListContent() {
               : 'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700',
           )}
         >
-          Lịch sử xóa bàn
+          {t('deleteHistory')}
         </button>
       </div>
 

@@ -38,7 +38,7 @@ export default async function LocaleLayout({ children, params }: Props) {
           storageKey="theme"
           disableTransitionOnChange
         >
-          <NextIntlClientProvider messages={messages}>
+          <NextIntlClientProvider messages={messages} locale={locale}>
             <QueryProvider>{children}</QueryProvider>
           </NextIntlClientProvider>
           <Toaster />

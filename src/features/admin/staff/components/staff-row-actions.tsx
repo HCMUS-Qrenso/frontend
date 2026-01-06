@@ -15,6 +15,7 @@ import { StaffEditDialog } from './staff-edit-dialog'
 import { StaffLockDialog } from './staff-lock-dialog'
 import { StaffDeleteDialog } from './staff-delete-dialog'
 import { StaffPasswordDialog } from './staff-password-dialog'
+import { useTranslations } from 'next-intl'
 
 interface StaffRowActionsProps {
   staff: Staff
@@ -24,6 +25,7 @@ type DialogType = 'edit' | 'lock' | 'unlock' | 'resetPassword' | 'resendInvite' 
 
 export function StaffRowActions({ staff }: StaffRowActionsProps) {
   const [activeDialog, setActiveDialog] = useState<DialogType>(null)
+  const t = useTranslations('staff')
 
   const closeDialog = () => setActiveDialog(null)
 
@@ -38,18 +40,18 @@ export function StaffRowActions({ staff }: StaffRowActionsProps) {
         <DropdownMenuContent align="end">
           <DropdownMenuItem onClick={() => setActiveDialog('edit')}>
             <Pencil className="mr-2 h-4 w-4" />
-            Chỉnh sửa
+            {t('editAction')}
           </DropdownMenuItem>
 
           {staff.emailVerified ? (
             <DropdownMenuItem onClick={() => setActiveDialog('resetPassword')}>
               <Key className="mr-2 h-4 w-4" />
-              Reset mật khẩu
+              {t('resetPassword')}
             </DropdownMenuItem>
           ) : (
             <DropdownMenuItem onClick={() => setActiveDialog('resendInvite')}>
               <Mail className="mr-2 h-4 w-4" />
-              Gửi lại lời mời
+              {t('resendInvite')}
             </DropdownMenuItem>
           )}
 
@@ -61,18 +63,18 @@ export function StaffRowActions({ staff }: StaffRowActionsProps) {
               className="text-emerald-600"
             >
               <Unlock className="mr-2 h-4 w-4" />
-              Mở khóa
+              {t('unlockAccount')}
             </DropdownMenuItem>
           ) : (
             <DropdownMenuItem onClick={() => setActiveDialog('lock')} className="text-red-600">
               <Lock className="mr-2 h-4 w-4" />
-              Khóa tài khoản
+              {t('lockAccount')}
             </DropdownMenuItem>
           )}
 
           <DropdownMenuItem onClick={() => setActiveDialog('delete')} className="text-red-600">
             <Trash2 className="mr-2 h-4 w-4" />
-            Xóa nhân viên
+            {t('deleteAction')}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

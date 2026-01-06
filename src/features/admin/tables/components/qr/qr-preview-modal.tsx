@@ -18,6 +18,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/src/components/ui/dialog'
+import { useTranslations } from 'next-intl'
 
 interface QRPreviewModalProps {
   table: TableQR | null
@@ -28,6 +29,7 @@ interface QRPreviewModalProps {
 export function QRPreviewModal({ table, open, onOpenChange }: QRPreviewModalProps) {
   const [downloading, setDownloading] = useState<string | null>(null)
   const { handleError } = useErrorHandler()
+  const t = useTranslations('tables')
 
   const handleDownload = async (format: 'png' | 'pdf') => {
     if (!table) return
@@ -37,9 +39,9 @@ export function QRPreviewModal({ table, open, onOpenChange }: QRPreviewModalProp
       const blob = await tablesApi.downloadQR(table.id, format)
       const filename = `table-${table.tableNumber}-qr.${format}`
       downloadBlob(blob, filename)
-      toast.success(`Đã tải xuống ${format.toUpperCase()}`)
+      toast.success(t('downloadedFormat').replace('{format}', format.toUpperCase()))
     } catch (error: any) {
-      handleError(error, 'Có lỗi xảy ra khi tải xuống QR')
+      handleError(error, t('downloadQrError'))
     } finally {
       setDownloading(null)
     }
@@ -50,9 +52,9 @@ export function QRPreviewModal({ table, open, onOpenChange }: QRPreviewModalProp
       <DialogContent className="max-w-lg rounded-2xl">
         <DialogHeader>
           <div className="space-y-1">
-            <DialogTitle>Xem trước mã QR</DialogTitle>
+            <DialogTitle>{t('qrPreviewTitle')}</DialogTitle>
             <DialogDescription>
-              Bàn {table?.tableNumber} - {table?.tableArea}
+              {t('tableCol')} {table?.tableNumber} - {table?.tableArea}
             </DialogDescription>
           </div>
         </DialogHeader>
@@ -87,15 +89,15 @@ export function QRPreviewModal({ table, open, onOpenChange }: QRPreviewModalProp
         <div className="space-y-3 overflow-hidden rounded-2xl bg-slate-50 p-4 dark:bg-slate-800/50">
           <div>
             <p className="text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-              Thông tin bàn
+              {t('tableInfo')}
             </p>
             <p className="text-sm font-medium text-slate-900 dark:text-white">
-              Bàn {table?.tableNumber} ({table?.seats} ghế)
+              {t('tableCol')} {table?.tableNumber} ({table?.seats} {t('seats')})
             </p>
           </div>
           <div className="overflow-hidden">
             <p className="text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-              URL đích đến
+              {t('destinationUrl')}
             </p>
             <div className="flex items-center gap-2">
               <code className="flex-1 truncate text-xs text-slate-600 dark:text-slate-300">
@@ -110,7 +112,7 @@ export function QRPreviewModal({ table, open, onOpenChange }: QRPreviewModalProp
           </div>
           <div className="rounded-lg bg-emerald-50 p-3 dark:bg-emerald-500/10">
             <p className="text-xs text-emerald-700 dark:text-emerald-400">
-              Khách scan QR này sẽ được dẫn thẳng vào menu bàn {table?.tableNumber}
+              {t('qrScanNote').replace('{tableNumber}', table?.tableNumber || '')}
             </p>
           </div>
         </div>

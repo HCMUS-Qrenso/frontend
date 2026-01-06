@@ -20,6 +20,7 @@ import { downloadBlobWithHeaders } from '@/src/lib/helpers/download'
 import { toast } from 'sonner'
 import { useErrorHandler } from '@/src/hooks/use-error-handler'
 import { QrStats, type QRStatus, type TableQR } from '@/src/features/admin/tables/types/tables'
+import { useTranslations } from 'next-intl'
 
 // Helper function to map backend QR status to UI status
 // API returns title case: "Missing", "Ready", "Outdated"
@@ -108,6 +109,7 @@ function QRManagerContent() {
   const [statusFilter, setStatusFilter] = useState<QRStatus | undefined>(undefined)
   const [zoneFilter, setZoneFilter] = useState<string | undefined>(undefined)
   const [overrides, setOverrides] = useState<Record<string, TableQR>>({})
+  const t = useTranslations('tables')
 
   const { handleError } = useErrorHandler()
   const { data: zonesData } = useZonesSimpleQuery()
@@ -153,7 +155,7 @@ function QRManagerContent() {
 
   const handleGenerateAll = async (forceRegenerate: boolean) => {
     if (tableQRs.length === 0) {
-      toast.info('Không có bàn nào để tạo QR')
+      toast.info(t('noTablesToGenerate'))
       return
     }
 
@@ -165,8 +167,8 @@ function QRManagerContent() {
       })
       toast.success(
         forceRegenerate
-          ? 'Đã tạo lại QR cho tất cả bàn thành công'
-          : 'Đã tạo QR cho các bàn thiếu thành công',
+          ? t('regeneratedAllSuccess')
+          : t('generatedMissingSuccess'),
       )
     } catch (error) {
       handleError(error)
@@ -175,7 +177,7 @@ function QRManagerContent() {
 
   const handleBatchGenerate = async (forceRegenerate: boolean) => {
     if (selectedTables.length === 0) {
-      toast.info('Vui lòng chọn ít nhất một bàn')
+      toast.info(t('selectAtLeastOne'))
       return
     }
 
@@ -184,7 +186,7 @@ function QRManagerContent() {
         table_ids: selectedTables,
         force_regenerate: forceRegenerate,
       })
-      toast.success(`Đã tạo QR cho ${selectedTables.length} bàn thành công`)
+      toast.success(t('generatedBatchSuccess').replace('{count}', String(selectedTables.length)))
       setSelectedTables([])
       setShowBatchDialog(false)
     } catch (error) {
@@ -197,7 +199,7 @@ function QRManagerContent() {
       const blob = await tablesApi.downloadAllQR(format)
       const extension = format === 'zip' ? 'zip' : format === 'pdf' ? 'pdf' : 'png'
       downloadBlobWithHeaders(blob, {}, `qr-codes-all.${extension}`)
-      toast.success('Đã tải xuống tất cả QR codes')
+      toast.success(t('downloadedAllSuccess'))
     } catch (error) {
       handleError(error)
     }
@@ -209,7 +211,7 @@ function QRManagerContent() {
       const table = tableQRs.find((t) => t.id === tableId)
       const filename = `qr-table-${table?.tableNumber || tableId}.${format}`
       downloadBlobWithHeaders(blob, {}, filename)
-      toast.success('Đã tải xuống QR code')
+      toast.success(t('downloadedSuccess'))
     } catch (error) {
       handleError(error)
     }
@@ -218,7 +220,7 @@ function QRManagerContent() {
   const handleGenerateQR = async (tableId: string, forceRegenerate = false) => {
     try {
       await generateMutation.mutateAsync({ tableId, forceRegenerate })
-      toast.success(forceRegenerate ? 'Đã tạo lại QR code thành công' : 'Đã tạo QR code thành công')
+      toast.success(forceRegenerate ? t('regeneratedSuccess') : t('generatedSuccess'))
       await refreshSingleQR(tableId)
     } catch (error) {
       handleError(error)
@@ -229,7 +231,7 @@ function QRManagerContent() {
     return (
       <div className="rounded-2xl border border-red-200 bg-red-50 p-6 dark:border-red-800 dark:bg-red-500/10">
         <p className="text-sm text-red-600 dark:text-red-400">
-          Có lỗi xảy ra khi tải danh sách QR. Vui lòng thử lại.
+          {t('qrLoadError')}
         </p>
       </div>
     )

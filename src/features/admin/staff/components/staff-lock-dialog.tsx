@@ -15,6 +15,7 @@ import { toast } from 'sonner'
 import type { Staff } from '@/src/features/admin/staff/types'
 import { useUpdateStaffStatusMutation } from '@/src/features/admin/staff/queries'
 import { useErrorHandler } from '@/src/hooks/use-error-handler'
+import { useTranslations } from 'next-intl'
 
 interface StaffLockDialogProps {
   open: boolean
@@ -26,6 +27,7 @@ interface StaffLockDialogProps {
 export function StaffLockDialog({ open, onOpenChange, staff, action }: StaffLockDialogProps) {
   const updateStatusMutation = useUpdateStaffStatusMutation()
   const { handleError } = useErrorHandler()
+  const t = useTranslations('staff')
 
   const isLocking = action === 'lock'
 
@@ -35,10 +37,10 @@ export function StaffLockDialog({ open, onOpenChange, staff, action }: StaffLock
         id: staff.id,
         payload: { status: isLocking ? 'suspended' : 'active' },
       })
-      toast.success(isLocking ? 'Đã khóa tài khoản thành công' : 'Đã mở khóa tài khoản thành công')
+      toast.success(isLocking ? t('lockSuccess') : t('unlockSuccess'))
       onOpenChange(false)
     } catch (error) {
-      handleError(error, isLocking ? 'Không thể khóa tài khoản' : 'Không thể mở khóa tài khoản')
+      handleError(error, isLocking ? t('lockError') : t('unlockError'))
     }
   }
 
@@ -47,24 +49,28 @@ export function StaffLockDialog({ open, onOpenChange, staff, action }: StaffLock
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>
-            {isLocking ? 'Khóa tài khoản?' : 'Mở khóa tài khoản?'}
+            {isLocking ? t('lockTitle') : t('unlockTitle')}
           </AlertDialogTitle>
           <AlertDialogDescription>
             {isLocking ? (
-              <>
-                Bạn có chắc chắn muốn khóa tài khoản <strong>{staff.fullName}</strong>? Họ sẽ không
-                thể đăng nhập cho đến khi được mở khóa.
-              </>
+              <span dangerouslySetInnerHTML={{ 
+                __html: t('lockDesc', { name: staff.fullName }).replace(
+                  '<strong>',
+                  '<strong class="font-semibold">'
+                )
+              }} />
             ) : (
-              <>
-                Bạn có chắc chắn muốn mở khóa tài khoản <strong>{staff.fullName}</strong>? Họ sẽ có
-                thể đăng nhập trở lại.
-              </>
+              <span dangerouslySetInnerHTML={{ 
+                __html: t('unlockDesc', { name: staff.fullName }).replace(
+                  '<strong>',
+                  '<strong class="font-semibold">'
+                )
+              }} />
             )}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={updateStatusMutation.isPending}>Hủy</AlertDialogCancel>
+          <AlertDialogCancel disabled={updateStatusMutation.isPending}>{t('cancel')}</AlertDialogCancel>
           <AlertDialogAction
             onClick={handleConfirm}
             className={
@@ -73,7 +79,7 @@ export function StaffLockDialog({ open, onOpenChange, staff, action }: StaffLock
             disabled={updateStatusMutation.isPending}
           >
             {updateStatusMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {isLocking ? 'Khóa tài khoản' : 'Mở khóa'}
+            {isLocking ? t('lockConfirm') : t('unlockConfirm')}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

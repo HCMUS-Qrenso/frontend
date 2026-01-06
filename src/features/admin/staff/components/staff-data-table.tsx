@@ -25,6 +25,8 @@ import { SkeletonTableRows } from '@/src/components/loading'
 import { useSearchParams, useRouter } from 'next/navigation'
 import type { StaffQueryParams } from '@/src/features/admin/staff/types'
 import { TablePagination } from '@/src/components/ui/table-pagination'
+import { useTranslations } from 'next-intl'
+import { useLocale } from 'next-intl'
 
 interface StaffDataTableProps {
   role: 'admin' | 'waiter' | 'kitchen_staff'
@@ -33,6 +35,8 @@ interface StaffDataTableProps {
 export function StaffDataTable({ role }: StaffDataTableProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const t = useTranslations('staff')
+  const locale = useLocale()
 
   // Read filters from URL params
   const search = searchParams.get('search') || ''
@@ -81,7 +85,7 @@ export function StaffDataTable({ role }: StaffDataTableProps) {
 
   const formatDate = (date: string | null) => {
     if (!date) return '—'
-    return new Date(date).toLocaleDateString('vi-VN', {
+    return new Date(date).toLocaleDateString(locale === 'vi' ? 'vi-VN' : 'en-US', {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
@@ -90,7 +94,7 @@ export function StaffDataTable({ role }: StaffDataTableProps) {
 
   const formatDateTime = (date: string | null) => {
     if (!date) return '—'
-    return new Date(date).toLocaleString('vi-VN', {
+    return new Date(date).toLocaleString(locale === 'vi' ? 'vi-VN' : 'en-US', {
       month: 'short',
       day: 'numeric',
       hour: '2-digit',
@@ -107,6 +111,12 @@ export function StaffDataTable({ role }: StaffDataTableProps) {
       .slice(0, 2)
   }
 
+  const getEmptyTitle = () => {
+    if (role === 'waiter') return t('noWaiterStaff')
+    if (role === 'kitchen_staff') return t('noKitchenStaff')
+    return t('noAdminStaff')
+  }
+
   // Loading state - skeleton rows to avoid layout shift
   if (isLoading) {
     return (
@@ -115,13 +125,13 @@ export function StaffDataTable({ role }: StaffDataTableProps) {
           <Table>
             <TableHeader>
               <AdminTableHeaderRow>
-                <AdminTableHead>Nhân viên</AdminTableHead>
-                <AdminTableHead>Liên hệ</AdminTableHead>
-                <AdminTableHead>Vai trò</AdminTableHead>
-                <AdminTableHead>Trạng thái</AdminTableHead>
-                <AdminTableHead align="center">Xác thực</AdminTableHead>
-                <AdminTableHead>Đăng nhập cuối</AdminTableHead>
-                <AdminTableHead align="right">Thao tác</AdminTableHead>
+                <AdminTableHead>{t('staffHeader')}</AdminTableHead>
+                <AdminTableHead>{t('contactHeader')}</AdminTableHead>
+                <AdminTableHead>{t('roleHeader')}</AdminTableHead>
+                <AdminTableHead>{t('statusHeader')}</AdminTableHead>
+                <AdminTableHead align="center">{t('verifiedHeader')}</AdminTableHead>
+                <AdminTableHead>{t('lastLoginHeader')}</AdminTableHead>
+                <AdminTableHead align="right">{t('actionsHeader')}</AdminTableHead>
               </AdminTableHeaderRow>
             </TableHeader>
             <TableBody>
@@ -149,7 +159,7 @@ export function StaffDataTable({ role }: StaffDataTableProps) {
     return (
       <div className="rounded-2xl border border-red-200 bg-red-50 p-6 dark:border-red-800 dark:bg-red-500/10">
         <p className="text-sm text-red-600 dark:text-red-400">
-          Có lỗi xảy ra khi tải danh sách nhân viên. Vui lòng thử lại.
+          {t('loadError')}
         </p>
       </div>
     )
@@ -162,13 +172,13 @@ export function StaffDataTable({ role }: StaffDataTableProps) {
         <Table>
           <TableHeader>
             <AdminTableHeaderRow>
-              <AdminTableHead>Nhân viên</AdminTableHead>
-              <AdminTableHead>Liên hệ</AdminTableHead>
-              <AdminTableHead>Vai trò</AdminTableHead>
-              <AdminTableHead>Trạng thái</AdminTableHead>
-              <AdminTableHead align="center">Xác thực</AdminTableHead>
-              <AdminTableHead>Đăng nhập cuối</AdminTableHead>
-              <AdminTableHead align="right">Thao tác</AdminTableHead>
+              <AdminTableHead>{t('staffHeader')}</AdminTableHead>
+              <AdminTableHead>{t('contactHeader')}</AdminTableHead>
+              <AdminTableHead>{t('roleHeader')}</AdminTableHead>
+              <AdminTableHead>{t('statusHeader')}</AdminTableHead>
+              <AdminTableHead align="center">{t('verifiedHeader')}</AdminTableHead>
+              <AdminTableHead>{t('lastLoginHeader')}</AdminTableHead>
+              <AdminTableHead align="right">{t('actionsHeader')}</AdminTableHead>
             </AdminTableHeaderRow>
           </TableHeader>
           <TableBody>
@@ -177,12 +187,8 @@ export function StaffDataTable({ role }: StaffDataTableProps) {
                 <TableCell colSpan={7} className="px-6 py-0">
                   <EmptyState
                     icon={Users}
-                    title={
-                      role === 'waiter'
-                        ? 'Chưa có nhân viên phục vụ nào'
-                        : 'Chưa có nhân viên bếp nào'
-                    }
-                    description="Nhấn 'Mời nhân viên' để thêm nhân viên mới"
+                    title={getEmptyTitle()}
+                    description={t('inviteHint')}
                   />
                 </TableCell>
               </TableRow>
@@ -203,7 +209,7 @@ export function StaffDataTable({ role }: StaffDataTableProps) {
                           {staff.fullName}
                         </p>
                         <p className="text-xs text-slate-500 dark:text-slate-400">
-                          Tham gia {formatDate(staff.createdAt)}
+                          {t('joinedAt', { date: formatDate(staff.createdAt) })}
                         </p>
                       </div>
                     </div>
@@ -265,7 +271,7 @@ export function StaffDataTable({ role }: StaffDataTableProps) {
           totalPages={pagination.totalPages}
           total={pagination.total}
           limit={pagination.limit}
-          itemLabel="nhân viên"
+          itemLabel={t('staffLabel')}
           onPageChange={handlePageChange}
         />
       )}

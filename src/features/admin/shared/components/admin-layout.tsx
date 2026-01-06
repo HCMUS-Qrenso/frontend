@@ -16,6 +16,7 @@ import { Menu, Store, ChevronDown, User, Settings, LogOut } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/src/components/ui/avatar'
 import { useSearchParams, usePathname } from 'next/navigation'
 import { ThemeToggle } from '@/src/components/theme-toggle'
+import { LanguageSwitcher } from '@/src/components/language-switcher'
 import { useAuth, useUserProfileQuery } from '@/src/features/auth/hooks'
 import {
   useOwnerTenantsQuery,
@@ -25,6 +26,7 @@ import { useTenantStore } from '@/src/store/tenant-store'
 import { invalidateTenantQueries } from '@/src/features/admin/tenants/utils'
 import { AdminSidebar } from './admin-sidebar'
 import { getInitials } from '../utils'
+import { useTranslations } from 'next-intl'
 
 interface AdminLayoutProps {
   children: React.ReactNode
@@ -99,15 +101,17 @@ export function AdminLayout({ children }: AdminLayoutProps) {
     }
   }, [isOwner, ownerTenantsQuery.data, selectedTenantId, setTenants, selectTenant])
 
+  const t = useTranslations('admin')
+
   const selectedTenantName = useMemo(() => {
     if (isOwner) {
       const selected = tenants.find((t) => t.id === selectedTenantId)
-      return selected?.name ?? 'Chọn nhà hàng'
+      return selected?.name ?? t('selectRestaurant')
     }
 
     const detail = currentTenantQuery.data?.data
-    return detail?.name ?? 'Nhà hàng của bạn'
-  }, [isOwner, tenants, selectedTenantId, currentTenantQuery.data])
+    return detail?.name ?? t('yourRestaurant')
+  }, [isOwner, tenants, selectedTenantId, currentTenantQuery.data, t])
 
   // Query client for invalidating queries
   const queryClient = useQueryClient()
@@ -126,123 +130,60 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   const isModalOpen = searchParams.get('modal') !== null || searchParams.get('delete') !== null
 
   // Helper: resolve page header (title + description) based on current pathname.
-  // Để thêm header cho trang mới /admin/xxx, chỉ cần thêm case mới vào hàm này.
   const getPageHeader = (path: string): { title: string; description: string } => {
     // Exact matches for menu pages
     if (path === '/admin/menu/categories') {
-      return {
-        title: 'Thực đơn / Danh mục',
-        description: 'Quản lý danh mục để nhóm món ăn; thay đổi sẽ ảnh hưởng filter ở trang Món ăn',
-      }
+      return { title: t('menuCategories'), description: t('menuCategoriesDesc') }
     }
-
     if (path === '/admin/menu/items') {
-      return {
-        title: 'Thực đơn / Món ăn',
-        description: 'Quản lý món, trạng thái bán, ảnh và tuỳ chọn (modifiers)',
-      }
+      return { title: t('menuItems'), description: t('menuItemsDesc') }
     }
-
     if (path === '/admin/menu/modifiers') {
-      return {
-        title: 'Thực đơn / Nhóm tuỳ chọn (Modifiers)',
-        description: 'Quản lý các nhóm tuỳ chọn (Size, Topping...) và các option trong từng nhóm',
-      }
+      return { title: t('menuModifiers'), description: t('menuModifiersDesc') }
     }
-
     if (path === '/admin/menu/import-export') {
-      return {
-        title: 'Import / Export Thực đơn',
-        description: 'Nhập dữ liệu từ CSV/Excel, xuất backup dữ liệu menu',
-      }
+      return { title: t('menuImportExport'), description: t('menuImportExportDesc') }
     }
-
     if (path === '/admin/menu/templates') {
-      return {
-        title: 'Menu Templates',
-        description: 'Tạo menu đẹp với các template có sẵn, xuất PDF/PNG để in ấn',
-      }
+      return { title: t('menuTemplates'), description: t('menuTemplatesDesc') }
     }
-
     // Orders
     if (path === '/admin/orders' || path.startsWith('/admin/orders/')) {
-      return {
-        title: 'Đơn hàng',
-        description: 'Theo dõi và xử lý đơn theo thời gian thực',
-      }
+      return { title: t('ordersTitle'), description: t('ordersDesc') }
     }
-
     // Staff
     if (path === '/admin/staff' || path.startsWith('/admin/staff/')) {
-      return {
-        title: 'Nhân viên',
-        description: 'Quản lý tài khoản phục vụ & bếp theo nhà hàng',
-      }
+      return { title: t('staffTitle'), description: t('staffDesc') }
     }
-
     // Dashboard
     if (path === '/admin/dashboard' || path === '/admin') {
-      return {
-        title: 'Bảng điều khiển',
-        description: 'Tổng quan hôm nay',
-      }
+      return { title: t('dashboardTitle'), description: t('dashboardDesc') }
     }
-
-    // Tables area (list, layout, qr, zones under tables)
+    // Tables area
     if (path.startsWith('/admin/tables')) {
-      // More specific sub-routes
       if (path.startsWith('/admin/tables/list')) {
-        return {
-          title: 'Bàn / Danh sách',
-          description: 'Xem và quản lý danh sách bàn theo dạng bảng, thuận tiện cho thao tác nhanh',
-        }
+        return { title: t('tablesList'), description: t('tablesListDesc') }
       }
-
       if (path.startsWith('/admin/tables/layout')) {
-        return {
-          title: 'Bàn / Sơ đồ',
-          description:
-            'Quản lý sơ đồ bàn theo mặt bằng nhà hàng, kéo thả và sắp xếp vị trí trực quan',
-        }
+        return { title: t('tablesLayout'), description: t('tablesLayoutDesc') }
       }
-
       if (path.startsWith('/admin/tables/qr')) {
-        return {
-          title: 'Bàn / QR Code',
-          description: 'Tạo và tải QR Code cho từng bàn để khách gọi món trực tiếp',
-        }
+        return { title: t('tablesQr'), description: t('tablesQrDesc') }
       }
-
       if (path.startsWith('/admin/tables/zones')) {
-        return {
-          title: 'Khu vực / Danh sách',
-          description: 'Quản lý các khu vực (Zone) trong nhà hàng để nhóm và phân chia bàn',
-        }
+        return { title: t('tablesZones'), description: t('tablesZonesDesc') }
       }
-
-      // Generic tables fallback
-      return {
-        title: 'Bàn / Quản lý',
-        description: 'Quản lý bàn, sơ đồ và QR Code cho nhà hàng của bạn',
-      }
+      return { title: t('tablesGeneric'), description: t('tablesGenericDesc') }
     }
-
     // KDS
     if (path === '/admin/kds' || path.startsWith('/admin/kds/')) {
-      return {
-        title: 'KDS - Global View',
-        description: 'Màn hình theo dõi và xử lý đơn bếp theo thời gian thực',
-      }
+      return { title: t('kdsTitle'), description: t('kdsDesc') }
     }
-
-    // Fallback: dashboard-style default
-    return {
-      title: 'Bảng điều khiển',
-      description: 'Tổng quan hôm nay',
-    }
+    // Fallback
+    return { title: t('dashboardTitle'), description: t('dashboardDesc') }
   }
 
-  const currentPageHeader = useMemo(() => getPageHeader(pathname), [pathname])
+  const currentPageHeader = useMemo(() => getPageHeader(pathname), [pathname, t])
 
   // Wrapper to ensure logout returns Promise<void>
   const handleLogout = async () => {
@@ -304,7 +245,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-56">
                     {ownerTenantsQuery.isLoading && (
-                      <DropdownMenuItem disabled>Đang tải danh sách...</DropdownMenuItem>
+                      <DropdownMenuItem disabled>{t('loadingList')}</DropdownMenuItem>
                     )}
                     {!ownerTenantsQuery.isLoading &&
                       tenants.map((tenant) => (
@@ -316,7 +257,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                         </DropdownMenuItem>
                       ))}
                     {!ownerTenantsQuery.isLoading && tenants.length === 0 && (
-                      <DropdownMenuItem disabled>Chưa có nhà hàng nào</DropdownMenuItem>
+                      <DropdownMenuItem disabled>{t('noRestaurant')}</DropdownMenuItem>
                     )}
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -335,18 +276,21 @@ export function AdminLayout({ children }: AdminLayoutProps) {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" className="gap-2 rounded-full bg-transparent">
-                    <span className="hidden sm:inline">Hôm nay</span>
+                    <span className="hidden sm:inline">{t('today')}</span>
                     <ChevronDown className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem>Hôm nay</DropdownMenuItem>
-                  <DropdownMenuItem>Tuần này</DropdownMenuItem>
-                  <DropdownMenuItem>Tháng này</DropdownMenuItem>
+                  <DropdownMenuItem>{t('today')}</DropdownMenuItem>
+                  <DropdownMenuItem>{t('thisWeek')}</DropdownMenuItem>
+                  <DropdownMenuItem>{t('thisMonth')}</DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem>Tùy chọn...</DropdownMenuItem>
+                  <DropdownMenuItem>{t('custom')}</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
+
+              {/* Language Switcher */}
+              <LanguageSwitcher />
 
               {/* Theme Toggle */}
               <ThemeToggle />
@@ -366,11 +310,11 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                 <DropdownMenuContent align="end" className="w-48">
                   <DropdownMenuItem>
                     <User className="mr-2 h-4 w-4" />
-                    Hồ sơ
+                    {t('profile')}
                   </DropdownMenuItem>
                   <DropdownMenuItem>
                     <Settings className="mr-2 h-4 w-4" />
-                    Cài đặt
+                    {t('settings')}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
@@ -379,7 +323,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                     disabled={logoutPending}
                   >
                     <LogOut className="mr-2 h-4 w-4" />
-                    Đăng xuất
+                    {t('logout')}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

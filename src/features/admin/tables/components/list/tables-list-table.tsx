@@ -37,6 +37,7 @@ import {
   AdminTableHead,
   AdminTableRow,
 } from '@/src/components/ui/table'
+import { useTranslations } from 'next-intl'
 
 interface TablesListTableProps {
   isTrashView?: boolean
@@ -51,6 +52,7 @@ export function TablesListTable({
 }: TablesListTableProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const t = useTranslations('tables')
 
   // Get query params
   const page = Number.parseInt(searchParams.get('page') || '1')
@@ -88,7 +90,7 @@ export function TablesListTable({
     // Ưu tiên zone_id từ nested zone object hoặc zone_id field
     const zoneId = table.zone?.id || table.zone_id
     // Chỉ fallback về zone_name/floor nếu không có zone_id
-    const zoneParam = zoneId || table.zone_name || table.floor || 'Tất cả'
+    const zoneParam = zoneId || table.zone_name || table.floor || t('all')
     router.push(`/admin/tables/layout?zone=${encodeURIComponent(zoneParam)}&tableId=${table.id}`)
   }
 
@@ -116,9 +118,9 @@ export function TablesListTable({
           position,
         },
       })
-      toast.success('Bàn đã được khôi phục thành công')
+      toast.success(t('tableRestoredSuccess'))
     } catch (error: any) {
-      handleErrorWithStatus(error, undefined, 'Không thể khôi phục bàn. Vui lòng thử lại.')
+      handleErrorWithStatus(error, undefined, t('cannotRestoreTable'))
     }
   }
 
@@ -144,12 +146,12 @@ export function TablesListTable({
             </colgroup>
             <TableHeader>
               <AdminTableHeaderRow>
-                <AdminTableHead>Bàn</AdminTableHead>
-                <AdminTableHead>Khu vực / Tầng</AdminTableHead>
-                <AdminTableHead>Sức chứa</AdminTableHead>
-                <AdminTableHead>Trạng thái</AdminTableHead>
-                <AdminTableHead>Đơn hàng hiện tại</AdminTableHead>
-                <AdminTableHead align="right">Thao tác</AdminTableHead>
+                <AdminTableHead>{t('tableHeaderCol')}</AdminTableHead>
+                <AdminTableHead>{t('zoneFloor')}</AdminTableHead>
+                <AdminTableHead>{t('capacity')}</AdminTableHead>
+                <AdminTableHead>{t('status')}</AdminTableHead>
+                <AdminTableHead>{t('currentOrder')}</AdminTableHead>
+                <AdminTableHead align="right">{t('actions')}</AdminTableHead>
               </AdminTableHeaderRow>
             </TableHeader>
             <TableBody>
@@ -174,8 +176,8 @@ export function TablesListTable({
   if (error) {
     return (
       <ContainerErrorState
-        title="Có lỗi xảy ra"
-        description="Không thể tải danh sách bàn. Vui lòng thử lại."
+        title={t('errorOccurred')}
+        description={t('tablesLoadError')}
       />
     )
   }
@@ -195,12 +197,12 @@ export function TablesListTable({
           </colgroup>
           <TableHeader>
             <AdminTableHeaderRow>
-              <AdminTableHead>Bàn</AdminTableHead>
-              <AdminTableHead>Khu vực / Tầng</AdminTableHead>
-              <AdminTableHead>Sức chứa</AdminTableHead>
-              <AdminTableHead>Trạng thái</AdminTableHead>
-              <AdminTableHead>Đơn hàng hiện tại</AdminTableHead>
-              <AdminTableHead align="right">Thao tác</AdminTableHead>
+              <AdminTableHead>{t('tableHeaderCol')}</AdminTableHead>
+              <AdminTableHead>{t('zoneFloor')}</AdminTableHead>
+              <AdminTableHead>{t('capacity')}</AdminTableHead>
+              <AdminTableHead>{t('status')}</AdminTableHead>
+              <AdminTableHead>{t('currentOrder')}</AdminTableHead>
+              <AdminTableHead align="right">{t('actions')}</AdminTableHead>
             </AdminTableHeaderRow>
           </TableHeader>
           <TableBody>
@@ -209,8 +211,8 @@ export function TablesListTable({
                 <TableCell colSpan={6} className="px-6 py-0">
                   <EmptyState
                     icon={TableProperties}
-                    title="Không có bàn nào"
-                    description="Hãy tạo bàn đầu tiên hoặc thử tìm kiếm khác"
+                    title={t('noTableFound')}
+                    description={t('noTableFoundHint')}
                   />
                 </TableCell>
               </TableRow>
@@ -220,10 +222,10 @@ export function TablesListTable({
                   <TableCell className="px-6 py-4">
                     <div>
                       <p className="text-sm font-medium text-slate-900 dark:text-white">
-                        Số {table.table_number}
+                        {t('tableNum')} {table.table_number}
                       </p>
                       <p className="text-xs text-slate-500 dark:text-slate-400">
-                        {table.capacity} chỗ ngồi
+                        {table.capacity} {t('seats')}
                       </p>
                     </div>
                   </TableCell>
@@ -256,7 +258,7 @@ export function TablesListTable({
                           className="h-8 w-8 rounded-full"
                           onClick={() => handleRestore(table)}
                           disabled={updateMutation.isPending}
-                          title="Khôi phục bàn"
+                          title={t('restoreTable')}
                         >
                           <RotateCcw className="h-4 w-4" />
                         </Button>
@@ -270,18 +272,18 @@ export function TablesListTable({
                           <DropdownMenuContent align="end" className="w-48">
                             <DropdownMenuItem onClick={() => onEditClick(table)}>
                               <Edit2 className="mr-2 h-4 w-4" />
-                              Chỉnh sửa
+                              {t('edit')}
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => handleViewOnLayout(table)}>
                               <MapPin className="mr-2 h-4 w-4" />
-                              Xem trên sơ đồ
+                              {t('viewOnLayout')}
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={() => onDeleteClick(table)}
                               className="text-red-600 focus:text-red-600 dark:text-red-400"
                             >
                               <Trash2 className="mr-2 h-4 w-4" />
-                              Xóa bàn
+                              {t('deleteTable')}
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -302,7 +304,7 @@ export function TablesListTable({
           totalPages={pagination.total_pages}
           total={pagination.total}
           limit={pagination.limit}
-          itemLabel="bàn"
+          itemLabel={t('tableLabel')}
           onPageChange={handlePageChange}
         />
       )}

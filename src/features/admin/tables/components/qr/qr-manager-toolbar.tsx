@@ -22,6 +22,7 @@ import {
 } from '@/src/components/ui/alert-dialog'
 import { Search, ChevronDown, QrCode, Shield, Download, AlertTriangle } from 'lucide-react'
 import type { QRStatus } from '@/src/features/admin/tables/types/tables'
+import { useTranslations } from 'next-intl'
 
 interface QRManagerToolbarProps {
   zones: Array<{ id: string; name: string }>
@@ -48,18 +49,19 @@ export function QRManagerToolbar({
 }: QRManagerToolbarProps) {
   const [searchQuery, setSearchQuery] = useState('')
   const [showForceWarning, setShowForceWarning] = useState(false)
+  const t = useTranslations('tables')
 
   const statusMap: Record<QRStatus, string> = {
-    ready: 'Có QR',
-    missing: 'Thiếu QR',
-    outdated: 'Lỗi thời',
+    ready: t('qrHasCode'),
+    missing: t('qrMissingCode'),
+    outdated: t('qrOutdatedLabel'),
   }
 
   const selectedZoneName = zoneFilter
-    ? zones.find((z) => z.id === zoneFilter)?.name || 'Tất cả'
-    : 'Tất cả'
+    ? zones.find((z) => z.id === zoneFilter)?.name || t('all')
+    : t('all')
 
-  const selectedStatusLabel = statusFilter ? statusMap[statusFilter] : 'Tất cả trạng thái'
+  const selectedStatusLabel = statusFilter ? statusMap[statusFilter] : t('allStatuses')
 
   const handleForceGenerate = () => {
     setShowForceWarning(false)
@@ -75,7 +77,7 @@ export function QRManagerToolbar({
           <div className="relative sm:max-w-xs">
             <Search className="absolute top-1/2 left-3 h-3 w-3 -translate-y-1/2 text-slate-400" />
             <Input
-              placeholder="Tìm theo số bàn, khu vực hoặc link QR..."
+              placeholder={t('searchQr')}
               className="h-8 rounded-lg border-slate-200 bg-slate-50 pr-4 pl-9 text-sm focus:bg-white sm:w-64 dark:border-slate-700 dark:bg-slate-800 dark:focus:bg-slate-900"
             />
           </div>
@@ -85,13 +87,13 @@ export function QRManagerToolbar({
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" className="h-8 gap-1 rounded-lg bg-transparent px-3">
-                  <span className="text-sm">Khu vực: {selectedZoneName}</span>
+                  <span className="text-sm">{t('zone')}: {selectedZoneName}</span>
                   <ChevronDown className="h-3 w-3" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start">
                 <DropdownMenuItem onClick={() => onZoneFilterChange(undefined)}>
-                  Tất cả khu vực
+                  {t('allZones')}
                 </DropdownMenuItem>
                 {zones.map((zone) => (
                   <DropdownMenuItem key={zone.id} onClick={() => onZoneFilterChange(zone.id)}>
@@ -111,7 +113,7 @@ export function QRManagerToolbar({
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start">
                 <DropdownMenuItem onClick={() => onStatusFilterChange(undefined)}>
-                  Tất cả trạng thái
+                  {t('allStatuses')}
                 </DropdownMenuItem>
                 {Object.entries(statusMap).map(([key, label]) => (
                   <DropdownMenuItem key={key} onClick={() => onStatusFilterChange(key as QRStatus)}>
@@ -131,22 +133,22 @@ export function QRManagerToolbar({
             className="h-8 gap-1 rounded-lg border border-slate-200 bg-transparent px-3 text-sm font-medium text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
           >
             <Shield className="h-3 w-3" />
-            <span className="hidden sm:inline">Lưu ý bảo mật QR</span>
+            <span className="hidden sm:inline">{t('qrSecurityNote')}</span>
           </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="h-8 gap-1 rounded-lg bg-transparent px-3">
                 <Download className="h-3 w-3" />
-                <span className="hidden text-sm sm:inline">Tải xuống</span>
+                <span className="hidden text-sm sm:inline">{t('download')}</span>
                 <ChevronDown className="h-3 w-3" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={() => onDownloadAll('zip')}>
-                Tải xuống ZIP
+                {t('downloadZip')}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => onDownloadAll('pdf')}>
-                Tải xuống PDF
+                {t('downloadPdf')}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -159,14 +161,14 @@ export function QRManagerToolbar({
                 className="h-8 gap-1 rounded-lg bg-emerald-500 px-3 hover:bg-emerald-600"
               >
                 <QrCode className="h-3 w-3" />
-                <span className="hidden text-sm sm:inline">Tạo QR</span>
+                <span className="hidden text-sm sm:inline">{t('generateQR')}</span>
                 <ChevronDown className="h-3 w-3" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={() => onGenerateAll(false)}>
                 <QrCode className="mr-2 h-4 w-4" />
-                Tạo QR cho bàn thiếu
+                {t('generateMissing')}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
@@ -174,7 +176,7 @@ export function QRManagerToolbar({
                 className="text-red-600 focus:text-red-600 dark:text-red-400"
               >
                 <AlertTriangle className="mr-2 h-4 w-4" />
-                Tạo lại toàn bộ (Force)
+                {t('forceRegenerateAll')}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -187,28 +189,27 @@ export function QRManagerToolbar({
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2 text-red-600">
               <AlertTriangle className="h-5 w-5" />
-              Tạo lại toàn bộ mã QR?
+              {t('forceRegenerateTitle')}
             </AlertDialogTitle>
             <AlertDialogDescription className="space-y-2">
               <span className="block">
-                Hành động này sẽ tạo lại <strong>TẤT CẢ</strong> mã QR cho toàn bộ bàn trong hệ
-                thống.
+                {t('forceRegenerateDesc1')}
               </span>
               <span className="block font-medium text-red-500">
-                Các mã QR cũ đã in hoặc dán tại bàn sẽ KHÔNG còn hoạt động.
+                {t('forceRegenerateWarning')}
               </span>
               <span className="block">
-                Bạn sẽ cần in lại và thay thế tất cả mã QR tại nhà hàng.
+                {t('forceRegenerateDesc2')}
               </span>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Hủy</AlertDialogCancel>
+            <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleForceGenerate}
               className="bg-red-500 hover:bg-red-600"
             >
-              Tạo lại toàn bộ
+              {t('forceRegenerateConfirm')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

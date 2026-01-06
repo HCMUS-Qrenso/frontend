@@ -14,6 +14,7 @@ import {
 import { TrendingUp, TrendingDown } from 'lucide-react'
 import { usePerformanceQuery } from '../queries'
 import { Skeleton } from '@/src/components/ui/skeleton'
+import { useTranslations } from 'next-intl'
 
 type TimeRange = 'day' | 'week' | 'month'
 type DataType = 'revenue' | 'orders'
@@ -28,11 +29,23 @@ function formatCurrency(value: number) {
 export function PerformanceChart() {
   const [timeRange, setTimeRange] = useState<TimeRange>('day')
   const [dataType, setDataType] = useState<DataType>('revenue')
+  const t = useTranslations('dashboard')
 
   const { data: performanceData, isLoading } = usePerformanceQuery(timeRange, 11)
 
   const chartData = performanceData?.data || []
   const summary = performanceData?.summary
+
+  const timeRangeLabels: Record<TimeRange, string> = {
+    day: t('day'),
+    week: t('week'),
+    month: t('month'),
+  }
+
+  const dataTypeLabels: Record<DataType, string> = {
+    revenue: t('revenue'),
+    orders: t('orders'),
+  }
 
   return (
     <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
@@ -40,10 +53,10 @@ export function PerformanceChart() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
-            Hiệu suất theo thời gian
+            {t('performanceOverTime')}
           </h3>
           <p className="text-sm text-slate-500 dark:text-slate-400">
-            Theo dõi doanh thu và số order
+            {t('trackRevenueOrders')}
           </p>
         </div>
 
@@ -61,7 +74,7 @@ export function PerformanceChart() {
                     : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white',
                 )}
               >
-                {range === 'day' ? 'Ngày' : range === 'week' ? 'Tuần' : 'Tháng'}
+                {timeRangeLabels[range]}
               </button>
             ))}
           </div>
@@ -79,7 +92,7 @@ export function PerformanceChart() {
                     : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white',
                 )}
               >
-                {type === 'revenue' ? 'Doanh thu' : 'Đơn hàng'}
+                {dataTypeLabels[type]}
               </button>
             ))}
           </div>
@@ -94,7 +107,7 @@ export function PerformanceChart() {
           </div>
         ) : chartData.length === 0 ? (
           <div className="flex h-full items-center justify-center text-slate-500">
-            Chưa có dữ liệu
+            {t('noData')}
           </div>
         ) : (
           <ResponsiveContainer width="100%" height="100%">
@@ -139,8 +152,8 @@ export function PerformanceChart() {
                         style: 'currency',
                         currency: 'VND',
                       }).format(value)
-                    : `${value} đơn hàng`,
-                  dataType === 'revenue' ? 'Doanh thu' : 'Đơn hàng',
+                    : `${value} ${t('orders').toLowerCase()}`,
+                  dataTypeLabels[dataType],
                 ]}
               />
               <Area
@@ -159,7 +172,7 @@ export function PerformanceChart() {
       {/* Stats */}
       <div className="mt-6 grid gap-4 border-t border-slate-100 pt-6 sm:grid-cols-3 dark:border-slate-800">
         <div>
-          <p className="text-sm text-slate-500 dark:text-slate-400">Tổng doanh thu</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">{t('totalRevenue')}</p>
           {isLoading ? (
             <Skeleton className="mt-1 h-7 w-32" />
           ) : (
@@ -173,7 +186,7 @@ export function PerformanceChart() {
           )}
         </div>
         <div>
-          <p className="text-sm text-slate-500 dark:text-slate-400">Tăng trưởng</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">{t('growth')}</p>
           {isLoading ? (
             <Skeleton className="mt-1 h-7 w-20" />
           ) : (
@@ -191,7 +204,7 @@ export function PerformanceChart() {
           )}
         </div>
         <div>
-          <p className="text-sm text-slate-500 dark:text-slate-400">Đơn hàng TB/ngày</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">{t('avgOrdersPerDay')}</p>
           {isLoading ? (
             <Skeleton className="mt-1 h-7 w-16" />
           ) : (

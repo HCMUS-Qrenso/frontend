@@ -40,6 +40,7 @@ import {
 } from '@/src/features/admin/menu/queries'
 import { useErrorHandler } from '@/src/hooks/use-error-handler'
 import { toast } from 'sonner'
+import { useTranslations } from 'next-intl'
 
 interface ModifiersPanelProps {
   selectedGroup: ModifierGroup | null
@@ -59,6 +60,7 @@ export function ModifiersPanel({
   const [searchQuery, setSearchQuery] = useState('')
   const [showOnlyAvailable, setShowOnlyAvailable] = useState(false)
   const { handleErrorWithStatus } = useErrorHandler()
+  const t = useTranslations('menu')
 
   // Fetch modifiers for the selected group
   const {
@@ -103,11 +105,11 @@ export function ModifiersPanel({
         { groupId: selectedGroupId, payload: { modifiers: reordered } },
         {
           onSuccess: () => {
-            toast.success('Đã cập nhật thứ tự option')
+            toast.success(t('optionOrderUpdatedSuccess'))
           },
           onError: (error) => {
             handleErrorWithStatus(error)
-            toast.error('Không thể cập nhật thứ tự')
+            toast.error(t('cannotUpdateOrder'))
           },
         },
       )
@@ -115,7 +117,7 @@ export function ModifiersPanel({
   }
 
   const formatPrice = (amount: number) => {
-    if (amount === 0) return 'Chuẩn'
+    if (amount === 0) return t('standard')
     const formatted = new Intl.NumberFormat('vi-VN').format(Math.abs(amount))
     return amount > 0 ? `+${formatted}đ` : `-${formatted}đ`
   }
@@ -127,7 +129,7 @@ export function ModifiersPanel({
           <div className="text-center">
             <Eye className="mx-auto h-12 w-12 text-slate-300 dark:text-slate-600" />
             <p className="mt-4 text-sm text-slate-500 dark:text-slate-400">
-              Chọn nhóm để xem các option
+              {t('selectGroupToView')}
             </p>
           </div>
         </div>
@@ -145,14 +147,14 @@ export function ModifiersPanel({
               {selectedGroup.name}
             </h2>
             <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-              {selectedGroup.is_required && <span>• Bắt buộc chọn</span>}
+              {selectedGroup.is_required && <span>• {t('required')}</span>}
               {selectedGroup.min_selections !== null && selectedGroup.min_selections > 0 && (
-                <span>• Tối thiểu: {selectedGroup.min_selections}</span>
+                <span>• {t('minSelections')}: {selectedGroup.min_selections}</span>
               )}
               {selectedGroup.max_selections !== null ? (
-                <span>• Tối đa: {selectedGroup.max_selections}</span>
+                <span>• {t('maxSelections')}: {selectedGroup.max_selections}</span>
               ) : (
-                <span>• Không giới hạn số lượng</span>
+                <span>• {t('noLimit')}</span>
               )}
             </div>
           </div>
@@ -164,7 +166,7 @@ export function ModifiersPanel({
           <div className="relative flex-1">
             <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400" />
             <Input
-              placeholder="Tìm option..."
+              placeholder={t('searchOptions')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10"
@@ -177,12 +179,12 @@ export function ModifiersPanel({
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm">
                   <Filter className="mr-2 h-4 w-4" />
-                  Lọc
+                  {t('filter')}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <div className="flex items-center justify-between px-2 py-1.5">
-                  <span className="text-sm">Chỉ hiện Available</span>
+                  <span className="text-sm">{t('showOnlyAvailable')}</span>
                   <Switch checked={showOnlyAvailable} onCheckedChange={setShowOnlyAvailable} />
                 </div>
               </DropdownMenuContent>
@@ -193,7 +195,7 @@ export function ModifiersPanel({
               className="bg-emerald-600 hover:bg-emerald-700"
             >
               <Plus className="mr-2 h-4 w-4" />
-              Thêm option
+              {t('createModifier')}
             </Button>
           </div>
         </div>
@@ -223,6 +225,7 @@ export function ModifiersPanel({
                       handleErrorWithStatus={handleErrorWithStatus}
                       onEdit={() => onEditModifier(modifier)}
                       onDelete={() => onDeleteModifier(modifier)}
+                      t={t}
                     />
                   ))}
                 </div>
@@ -233,8 +236,8 @@ export function ModifiersPanel({
               <div className="py-12 text-center">
                 <p className="text-sm text-slate-500 dark:text-slate-400">
                   {modifiers.length === 0
-                    ? 'Chưa có option nào. Thêm mới để bắt đầu.'
-                    : 'Không tìm thấy option nào'}
+                    ? t('noModifiers')
+                    : t('noModifiersFound')}
                 </p>
               </div>
             )}
@@ -253,6 +256,7 @@ function SortableModifierItem({
   handleErrorWithStatus,
   onEdit,
   onDelete,
+  t,
 }: {
   modifier: Modifier
   formatPrice: (amount: number) => string
@@ -261,6 +265,7 @@ function SortableModifierItem({
   handleErrorWithStatus: any
   onEdit: () => void
   onDelete: () => void
+  t: (key: string) => string
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: modifier.id,
@@ -284,11 +289,11 @@ function SortableModifierItem({
       },
       {
         onSuccess: () => {
-          toast.success(modifier.is_available ? 'Đã ẩn option' : 'Đã hiện option')
+          toast.success(modifier.is_available ? t('optionHidden') : t('optionShown'))
         },
         onError: (error: any) => {
           handleErrorWithStatus(error)
-          toast.error('Không thể cập nhật trạng thái')
+          toast.error(t('cannotUpdateStatus'))
         },
       },
     )
@@ -317,7 +322,7 @@ function SortableModifierItem({
             {!modifier.is_available && (
               <Badge variant="secondary" className="text-xs">
                 <EyeOff className="mr-1 h-3 w-3" />
-                Ẩn
+                {t('hiddenLabel')}
               </Badge>
             )}
           </div>
@@ -357,9 +362,9 @@ function SortableModifierItem({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={onEdit}>Chỉnh sửa</DropdownMenuItem>
+              <DropdownMenuItem onClick={onEdit}>{t('editModifier')}</DropdownMenuItem>
               <DropdownMenuItem onClick={onDelete} className="text-red-600">
-                Xoá
+                {t('deleteModifier')}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

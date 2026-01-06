@@ -3,6 +3,7 @@
 import { cn } from '@/src/lib/utils'
 import { useTopItemsQuery } from '../queries'
 import { Skeleton } from '@/src/components/ui/skeleton'
+import { useTranslations } from 'next-intl'
 
 interface TopItemsProps {
   className?: string
@@ -10,6 +11,7 @@ interface TopItemsProps {
 
 export function TopItems({ className }: TopItemsProps) {
   const { data: items, isLoading } = useTopItemsQuery(6)
+  const t = useTranslations('dashboard')
 
   const maxSold = items ? Math.max(...items.map((item) => item.quantity_sold), 1) : 1
 
@@ -22,8 +24,8 @@ export function TopItems({ className }: TopItemsProps) {
     >
       {/* Header */}
       <div className="border-b border-slate-100 px-6 py-4 dark:border-slate-800">
-        <h3 className="font-semibold text-slate-900 dark:text-white">Top món hôm nay</h3>
-        <p className="text-sm text-slate-500 dark:text-slate-400">Món bán chạy nhất</p>
+        <h3 className="font-semibold text-slate-900 dark:text-white">{t('topItemsToday')}</h3>
+        <p className="text-sm text-slate-500 dark:text-slate-400">{t('bestSelling')}</p>
       </div>
 
       {/* List */}
@@ -43,7 +45,7 @@ export function TopItems({ className }: TopItemsProps) {
           ))
         ) : items?.length === 0 ? (
           <div className="px-6 py-8 text-center text-slate-500">
-            Chưa có dữ liệu bán hàng hôm nay
+            {t('noSalesDataToday')}
           </div>
         ) : (
           items?.map((item, index) => (
@@ -69,7 +71,7 @@ export function TopItems({ className }: TopItemsProps) {
                   {item.name}
                 </p>
                 <div className="mt-1 flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
-                  <span>{item.quantity_sold} đã bán</span>
+                  <span>{item.quantity_sold} {t('sold')}</span>
                   <span>
                     {new Intl.NumberFormat('vi-VN', {
                       style: 'currency',

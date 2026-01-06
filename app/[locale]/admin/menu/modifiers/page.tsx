@@ -11,10 +11,12 @@ import { Loader2, AlertCircle } from 'lucide-react'
 import { useModifierGroupsQuery } from '@/src/features/admin/menu/queries/modifiers.queries'
 import { useErrorHandler } from '@/src/hooks/use-error-handler'
 import { Modifier, type ModifierGroup } from '@/src/features/admin/menu/types/modifiers'
+import { useTranslations } from 'next-intl'
 
 function ModifiersContent() {
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null)
   const { handleErrorWithStatus } = useErrorHandler()
+  const t = useTranslations('menu')
 
   // Fetch modifier groups from API
   const {
@@ -62,7 +64,7 @@ function ModifiersContent() {
     return (
       <div className="flex flex-col items-center justify-center py-12">
         <AlertCircle className="mb-4 h-12 w-12 text-red-600" />
-        <p className="text-sm text-slate-500">Không thể tải dữ liệu. Vui lòng thử lại.</p>
+        <p className="text-sm text-slate-500">{t('cannotLoadData')}</p>
       </div>
     )
   }

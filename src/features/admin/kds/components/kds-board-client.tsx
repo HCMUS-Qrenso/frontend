@@ -12,8 +12,11 @@ import { useKdsSocket } from '../hooks/use-kds-socket'
 import { useNow } from '../hooks/use-now'
 import type { KdsOrder, OrderItemStatus } from '../types/kds.types'
 import { PRIORITY_WEIGHT } from '../types/kds.types'
+import { useTranslations } from 'next-intl'
 
 export function KdsBoardClient() {
+  const t = useTranslations('kds')
+  
   // State
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null)
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
@@ -95,16 +98,16 @@ export function KdsBoardClient() {
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 rounded-2xl border border-red-200 bg-red-50 p-8 dark:border-red-800 dark:bg-red-950/20">
         <AlertCircle className="h-12 w-12 text-red-600 dark:text-red-400" />
         <div className="text-center">
-          <h3 className="text-lg font-semibold text-red-900 dark:text-red-200">Lỗi tải dữ liệu</h3>
+          <h3 className="text-lg font-semibold text-red-900 dark:text-red-200">{t('loadingError')}</h3>
           <p className="mt-1 text-sm text-red-600 dark:text-red-400">
-            {error instanceof Error ? error.message : 'Đã có lỗi xảy ra'}
+            {error instanceof Error ? error.message : t('errorOccurred')}
           </p>
         </div>
         <Button
           onClick={() => window.location.reload()}
           className="bg-red-600 hover:bg-red-700"
         >
-          Thử lại
+          {t('retry')}
         </Button>
       </div>
     )

@@ -11,6 +11,7 @@ import { useErrorHandler } from '@/src/hooks/use-error-handler'
 import { toast } from 'sonner'
 import type { Zone } from '@/src/features/admin/tables/types'
 import { zoneFormSchema } from '@/src/features/admin/tables/schemas'
+import { useTranslations } from 'next-intl'
 
 interface ZoneUpsertModalProps {
   open: boolean
@@ -35,6 +36,7 @@ const initialFormData: ZoneFormData = {
 
 export function ZoneUpsertModal({ open, onOpenChange, zone, mode }: ZoneUpsertModalProps) {
   const [formData, setFormData] = useState<ZoneFormData>(initialFormData)
+  const t = useTranslations('tables')
 
   const isEdit = mode === 'edit'
 
@@ -65,7 +67,7 @@ export function ZoneUpsertModal({ open, onOpenChange, zone, mode }: ZoneUpsertMo
 
     if (!result.success) {
       const firstError = result.error.issues[0]
-      toast.error(firstError?.message || 'Dữ liệu không hợp lệ')
+      toast.error(firstError?.message || t('invalidData'))
       return
     }
 
@@ -79,15 +81,15 @@ export function ZoneUpsertModal({ open, onOpenChange, zone, mode }: ZoneUpsertMo
 
       if (isEdit && zone) {
         await updateMutation.mutateAsync({ id: zone.id, payload })
-        toast.success('Khu vực đã được cập nhật thành công')
+        toast.success(t('zoneUpdatedSuccess'))
       } else {
         await createMutation.mutateAsync(payload)
-        toast.success('Khu vực đã được tạo thành công')
+        toast.success(t('zoneCreatedSuccess'))
       }
 
       onOpenChange(false)
     } catch (error: any) {
-      handleError(error, 'Có lỗi xảy ra khi lưu khu vực')
+      handleError(error, t('saveZoneError'))
     }
   }
 
@@ -102,23 +104,23 @@ export function ZoneUpsertModal({ open, onOpenChange, zone, mode }: ZoneUpsertMo
     <FormDialog
       open={open}
       onOpenChange={onOpenChange}
-      title={isEdit ? 'Chỉnh sửa khu vực' : 'Thêm khu vực mới'}
+      title={isEdit ? t('editZoneTitle') : t('addNewZone')}
       description={
         isEdit
-          ? 'Cập nhật thông tin khu vực bàn ăn'
-          : 'Tạo khu vực mới để nhóm các bàn lại với nhau'
+          ? t('editZoneDesc')
+          : t('addZoneDesc')
       }
       onSubmit={handleSubmit}
       isSubmitting={isLoading}
-      submitText={isEdit ? 'Cập nhật' : 'Tạo khu vực'}
-      loadingText={isEdit ? 'Đang cập nhật...' : 'Đang tạo...'}
+      submitText={isEdit ? t('updateZoneBtn') : t('createZoneBtn')}
+      loadingText={isEdit ? t('updatingZone') : t('creatingZone')}
       size="sm"
     >
       {/* Tên khu vực */}
-      <FormDialogField label="Tên khu vực" required>
+      <FormDialogField label={t('zoneNameLabel')} required>
         <Input
           id="name"
-          placeholder="Ví dụ: Tầng 1 - Khu vực chính"
+          placeholder={t('zoneNamePlaceholder')}
           value={formData.name}
           onChange={(e) => handleInputChange('name', e.target.value)}
           disabled={isLoading}
@@ -126,10 +128,10 @@ export function ZoneUpsertModal({ open, onOpenChange, zone, mode }: ZoneUpsertMo
       </FormDialogField>
 
       {/* Mô tả */}
-      <FormDialogField label="Mô tả">
+      <FormDialogField label={t('descriptionLabel')}>
         <Textarea
           id="description"
-          placeholder="Mô tả ngắn gọn về khu vực này..."
+          placeholder={t('descriptionPlaceholder')}
           value={formData.description}
           onChange={(e) => handleInputChange('description', e.target.value)}
           className="min-h-20 resize-none"
@@ -138,7 +140,7 @@ export function ZoneUpsertModal({ open, onOpenChange, zone, mode }: ZoneUpsertMo
       </FormDialogField>
 
       {/* Thứ tự hiển thị */}
-      <FormDialogField label="Thứ tự hiển thị" required>
+      <FormDialogField label={t('displayOrderLabel')} required>
         <Input
           id="display_order"
           type="number"
@@ -154,10 +156,10 @@ export function ZoneUpsertModal({ open, onOpenChange, zone, mode }: ZoneUpsertMo
       <FormDialogSection>
         <div className="space-y-1">
           <Label htmlFor="is_active" className="text-sm font-medium">
-            Trạng thái hoạt động
+            {t('activeStatusLabel')}
           </Label>
           <p className="text-xs text-slate-500 dark:text-slate-400">
-            Khu vực sẽ hiển thị cho khách hàng khi bật
+            {t('activeStatusHint')}
           </p>
         </div>
         <Switch

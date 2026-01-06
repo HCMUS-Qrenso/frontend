@@ -12,7 +12,7 @@ import {
   TableRow,
 } from '@/src/components/ui/table'
 import { Button } from '@/src/components/ui/button'
-import { StatusBadge, CATEGORY_ACTIVE_CONFIG } from '@/src/components/ui/status-badge'
+import { StatusBadge, type StatusConfig } from '@/src/components/ui/status-badge'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -40,6 +40,7 @@ import type { CategorySortBy, CategorySortOrder, Category } from '@/src/features
 import { toast } from 'sonner'
 import { SkeletonTableRows } from '@/src/components/loading'
 import { TablePagination } from '@/src/components/ui/table-pagination'
+import { useTranslations } from 'next-intl'
 
 interface CategoriesTableProps {
   reorderMode: boolean
@@ -55,6 +56,7 @@ function SortableCategoryRow({
   onDelete,
   onToggleActive,
   onViewItems,
+  t,
 }: {
   category: Category
   reorderMode: boolean
@@ -62,11 +64,25 @@ function SortableCategoryRow({
   onDelete: (category: Category) => void
   onToggleActive: (id: string) => void
   onViewItems: (id: string) => void
+  t: (key: string) => string
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: category.id,
     disabled: !reorderMode,
   })
+
+  const CATEGORY_ACTIVE_CONFIG: Record<string, StatusConfig> = {
+    active: {
+      label: t('active'),
+      className:
+        'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20',
+    },
+    hidden: {
+      label: t('hidden'),
+      className:
+        'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-500/10 dark:text-slate-400 dark:border-slate-500/20',
+    },
+  }
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -141,7 +157,7 @@ function SortableCategoryRow({
                 }}
               >
                 <Pencil className="mr-2 h-4 w-4" />
-                Chỉnh sửa
+                {t('edit')}
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={(e) => {
@@ -152,12 +168,12 @@ function SortableCategoryRow({
                 {category.is_active ? (
                   <>
                     <EyeOff className="mr-2 h-4 w-4" />
-                    Ẩn danh mục
+                    {t('hideCategory')}
                   </>
                 ) : (
                   <>
                     <Eye className="mr-2 h-4 w-4" />
-                    Hiện danh mục
+                    {t('showCategory')}
                   </>
                 )}
               </DropdownMenuItem>
@@ -170,7 +186,7 @@ function SortableCategoryRow({
                 className="text-red-600 focus:text-red-600 dark:text-red-400"
               >
                 <Trash2 className="mr-2 h-4 w-4" />
-                Xóa danh mục
+                {t('deleteCategory')}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -189,6 +205,20 @@ export function CategoriesTable({
   const router = useRouter()
   const searchParams = useSearchParams()
   const { handleErrorWithStatus } = useErrorHandler()
+  const t = useTranslations('menu')
+
+  const CATEGORY_ACTIVE_CONFIG: Record<string, StatusConfig> = {
+    active: {
+      label: t('active'),
+      className:
+        'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20',
+    },
+    hidden: {
+      label: t('hidden'),
+      className:
+        'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-500/10 dark:text-slate-400 dark:border-slate-500/20',
+    },
+  }
 
   // Get query params from URL
   const page = Number.parseInt(searchParams.get('page') || '1')
@@ -256,9 +286,9 @@ export function CategoriesTable({
         payload: { is_active: !category.is_active },
       })
 
-      toast.success(`Đã ${category.is_active ? 'ẩn' : 'hiện'} danh mục thành công`)
+      toast.success(category.is_active ? t('categoryHiddenSuccess') : t('categoryShownSuccess'))
     } catch (error) {
-      handleErrorWithStatus(error, undefined, 'Không thể thay đổi trạng thái danh mục')
+      handleErrorWithStatus(error, undefined, t('cannotChangeStatus'))
     }
   }
 
@@ -284,10 +314,10 @@ export function CategoriesTable({
       }
 
       await reorderMutation.mutateAsync(payload)
-      toast.success('Đã cập nhật thứ tự danh mục thành công')
+      toast.success(t('orderSavedSuccess'))
       setReorderMode(false)
     } catch (error) {
-      handleErrorWithStatus(error, undefined, 'Không thể lưu thứ tự danh mục')
+      handleErrorWithStatus(error, undefined, t('cannotSaveOrder'))
     }
   }
 
@@ -299,22 +329,22 @@ export function CategoriesTable({
           <TableHeader>
             <TableRow className="border-b border-slate-100 bg-slate-50/80 hover:bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900">
               <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Danh mục
+                {t('category')}
               </TableHead>
               <TableHead className="w-37.5 px-6 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Thứ tự
+                {t('displayOrder')}
               </TableHead>
               <TableHead className="w-37.5 px-6 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Trạng thái
+                {t('status')}
               </TableHead>
               <TableHead className="w-37.5 px-6 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                # Món ăn
+                {t('itemCount')}
               </TableHead>
               <TableHead className="w-30 px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Cập nhật
+                {t('updatedAt')}
               </TableHead>
               <TableHead className="w-37.5 px-6 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Thao tác
+                {t('actions')}
               </TableHead>
             </TableRow>
           </TableHeader>
@@ -341,8 +371,8 @@ export function CategoriesTable({
     return (
       <div className="flex items-center justify-center rounded-2xl border border-slate-100 bg-white/80 py-12 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
         <div className="text-center">
-          <p className="text-red-600 dark:text-red-400">Không thể tải danh mục</p>
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Vui lòng thử lại sau</p>
+          <p className="text-red-600 dark:text-red-400">{t('cannotLoadCategories')}</p>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{t('tryAgainLater')}</p>
         </div>
       </div>
     )
@@ -354,22 +384,22 @@ export function CategoriesTable({
         <TableRow className="border-b border-slate-100 bg-slate-50/80 hover:bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900">
           {reorderMode && <TableHead className="w-12.5 px-6 py-3"></TableHead>}
           <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-            Danh mục
+            {t('category')}
           </TableHead>
           <TableHead className="w-37.5 px-6 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-            Thứ tự
+            {t('displayOrder')}
           </TableHead>
           <TableHead className="w-37.5 px-6 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-            Trạng thái
+            {t('status')}
           </TableHead>
           <TableHead className="w-37.5 px-6 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-            # Món ăn
+            {t('itemCount')}
           </TableHead>
           <TableHead className="w-30 px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-            Cập nhật
+            {t('updatedAt')}
           </TableHead>
           <TableHead className="w-37.5 px-6 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-            Thao tác
+            {t('actions')}
           </TableHead>
         </TableRow>
       </TableHeader>
@@ -388,6 +418,7 @@ export function CategoriesTable({
                 onDelete={onDeleteClick}
                 onToggleActive={handleToggleActive}
                 onViewItems={handleViewItems}
+                t={t}
               />
             ))}
           </TableBody>
@@ -449,7 +480,7 @@ export function CategoriesTable({
                         }}
                       >
                         <Pencil className="mr-2 h-4 w-4" />
-                        Chỉnh sửa
+                        {t('edit')}
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={(e) => {
@@ -460,12 +491,12 @@ export function CategoriesTable({
                         {category.is_active ? (
                           <>
                             <EyeOff className="mr-2 h-4 w-4" />
-                            Ẩn danh mục
+                            {t('hideCategory')}
                           </>
                         ) : (
                           <>
                             <Eye className="mr-2 h-4 w-4" />
-                            Hiện danh mục
+                            {t('showCategory')}
                           </>
                         )}
                       </DropdownMenuItem>
@@ -478,7 +509,7 @@ export function CategoriesTable({
                         className="text-red-600 focus:text-red-600 dark:text-red-400"
                       >
                         <Trash2 className="mr-2 h-4 w-4" />
-                        Xóa danh mục
+                        {t('deleteCategory')}
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -509,7 +540,7 @@ export function CategoriesTable({
               onClick={() => setReorderMode(false)}
               disabled={reorderMutation.isPending}
             >
-              Hủy
+              {t('cancel')}
             </Button>
             <Button
               onClick={handleSaveOrder}
@@ -519,10 +550,10 @@ export function CategoriesTable({
               {reorderMutation.isPending ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Đang lưu...
+                  {t('saving')}
                 </>
               ) : (
-                'Lưu thứ tự'
+                t('saveOrder')
               )}
             </Button>
           </div>
@@ -536,7 +567,7 @@ export function CategoriesTable({
           totalPages={pagination.total_pages}
           total={pagination.total}
           limit={pagination.limit}
-          itemLabel="danh mục"
+          itemLabel={t('itemLabel')}
           onPageChange={handlePageChange}
         />
       )}

@@ -10,30 +10,32 @@ import { cn } from '@/src/lib/utils'
 import { useOrdersSocket } from '../hooks'
 import { useTablesQuery } from '@/src/features/admin/tables/queries'
 import { useZonesSimpleQuery } from '@/src/features/admin/tables/queries/zones.queries'
-
-const STATUS_OPTIONS = [
-  { value: 'all', label: 'Tất cả' },
-  { value: 'pending', label: 'Chờ xử lý' },
-  { value: 'accepted', label: 'Đã nhận' },
-  { value: 'in_progress', label: 'Đang chuẩn bị' },
-  { value: 'ready', label: 'Sẵn sàng' },
-  { value: 'served', label: 'Đã phục vụ' },
-  { value: 'completed', label: 'Hoàn thành' },
-  { value: 'rejected', label: 'Từ chối' },
-  { value: 'cancelled', label: 'Đã hủy' },
-  { value: 'abandoned', label: 'Bỏ dở' },
-]
-
-const TIME_RANGE_OPTIONS: FilterOption[] = [
-  { value: 'all', label: 'Tất cả' },
-  { value: 'today', label: 'Hôm nay' },
-  { value: 'last24h', label: '24h qua' },
-  { value: 'last7d', label: '7 ngày qua' },
-]
+import { useTranslations } from 'next-intl'
 
 export function OrdersFilterToolbar() {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const t = useTranslations('orders')
+
+  const STATUS_OPTIONS = [
+    { value: 'all', label: t('all') },
+    { value: 'pending', label: t('pending') },
+    { value: 'accepted', label: t('accepted') },
+    { value: 'in_progress', label: t('preparing') },
+    { value: 'ready', label: t('ready') },
+    { value: 'served', label: t('served') },
+    { value: 'completed', label: t('completed') },
+    { value: 'rejected', label: t('rejected') },
+    { value: 'cancelled', label: t('cancelled') },
+    { value: 'abandoned', label: t('abandoned') },
+  ]
+
+  const TIME_RANGE_OPTIONS: FilterOption[] = [
+    { value: 'all', label: t('all') },
+    { value: 'today', label: t('today') },
+    { value: 'last24h', label: t('last24h') },
+    { value: 'last7d', label: t('last7d') },
+  ]
 
   const [search, setSearch] = useState(searchParams.get('q') || '')
   const [status, setStatus] = useState(searchParams.get('status') || 'all')
@@ -59,7 +61,7 @@ export function OrdersFilterToolbar() {
 
   // Build zone options from API data
   const zoneOptions = useMemo((): FilterOption[] => {
-    const options: FilterOption[] = [{ value: 'all', label: 'Tất cả' }]
+    const options: FilterOption[] = [{ value: 'all', label: t('all') }]
 
     if (zonesData?.zones) {
       zonesData.zones.forEach((zone) => {
@@ -71,23 +73,23 @@ export function OrdersFilterToolbar() {
     }
 
     return options
-  }, [zonesData])
+  }, [zonesData, t])
 
   // Build table options from API data
   const tableOptions = useMemo((): FilterOption[] => {
-    const options: FilterOption[] = [{ value: 'all', label: 'Tất cả' }]
+    const options: FilterOption[] = [{ value: 'all', label: t('all') }]
 
     if (tablesData?.data?.tables) {
       tablesData.data.tables.forEach((table) => {
         options.push({
           value: table.id,
-          label: `Bàn ${table.table_number}`,
+          label: `${t('table')} ${table.table_number}`,
         })
       })
     }
 
     return options
-  }, [tablesData])
+  }, [tablesData, t])
 
   // Update URL params when filters change
   const updateFilter = (key: string, value: string) => {
@@ -161,29 +163,29 @@ export function OrdersFilterToolbar() {
         {/* Left: Filters */}
         <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
           <SearchInput
-            placeholder="Tìm theo Order ID / khách / ghi chú..."
+            placeholder={t('searchPlaceholder')}
             value={search}
             onChange={setSearch}
           />
 
           <FilterDropdown
-            label="Khu vực:"
+            label={`${t('zone')}:`}
             value={zoneId}
             options={zoneOptions}
             onChange={handleZoneChange}
-            placeholder="Tất cả"
+            placeholder={t('all')}
           />
 
           <FilterDropdown
-            label="Bàn:"
+            label={`${t('table')}:`}
             value={tableId}
             options={tableOptions}
             onChange={handleTableChange}
-            placeholder="Tất cả"
+            placeholder={t('all')}
           />
 
           <FilterDropdown
-            label="Thời gian:"
+            label={`${t('timeRange')}:`}
             value={timeRange}
             options={TIME_RANGE_OPTIONS}
             onChange={handleTimeRangeChange}
@@ -199,12 +201,12 @@ export function OrdersFilterToolbar() {
               htmlFor="auto-refresh"
               className="text-xs font-medium text-slate-700 dark:text-slate-300"
             >
-              Tự động làm mới
+              {t('autoRefresh')}
             </label>
             {/* Connection Status */}
             <div
               className={cn('h-2 w-2 rounded-full', isConnected ? 'bg-emerald-500' : 'bg-red-500')}
-              title={isConnected ? 'Đã kết nối' : 'Mất kết nối'}
+              title={isConnected ? t('connected') : t('disconnected')}
             />
           </div>
         </div>

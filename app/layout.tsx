@@ -1,10 +1,6 @@
 import type React from 'react'
 import type { Metadata, Viewport } from 'next'
-import { Inter } from 'next/font/google'
-import { Analytics } from '@vercel/analytics/next'
 import './[locale]/globals.css'
-
-const inter = Inter({ subsets: ['latin', 'vietnamese'] })
 
 export const metadata: Metadata = {
   title: 'Qrenso - Admin Dashboard',
@@ -37,12 +33,16 @@ export const viewport: Viewport = {
   ],
 }
 
+/**
+ * Root layout for App Router.
+ * This layout does NOT include html/body tags because:
+ * 1. The [locale] layout handles html/body with dynamic lang attribute
+ * 2. Global not-found.tsx wraps itself with html/body for 404 pages outside locale context
+ */
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  // Root layout chỉ trả về children
-  // Locale layout sẽ xử lý html và body tags
   return children
 }
