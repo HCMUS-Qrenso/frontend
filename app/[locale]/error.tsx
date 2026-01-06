@@ -13,6 +13,7 @@
 import { useEffect } from 'react'
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react'
 import { Button } from '@/src/components/ui/button'
+import { useTranslations } from 'next-intl'
 
 interface ErrorProps {
   error: Error & { digest?: string }
@@ -20,6 +21,8 @@ interface ErrorProps {
 }
 
 export default function Error({ error, reset }: ErrorProps) {
+  const t = useTranslations('errors')
+
   useEffect(() => {
     // Log error to console in development
     if (process.env.NODE_ENV === 'development') {
@@ -37,18 +40,18 @@ export default function Error({ error, reset }: ErrorProps) {
       </div>
 
       {/* Title */}
-      <h1 className="mb-3 text-2xl font-bold text-slate-900 dark:text-white">Đã xảy ra lỗi</h1>
+      <h1 className="mb-3 text-2xl font-bold text-slate-900 dark:text-white">{t('errorTitle')}</h1>
 
       {/* Message */}
       <p className="mb-8 max-w-md text-slate-500 dark:text-slate-400">
-        Xin lỗi, đã có lỗi xảy ra khi tải trang này. Vui lòng thử lại hoặc quay về trang chủ.
+        {t('errorMessage')}
       </p>
 
       {/* Actions */}
       <div className="flex flex-wrap items-center justify-center gap-4">
         <Button onClick={reset} className="gap-2 rounded-full bg-emerald-600 hover:bg-emerald-700">
           <RefreshCw className="h-4 w-4" />
-          Thử lại
+          {t('tryAgain')}
         </Button>
         <Button
           variant="outline"
@@ -56,7 +59,7 @@ export default function Error({ error, reset }: ErrorProps) {
           className="gap-2 rounded-full"
         >
           <Home className="h-4 w-4" />
-          Về trang chủ
+          {t('goHome')}
         </Button>
       </div>
 
@@ -65,7 +68,7 @@ export default function Error({ error, reset }: ErrorProps) {
         <div className="mt-12 w-full max-w-2xl text-left">
           <details className="rounded-xl border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/20">
             <summary className="cursor-pointer text-sm font-medium text-red-700 dark:text-red-400">
-              Chi tiết lỗi (Development)
+              {t('errorDetails')}
             </summary>
             <div className="mt-4 space-y-3">
               <p className="text-sm text-red-700 dark:text-red-400">

@@ -4,9 +4,11 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { FileQuestion, Home, ArrowLeft } from 'lucide-react'
 import { Button } from '@/src/components/ui/button'
+import { useTranslations } from 'next-intl'
 
 export default function NotFound() {
   const router = useRouter()
+  const t = useTranslations('errors')
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-white px-4 py-16 dark:bg-slate-950">
@@ -29,15 +31,14 @@ export default function NotFound() {
         {/* Title */}
         <div className="mb-3">
           <h2 className="text-2xl font-semibold text-slate-900 dark:text-white">
-            Trang không tìm thấy
+            {t('notFoundTitle')}
           </h2>
         </div>
 
         {/* Description */}
         <div className="mb-8">
           <p className="text-slate-600 dark:text-slate-400">
-            Xin lỗi, trang bạn đang tìm kiếm không tồn tại hoặc đã bị di chuyển. Vui lòng kiểm tra
-            lại đường dẫn hoặc quay về trang chủ.
+            {t('notFoundMessage')}
           </p>
         </div>
 
@@ -51,7 +52,7 @@ export default function NotFound() {
           >
             <Link href="/" className="flex items-center gap-2">
               <Home className="h-4 w-4" />
-              Về trang chủ
+              {t('goHome')}
             </Link>
           </Button>
           <Button
@@ -61,7 +62,7 @@ export default function NotFound() {
             onClick={() => router.back()}
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Quay lại
+            {t('goBack')}
           </Button>
         </div>
       </div>

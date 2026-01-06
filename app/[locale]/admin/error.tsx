@@ -10,6 +10,7 @@ import { useEffect } from 'react'
 import { AlertTriangle, RefreshCw, LayoutDashboard, ArrowLeft } from 'lucide-react'
 import { Button } from '@/src/components/ui/button'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 
 interface ErrorProps {
   error: Error & { digest?: string }
@@ -18,6 +19,7 @@ interface ErrorProps {
 
 export default function AdminError({ error, reset }: ErrorProps) {
   const router = useRouter()
+  const t = useTranslations('errors')
 
   useEffect(() => {
     // Log error in development
@@ -37,19 +39,19 @@ export default function AdminError({ error, reset }: ErrorProps) {
 
       {/* Title */}
       <h1 className="mb-3 text-2xl font-bold text-slate-900 dark:text-white">
-        Không thể tải trang
+        {t('adminErrorTitle')}
       </h1>
 
       {/* Message */}
       <p className="mb-8 max-w-md text-slate-500 dark:text-slate-400">
-        Đã xảy ra lỗi khi tải trang quản trị. Vui lòng thử lại hoặc quay về trang tổng quan.
+        {t('adminErrorMessage')}
       </p>
 
       {/* Actions */}
       <div className="flex flex-wrap items-center justify-center gap-3">
         <Button onClick={reset} className="gap-2 rounded-full bg-emerald-600 hover:bg-emerald-700">
           <RefreshCw className="h-4 w-4" />
-          Thử lại
+          {t('tryAgain')}
         </Button>
         <Button
           variant="outline"
@@ -57,11 +59,11 @@ export default function AdminError({ error, reset }: ErrorProps) {
           className="gap-2 rounded-full"
         >
           <LayoutDashboard className="h-4 w-4" />
-          Về tổng quan
+          {t('goDashboard')}
         </Button>
         <Button variant="ghost" onClick={() => router.back()} className="gap-2 rounded-full">
           <ArrowLeft className="h-4 w-4" />
-          Quay lại
+          {t('goBack')}
         </Button>
       </div>
 
@@ -70,7 +72,7 @@ export default function AdminError({ error, reset }: ErrorProps) {
         <div className="mt-12 w-full max-w-2xl text-left">
           <details className="rounded-xl border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/20">
             <summary className="cursor-pointer text-sm font-medium text-red-700 dark:text-red-400">
-              Chi tiết lỗi (Development)
+              {t('errorDetails')}
             </summary>
             <div className="mt-4 space-y-3">
               <p className="text-sm text-red-700 dark:text-red-400">

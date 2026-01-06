@@ -1,12 +1,17 @@
+'use client'
+
 import { Suspense } from 'react'
 import { TodayStats } from '@/src/features/admin/dashboard/components/today-stats'
 import { PerformanceChart } from '@/src/features/admin/dashboard/components/performance-chart'
 import { RecentOrders } from '@/src/features/admin/dashboard/components/recent-orders'
 import { TopItems } from '@/src/features/admin/dashboard/components/top-items'
+import { useTranslations } from 'next-intl'
 
 export default function AdminDashboardPage() {
+  const t = useTranslations('errors')
+
   return (
-    <Suspense fallback={<div>Đang tải...</div>}>
+    <Suspense fallback={<div>{t('loading')}</div>}>
       <div className="space-y-6">
         {/* KPI Cards */}
         <TodayStats />

@@ -4,7 +4,7 @@ import type React from 'react'
 
 import { Suspense, useState, useEffect } from 'react'
 import Link from 'next/link'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import { extractErrorMessage } from '@/src/lib/helpers/error-handler'
 import { AuthContainer } from '@/src/features/auth/components/auth-container'
 import { Button } from '@/src/components/ui/button'
@@ -13,13 +13,14 @@ import { Label } from '@/src/components/ui/label'
 import { Loader2, CheckCircle2, Eye, EyeOff, AlertCircle, AlertTriangle } from 'lucide-react'
 import { Alert, AlertDescription } from '@/src/components/ui/alert'
 import { useAuth } from '@/src/features/auth/hooks'
+import { useTranslations } from 'next-intl'
 
 type PasswordStrength = 'weak' | 'medium' | 'strong'
 
 function ResetPasswordContent() {
-  const router = useRouter()
   const searchParams = useSearchParams()
   const token = searchParams.get('token')
+  const t = useTranslations('auth')
 
   const [isValidatingToken, setIsValidatingToken] = useState(true)
   const [isTokenValid, setIsTokenValid] = useState(false)
@@ -72,11 +73,11 @@ function ResetPasswordContent() {
   }, [formData.password])
 
   const validatePassword = (password: string): string => {
-    if (!password) return 'Vui lòng nhập mật khẩu mới'
-    if (password.length < 8) return 'Mật khẩu phải có ít nhất 8 ký tự'
-    if (!/[a-z]/.test(password)) return 'Mật khẩu phải có ít nhất 1 chữ thường'
-    if (!/[A-Z]/.test(password)) return 'Mật khẩu phải có ít nhất 1 chữ hoa'
-    if (!/\d/.test(password)) return 'Mật khẩu phải có ít nhất 1 số'
+    if (!password) return t('enterNewPassword')
+    if (password.length < 8) return t('passwordMinLength')
+    if (!/[a-z]/.test(password)) return t('passwordLowercase')
+    if (!/[A-Z]/.test(password)) return t('passwordUppercase')
+    if (!/\d/.test(password)) return t('passwordNumber')
     return ''
   }
 
@@ -95,10 +96,10 @@ function ResetPasswordContent() {
     }
 
     if (!formData.confirmPassword) {
-      errors.confirmPassword = 'Vui lòng nhập lại mật khẩu'
+      errors.confirmPassword = t('enterConfirmPassword')
       hasError = true
     } else if (formData.password !== formData.confirmPassword) {
-      errors.confirmPassword = 'Mật khẩu nhập lại không khớp'
+      errors.confirmPassword = t('passwordMismatch')
       hasError = true
     }
 
@@ -124,7 +125,7 @@ function ResetPasswordContent() {
           <div className="flex justify-center">
             <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
           </div>
-          <p className="mt-4 text-sm text-slate-500 dark:text-slate-400">Đang xác thực...</p>
+          <p className="mt-4 text-sm text-slate-500 dark:text-slate-400">{t('verifying')}</p>
         </div>
       </AuthContainer>
     )
@@ -145,11 +146,10 @@ function ResetPasswordContent() {
           {/* Header */}
           <div className="mb-6 space-y-2">
             <h1 className="text-2xl font-bold text-slate-900 lg:text-3xl dark:text-white">
-              Link đã hết hạn hoặc không hợp lệ
+              {t('invalidLinkTitle')}
             </h1>
             <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400">
-              Link đặt lại mật khẩu này đã hết hạn hoặc đã được sử dụng. Vui lòng yêu cầu một link
-              mới.
+              {t('invalidLinkMessage')}
             </p>
           </div>
 
@@ -158,7 +158,7 @@ function ResetPasswordContent() {
             asChild
             className="w-full rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600"
           >
-            <Link href="/auth/forgot-password">Gửi lại email đặt lại mật khẩu</Link>
+            <Link href="/auth/forgot-password">{t('resendResetEmail')}</Link>
           </Button>
 
           {/* Back to Login Link */}
@@ -167,7 +167,7 @@ function ResetPasswordContent() {
               href="/auth/login"
               className="text-xs font-medium text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300"
             >
-              Quay lại đăng nhập
+              {t('backToLogin')}
             </Link>
           </div>
         </div>
@@ -190,10 +190,10 @@ function ResetPasswordContent() {
           {/* Header */}
           <div className="mb-6 space-y-2">
             <h1 className="text-2xl font-bold text-slate-900 lg:text-3xl dark:text-white">
-              Mật khẩu của bạn đã được cập nhật
+              {t('passwordUpdatedTitle')}
             </h1>
             <p className="text-sm text-slate-600 dark:text-slate-400">
-              Bây giờ bạn có thể đăng nhập bằng mật khẩu mới.
+              {t('passwordUpdatedMessage')}
             </p>
           </div>
 
@@ -202,7 +202,7 @@ function ResetPasswordContent() {
             asChild
             className="w-full rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600"
           >
-            <Link href="/auth/login">Đăng nhập</Link>
+            <Link href="/auth/login">{t('login')}</Link>
           </Button>
         </div>
       </AuthContainer>
@@ -223,10 +223,10 @@ function ResetPasswordContent() {
         {/* Header */}
         <div className="mb-8 space-y-2 text-center lg:text-left">
           <h1 className="text-2xl font-bold text-slate-900 lg:text-3xl dark:text-white">
-            Đặt lại mật khẩu mới
+            {t('resetPasswordTitle')}
           </h1>
           <p className="text-sm text-slate-500 dark:text-slate-400">
-            Hãy tạo một mật khẩu mạnh để bảo vệ tài khoản của bạn.
+            {t('resetPasswordSubtitle')}
           </p>
         </div>
 
@@ -234,7 +234,7 @@ function ResetPasswordContent() {
         <Alert className="mb-6 border-amber-200 bg-amber-50 dark:border-amber-900/50 dark:bg-amber-900/10">
           <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400" />
           <AlertDescription className="text-xs text-amber-800 dark:text-amber-300">
-            Link đặt lại mật khẩu này chỉ có hiệu lực trong 15 phút.
+            {t('linkExpiryWarning')}
           </AlertDescription>
         </Alert>
 
@@ -246,7 +246,7 @@ function ResetPasswordContent() {
               htmlFor="password"
               className="text-sm font-medium text-slate-700 dark:text-white"
             >
-              Mật khẩu mới
+              {t('newPassword')}
             </Label>
             <div className="relative">
               <Input
@@ -307,9 +307,9 @@ function ResetPasswordContent() {
                         : 'text-emerald-600 dark:text-emerald-400'
                   }`}
                 >
-                  {passwordStrength === 'weak' && 'Mật khẩu yếu'}
-                  {passwordStrength === 'medium' && 'Mật khẩu trung bình'}
-                  {passwordStrength === 'strong' && 'Mật khẩu mạnh'}
+                  {passwordStrength === 'weak' && t('weakPassword')}
+                  {passwordStrength === 'medium' && t('mediumPassword')}
+                  {passwordStrength === 'strong' && t('strongPassword')}
                 </p>
               </div>
             )}
@@ -318,7 +318,7 @@ function ResetPasswordContent() {
               <p className="text-xs text-red-600 dark:text-red-400">{fieldErrors.password}</p>
             )}
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              Tối thiểu 8 ký tự, nên bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt.
+              {t('passwordHintStrong')}
             </p>
           </div>
 
@@ -328,7 +328,7 @@ function ResetPasswordContent() {
               htmlFor="confirmPassword"
               className="text-sm font-medium text-slate-700 dark:text-white"
             >
-              Nhập lại mật khẩu
+              {t('confirmPassword')}
             </Label>
             <div className="relative">
               <Input
@@ -365,10 +365,10 @@ function ResetPasswordContent() {
             {resetPasswordPending ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Đang đặt lại...
+                {t('resetting')}
               </>
             ) : (
-              'Đặt lại mật khẩu'
+              t('resetPassword')
             )}
           </Button>
         </form>
@@ -376,12 +376,12 @@ function ResetPasswordContent() {
         {/* Back to Login Link */}
         <div className="mt-6 text-center">
           <p className="text-xs text-slate-500 dark:text-slate-400">
-            Nhớ mật khẩu cũ?{' '}
+            {t('rememberedOldPassword')}{' '}
             <Link
               href="/auth/login"
               className="font-medium text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300"
             >
-              Quay lại đăng nhập
+              {t('backToLogin')}
             </Link>
           </p>
         </div>
@@ -391,13 +391,14 @@ function ResetPasswordContent() {
 }
 
 function LoadingFallback() {
+  const t = useTranslations('auth')
   return (
     <AuthContainer>
       <div className="mx-auto w-full max-w-sm text-center">
         <div className="flex justify-center">
           <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
         </div>
-        <p className="mt-4 text-sm text-slate-500 dark:text-slate-400">Đang xác thực...</p>
+        <p className="mt-4 text-sm text-slate-500 dark:text-slate-400">{t('verifying')}</p>
       </div>
     </AuthContainer>
   )

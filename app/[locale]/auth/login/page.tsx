@@ -14,6 +14,7 @@ import { Checkbox } from '@/src/components/ui/checkbox'
 import { Eye, EyeOff, Loader2, AlertCircle } from 'lucide-react'
 import { Alert, AlertDescription } from '@/src/components/ui/alert'
 import { useAuth } from '@/src/features/auth/hooks'
+import { useTranslations } from 'next-intl'
 
 import { loginSchema } from '@/src/features/auth/schemas'
 
@@ -23,6 +24,7 @@ const REMEMBERED_EMAIL_KEY = 'rememberedEmail'
 export default function LoginPage() {
   const router = useRouter()
   const { login, loginPending } = useAuth()
+  const t = useTranslations('auth')
   const [showPassword, setShowPassword] = useState(false)
   const [rememberMe, setRememberMe] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -103,10 +105,10 @@ export default function LoginPage() {
         {/* Header */}
         <div className="mb-8 space-y-2 text-center lg:text-left">
           <h1 className="text-2xl font-bold text-slate-900 lg:text-3xl dark:text-white">
-            Đăng nhập vào Qrenso
+            {t('loginTitle')}
           </h1>
           <p className="text-sm text-slate-500 dark:text-slate-400">
-            Tiếp tục quản lý menu, bàn, order và KDS của bạn
+            {t('loginSubtitle')}
           </p>
         </div>
 
@@ -123,7 +125,7 @@ export default function LoginPage() {
           {/* Email Field */}
           <div className="space-y-2">
             <Label htmlFor="email" className="text-sm font-medium text-slate-700 dark:text-white">
-              Email
+              {t('email')}
             </Label>
             <Input
               id="email"
@@ -145,7 +147,7 @@ export default function LoginPage() {
               htmlFor="password"
               className="text-sm font-medium text-slate-700 dark:text-white"
             >
-              Mật khẩu
+              {t('password')}
             </Label>
             <div className="relative">
               <Input
@@ -169,7 +171,7 @@ export default function LoginPage() {
             {fieldErrors.password && (
               <p className="text-xs text-red-600 dark:text-red-400">{fieldErrors.password}</p>
             )}
-            <p className="text-xs text-slate-500 dark:text-slate-400">Tối thiểu 8 ký tự</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400">{t('passwordHint')}</p>
           </div>
 
           {/* Remember Me & Forgot Password */}
@@ -185,14 +187,14 @@ export default function LoginPage() {
                 htmlFor="remember"
                 className="text-xs font-medium text-slate-600 dark:text-slate-400"
               >
-                Ghi nhớ đăng nhập
+                {t('rememberMe')}
               </label>
             </div>
             <Link
               href="/auth/forgot-password"
               className="text-xs font-medium text-emerald-600 hover:text-emerald-700 dark:text-white dark:hover:text-slate-200"
             >
-              Quên mật khẩu?
+              {t('forgotPassword')}
             </Link>
           </div>
 
@@ -205,10 +207,10 @@ export default function LoginPage() {
             {loginPending ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Đang đăng nhập...
+                {t('loggingIn')}
               </>
             ) : (
-              'Đăng nhập'
+              t('login')
             )}
           </Button>
         </form>
@@ -216,19 +218,19 @@ export default function LoginPage() {
         {/* Footer */}
         <div className="mt-8 space-y-4 border-t border-slate-200 pt-6 dark:border-slate-800">
           <p className="text-center text-xs text-slate-500 dark:text-slate-400">
-            Bạn là khách dùng QR để gọi món?
+            {t('guestInfo')}
             <br />
-            Bạn không cần tài khoản để sử dụng menu.
+            {t('guestNoAccount')}
           </p>
           <p className="text-center text-xs text-slate-500 dark:text-slate-400">
-            Chưa có tài khoản?{' '}
+            {t('noAccount')}{' '}
             <Link
               href="/contact"
               className="font-medium text-emerald-600 hover:text-emerald-700 dark:text-emerald-400"
             >
-              Liên hệ chúng tôi
+              {t('contactUs')}
             </Link>{' '}
-            để đăng ký Qrenso.
+            {t('contactToRegister')}
           </p>
         </div>
       </div>

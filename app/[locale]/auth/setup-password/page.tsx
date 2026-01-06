@@ -4,7 +4,7 @@ import type React from 'react'
 
 import { Suspense, useState, useEffect } from 'react'
 import Link from 'next/link'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import { extractErrorMessage } from '@/src/lib/helpers/error-handler'
 import { AuthContainer } from '@/src/features/auth/components/auth-container'
 import { Button } from '@/src/components/ui/button'
@@ -13,14 +13,15 @@ import { Label } from '@/src/components/ui/label'
 import { Loader2, CheckCircle2, Eye, EyeOff, AlertCircle, AlertTriangle, Mail } from 'lucide-react'
 import { Alert, AlertDescription } from '@/src/components/ui/alert'
 import { authApi } from '@/src/features/auth/api/auth.api'
+import { useTranslations } from 'next-intl'
 
 type PasswordStrength = 'weak' | 'medium' | 'strong'
 
 function SetupPasswordContent() {
-  const router = useRouter()
   const searchParams = useSearchParams()
   const token = searchParams.get('token')
   const email = searchParams.get('email')
+  const t = useTranslations('auth')
 
   const [isValidatingParams, setIsValidatingParams] = useState(true)
   const [isParamsValid, setIsParamsValid] = useState(false)
@@ -73,11 +74,11 @@ function SetupPasswordContent() {
   }, [formData.password])
 
   const validatePassword = (password: string): string => {
-    if (!password) return 'Vui lòng nhập mật khẩu'
-    if (password.length < 8) return 'Mật khẩu phải có ít nhất 8 ký tự'
-    if (!/[a-z]/.test(password)) return 'Mật khẩu phải có ít nhất 1 chữ thường'
-    if (!/[A-Z]/.test(password)) return 'Mật khẩu phải có ít nhất 1 chữ hoa'
-    if (!/\d/.test(password)) return 'Mật khẩu phải có ít nhất 1 số'
+    if (!password) return t('enterPassword')
+    if (password.length < 8) return t('passwordMinLength')
+    if (!/[a-z]/.test(password)) return t('passwordLowercase')
+    if (!/[A-Z]/.test(password)) return t('passwordUppercase')
+    if (!/\d/.test(password)) return t('passwordNumber')
     return ''
   }
 
@@ -96,10 +97,10 @@ function SetupPasswordContent() {
     }
 
     if (!formData.confirmPassword) {
-      errors.confirmPassword = 'Vui lòng nhập lại mật khẩu'
+      errors.confirmPassword = t('enterConfirmPassword')
       hasError = true
     } else if (formData.password !== formData.confirmPassword) {
-      errors.confirmPassword = 'Mật khẩu nhập lại không khớp'
+      errors.confirmPassword = t('passwordMismatch')
       hasError = true
     }
 
@@ -132,7 +133,7 @@ function SetupPasswordContent() {
           <div className="flex justify-center">
             <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
           </div>
-          <p className="mt-4 text-sm text-slate-500 dark:text-slate-400">Đang xác thực...</p>
+          <p className="mt-4 text-sm text-slate-500 dark:text-slate-400">{t('verifying')}</p>
         </div>
       </AuthContainer>
     )
@@ -153,18 +154,17 @@ function SetupPasswordContent() {
           {/* Header */}
           <div className="mb-6 space-y-2">
             <h1 className="text-2xl font-bold text-slate-900 lg:text-3xl dark:text-white">
-              Link không hợp lệ
+              {t('invalidSetupLinkTitle')}
             </h1>
             <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400">
-              Link thiết lập tài khoản này không hợp lệ hoặc thiếu thông tin. Vui lòng kiểm tra lại
-              email mời hoặc liên hệ quản trị viên.
+              {t('invalidSetupLinkMessage')}
             </p>
           </div>
 
           {/* Contact Admin Info */}
           <div className="mb-6 rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-800">
             <p className="text-xs text-slate-600 dark:text-slate-400">
-              Nếu bạn gặp vấn đề, vui lòng liên hệ quản trị viên để được gửi lại email mời.
+              {t('contactAdminInfo')}
             </p>
           </div>
 
@@ -174,7 +174,7 @@ function SetupPasswordContent() {
               href="/auth/login"
               className="text-xs font-medium text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300"
             >
-              Quay lại đăng nhập
+              {t('backToLogin')}
             </Link>
           </div>
         </div>
@@ -197,10 +197,10 @@ function SetupPasswordContent() {
           {/* Header */}
           <div className="mb-6 space-y-2">
             <h1 className="text-2xl font-bold text-slate-900 lg:text-3xl dark:text-white">
-              Thiết lập tài khoản thành công!
+              {t('setupSuccessTitle')}
             </h1>
             <p className="text-sm text-slate-600 dark:text-slate-400">
-              Tài khoản của bạn đã được kích hoạt. Bây giờ bạn có thể đăng nhập để bắt đầu làm việc.
+              {t('setupSuccessMessage')}
             </p>
           </div>
 
@@ -209,7 +209,7 @@ function SetupPasswordContent() {
             asChild
             className="w-full rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600"
           >
-            <Link href="/auth/login">Đăng nhập ngay</Link>
+            <Link href="/auth/login">{t('loginNow')}</Link>
           </Button>
         </div>
       </AuthContainer>
@@ -230,10 +230,10 @@ function SetupPasswordContent() {
         {/* Header */}
         <div className="mb-8 space-y-2 text-center lg:text-left">
           <h1 className="text-2xl font-bold text-slate-900 lg:text-3xl dark:text-white">
-            Chào mừng bạn!
+            {t('welcomeTitle')}
           </h1>
           <p className="text-sm text-slate-500 dark:text-slate-400">
-            Thiết lập mật khẩu để hoàn tất đăng ký tài khoản của bạn.
+            {t('setupPasswordSubtitle')}
           </p>
         </div>
 
@@ -241,7 +241,7 @@ function SetupPasswordContent() {
         <div className="mb-6 flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-700 dark:bg-slate-800">
           <Mail className="h-5 w-5 text-slate-400" />
           <div>
-            <p className="text-xs text-slate-500 dark:text-slate-400">Đăng ký với email</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400">{t('registeringWith')}</p>
             <p className="text-sm font-medium text-slate-900 dark:text-white">{email}</p>
           </div>
         </div>
@@ -250,7 +250,7 @@ function SetupPasswordContent() {
         <Alert className="mb-6 border-emerald-200 bg-emerald-50 dark:border-emerald-900/50 dark:bg-emerald-900/10">
           <AlertCircle className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
           <AlertDescription className="text-xs text-emerald-800 dark:text-emerald-300">
-            Link này chỉ có hiệu lực trong 24 giờ. Hãy thiết lập mật khẩu ngay.
+            {t('linkExpiry24')}
           </AlertDescription>
         </Alert>
 
@@ -262,7 +262,7 @@ function SetupPasswordContent() {
               htmlFor="password"
               className="text-sm font-medium text-slate-700 dark:text-white"
             >
-              Mật khẩu
+              {t('password')}
             </Label>
             <div className="relative">
               <Input
@@ -323,9 +323,9 @@ function SetupPasswordContent() {
                         : 'text-emerald-600 dark:text-emerald-400'
                   }`}
                 >
-                  {passwordStrength === 'weak' && 'Mật khẩu yếu'}
-                  {passwordStrength === 'medium' && 'Mật khẩu trung bình'}
-                  {passwordStrength === 'strong' && 'Mật khẩu mạnh'}
+                  {passwordStrength === 'weak' && t('weakPassword')}
+                  {passwordStrength === 'medium' && t('mediumPassword')}
+                  {passwordStrength === 'strong' && t('strongPassword')}
                 </p>
               </div>
             )}
@@ -334,7 +334,7 @@ function SetupPasswordContent() {
               <p className="text-xs text-red-600 dark:text-red-400">{fieldErrors.password}</p>
             )}
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              Tối thiểu 8 ký tự, bao gồm chữ hoa, chữ thường và số.
+              {t('passwordHint')}
             </p>
           </div>
 
@@ -344,7 +344,7 @@ function SetupPasswordContent() {
               htmlFor="confirmPassword"
               className="text-sm font-medium text-slate-700 dark:text-white"
             >
-              Nhập lại mật khẩu
+              {t('confirmPassword')}
             </Label>
             <div className="relative">
               <Input
@@ -381,10 +381,10 @@ function SetupPasswordContent() {
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Đang thiết lập...
+                {t('settingUp')}
               </>
             ) : (
-              'Hoàn tất đăng ký'
+              t('completeRegistration')
             )}
           </Button>
         </form>
@@ -392,12 +392,12 @@ function SetupPasswordContent() {
         {/* Footer */}
         <div className="mt-6 text-center">
           <p className="text-xs text-slate-500 dark:text-slate-400">
-            Đã có tài khoản?{' '}
+            {t('hasAccount')}{' '}
             <Link
               href="/auth/login"
               className="font-medium text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300"
             >
-              Đăng nhập
+              {t('login')}
             </Link>
           </p>
         </div>
@@ -407,13 +407,14 @@ function SetupPasswordContent() {
 }
 
 function LoadingFallback() {
+  const t = useTranslations('auth')
   return (
     <AuthContainer>
       <div className="mx-auto w-full max-w-sm text-center">
         <div className="flex justify-center">
           <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
         </div>
-        <p className="mt-4 text-sm text-slate-500 dark:text-slate-400">Đang tải...</p>
+        <p className="mt-4 text-sm text-slate-500 dark:text-slate-400">{t('loading')}</p>
       </div>
     </AuthContainer>
   )
