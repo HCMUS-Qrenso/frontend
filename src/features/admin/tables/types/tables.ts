@@ -42,7 +42,11 @@ export interface Table {
   ordering_url: string | null
   qr_code_generated_at: string | null
   is_active: boolean
-  current_order: string | null
+  current_order: {
+    order_number: string
+    total_amount: number
+    status: string
+  } | null
   created_at: string
   updated_at: string
 }

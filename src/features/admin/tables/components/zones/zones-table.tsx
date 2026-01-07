@@ -91,9 +91,15 @@ export function ZonesTable({ onEdit, onDelete }: ZonesTableProps) {
             <AdminTableHeaderRow>
               <AdminTableHead>Tên khu vực</AdminTableHead>
               <AdminTableHead className="w-50">Mô tả</AdminTableHead>
-              <AdminTableHead className="w-30" align="center">Thứ tự</AdminTableHead>
-              <AdminTableHead className="w-30" align="center">Trạng thái</AdminTableHead>
-              <AdminTableHead className="w-37.5" align="right">Thao tác</AdminTableHead>
+              <AdminTableHead className="w-30" align="center">
+                Thứ tự
+              </AdminTableHead>
+              <AdminTableHead className="w-30" align="center">
+                Trạng thái
+              </AdminTableHead>
+              <AdminTableHead className="w-37.5" align="right">
+                Thao tác
+              </AdminTableHead>
             </AdminTableHeaderRow>
           </TableHeader>
           <TableBody>
@@ -138,9 +144,15 @@ export function ZonesTable({ onEdit, onDelete }: ZonesTableProps) {
             <AdminTableHeaderRow>
               <AdminTableHead>Tên khu vực</AdminTableHead>
               <AdminTableHead className="w-50">Mô tả</AdminTableHead>
-              <AdminTableHead className="w-30" align="center">Thứ tự</AdminTableHead>
-              <AdminTableHead className="w-30" align="center">Trạng thái</AdminTableHead>
-              <AdminTableHead className="w-37.5" align="right">Thao tác</AdminTableHead>
+              <AdminTableHead className="w-30" align="center">
+                Thứ tự
+              </AdminTableHead>
+              <AdminTableHead className="w-30" align="center">
+                Trạng thái
+              </AdminTableHead>
+              <AdminTableHead className="w-37.5" align="right">
+                Thao tác
+              </AdminTableHead>
             </AdminTableHeaderRow>
           </TableHeader>
           <TableBody>

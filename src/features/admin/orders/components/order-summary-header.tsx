@@ -10,34 +10,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/src/components/ui/dropdown-menu'
-import {
-  ArrowLeft,
-  Copy,
-  Printer,
-  FileDown,
-  MoreVertical,
-  AlertTriangle,
-  Check,
-} from 'lucide-react'
+import { ArrowLeft, Copy, Printer, MoreVertical, AlertTriangle, Check, Wallet } from 'lucide-react'
 import { cn } from '@/src/lib/utils'
 import { formatDistanceToNow } from 'date-fns'
 import { vi } from 'date-fns/locale'
 import { OverrideStatusModal } from './override-status-modal'
+import { PaymentDialog } from './payment-dialog'
+import type { OrderDetail } from '../types/orders'
 
-// Mock data
-const MOCK_ORDER = {
-  id: 'ORD-1024',
-  order_number: 'ORD-1024',
-  table_id: '5',
-  tableName: 'Bàn 5',
-  floor: 'Tầng 1',
-  status: 'preparing',
-  priority: 'normal',
-  created_at: new Date(Date.now() - 18 * 60 * 1000),
-  total_amount: 285000,
-}
-
-const STATUS_CONFIG = {
+const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
   pending: {
     label: 'Chờ xử lý',
     color: 'bg-slate-100 text-slate-700 dark:bg-slate-500/10 dark:text-slate-400',
@@ -74,9 +55,13 @@ const STATUS_CONFIG = {
     label: 'Đã hủy',
     color: 'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400',
   },
+  abandoned: {
+    label: 'Bỏ dở',
+    color: 'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400',
+  },
 }
 
-const PRIORITY_CONFIG = {
+const PRIORITY_CONFIG: Record<string, { label: string; color: string }> = {
   normal: {
     label: 'Bình thường',
     color: 'bg-slate-100 text-slate-600 dark:bg-slate-500/10 dark:text-slate-400',
@@ -93,30 +78,32 @@ const PRIORITY_CONFIG = {
 }
 
 interface OrderSummaryHeaderProps {
-  orderId: string
+  order: OrderDetail
 }
 
-export function OrderSummaryHeader({ orderId }: OrderSummaryHeaderProps) {
+export function OrderSummaryHeader({ order }: OrderSummaryHeaderProps) {
   const router = useRouter()
   const [copied, setCopied] = useState(false)
   const [overrideModalOpen, setOverrideModalOpen] = useState(false)
-
-  const order = MOCK_ORDER
+  const [paymentDialogOpen, setPaymentDialogOpen] = useState(false)
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(order.order_number)
+    navigator.clipboard.writeText(order.orderNumber)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
 
-  const handlePrint = () => {
-    window.open(`/admin/orders/${orderId}/print`, '_blank')
-  }
+  // Check if there are any payments in process
+  const hasPaymentInProcess = order.payments?.some(
+    (payment) => payment.status === 'pending' || payment.status === 'processing',
+  )
 
-  const handleExport = (format: 'json' | 'pdf') => {
-    console.log(`[v0] Exporting order ${orderId} as ${format}`)
-    // API call to generate export
-  }
+  // Show payment button only when:
+  // - Order is completed
+  // - Payment status is unpaid
+  // - No payment in process
+  const canInitiatePayment =
+    order.status === 'completed' && order.paymentStatus === 'unpaid' && !hasPaymentInProcess
 
   return (
     <>
@@ -135,7 +122,7 @@ export function OrderSummaryHeader({ orderId }: OrderSummaryHeaderProps) {
               {/* Title */}
               <div className="flex items-center gap-3">
                 <h1 className="font-mono text-2xl font-bold text-slate-900 dark:text-white">
-                  Đơn hàng #{order.order_number}
+                  Đơn hàng #{order.orderNumber}
                 </h1>
                 <Button variant="ghost" size="sm" onClick={handleCopy} className="gap-2">
                   {copied ? (
@@ -148,61 +135,53 @@ export function OrderSummaryHeader({ orderId }: OrderSummaryHeaderProps) {
 
               {/* Table Info */}
               <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
-                <span className="text-lg font-medium">{order.tableName}</span>
-                <span className="text-sm">•</span>
-                <span className="text-sm">{order.floor}</span>
+                <span className="text-lg font-medium">Bàn {order.table?.tableNumber}</span>
+                {order.table?.zone?.name && (
+                  <>
+                    <span className="text-sm">•</span>
+                    <span className="text-sm">{order.table.zone.name}</span>
+                  </>
+                )}
               </div>
 
               {/* Meta Chips */}
               <div className="flex flex-wrap items-center gap-2">
-                <Badge
-                  className={cn(
-                    'text-xs font-medium',
-                    STATUS_CONFIG[order.status as keyof typeof STATUS_CONFIG]?.color,
-                  )}
-                >
-                  {STATUS_CONFIG[order.status as keyof typeof STATUS_CONFIG]?.label}
+                <Badge className={cn('text-xs font-medium', STATUS_CONFIG[order.status]?.color)}>
+                  {STATUS_CONFIG[order.status]?.label || order.status}
                 </Badge>
 
                 <Badge
-                  className={cn(
-                    'text-xs font-medium',
-                    PRIORITY_CONFIG[order.priority as keyof typeof PRIORITY_CONFIG]?.color,
-                  )}
+                  className={cn('text-xs font-medium', PRIORITY_CONFIG[order.priority]?.color)}
                 >
-                  {PRIORITY_CONFIG[order.priority as keyof typeof PRIORITY_CONFIG]?.label}
+                  {PRIORITY_CONFIG[order.priority]?.label || order.priority}
                 </Badge>
 
                 <span className="text-sm text-slate-500 dark:text-slate-400">
-                  {formatDistanceToNow(order.created_at, { addSuffix: true, locale: vi })}
+                  {formatDistanceToNow(new Date(order.createdAt), { addSuffix: true, locale: vi })}
                 </span>
               </div>
             </div>
 
             {/* Right: Quick Actions */}
             <div className="flex flex-wrap items-center gap-2">
-              <Button variant="outline" onClick={handlePrint} className="gap-2 bg-transparent">
-                <Printer className="h-4 w-4" />
-                In bill
-              </Button>
-
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="gap-2 bg-transparent">
-                    <FileDown className="h-4 w-4" />
-                    Xuất
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => handleExport('json')}>
-                    Xuất JSON
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleExport('pdf')}>Xuất PDF</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              {canInitiatePayment && (
+                <Button
+                  variant="outline"
+                  onClick={() => setPaymentDialogOpen(true)}
+                  className="gap-2 bg-transparent"
+                >
+                  <Wallet className="h-4 w-4" />
+                  Tính tiền
+                </Button>
+              )}
 
               <Button
                 variant="default"
+                disabled={
+                  order.paymentStatus === 'paid' ||
+                  order.status === 'abandoned' ||
+                  hasPaymentInProcess
+                }
                 onClick={() => setOverrideModalOpen(true)}
                 className="gap-2 bg-emerald-600 hover:bg-emerald-700"
               >
@@ -210,18 +189,26 @@ export function OrderSummaryHeader({ orderId }: OrderSummaryHeaderProps) {
                 Thay đổi trạng thái
               </Button>
 
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon">
-                    <MoreVertical className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem>Giao cho nhân viên</DropdownMenuItem>
-                  <DropdownMenuItem>Thay đổi ưu tiên</DropdownMenuItem>
-                  <DropdownMenuItem className="text-red-600">Hủy đơn</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              {order.paymentStatus !== 'paid' && order.status !== 'abandoned' && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" disabled={hasPaymentInProcess}>
+                      <MoreVertical className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem disabled={hasPaymentInProcess}>
+                      Giao cho nhân viên
+                    </DropdownMenuItem>
+                    <DropdownMenuItem disabled={hasPaymentInProcess}>
+                      Thay đổi ưu tiên
+                    </DropdownMenuItem>
+                    <DropdownMenuItem disabled={hasPaymentInProcess} className="text-red-600">
+                      Hủy đơn
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
             </div>
           </div>
         </div>
@@ -229,11 +216,14 @@ export function OrderSummaryHeader({ orderId }: OrderSummaryHeaderProps) {
 
       {/* Override Status Modal */}
       <OverrideStatusModal
-        orderId={orderId}
+        orderId={order.id}
         currentStatus={order.status}
         open={overrideModalOpen}
         onOpenChange={setOverrideModalOpen}
       />
+
+      {/* Payment Dialog */}
+      <PaymentDialog open={paymentDialogOpen} onOpenChange={setPaymentDialogOpen} order={order} />
     </>
   )
 }

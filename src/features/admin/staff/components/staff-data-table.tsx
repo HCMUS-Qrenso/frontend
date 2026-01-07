@@ -188,10 +188,7 @@ export function StaffDataTable({ role }: StaffDataTableProps) {
               </TableRow>
             ) : (
               staffList.map((staff, index) => (
-                <AdminTableRow
-                  key={staff.id}
-                  isLast={index === staffList.length - 1}
-                >
+                <AdminTableRow key={staff.id} isLast={index === staffList.length - 1}>
                   {/* Staff Info */}
                   <TableCell className="px-6 py-4">
                     <div className="flex items-center gap-3">

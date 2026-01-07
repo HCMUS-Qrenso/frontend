@@ -13,7 +13,6 @@ import {
   AdminTableHead,
   AdminTableRow,
 } from '@/src/components/ui/table'
-import { Badge } from '@/src/components/ui/badge'
 import { Button } from '@/src/components/ui/button'
 import {
   DropdownMenu,
@@ -22,138 +21,41 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/src/components/ui/dropdown-menu'
-import { Eye, MoreVertical, Printer, ChevronRight, AlertCircle, ClipboardList } from 'lucide-react'
+import {
+  Eye,
+  MoreVertical,
+  Printer,
+  ChevronRight,
+  AlertCircle,
+  ClipboardList,
+  Wallet,
+  CheckCircle,
+  X,
+  Loader2,
+} from 'lucide-react'
+import { PaymentDialog } from './payment-dialog'
+import { printBill } from '../utils/print-bill'
+import { toast } from 'sonner'
 import { cn } from '@/src/lib/utils'
 import { StatusBadge, type StatusConfig } from '@/src/components/ui/status-badge'
-import { ContainerLoadingState } from '@/src/components/ui/loading-state'
 import { EmptyState } from '@/src/components/ui/empty-state'
 import { SkeletonTableRows } from '@/src/components/loading'
 import { formatDistanceToNow } from 'date-fns'
 import { vi } from 'date-fns/locale'
 import { TablePagination } from '@/src/components/ui/table-pagination'
-
-// Mock data
-const MOCK_ORDERS = [
-  {
-    id: 'ORD-1024',
-    tableId: '5',
-    tableName: 'Bàn 5',
-    floor: 'Tầng 1',
-    items: [
-      { name: 'Phở bò', quantity: 2 },
-      { name: 'Bánh xèo', quantity: 1 },
-      { name: 'Cà phê sữa', quantity: 2 },
-    ],
-    status: 'new',
-    paymentStatus: 'unpaid',
-    total: 285000,
-    createdAt: new Date(Date.now() - 12 * 60 * 1000), // 12 minutes ago
-    customerName: 'Nguyễn Văn A',
-    note: 'Không hành',
-  },
-  {
-    id: 'ORD-1023',
-    tableId: '3',
-    tableName: 'Bàn 3',
-    floor: 'Tầng 1',
-    items: [
-      { name: 'Bún chả', quantity: 3 },
-      { name: 'Nem rán', quantity: 1 },
-    ],
-    status: 'preparing',
-    paymentStatus: 'unpaid',
-    total: 420000,
-    createdAt: new Date(Date.now() - 25 * 60 * 1000), // 25 minutes ago
-    customerName: 'Trần Thị B',
-    note: '',
-  },
-  {
-    id: 'ORD-1022',
-    tableId: '7',
-    tableName: 'Bàn 7',
-    floor: 'Tầng 2',
-    items: [
-      { name: 'Cơm gà', quantity: 2 },
-      { name: 'Canh chua', quantity: 1 },
-      { name: 'Trà đá', quantity: 2 },
-    ],
-    status: 'ready',
-    paymentStatus: 'unpaid',
-    total: 350000,
-    createdAt: new Date(Date.now() - 8 * 60 * 1000), // 8 minutes ago
-    customerName: 'Lê Văn C',
-    note: '',
-  },
-  {
-    id: 'ORD-1021',
-    tableId: '2',
-    tableName: 'Bàn 2',
-    floor: 'Tầng 1',
-    items: [
-      { name: 'Phở gà', quantity: 1 },
-      { name: 'Gỏi cuốn', quantity: 2 },
-    ],
-    status: 'served',
-    paymentStatus: 'unpaid',
-    total: 185000,
-    createdAt: new Date(Date.now() - 45 * 60 * 1000), // 45 minutes ago
-    customerName: 'Phạm Thị D',
-    note: '',
-  },
-  {
-    id: 'ORD-1020',
-    tableId: '12',
-    tableName: 'Bàn 12',
-    floor: 'Tầng 2',
-    items: [
-      { name: 'Lẩu thái', quantity: 1 },
-      { name: 'Rau củ', quantity: 1 },
-      { name: 'Nước ngọt', quantity: 4 },
-    ],
-    status: 'preparing',
-    paymentStatus: 'unpaid',
-    total: 580000,
-    createdAt: new Date(Date.now() - 18 * 60 * 1000), // 18 minutes ago
-    customerName: 'Hoàng Văn E',
-    note: 'Không cay',
-  },
-  {
-    id: 'ORD-1019',
-    tableId: '1',
-    tableName: 'Bàn 1',
-    floor: 'Tầng 1',
-    items: [
-      { name: 'Bún bò Huế', quantity: 2 },
-      { name: 'Chả giò', quantity: 1 },
-    ],
-    status: 'new',
-    paymentStatus: 'unpaid',
-    total: 260000,
-    createdAt: new Date(Date.now() - 5 * 60 * 1000), // 5 minutes ago
-    customerName: 'Đỗ Thị F',
-    note: '',
-  },
-  {
-    id: 'ORD-1018',
-    tableId: '5',
-    tableName: 'Bàn 5',
-    floor: 'Tầng 1',
-    items: [
-      { name: 'Cơm chiên dương châu', quantity: 1 },
-      { name: 'Canh chua cá', quantity: 1 },
-    ],
-    status: 'completed',
-    paymentStatus: 'paid',
-    total: 180000,
-    createdAt: new Date(Date.now() - 120 * 60 * 1000), // 2 hours ago
-    customerName: 'Vũ Văn G',
-    note: '',
-  },
-]
+import {
+  useOrdersQuery,
+  useUpdateOrderStatusMutation,
+  useCompletePaymentMutation,
+  useCancelPaymentMutation,
+} from '../queries'
+import type { Order, OrderItem, OrderStatus } from '../types/orders'
+import { CancelPaymentDialog } from './cancel-payment-dialog'
+import { useCurrentTenantQuery } from '../../tenants/queries/tenants.queries'
 
 const STATUS_CONFIG: Record<string, StatusConfig> = {
-  new: {
-    label: 'Mới',
+  pending: {
+    label: 'Chờ xử lý',
     className:
       'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20',
   },
@@ -162,7 +64,7 @@ const STATUS_CONFIG: Record<string, StatusConfig> = {
     className:
       'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-500/10 dark:text-purple-400 dark:border-purple-500/20',
   },
-  preparing: {
+  in_progress: {
     label: 'Đang chuẩn bị',
     className:
       'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20',
@@ -182,10 +84,20 @@ const STATUS_CONFIG: Record<string, StatusConfig> = {
     className:
       'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-500/10 dark:text-slate-400 dark:border-slate-500/20',
   },
+  rejected: {
+    label: 'Từ chối',
+    className:
+      'bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-500/10 dark:text-orange-400 dark:border-orange-500/20',
+  },
   cancelled: {
     label: 'Đã hủy',
     className:
       'bg-red-50 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20',
+  },
+  abandoned: {
+    label: 'Bỏ dở',
+    className:
+      'bg-gray-50 text-gray-700 border-gray-200 dark:bg-gray-500/10 dark:text-gray-400 dark:border-gray-500/20',
   },
 }
 
@@ -193,24 +105,34 @@ const PAYMENT_STATUS_CONFIG: Record<string, StatusConfig> = {
   unpaid: {
     label: 'Chưa TT',
     className:
-      'bg-red-50 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20',
+      'bg-slate-50 text-slate-700 border-slate-200 dark:bg-slate-500/10 dark:text-slate-400 dark:border-slate-500/20',
+  },
+  initiated: {
+    label: 'Đang TT',
+    className:
+      'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20',
+  },
+  processing: {
+    label: 'Xử lý',
+    className:
+      'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20',
   },
   paid: {
     label: 'Đã TT',
     className:
       'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20',
   },
-  refunded: {
-    label: 'Hoàn tiền',
+  failed: {
+    label: 'Thất bại',
     className:
-      'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-500/10 dark:text-slate-400 dark:border-slate-500/20',
+      'bg-red-50 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20',
   },
 }
 
 const NEXT_STATUS_MAP: Record<string, string> = {
-  new: 'accepted',
-  accepted: 'preparing',
-  preparing: 'ready',
+  pending: 'accepted',
+  accepted: 'in_progress',
+  in_progress: 'ready',
   ready: 'served',
   served: 'completed',
 }
@@ -218,26 +140,120 @@ const NEXT_STATUS_MAP: Record<string, string> = {
 export function OrdersTable() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const [orders, setOrders] = useState(MOCK_ORDERS)
-  const [isLoading, setIsLoading] = useState(false)
+  const [paymentDialogOpen, setPaymentDialogOpen] = useState(false)
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false)
+  const [orderToCancel, setOrderToCancel] = useState<Order | null>(null)
+  const completePaymentMutation = useCompletePaymentMutation()
+  const { data: tenantData } = useCurrentTenantQuery()
 
-  // Pagination state (mock)
-  const page = 1
-  const totalPages = 1
-  const total = orders.length
+  // Build query params from URL
+  const timeRange = searchParams.get('timeRange') || 'all'
+
+  // Calculate date_from and date_to based on timeRange
+  const getDateRange = (range: string) => {
+    const now = new Date()
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+
+    switch (range) {
+      case 'today':
+        return {
+          date_from: today.toISOString().split('T')[0],
+          date_to: today.toISOString().split('T')[0],
+        }
+      case 'last24h':
+        const last24h = new Date(now.getTime() - 24 * 60 * 60 * 1000)
+        return {
+          date_from: last24h.toISOString().split('T')[0],
+          date_to: today.toISOString().split('T')[0],
+        }
+      case 'last7d':
+        const last7d = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000)
+        return {
+          date_from: last7d.toISOString().split('T')[0],
+          date_to: today.toISOString().split('T')[0],
+        }
+      default:
+        return {}
+    }
+  }
+
+  const dateRange = getDateRange(timeRange)
+
+  const queryParams = {
+    page: Number(searchParams.get('page')) || 1,
+    limit: 10,
+    status:
+      searchParams.get('status') !== 'all'
+        ? (searchParams.get('status') as OrderStatus)
+        : undefined,
+    search: searchParams.get('q') || undefined,
+    zone_id: searchParams.get('zoneId') || undefined,
+    table_id: searchParams.get('tableId') || undefined,
+    ...dateRange,
+  }
+
+  // Fetch orders from API
+  const { data, isLoading, error } = useOrdersQuery(queryParams)
+  const orders = data?.data || []
+  const meta = data?.meta
+
+  // Update status mutation
+  const updateStatusMutation = useUpdateOrderStatusMutation()
+
+  // NOTE: WebSocket connection is managed by OrdersFilterToolbar with auto-refresh toggle
+  // The socket invalidates queries automatically, so this table will update in real-time
 
   const handleBumpStatus = (orderId: string) => {
-    setOrders((prev) =>
-      prev.map((order) =>
-        order.id === orderId
-          ? { ...order, status: NEXT_STATUS_MAP[order.status] || order.status }
-          : order,
-      ),
-    )
+    const order = orders.find((o: Order) => o.id === orderId)
+    if (!order) return
+
+    const nextStatus = NEXT_STATUS_MAP[order.status]
+    if (!nextStatus) return
+
+    updateStatusMutation.mutate({
+      id: orderId,
+      payload: { status: nextStatus as OrderStatus },
+    })
   }
 
   const handleViewOrder = (orderId: string) => {
     router.push(`/admin/orders/${orderId}`)
+  }
+
+  const handleOpenPaymentDialog = (order: Order) => {
+    setSelectedOrder(order)
+    setPaymentDialogOpen(true)
+  }
+
+  const handlePrintBill = (order: Order) => {
+    printBill({
+      order,
+      billType: 'final',
+      paymentMethod: 'cash',
+      tenantName: tenantData?.data?.name,
+      tenantAddress: tenantData?.data?.address,
+    })
+    toast.success('Đang in hóa đơn')
+  }
+
+  const handleCompletePayment = async (order: Order) => {
+    const activePayment = order.payments?.find(
+      (p: { status: string }) => !['cancelled', 'failed', 'paid'].includes(p.status),
+    )
+    if (!activePayment) return
+
+    try {
+      await completePaymentMutation.mutateAsync(activePayment.id)
+      toast.success('Đã hoàn tất thanh toán')
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Không thể hoàn tất thanh toán')
+    }
+  }
+
+  const handleOpenCancelDialog = (order: Order) => {
+    setOrderToCancel(order)
+    setCancelDialogOpen(true)
   }
 
   const getAgingMinutes = (createdAt: Date) => {
@@ -261,9 +277,15 @@ export function OrdersTable() {
                 <AdminTableHead className="px-4">Món</AdminTableHead>
                 <AdminTableHead className="px-4">Trạng thái</AdminTableHead>
                 <AdminTableHead className="px-4">Thanh toán</AdminTableHead>
-                <AdminTableHead className="px-4" align="right">Tổng tiền</AdminTableHead>
-                <AdminTableHead className="px-4" align="center">Thời gian</AdminTableHead>
-                <AdminTableHead className="px-4" align="right">Thao tác</AdminTableHead>
+                <AdminTableHead className="px-4" align="right">
+                  Tổng tiền
+                </AdminTableHead>
+                <AdminTableHead className="px-4" align="center">
+                  Thời gian
+                </AdminTableHead>
+                <AdminTableHead className="px-4" align="right">
+                  Thao tác
+                </AdminTableHead>
               </AdminTableHeaderRow>
             </TableHeader>
             <TableBody>
@@ -299,9 +321,15 @@ export function OrdersTable() {
               <AdminTableHead className="px-4">Món</AdminTableHead>
               <AdminTableHead className="px-4">Trạng thái</AdminTableHead>
               <AdminTableHead className="px-4">Thanh toán</AdminTableHead>
-              <AdminTableHead className="px-4" align="right">Tổng tiền</AdminTableHead>
-              <AdminTableHead className="px-4" align="center">Thời gian</AdminTableHead>
-              <AdminTableHead className="px-4" align="right">Thao tác</AdminTableHead>
+              <AdminTableHead className="px-4" align="right">
+                Tổng tiền
+              </AdminTableHead>
+              <AdminTableHead className="px-4" align="center">
+                Thời gian
+              </AdminTableHead>
+              <AdminTableHead className="px-4" align="right">
+                Thao tác
+              </AdminTableHead>
             </AdminTableHeaderRow>
           </TableHeader>
           <TableBody>
@@ -316,9 +344,9 @@ export function OrdersTable() {
                 </TableCell>
               </TableRow>
             ) : (
-              orders.map((order, index) => {
-                const aging = getAgingMinutes(order.createdAt)
-                const isOverdue = isAging(order.createdAt)
+              orders.map((order: Order, index: number) => {
+                const aging = getAgingMinutes(new Date(order.createdAt))
+                const isOverdue = isAging(new Date(order.createdAt))
 
                 return (
                   <AdminTableRow
@@ -330,19 +358,24 @@ export function OrdersTable() {
                     <TableCell className="px-4 py-4">
                       <div>
                         <p className="font-mono text-sm font-semibold text-slate-900 dark:text-white">
-                          {order.id}
+                          {order.orderNumber}
                         </p>
                         <p className="text-xs text-slate-500 dark:text-slate-400">
-                          {formatDistanceToNow(order.createdAt, { addSuffix: true, locale: vi })}
+                          {formatDistanceToNow(new Date(order.createdAt), {
+                            addSuffix: true,
+                            locale: vi,
+                          })}
                         </p>
                       </div>
                     </TableCell>
                     <TableCell className="px-4 py-4">
                       <div>
                         <p className="text-sm font-medium text-slate-900 dark:text-white">
-                          {order.tableName}
+                          Bàn {order.table?.tableNumber || 'N/A'}
                         </p>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">{order.floor}</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">
+                          {order.table?.zone?.name || ''}
+                        </p>
                       </div>
                     </TableCell>
                     <TableCell className="px-4 py-4">
@@ -356,7 +389,7 @@ export function OrdersTable() {
                             Chi tiết món:
                           </p>
                           <ul className="space-y-1">
-                            {order.items.slice(0, 3).map((item, idx) => (
+                            {order.items.slice(0, 3).map((item: OrderItem, idx: number) => (
                               <li key={idx} className="text-xs text-slate-600 dark:text-slate-400">
                                 {item.quantity}x {item.name}
                               </li>
@@ -378,7 +411,7 @@ export function OrdersTable() {
                     </TableCell>
                     <TableCell className="px-4 py-4 text-right">
                       <p className="font-semibold text-slate-900 dark:text-white">
-                        {order.total.toLocaleString('vi-VN')}₫
+                        {order.totalAmount?.toLocaleString('vi-VN')}₫
                       </p>
                     </TableCell>
                     <TableCell className="px-4 py-4">
@@ -401,6 +434,91 @@ export function OrdersTable() {
                       onClick={(e) => e.stopPropagation()}
                     >
                       <div className="flex items-center justify-end gap-1">
+                        {/* Payment Processing Indicator */}
+                        {(() => {
+                          const activePayment = order.payments?.find(
+                            (p: { status: string; paymentMethod?: string }) =>
+                              !['cancelled', 'failed', 'paid'].includes(p.status),
+                          )
+
+                          // Show Complete/Cancel buttons for active payments
+                          if (activePayment && order.status === 'completed') {
+                            const isProcessing = completePaymentMutation.isPending
+
+                            return (
+                              <>
+                                {/* Processing indicator */}
+                                <div className="relative mr-1">
+                                  <div className="flex h-2 w-2 items-center justify-center">
+                                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-blue-400 opacity-75"></span>
+                                    <span className="relative inline-flex h-2 w-2 rounded-full bg-blue-500"></span>
+                                  </div>
+                                </div>
+
+                                {/* Complete button - only for pending cash */}
+                                {activePayment.status === 'pending' &&
+                                  activePayment.paymentMethod === 'cash' && (
+                                    <Button
+                                      variant="default"
+                                      className="h-7 gap-1 rounded-full px-2 text-xs md:h-8 md:px-3"
+                                      disabled={isProcessing}
+                                      onClick={(e) => {
+                                        e.stopPropagation()
+                                        handleCompletePayment(order)
+                                      }}
+                                    >
+                                      {isProcessing ? (
+                                        <Loader2 className="h-3 w-3 animate-spin" />
+                                      ) : (
+                                        <CheckCircle className="h-3 w-3" />
+                                      )}
+                                      {!isProcessing && (
+                                        <span className="hidden md:inline">Hoàn tất</span>
+                                      )}
+                                    </Button>
+                                  )}
+
+                                {/* Cancel button */}
+                                <Button
+                                  variant="outline"
+                                  className="h-7 gap-1 rounded-full px-2 text-xs md:h-8 md:px-3"
+                                  disabled={isProcessing}
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    handleOpenCancelDialog(order)
+                                  }}
+                                >
+                                  {isProcessing ? (
+                                    <Loader2 className="h-3 w-3 animate-spin" />
+                                  ) : (
+                                    <X className="h-3 w-3" />
+                                  )}
+                                  {!isProcessing && <span className="hidden md:inline">Hủy</span>}
+                                </Button>
+                              </>
+                            )
+                          }
+
+                          // Show Tính tiền button for completed unpaid orders without active payment
+                          if (order.status === 'completed' && order.paymentStatus !== 'paid') {
+                            return (
+                              <Button
+                                variant="default"
+                                className="h-7 gap-1 rounded-full px-2 text-xs md:h-8 md:px-3"
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  handleOpenPaymentDialog(order)
+                                }}
+                              >
+                                <Wallet className="h-3 w-3" />
+                                Tính tiền
+                              </Button>
+                            )
+                          }
+
+                          return null
+                        })()}
+
                         {/* Bump/Next Status */}
                         {NEXT_STATUS_MAP[order.status] && (
                           <Button
@@ -445,13 +563,23 @@ export function OrdersTable() {
                               <Eye className="mr-2 h-4 w-4" />
                               Xem chi tiết
                             </DropdownMenuItem>
-                            <DropdownMenuItem>
+                            <DropdownMenuItem
+                              disabled={order.paymentStatus !== 'paid'}
+                              onClick={() => handlePrintBill(order)}
+                            >
                               <Printer className="mr-2 h-4 w-4" />
                               In bill
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem>Thay đổi trạng thái...</DropdownMenuItem>
-                            <DropdownMenuItem>Xuất PDF</DropdownMenuItem>
+                            <DropdownMenuItem
+                              disabled={
+                                order.status !== 'completed' || order.paymentStatus === 'paid'
+                              }
+                              onClick={() => handleOpenPaymentDialog(order)}
+                            >
+                              <Wallet className="mr-2 h-4 w-4" />
+                              Tính tiền
+                            </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </div>
@@ -465,13 +593,31 @@ export function OrdersTable() {
       </AdminTableContainer>
 
       {/* Pagination */}
-      <TablePagination
-        currentPage={page}
-        totalPages={totalPages}
-        total={total}
-        limit={10}
-        itemLabel="đơn"
-        onPageChange={() => {}}
+      {meta && (
+        <TablePagination
+          currentPage={meta.page || 1}
+          totalPages={meta.totalPages || 1}
+          total={meta.total || 0}
+          limit={meta.limit || 10}
+          itemLabel="đơn"
+          onPageChange={() => {}}
+        />
+      )}
+
+      {/* Payment Dialog */}
+      <PaymentDialog
+        open={paymentDialogOpen}
+        onOpenChange={setPaymentDialogOpen}
+        order={selectedOrder}
+        tenantAddress={tenantData?.data?.address}
+        tenantName={tenantData?.data?.name}
+      />
+
+      {/* Cancel Payment Confirmation Dialog */}
+      <CancelPaymentDialog
+        open={cancelDialogOpen}
+        onOpenChange={setCancelDialogOpen}
+        orderToCancel={orderToCancel}
       />
     </div>
   )

@@ -25,6 +25,7 @@ import {
   Upload,
   MapPin,
   Construction,
+  ShipIcon,
 } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/src/components/ui/avatar'
 import {
@@ -41,7 +42,8 @@ import { getInitials, getRoleLabel } from '../utils'
 
 const menuItems = [
   { icon: LayoutDashboard, label: 'Tổng quan', href: '/admin/dashboard', wip: true },
-  { icon: ClipboardList, label: 'Đơn hàng', href: '/admin/orders', wip: true },
+  { icon: ClipboardList, label: 'Đơn hàng', href: '/admin/orders' },
+  { icon: ShipIcon, label: 'KDS', href: '/admin/kds', wip: true },
   {
     icon: UtensilsCrossed,
     label: 'Thực đơn',
