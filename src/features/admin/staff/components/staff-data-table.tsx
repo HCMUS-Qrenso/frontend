@@ -158,9 +158,7 @@ export function StaffDataTable({ role }: StaffDataTableProps) {
   if (error) {
     return (
       <div className="rounded-2xl border border-red-200 bg-red-50 p-6 dark:border-red-800 dark:bg-red-500/10">
-        <p className="text-sm text-red-600 dark:text-red-400">
-          {t('loadError')}
-        </p>
+        <p className="text-sm text-red-600 dark:text-red-400">{t('loadError')}</p>
       </div>
     )
   }
@@ -185,11 +183,7 @@ export function StaffDataTable({ role }: StaffDataTableProps) {
             {staffList.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={7} className="px-6 py-0">
-                  <EmptyState
-                    icon={Users}
-                    title={getEmptyTitle()}
-                    description={t('inviteHint')}
-                  />
+                  <EmptyState icon={Users} title={getEmptyTitle()} description={t('inviteHint')} />
                 </TableCell>
               </TableRow>
             ) : (

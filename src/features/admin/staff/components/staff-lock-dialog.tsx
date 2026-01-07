@@ -48,29 +48,33 @@ export function StaffLockDialog({ open, onOpenChange, staff, action }: StaffLock
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>
-            {isLocking ? t('lockTitle') : t('unlockTitle')}
-          </AlertDialogTitle>
+          <AlertDialogTitle>{isLocking ? t('lockTitle') : t('unlockTitle')}</AlertDialogTitle>
           <AlertDialogDescription>
             {isLocking ? (
-              <span dangerouslySetInnerHTML={{ 
-                __html: t('lockDesc', { name: staff.fullName }).replace(
-                  '<strong>',
-                  '<strong class="font-semibold">'
-                )
-              }} />
+              <span
+                dangerouslySetInnerHTML={{
+                  __html: t('lockDesc', { name: staff.fullName }).replace(
+                    '<strong>',
+                    '<strong class="font-semibold">',
+                  ),
+                }}
+              />
             ) : (
-              <span dangerouslySetInnerHTML={{ 
-                __html: t('unlockDesc', { name: staff.fullName }).replace(
-                  '<strong>',
-                  '<strong class="font-semibold">'
-                )
-              }} />
+              <span
+                dangerouslySetInnerHTML={{
+                  __html: t('unlockDesc', { name: staff.fullName }).replace(
+                    '<strong>',
+                    '<strong class="font-semibold">',
+                  ),
+                }}
+              />
             )}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={updateStatusMutation.isPending}>{t('cancel')}</AlertDialogCancel>
+          <AlertDialogCancel disabled={updateStatusMutation.isPending}>
+            {t('cancel')}
+          </AlertDialogCancel>
           <AlertDialogAction
             onClick={handleConfirm}
             className={

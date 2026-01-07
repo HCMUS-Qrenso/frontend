@@ -67,22 +67,24 @@ function StatCard({ title, value, subtext, trend, icon, className, isLoading }: 
 }
 
 // Order Status Card with progress bar
-function OrderStatusCard({ 
-  data, 
+function OrderStatusCard({
+  data,
   isLoading,
-  t
-}: { 
-  data?: { pending: number; preparing: number; ready: number; served: number; completed: number };
-  isLoading?: boolean;
-  t: (key: string) => string;
+  t,
+}: {
+  data?: { pending: number; preparing: number; ready: number; served: number; completed: number }
+  isLoading?: boolean
+  t: (key: string) => string
 }) {
-  const statuses = data ? [
-    { name: t('pending'), count: data.pending, color: 'bg-amber-400' },
-    { name: t('preparing'), count: data.preparing, color: 'bg-sky-400' },
-    { name: t('ready'), count: data.ready, color: 'bg-emerald-400' },
-    { name: t('served'), count: data.served, color: 'bg-slate-400' },
-    { name: t('completed'), count: data.completed, color: 'bg-green-600' },
-  ] : []
+  const statuses = data
+    ? [
+        { name: t('pending'), count: data.pending, color: 'bg-amber-400' },
+        { name: t('preparing'), count: data.preparing, color: 'bg-sky-400' },
+        { name: t('ready'), count: data.ready, color: 'bg-emerald-400' },
+        { name: t('served'), count: data.served, color: 'bg-slate-400' },
+        { name: t('completed'), count: data.completed, color: 'bg-green-600' },
+      ]
+    : []
   const total = statuses.reduce((sum, s) => sum + s.count, 0)
 
   return (
@@ -150,10 +152,14 @@ export function TodayStats() {
         title={t('ordersToday')}
         value={data?.orders_today.toString() || '0'}
         subtext={t('comparedToYesterday')}
-        trend={data ? { 
-          value: `${data.orders_change_percent >= 0 ? '+' : ''}${data.orders_change_percent}%`, 
-          isPositive: data.orders_change_percent >= 0 
-        } : undefined}
+        trend={
+          data
+            ? {
+                value: `${data.orders_change_percent >= 0 ? '+' : ''}${data.orders_change_percent}%`,
+                isPositive: data.orders_change_percent >= 0,
+              }
+            : undefined
+        }
         icon={<ShoppingBag className="h-6 w-6" />}
         isLoading={isLoading}
       />
@@ -161,10 +167,14 @@ export function TodayStats() {
         title={t('revenueToday')}
         value={data ? formatCurrency(data.revenue_today) : '0'}
         subtext={data ? `${t('avgValue')}: ${formatCurrency(data.avg_order_value)}` : ''}
-        trend={data ? { 
-          value: `${data.revenue_change_percent >= 0 ? '+' : ''}${data.revenue_change_percent}%`, 
-          isPositive: data.revenue_change_percent >= 0 
-        } : undefined}
+        trend={
+          data
+            ? {
+                value: `${data.revenue_change_percent >= 0 ? '+' : ''}${data.revenue_change_percent}%`,
+                isPositive: data.revenue_change_percent >= 0,
+              }
+            : undefined
+        }
         icon={<DollarSign className="h-6 w-6" />}
         isLoading={isLoading}
       />
@@ -182,14 +192,19 @@ export function TodayStats() {
         icon={<Clock className="h-6 w-6" />}
         isLoading={isLoading}
       />
-      <OrderStatusCard 
-        data={data ? {
-          pending: data.order_status_breakdown.pending,
-          preparing: data.order_status_breakdown.preparing || data.order_status_breakdown.in_progress,
-          ready: data.order_status_breakdown.ready,
-          served: data.order_status_breakdown.served,
-          completed: data.order_status_breakdown.completed,
-        } : undefined}
+      <OrderStatusCard
+        data={
+          data
+            ? {
+                pending: data.order_status_breakdown.pending,
+                preparing:
+                  data.order_status_breakdown.preparing || data.order_status_breakdown.in_progress,
+                ready: data.order_status_breakdown.ready,
+                served: data.order_status_breakdown.served,
+                completed: data.order_status_breakdown.completed,
+              }
+            : undefined
+        }
         isLoading={isLoading}
         t={t}
       />

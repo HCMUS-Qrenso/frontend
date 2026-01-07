@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -45,9 +45,18 @@ export function PaymentDialog({
   const [description, setDescription] = useState('')
   const [qrModalOpen, setQrModalOpen] = useState(false)
   const [qrCode, setQrCode] = useState<string | null>(null)
-  const [orderCode, setOrderCode] = useState<number | undefined>(undefined)
+  const [transactionId, setTransactionId] = useState<string | undefined>(undefined)
 
   const createPaymentMutation = useCreatePaymentMutation()
+
+  useEffect(() => {
+    if (open) {
+      // Set defaults when dialog opens
+      setPaymentMethod('cash')
+      setAction('print')
+      setDescription('')
+    }
+  }, [open])
 
   const handleProcessPayment = async () => {
     if (!order) return
@@ -76,7 +85,7 @@ export function PaymentDialog({
         const result = await createPaymentMutation.mutateAsync({
           orderId: order.id,
           paymentMethod,
-          description: description || `Thanh toán đơn hàng ${order.orderNumber}`,
+          description: description || `${order.orderNumber}`,
         })
 
         // Print phiếu tạm tính with payment info (including QR for qr)
@@ -84,7 +93,7 @@ export function PaymentDialog({
           order,
           billType: 'temporary',
           paymentMethod,
-          description: description || `Thanh toán đơn hàng ${order.orderNumber}`,
+          description: description || `${order.orderNumber}`,
           qrCodeData: result?.qrCodeData,
           tenantName,
           tenantAddress,
@@ -113,7 +122,7 @@ export function PaymentDialog({
       const result = await createPaymentMutation.mutateAsync({
         orderId: order.id,
         paymentMethod,
-        description: description || `Thanh toán đơn hàng ${order.orderNumber}`,
+        description: description || `${order.orderNumber}`,
       })
 
       if (paymentMethod === 'cash') {
@@ -123,7 +132,7 @@ export function PaymentDialog({
         // For QR payment at counter, show QR modal
         if (result?.qrCode) {
           setQrCode(result.qrCode)
-          setOrderCode(result.orderCode)
+          setTransactionId(result.transactionId)
           setQrModalOpen(true)
           toast.success('Đã tạo mã QR thanh toán')
         }
@@ -144,204 +153,214 @@ export function PaymentDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
-        <DialogHeader>
+      <DialogContent className="flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-700 dark:bg-slate-900">
+        <DialogHeader className="border-b border-slate-200 pb-2 dark:border-slate-800">
           <DialogTitle>Tính tiền - {order.orderNumber}</DialogTitle>
           <DialogDescription>
             Bàn {order.table?.tableNumber} - Tổng: {order.totalAmount.toLocaleString('vi-VN')}₫
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6 py-4">
-          {/* Warning for non-completed orders */}
-          {order.status !== 'completed' && (
-            <div className="rounded-lg bg-amber-50 p-4 dark:bg-amber-500/10">
-              <p className="text-sm font-medium text-amber-900 dark:text-amber-400">
-                ⚠️ Đơn hàng chưa hoàn thành
-              </p>
-              <p className="mt-1 text-xs text-amber-700 dark:text-amber-300">
-                Chỉ có thể in phiếu tạm tính. Tạo thanh toán chỉ khả dụng khi đơn hàng đã hoàn
-                thành.
-              </p>
-            </div>
-          )}
+        <div className="flex-1 space-y-6 overflow-y-auto">
+          <div className="space-y-6 px-4">
+            {/* Warning for non-completed orders */}
+            {order.status !== 'completed' && (
+              <div className="rounded-lg bg-amber-50 p-4 dark:bg-amber-500/10">
+                <p className="text-sm font-medium text-amber-900 dark:text-amber-400">
+                  ⚠️ Đơn hàng chưa hoàn thành
+                </p>
+                <p className="mt-1 text-xs text-amber-700 dark:text-amber-300">
+                  Chỉ có thể in phiếu tạm tính. Tạo thanh toán chỉ khả dụng khi đơn hàng đã hoàn
+                  thành.
+                </p>
+              </div>
+            )}
 
-          {/* Warning for existing active payment */}
-          {(() => {
-            const activePayment = order.payments?.find(
-              (p) => !['cancelled', 'failed', 'paid'].includes(p.status),
-            )
-            if (activePayment) {
-              const statusLabels: Record<string, string> = {
-                pending: 'chờ thanh toán',
-                processing: 'đang xử lý',
-              }
-              const methodLabels: Record<string, string> = {
-                cash: 'Tiền mặt',
-                payos: 'VietQR',
-              }
-              return (
-                <div className="rounded-lg bg-blue-50 p-4 dark:bg-blue-500/10">
-                  <p className="text-sm font-medium text-blue-900 dark:text-blue-400">
-                    💳 Thanh toán đang xử lý
-                  </p>
-                  <p className="mt-1 text-xs text-blue-700 dark:text-blue-300">
-                    Phương thức:{' '}
-                    {methodLabels[activePayment.paymentMethod || ''] || activePayment.paymentMethod}{' '}
-                    - Trạng thái: {statusLabels[activePayment.status] || activePayment.status}
-                  </p>
-                  <p className="mt-1 text-xs text-blue-600 dark:text-blue-400">
-                    Không thể tạo thanh toán mới. Vui lòng hoàn tất hoặc hủy thanh toán hiện tại.
-                  </p>
-                </div>
+            {/* Warning for existing active payment */}
+            {(() => {
+              const activePayment = order.payments?.find(
+                (p) => !['cancelled', 'failed', 'paid'].includes(p.status),
               )
-            }
-            return null
-          })()}
-
-          {/* Action Selection */}
-          <div className="space-y-3">
-            <Label className="text-base font-semibold">Hành động</Label>
-            <RadioGroup value={action} onValueChange={(value) => setAction(value as DialogAction)}>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="print" id="print" />
-                <Label
-                  htmlFor="print"
-                  className="flex cursor-pointer items-center gap-2 font-normal"
-                >
-                  <Printer className="h-4 w-4" />
-                  <div>
-                    <div className="font-medium">In phiếu tạm tính</div>
-                    <div className="text-muted-foreground text-xs">
-                      Tạo thanh toán và in phiếu mang ra bàn
-                    </div>
+              if (activePayment) {
+                const statusLabels: Record<string, string> = {
+                  pending: 'chờ thanh toán',
+                  processing: 'đang xử lý',
+                }
+                const methodLabels: Record<string, string> = {
+                  cash: 'Tiền mặt',
+                  payos: 'VietQR',
+                }
+                return (
+                  <div className="rounded-lg bg-blue-50 p-4 dark:bg-blue-500/10">
+                    <p className="text-sm font-medium text-blue-900 dark:text-blue-400">
+                      💳 Thanh toán đang xử lý
+                    </p>
+                    <p className="mt-1 text-xs text-blue-700 dark:text-blue-300">
+                      Phương thức:{' '}
+                      {methodLabels[activePayment.paymentMethod || ''] ||
+                        activePayment.paymentMethod}{' '}
+                      - Trạng thái: {statusLabels[activePayment.status] || activePayment.status}
+                    </p>
+                    <p className="mt-1 text-xs text-blue-600 dark:text-blue-400">
+                      Không thể tạo thanh toán mới. Vui lòng hoàn tất hoặc hủy thanh toán hiện tại.
+                    </p>
                   </div>
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem
-                  value="payment"
-                  id="payment"
-                  disabled={order.status !== 'completed'}
-                />
-                <Label
-                  htmlFor="payment"
-                  className={cn(
-                    'flex cursor-pointer items-center gap-2 font-normal',
-                    order.status !== 'completed' && 'cursor-not-allowed opacity-50',
-                  )}
-                >
-                  <Banknote className="h-4 w-4" />
-                  <div>
-                    <div className="font-medium">Tạo thanh toán</div>
-                    <div className="text-muted-foreground text-xs">
-                      Tạo thanh toán không in phiếu (thanh toán ngay)
-                    </div>
-                  </div>
-                </Label>
-              </div>
-            </RadioGroup>
-          </div>
+                )
+              }
+              return null
+            })()}
 
-          {/* Payment Method (always show when order is completed) */}
-          {order.status === 'completed' && (
-            <>
-              <Separator />
-              <div className="space-y-3">
-                <Label className="text-base font-semibold">Phương thức thanh toán</Label>
-                <RadioGroup
-                  value={paymentMethod}
-                  onValueChange={(value) => setPaymentMethod(value as PaymentMethod)}
-                >
-                  <div
+            {/* Action Selection */}
+            <div className="space-y-3">
+              <Label className="text-base font-semibold">Hành động</Label>
+              <RadioGroup
+                value={action}
+                onValueChange={(value) => setAction(value as DialogAction)}
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="print" id="print" />
+                  <Label
+                    htmlFor="print"
+                    className="flex cursor-pointer items-center gap-2 font-normal"
+                  >
+                    <Printer className="h-4 w-4" />
+                    <div>
+                      <div className="font-medium">In phiếu tạm tính</div>
+                      <div className="text-muted-foreground text-xs">
+                        Tạo thanh toán và in phiếu mang ra bàn
+                      </div>
+                    </div>
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem
+                    value="payment"
+                    id="payment"
+                    disabled={order.status !== 'completed'}
+                  />
+                  <Label
+                    htmlFor="payment"
                     className={cn(
-                      'flex cursor-pointer items-center space-x-3 rounded-lg border-2 p-4 transition-colors',
-                      paymentMethod === 'cash'
-                        ? 'border-primary bg-primary/5'
-                        : 'border-border hover:border-primary/50',
+                      'flex cursor-pointer items-center gap-2 font-normal',
+                      order.status !== 'completed' && 'cursor-not-allowed opacity-50',
                     )}
                   >
-                    <RadioGroupItem value="cash" id="cash" />
-                    <Label htmlFor="cash" className="flex flex-1 cursor-pointer items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-500/10">
-                        <Banknote className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                    <Banknote className="h-4 w-4" />
+                    <div>
+                      <div className="font-medium">Tạo thanh toán</div>
+                      <div className="text-muted-foreground text-xs">
+                        Tạo thanh toán không in phiếu (thanh toán ngay)
                       </div>
-                      <div className="flex-1">
-                        <div className="font-medium">Tiền mặt</div>
-                        <div className="text-muted-foreground text-xs">
-                          Nhận tiền, sau đó nhấn "Hoàn tất"
-                        </div>
-                      </div>
-                    </Label>
-                  </div>
+                    </div>
+                  </Label>
+                </div>
+              </RadioGroup>
+            </div>
 
-                  <div
-                    className={cn(
-                      'flex cursor-pointer items-center space-x-3 rounded-lg border-2 p-4 transition-colors',
-                      paymentMethod === 'qr'
-                        ? 'border-primary bg-primary/5'
-                        : 'border-border hover:border-primary/50',
-                    )}
+            {/* Payment Method (always show when order is completed) */}
+            {order.status === 'completed' && (
+              <>
+                <Separator />
+                <div className="space-y-3">
+                  <Label className="text-base font-semibold">Phương thức thanh toán</Label>
+                  <RadioGroup
+                    value={paymentMethod}
+                    onValueChange={(value) => setPaymentMethod(value as PaymentMethod)}
                   >
-                    <RadioGroupItem value="qr" id="qr" />
-                    <Label htmlFor="qr" className="flex flex-1 cursor-pointer items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-500/10">
-                        <QrCode className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                      </div>
-                      <div className="flex-1">
-                        <div className="font-medium">VietQR</div>
-                        <div className="text-muted-foreground text-xs">
-                          Tạo mã QR, khách quét để thanh toán
+                    <div
+                      className={cn(
+                        'flex cursor-pointer items-center space-x-3 rounded-lg border-2 p-4 transition-colors',
+                        paymentMethod === 'cash'
+                          ? 'border-primary bg-primary/5'
+                          : 'border-border hover:border-primary/50',
+                      )}
+                    >
+                      <RadioGroupItem value="cash" id="cash" />
+                      <Label
+                        htmlFor="cash"
+                        className="flex flex-1 cursor-pointer items-center gap-3"
+                      >
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-500/10">
+                          <Banknote className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
                         </div>
-                      </div>
-                    </Label>
+                        <div className="flex-1">
+                          <div className="font-medium">Tiền mặt</div>
+                          <div className="text-muted-foreground text-xs">
+                            Nhận tiền, sau đó nhấn "Hoàn tất"
+                          </div>
+                        </div>
+                      </Label>
+                    </div>
+
+                    <div
+                      className={cn(
+                        'flex cursor-pointer items-center space-x-3 rounded-lg border-2 p-4 transition-colors',
+                        paymentMethod === 'qr'
+                          ? 'border-primary bg-primary/5'
+                          : 'border-border hover:border-primary/50',
+                      )}
+                    >
+                      <RadioGroupItem value="qr" id="qr" />
+                      <Label htmlFor="qr" className="flex flex-1 cursor-pointer items-center gap-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-500/10">
+                          <QrCode className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="font-medium">VietQR</div>
+                          <div className="text-muted-foreground text-xs">
+                            Tạo mã QR, khách quét để thanh toán
+                          </div>
+                        </div>
+                      </Label>
+                    </div>
+                  </RadioGroup>
+                </div>
+
+                <Separator />
+
+                {/* Description */}
+                <div className="space-y-2">
+                  <Label htmlFor="description">Ghi chú (tuỳ chọn)</Label>
+                  <Textarea
+                    id="description"
+                    placeholder="Nhập ghi chú cho giao dịch..."
+                    maxLength={25}
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    rows={1}
+                  />
+                </div>
+              </>
+            )}
+
+            {/* Order Summary */}
+            <div className="bg-muted/50 rounded-lg border p-4">
+              <div className="mb-3 text-sm font-semibold">Tóm tắt đơn hàng</div>
+              <div className="space-y-2 text-sm">
+                {order.items.slice(0, 3).map((item, idx) => (
+                  <div key={idx} className="flex justify-between">
+                    <span className="text-muted-foreground">
+                      {item.quantity}x {(item as any).name || (item as any).menuItem?.name}
+                    </span>
+                    <span className="font-medium">{item.subtotal.toLocaleString('vi-VN')}₫</span>
                   </div>
-                </RadioGroup>
-              </div>
-
-              <Separator />
-
-              {/* Description */}
-              <div className="space-y-2">
-                <Label htmlFor="description">Ghi chú (tuỳ chọn)</Label>
-                <Textarea
-                  id="description"
-                  placeholder="Nhập ghi chú cho giao dịch..."
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  rows={3}
-                />
-              </div>
-            </>
-          )}
-
-          {/* Order Summary */}
-          <div className="bg-muted/50 rounded-lg border p-4">
-            <div className="mb-3 text-sm font-semibold">Tóm tắt đơn hàng</div>
-            <div className="space-y-2 text-sm">
-              {order.items.slice(0, 3).map((item, idx) => (
-                <div key={idx} className="flex justify-between">
-                  <span className="text-muted-foreground">
-                    {item.quantity}x {(item as any).name || (item as any).menuItem?.name}
-                  </span>
-                  <span className="font-medium">{item.subtotal.toLocaleString('vi-VN')}₫</span>
+                ))}
+                {order.items.length > 3 && (
+                  <div className="text-muted-foreground text-xs">
+                    +{order.items.length - 3} món khác
+                  </div>
+                )}
+                <Separator />
+                <div className="flex justify-between text-base font-bold">
+                  <span>Tổng cộng:</span>
+                  <span>{order.totalAmount.toLocaleString('vi-VN')}₫</span>
                 </div>
-              ))}
-              {order.items.length > 3 && (
-                <div className="text-muted-foreground text-xs">
-                  +{order.items.length - 3} món khác
-                </div>
-              )}
-              <Separator />
-              <div className="flex justify-between text-base font-bold">
-                <span>Tổng cộng:</span>
-                <span>{order.totalAmount.toLocaleString('vi-VN')}₫</span>
               </div>
             </div>
           </div>
         </div>
 
-        <DialogFooter>
+        <DialogFooter className="border-t border-slate-200 pt-4 dark:border-slate-800">
           <Button
             variant="outline"
             onClick={() => onOpenChange(false)}
@@ -378,12 +397,12 @@ export function PaymentDialog({
         qrCode={qrCode}
         amount={order?.totalAmount || 0}
         orderNumber={order?.orderNumber || ''}
-        orderCode={orderCode}
+        transactionId={transactionId}
         orderId={order?.id || ''}
         onClose={() => {
           setQrModalOpen(false)
           setQrCode(null)
-          setOrderCode(undefined)
+          setTransactionId(undefined)
           onOpenChange(false)
           setPaymentMethod('cash')
           setAction('print')

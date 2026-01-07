@@ -173,7 +173,7 @@ export const useCancelPaymentMutation = () => {
 export const useCheckPaymentStatusMutation = () => {
   const queryClient = useQueryClient()
 
-  return useMutation<PaymentResponse, Error, number>({
+  return useMutation<PaymentResponse, Error, string>({
     mutationFn: (orderCode) => ordersApi.checkPaymentStatus(orderCode),
     onSuccess: () => {
       // Invalidate order queries to refresh payment status

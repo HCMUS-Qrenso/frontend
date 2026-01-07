@@ -151,16 +151,16 @@ export function PaymentCard({
   }
 
   const handleCheckPaymentStatus = async () => {
-    if (!payment?.orderCode) {
-      toast.error('Không có mã đơn hàng')
+    if (!payment?.transactionId) {
+      toast.error('Không có mã giao dịch')
       return
     }
 
     try {
-      const result = await checkPaymentStatusMutation.mutateAsync(payment.orderCode)
+      const result = await checkPaymentStatusMutation.mutateAsync(payment.transactionId)
       if (result.status === 'paid') {
         toast.success('Thanh toán đã được xác nhận!')
-      } else if (result.status === 'processing') {
+      } else if (result.status === 'pending') {
         toast.info('Đang chờ thanh toán...')
       } else {
         toast.warning(`Trạng thái: ${result.status}`)
@@ -314,12 +314,12 @@ export function PaymentCard({
           (payment.paymentMethod === 'qr' || payment.paymentMethod === 'payos') && (
             <>
               <div className="border-t border-slate-200 dark:border-slate-700" />
-              <div className="flex gap-2">
+              <div className="flex flex-row gap-2 lg:flex-col">
                 <Button
                   onClick={handleCheckPaymentStatus}
                   disabled={checkPaymentStatusMutation.isPending}
                   variant="outline"
-                  className="flex-1"
+                  className="flex-1 lg:flex-none"
                   size="lg"
                 >
                   <RefreshCw
@@ -336,7 +336,7 @@ export function PaymentCard({
                   onClick={handleOpenCancelDialog}
                   disabled={cancelPaymentMutation.isPending}
                   variant="destructive"
-                  className="flex-1"
+                  className="flex-1 lg:flex-none"
                   size="lg"
                 >
                   <X className="mr-2 h-4 w-4" />

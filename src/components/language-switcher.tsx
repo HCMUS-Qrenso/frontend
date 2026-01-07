@@ -15,11 +15,7 @@ import {
   CommandItem,
   CommandList,
 } from '@/src/components/ui/command'
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/src/components/ui/popover'
+import { Popover, PopoverContent, PopoverTrigger } from '@/src/components/ui/popover'
 
 const languages = locales.map((loc) => ({
   value: loc,
@@ -48,9 +44,7 @@ export function LanguageSwitcher() {
           aria-expanded={open}
           className="w-[140px] justify-between"
         >
-          {locale
-            ? languages.find((lang) => lang.value === locale)?.label
-            : 'Select language...'}
+          {locale ? languages.find((lang) => lang.value === locale)?.label : 'Select language...'}
           <ChevronsUpDown className="opacity-50" />
         </Button>
       </PopoverTrigger>
@@ -61,17 +55,10 @@ export function LanguageSwitcher() {
             <CommandEmpty>No language found.</CommandEmpty>
             <CommandGroup>
               {languages.map((lang) => (
-                <CommandItem
-                  key={lang.value}
-                  value={lang.value}
-                  onSelect={handleSelect}
-                >
+                <CommandItem key={lang.value} value={lang.value} onSelect={handleSelect}>
                   {lang.label}
                   <Check
-                    className={cn(
-                      'ml-auto',
-                      locale === lang.value ? 'opacity-100' : 'opacity-0',
-                    )}
+                    className={cn('ml-auto', locale === lang.value ? 'opacity-100' : 'opacity-0')}
                   />
                 </CommandItem>
               ))}
@@ -82,5 +69,3 @@ export function LanguageSwitcher() {
     </Popover>
   )
 }
-
-

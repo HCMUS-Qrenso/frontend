@@ -57,9 +57,9 @@ import { useCurrentTenantQuery } from '../../tenants/queries/tenants.queries'
 
 // Waiter-only transitions - KDS handles accepted->in_progress->ready
 const NEXT_STATUS_MAP: Record<string, string> = {
-  pending: 'accepted',    // Waiter accepts order
-  ready: 'served',        // Waiter serves ready items
-  served: 'completed',    // Waiter completes order
+  pending: 'accepted', // Waiter accepts order
+  ready: 'served', // Waiter serves ready items
+  served: 'completed', // Waiter completes order
 }
 
 export function OrdersTable() {

@@ -163,9 +163,7 @@ function SetupPasswordContent() {
 
           {/* Contact Admin Info */}
           <div className="mb-6 rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-800">
-            <p className="text-xs text-slate-600 dark:text-slate-400">
-              {t('contactAdminInfo')}
-            </p>
+            <p className="text-xs text-slate-600 dark:text-slate-400">{t('contactAdminInfo')}</p>
           </div>
 
           {/* Back to Login Link */}
@@ -199,9 +197,7 @@ function SetupPasswordContent() {
             <h1 className="text-2xl font-bold text-slate-900 lg:text-3xl dark:text-white">
               {t('setupSuccessTitle')}
             </h1>
-            <p className="text-sm text-slate-600 dark:text-slate-400">
-              {t('setupSuccessMessage')}
-            </p>
+            <p className="text-sm text-slate-600 dark:text-slate-400">{t('setupSuccessMessage')}</p>
           </div>
 
           {/* Login Button */}
@@ -232,9 +228,7 @@ function SetupPasswordContent() {
           <h1 className="text-2xl font-bold text-slate-900 lg:text-3xl dark:text-white">
             {t('welcomeTitle')}
           </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400">
-            {t('setupPasswordSubtitle')}
-          </p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">{t('setupPasswordSubtitle')}</p>
         </div>
 
         {/* Email Display */}
@@ -333,9 +327,7 @@ function SetupPasswordContent() {
             {fieldErrors.password && (
               <p className="text-xs text-red-600 dark:text-red-400">{fieldErrors.password}</p>
             )}
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              {t('passwordHint')}
-            </p>
+            <p className="text-xs text-slate-500 dark:text-slate-400">{t('passwordHint')}</p>
           </div>
 
           {/* Confirm Password Field */}

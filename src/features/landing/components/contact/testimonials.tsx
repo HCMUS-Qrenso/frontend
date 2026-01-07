@@ -21,9 +21,7 @@ export function Testimonials() {
             <h2 className="text-3xl font-bold text-slate-900 md:text-4xl dark:text-white">
               {t('title')}
             </h2>
-            <p className="mt-4 text-lg text-slate-500 dark:text-slate-400">
-              {t('subtitle')}
-            </p>
+            <p className="mt-4 text-lg text-slate-500 dark:text-slate-400">{t('subtitle')}</p>
           </div>
 
           {/* Testimonials Grid */}
@@ -74,4 +72,3 @@ export function Testimonials() {
     </section>
   )
 }
-

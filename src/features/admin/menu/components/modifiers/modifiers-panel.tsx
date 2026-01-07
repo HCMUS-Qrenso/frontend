@@ -149,10 +149,14 @@ export function ModifiersPanel({
             <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
               {selectedGroup.is_required && <span>• {t('required')}</span>}
               {selectedGroup.min_selections !== null && selectedGroup.min_selections > 0 && (
-                <span>• {t('minSelections')}: {selectedGroup.min_selections}</span>
+                <span>
+                  • {t('minSelections')}: {selectedGroup.min_selections}
+                </span>
               )}
               {selectedGroup.max_selections !== null ? (
-                <span>• {t('maxSelections')}: {selectedGroup.max_selections}</span>
+                <span>
+                  • {t('maxSelections')}: {selectedGroup.max_selections}
+                </span>
               ) : (
                 <span>• {t('noLimit')}</span>
               )}
@@ -235,9 +239,7 @@ export function ModifiersPanel({
             {filteredModifiers.length === 0 && (
               <div className="py-12 text-center">
                 <p className="text-sm text-slate-500 dark:text-slate-400">
-                  {modifiers.length === 0
-                    ? t('noModifiers')
-                    : t('noModifiersFound')}
+                  {modifiers.length === 0 ? t('noModifiers') : t('noModifiersFound')}
                 </p>
               </div>
             )}

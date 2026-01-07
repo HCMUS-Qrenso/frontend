@@ -87,7 +87,9 @@ export function QRManagerToolbar({
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" className="h-8 gap-1 rounded-lg bg-transparent px-3">
-                  <span className="text-sm">{t('zone')}: {selectedZoneName}</span>
+                  <span className="text-sm">
+                    {t('zone')}: {selectedZoneName}
+                  </span>
                   <ChevronDown className="h-3 w-3" />
                 </Button>
               </DropdownMenuTrigger>
@@ -192,15 +194,9 @@ export function QRManagerToolbar({
               {t('forceRegenerateTitle')}
             </AlertDialogTitle>
             <AlertDialogDescription className="space-y-2">
-              <span className="block">
-                {t('forceRegenerateDesc1')}
-              </span>
-              <span className="block font-medium text-red-500">
-                {t('forceRegenerateWarning')}
-              </span>
-              <span className="block">
-                {t('forceRegenerateDesc2')}
-              </span>
+              <span className="block">{t('forceRegenerateDesc1')}</span>
+              <span className="block font-medium text-red-500">{t('forceRegenerateWarning')}</span>
+              <span className="block">{t('forceRegenerateDesc2')}</span>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

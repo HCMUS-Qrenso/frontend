@@ -162,11 +162,7 @@ export function OrdersFilterToolbar() {
       <AdminFilterToolbarWrapper>
         {/* Left: Filters */}
         <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
-          <SearchInput
-            placeholder={t('searchPlaceholder')}
-            value={search}
-            onChange={setSearch}
-          />
+          <SearchInput placeholder={t('searchPlaceholder')} value={search} onChange={setSearch} />
 
           <FilterDropdown
             label={`${t('zone')}:`}

@@ -302,9 +302,7 @@ function FloorPlanCanvasComponent({
           <div className="flex flex-col items-center justify-between gap-4 border-b border-slate-100 px-6 py-4 md:flex-row dark:border-slate-800">
             <div className="text-center md:text-left">
               <h3 className="font-semibold text-slate-900 dark:text-white">{selectedArea}</h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                {t('unlimitedCanvas')}
-              </p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">{t('unlimitedCanvas')}</p>
             </div>
 
             {/* Legend */}
@@ -591,7 +589,9 @@ const DraggableTable = memo(function DraggableTable({
         className="pointer-events-none flex h-full flex-col items-center justify-center p-2 text-center select-none"
       >
         <p className="text-xs font-semibold text-slate-900 dark:text-white">{table.name}</p>
-        <p className="text-[10px] text-slate-600 dark:text-slate-400">{table.seats} {t('seats')}</p>
+        <p className="text-[10px] text-slate-600 dark:text-slate-400">
+          {table.seats} {t('seats')}
+        </p>
       </div>
 
       {/* Remove handle */}

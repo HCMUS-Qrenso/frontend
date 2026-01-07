@@ -34,7 +34,6 @@ export interface PaymentResponse {
   transactionId?: string
   checkoutUrl?: string
   paymentLinkId?: string
-  orderCode?: number
   amount?: number
   currency?: string
   status?: string
@@ -119,10 +118,10 @@ export const ordersApi = {
   },
 
   /**
-   * Check payment status by order code
+   * Check payment status by transaction ID
    */
-  checkPaymentStatus: async (orderCode: number): Promise<PaymentResponse> => {
-    const { data } = await apiClient.get<PaymentResponse>(`/payments/check/${orderCode}`)
+  checkPaymentStatus: async (transactionId: string): Promise<PaymentResponse> => {
+    const { data } = await apiClient.get<PaymentResponse>(`/payments/check/${transactionId}`)
     return data
   },
 }

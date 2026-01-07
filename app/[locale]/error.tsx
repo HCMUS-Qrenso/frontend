@@ -43,9 +43,7 @@ export default function Error({ error, reset }: ErrorProps) {
       <h1 className="mb-3 text-2xl font-bold text-slate-900 dark:text-white">{t('errorTitle')}</h1>
 
       {/* Message */}
-      <p className="mb-8 max-w-md text-slate-500 dark:text-slate-400">
-        {t('errorMessage')}
-      </p>
+      <p className="mb-8 max-w-md text-slate-500 dark:text-slate-400">{t('errorMessage')}</p>
 
       {/* Actions */}
       <div className="flex flex-wrap items-center justify-center gap-4">

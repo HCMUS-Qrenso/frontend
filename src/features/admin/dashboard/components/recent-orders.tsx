@@ -96,12 +96,24 @@ export function RecentOrders({ className }: { className?: string }) {
               // Loading skeleton
               Array.from({ length: 5 }).map((_, i) => (
                 <tr key={i}>
-                  <td className="px-6 py-4"><Skeleton className="h-4 w-32" /></td>
-                  <td className="px-6 py-4"><Skeleton className="h-4 w-16" /></td>
-                  <td className="px-6 py-4"><Skeleton className="h-4 w-12" /></td>
-                  <td className="px-6 py-4"><Skeleton className="h-4 w-20" /></td>
-                  <td className="px-6 py-4"><Skeleton className="h-6 w-20 rounded-full" /></td>
-                  <td className="px-6 py-4"><Skeleton className="h-8 w-8 rounded" /></td>
+                  <td className="px-6 py-4">
+                    <Skeleton className="h-4 w-32" />
+                  </td>
+                  <td className="px-6 py-4">
+                    <Skeleton className="h-4 w-16" />
+                  </td>
+                  <td className="px-6 py-4">
+                    <Skeleton className="h-4 w-12" />
+                  </td>
+                  <td className="px-6 py-4">
+                    <Skeleton className="h-4 w-20" />
+                  </td>
+                  <td className="px-6 py-4">
+                    <Skeleton className="h-6 w-20 rounded-full" />
+                  </td>
+                  <td className="px-6 py-4">
+                    <Skeleton className="h-8 w-8 rounded" />
+                  </td>
                 </tr>
               ))
             ) : orders?.length === 0 ? (
@@ -112,7 +124,10 @@ export function RecentOrders({ className }: { className?: string }) {
               </tr>
             ) : (
               orders?.map((order) => {
-                const status = statusConfig[order.status] || { label: order.status, className: 'bg-slate-100 text-slate-600' }
+                const status = statusConfig[order.status] || {
+                  label: order.status,
+                  className: 'bg-slate-100 text-slate-600',
+                }
                 return (
                   <tr
                     key={order.id}

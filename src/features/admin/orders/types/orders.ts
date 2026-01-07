@@ -35,7 +35,6 @@ export interface PaymentRecord {
   amount: number
   currency?: string
   transactionId?: string
-  orderCode?: number
   qrCode?: string
   qrCodeData?: string
   paidAt?: string

@@ -105,11 +105,7 @@ export function ZoneUpsertModal({ open, onOpenChange, zone, mode }: ZoneUpsertMo
       open={open}
       onOpenChange={onOpenChange}
       title={isEdit ? t('editZoneTitle') : t('addNewZone')}
-      description={
-        isEdit
-          ? t('editZoneDesc')
-          : t('addZoneDesc')
-      }
+      description={isEdit ? t('editZoneDesc') : t('addZoneDesc')}
       onSubmit={handleSubmit}
       isSubmitting={isLoading}
       submitText={isEdit ? t('updateZoneBtn') : t('createZoneBtn')}
@@ -158,9 +154,7 @@ export function ZoneUpsertModal({ open, onOpenChange, zone, mode }: ZoneUpsertMo
           <Label htmlFor="is_active" className="text-sm font-medium">
             {t('activeStatusLabel')}
           </Label>
-          <p className="text-xs text-slate-500 dark:text-slate-400">
-            {t('activeStatusHint')}
-          </p>
+          <p className="text-xs text-slate-500 dark:text-slate-400">{t('activeStatusHint')}</p>
         </div>
         <Switch
           id="is_active"

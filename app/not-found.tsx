@@ -12,7 +12,7 @@ const inter = Inter({ subsets: ['latin', 'vietnamese'] })
  * Global Not Found page (outside locale context)
  * This handles 404 errors that occur at the root level,
  * before the [locale] segment is matched.
- * 
+ *
  * IMPORTANT: This component includes its own html/body tags because
  * it renders outside the locale layout which normally provides them.
  */

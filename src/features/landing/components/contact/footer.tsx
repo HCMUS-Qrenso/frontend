@@ -17,9 +17,7 @@ export function Footer() {
               </div>
               <span className="text-xl font-bold text-slate-900 dark:text-white">Qrenso</span>
             </div>
-            <p className="mt-4 text-sm text-slate-500 dark:text-slate-400">
-              {t('tagline')}
-            </p>
+            <p className="mt-4 text-sm text-slate-500 dark:text-slate-400">{t('tagline')}</p>
           </div>
 
           {/* Product */}
@@ -113,4 +111,3 @@ export function Footer() {
     </footer>
   )
 }
-

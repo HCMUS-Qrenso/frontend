@@ -54,24 +54,26 @@ export function CancelPaymentDialog({
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent>
-        <AlertDialogHeader>
+      <AlertDialogContent className="flex max-h-[90vh] max-w-lg flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-700 dark:bg-slate-900">
+        <AlertDialogHeader className="border-b border-slate-200 pb-2 dark:border-slate-800">
           <AlertDialogTitle>Xác nhận hủy thanh toán</AlertDialogTitle>
           <AlertDialogDescription>
             Bạn có chắc chắn muốn hủy thanh toán này không? Hành động này không thể hoàn tác.
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <div className="space-y-2 py-4">
-          <Label htmlFor="cancel-reason">Lý do hủy (tùy chọn)</Label>
-          <Textarea
-            id="cancel-reason"
-            placeholder="Nhập lý do hủy thanh toán..."
-            value={cancelReason}
-            onChange={(e) => setCancelReason(e.target.value)}
-            rows={3}
-          />
+        <div className="flex-1 space-y-6 overflow-y-auto">
+          <div className="space-y-2">
+            <Label htmlFor="cancel-reason">Lý do hủy (tùy chọn)</Label>
+            <Textarea
+              id="cancel-reason"
+              placeholder="Nhập lý do hủy thanh toán..."
+              value={cancelReason}
+              onChange={(e) => setCancelReason(e.target.value)}
+              rows={5}
+            />
+          </div>
         </div>
-        <AlertDialogFooter>
+        <AlertDialogFooter className="border-t border-slate-200 pt-4 dark:border-slate-800">
           <AlertDialogCancel disabled={cancelPaymentMutation.isPending}>Không</AlertDialogCancel>
           <AlertDialogAction
             onClick={handleCancelPayment}

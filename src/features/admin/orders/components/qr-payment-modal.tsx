@@ -20,7 +20,7 @@ interface QrPaymentModalProps {
   qrCode: string | null
   amount: number
   orderNumber: string
-  orderCode?: number
+  transactionId?: string
   orderId: string
   onClose: () => void
 }
@@ -31,7 +31,7 @@ export function QrPaymentModal({
   qrCode,
   amount,
   orderNumber,
-  orderCode,
+  transactionId,
   orderId,
   onClose,
 }: QrPaymentModalProps) {
@@ -60,17 +60,17 @@ export function QrPaymentModal({
   }, [open, orderData, onClose])
 
   const handleCheckStatus = async () => {
-    if (!orderCode) {
-      toast.error('Không có mã đơn hàng')
+    if (!transactionId) {
+      toast.error('Không có mã giao dịch')
       return
     }
 
     try {
-      const result = await checkPaymentStatusMutation.mutateAsync(orderCode)
+      const result = await checkPaymentStatusMutation.mutateAsync(transactionId)
       if (result.status === 'paid') {
         toast.success('Thanh toán đã được xác nhận!')
         onClose()
-      } else if (result.status === 'processing') {
+      } else if (result.status === 'pending') {
         toast.info('Đang chờ thanh toán...')
       } else {
         toast.warning(`Trạng thái: ${result.status}`)
@@ -82,38 +82,40 @@ export function QrPaymentModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
+      <DialogContent className="flex max-h-[90vh] w-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl sm:max-w-md dark:border-slate-700 dark:bg-slate-900">
+        <DialogHeader className="border-b border-slate-200 p-6 dark:border-slate-800">
           <DialogTitle>Mã QR Thanh Toán</DialogTitle>
           <DialogDescription>
             Hiển thị mã QR này cho khách hàng quét để thanh toán
           </DialogDescription>
         </DialogHeader>
-        <div className="flex flex-col items-center justify-center space-y-4 py-6">
-          <div className="rounded-lg border-4 border-slate-200 p-4 dark:border-slate-700">
-            {qrCode ? (
-              <img
-                src={qrCode}
-                alt="QR Code"
-                className="h-64 w-64"
-                onError={(e) => {
-                  e.currentTarget.style.display = 'none'
-                  toast.error('Không thể tải mã QR')
-                }}
-              />
-            ) : (
-              <div className="text-muted-foreground flex h-64 w-64 items-center justify-center">
-                Không có mã QR
-              </div>
-            )}
-          </div>
-          <div className="text-center">
-            <p className="text-lg font-semibold">{amount.toLocaleString('vi-VN')}₫</p>
-            <p className="text-muted-foreground text-sm">Đơn hàng {orderNumber}</p>
+        <div className="flex-1 space-y-6 overflow-y-auto p-6">
+          <div className="flex flex-col items-center justify-center space-y-4">
+            <div className="rounded-lg border-4 border-slate-200 p-4 dark:border-slate-700">
+              {qrCode ? (
+                <img
+                  src={qrCode}
+                  alt="QR Code"
+                  className="h-64 w-64"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none'
+                    toast.error('Không thể tải mã QR')
+                  }}
+                />
+              ) : (
+                <div className="text-muted-foreground flex h-64 w-64 items-center justify-center">
+                  Không có mã QR
+                </div>
+              )}
+            </div>
+            <div className="text-center">
+              <p className="text-lg font-semibold">{amount.toLocaleString('vi-VN')}₫</p>
+              <p className="text-muted-foreground text-sm">Đơn hàng {orderNumber}</p>
+            </div>
           </div>
         </div>
-        <DialogFooter className="gap-2 sm:justify-center">
-          {orderCode && (
+        <DialogFooter className="gap-2 border-t border-slate-200 px-6 py-6 sm:justify-center dark:border-slate-800">
+          {transactionId && (
             <Button
               onClick={handleCheckStatus}
               disabled={checkPaymentStatusMutation.isPending}

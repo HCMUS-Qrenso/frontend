@@ -174,12 +174,7 @@ export function TablesListTable({
   }
 
   if (error) {
-    return (
-      <ContainerErrorState
-        title={t('errorOccurred')}
-        description={t('tablesLoadError')}
-      />
-    )
+    return <ContainerErrorState title={t('errorOccurred')} description={t('tablesLoadError')} />
   }
 
   return (

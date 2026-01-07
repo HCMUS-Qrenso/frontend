@@ -165,11 +165,7 @@ function QRManagerContent() {
         table_ids: allTableIds,
         force_regenerate: forceRegenerate,
       })
-      toast.success(
-        forceRegenerate
-          ? t('regeneratedAllSuccess')
-          : t('generatedMissingSuccess'),
-      )
+      toast.success(forceRegenerate ? t('regeneratedAllSuccess') : t('generatedMissingSuccess'))
     } catch (error) {
       handleError(error)
     }
@@ -230,9 +226,7 @@ function QRManagerContent() {
   if (error) {
     return (
       <div className="rounded-2xl border border-red-200 bg-red-50 p-6 dark:border-red-800 dark:bg-red-500/10">
-        <p className="text-sm text-red-600 dark:text-red-400">
-          {t('qrLoadError')}
-        </p>
+        <p className="text-sm text-red-600 dark:text-red-400">{t('qrLoadError')}</p>
       </div>
     )
   }

@@ -89,7 +89,9 @@ export function ModifierGroupsPanel({
       {/* Header */}
       <div className="border-b border-slate-200 p-6 dark:border-slate-800">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-slate-900 dark:text-white">{t('modifierGroups')}</h2>
+          <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
+            {t('modifierGroups')}
+          </h2>
           <Button onClick={onCreateGroup} size="sm" className="bg-emerald-600 hover:bg-emerald-700">
             <Plus className="mr-2 h-4 w-4" />
             {t('createGroup')}

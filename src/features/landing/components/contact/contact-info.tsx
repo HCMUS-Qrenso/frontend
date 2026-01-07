@@ -6,12 +6,7 @@ import { useTranslations } from 'next-intl'
 export function ContactInfo() {
   const t = useTranslations('landing.contact')
 
-  const benefits = [
-    t('benefit1'),
-    t('benefit2'),
-    t('benefit3'),
-    t('benefit4'),
-  ]
+  const benefits = [t('benefit1'), t('benefit2'), t('benefit3'), t('benefit4')]
 
   const contactMethods = [
     {

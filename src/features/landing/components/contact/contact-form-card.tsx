@@ -149,9 +149,7 @@ export function ContactFormCard() {
           <h3 className="mb-3 text-2xl font-bold text-black dark:text-white">
             {t('successTitle')}
           </h3>
-          <p className="mb-6 text-slate-600 dark:text-slate-300">
-            {t('successMessage')}
-          </p>
+          <p className="mb-6 text-slate-600 dark:text-slate-300">{t('successMessage')}</p>
           <Button className="bg-emerald-600 text-white hover:bg-emerald-700" asChild>
             <a href="/">{t('backToHome')}</a>
           </Button>
@@ -301,7 +299,8 @@ export function ContactFormCard() {
         {/* Notes */}
         <div className="space-y-2">
           <Label htmlFor="notes" className="text-slate-700 dark:text-slate-200">
-            {t('notes')} <span className="text-sm text-slate-500 dark:text-slate-400">({t('optional')})</span>
+            {t('notes')}{' '}
+            <span className="text-sm text-slate-500 dark:text-slate-400">({t('optional')})</span>
           </Label>
           <Textarea
             id="notes"
