@@ -33,6 +33,8 @@ import { useOrdersQuery, useUpdateOrderStatusMutation } from '../queries'
 import type { Order, OrderItem, OrderStatus } from '../types/orders'
 import { useTranslations } from 'next-intl'
 import { useLocale } from 'next-intl'
+import { PriceBreakdownTooltip } from './price-breakdown-tooltip'
+import { useFormat } from '@/src/hooks/use-format'
 
 // Waiter-only transitions - KDS handles accepted->in_progress->ready
 const NEXT_STATUS_MAP: Record<string, string> = {
@@ -46,6 +48,7 @@ export function OrdersTable() {
   const searchParams = useSearchParams()
   const t = useTranslations('orders')
   const locale = useLocale()
+  const { formatPrice } = useFormat()
 
   // Build status config with translations
   const STATUS_CONFIG: Record<string, StatusConfig> = {
@@ -341,9 +344,18 @@ export function OrdersTable() {
                       <StatusBadge status={order.paymentStatus} config={PAYMENT_STATUS_CONFIG} />
                     </TableCell>
                     <TableCell className="px-4 py-4 text-right">
-                      <p className="font-semibold text-slate-900 dark:text-white">
-                        {order.totalAmount?.toLocaleString('vi-VN')}₫
-                      </p>
+                      <PriceBreakdownTooltip
+                        price={{
+                          subtotal: order.subtotal,
+                          taxAmount: order.taxAmount,
+                          discountAmount: order.discountAmount,
+                          totalAmount: order.totalAmount,
+                        }}
+                      >
+                        <p className="font-semibold text-slate-900 dark:text-white cursor-help">
+                          {formatPrice(order.totalAmount)}
+                        </p>
+                      </PriceBreakdownTooltip>
                     </TableCell>
                     <TableCell className="px-4 py-4">
                       <div className="flex items-center justify-center gap-1">

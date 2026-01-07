@@ -27,6 +27,7 @@ import { invalidateTenantQueries } from '@/src/features/admin/tenants/utils'
 import { AdminSidebar } from './admin-sidebar'
 import { getInitials } from '../utils'
 import { useTranslations } from 'next-intl'
+import { TenantSettingsProvider } from '@/src/contexts/tenant-settings-context'
 
 interface AdminLayoutProps {
   children: React.ReactNode
@@ -178,6 +179,10 @@ export function AdminLayout({ children }: AdminLayoutProps) {
     // KDS
     if (path === '/admin/kds' || path.startsWith('/admin/kds/')) {
       return { title: t('kdsTitle'), description: t('kdsDesc') }
+    }
+    // Settings
+    if (path === '/admin/settings' || path.startsWith('/admin/settings/')) {
+      return { title: t('settingsTitle'), description: t('settingsDesc') }
     }
     // Fallback
     return { title: t('dashboardTitle'), description: t('dashboardDesc') }
@@ -332,7 +337,9 @@ export function AdminLayout({ children }: AdminLayoutProps) {
         </header>
 
         {/* Page content */}
-        <main className="p-4 lg:p-8">{children}</main>
+        <main className="p-4 lg:p-8">
+          <TenantSettingsProvider>{children}</TenantSettingsProvider>
+        </main>
       </div>
     </div>
   )

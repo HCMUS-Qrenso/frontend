@@ -6,6 +6,7 @@ import { TrendingUp, TrendingDown, ShoppingBag, DollarSign, Users, Clock } from 
 import { useTodayStatsQuery } from '../queries'
 import { Skeleton } from '@/src/components/ui/skeleton'
 import { useTranslations } from 'next-intl'
+import { useTenantSettings } from '@/src/contexts/tenant-settings-context'
 
 interface StatCardProps {
   title: string
@@ -134,15 +135,17 @@ function OrderStatusCard({
   )
 }
 
-function formatCurrency(value: number): string {
-  if (value >= 1000000) return `${(value / 1000000).toFixed(1)}M ₫`
-  if (value >= 1000) return `${(value / 1000).toFixed(0)}K ₫`
-  return `${value} ₫`
+function formatCurrency(value: number, symbol: string): string {
+  if (value >= 1000000) return `${(value / 1000000).toFixed(1)}M ${symbol}`
+  if (value >= 1000) return `${(value / 1000).toFixed(0)}K ${symbol}`
+  return `${value} ${symbol}`
 }
 
 export function TodayStats() {
   const { data, isLoading } = useTodayStatsQuery()
   const t = useTranslations('dashboard')
+  const { settings } = useTenantSettings()
+  const currencySymbol = settings.currencySymbol
 
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
@@ -159,8 +162,8 @@ export function TodayStats() {
       />
       <StatCard
         title={t('revenueToday')}
-        value={data ? formatCurrency(data.revenue_today) : '0'}
-        subtext={data ? `${t('avgValue')}: ${formatCurrency(data.avg_order_value)}` : ''}
+        value={data ? formatCurrency(data.revenue_today, currencySymbol) : '0'}
+        subtext={data ? `${t('avgValue')}: ${formatCurrency(data.avg_order_value, currencySymbol)}` : ''}
         trend={data ? { 
           value: `${data.revenue_change_percent >= 0 ? '+' : ''}${data.revenue_change_percent}%`, 
           isPositive: data.revenue_change_percent >= 0 

@@ -20,6 +20,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/src/components/ui/popover'
+import { useUpdateSettingsMutation } from '@/src/features/admin/settings/queries'
 
 const languages = locales.map((loc) => ({
   value: loc,
@@ -31,9 +32,13 @@ export function LanguageSwitcher() {
   const locale = useLocale()
   const router = useRouter()
   const pathname = usePathname()
+  const updateSettingsMutation = useUpdateSettingsMutation()
 
   const handleSelect = (currentValue: string) => {
     if (currentValue !== locale) {
+      // Update backend setting to keep language in sync
+      updateSettingsMutation.mutate({ language: currentValue })
+      // Navigate to new locale URL
       router.replace(pathname, { locale: currentValue as Locale })
     }
     setOpen(false)

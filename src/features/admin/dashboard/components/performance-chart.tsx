@@ -15,6 +15,7 @@ import { TrendingUp, TrendingDown } from 'lucide-react'
 import { usePerformanceQuery } from '../queries'
 import { Skeleton } from '@/src/components/ui/skeleton'
 import { useTranslations } from 'next-intl'
+import { useFormat } from '@/src/hooks/use-format'
 
 type TimeRange = 'day' | 'week' | 'month'
 type DataType = 'revenue' | 'orders'
@@ -30,6 +31,7 @@ export function PerformanceChart() {
   const [timeRange, setTimeRange] = useState<TimeRange>('day')
   const [dataType, setDataType] = useState<DataType>('revenue')
   const t = useTranslations('dashboard')
+  const { formatPrice } = useFormat()
 
   const { data: performanceData, isLoading } = usePerformanceQuery(timeRange, 11)
 
@@ -148,10 +150,7 @@ export function PerformanceChart() {
                 }}
                 formatter={(value: number) => [
                   dataType === 'revenue'
-                    ? new Intl.NumberFormat('vi-VN', {
-                        style: 'currency',
-                        currency: 'VND',
-                      }).format(value)
+                    ? formatPrice(value)
                     : `${value} ${t('orders').toLowerCase()}`,
                   dataTypeLabels[dataType],
                 ]}
@@ -177,11 +176,7 @@ export function PerformanceChart() {
             <Skeleton className="mt-1 h-7 w-32" />
           ) : (
             <p className="mt-1 text-xl font-semibold text-slate-900 dark:text-white">
-              {new Intl.NumberFormat('vi-VN', {
-                style: 'currency',
-                currency: 'VND',
-                maximumFractionDigits: 0,
-              }).format(summary?.total_revenue || 0)}
+              {formatPrice(summary?.total_revenue || 0)}
             </p>
           )}
         </div>

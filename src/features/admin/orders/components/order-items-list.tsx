@@ -4,10 +4,9 @@ import { Badge } from '@/src/components/ui/badge'
 import { Button } from '@/src/components/ui/button'
 import { cn } from '@/src/lib/utils'
 import { Clock, Check, XCircle, AlertCircle, Loader2 } from 'lucide-react'
-import { format } from 'date-fns'
-import { vi } from 'date-fns/locale'
 import type { OrderDetailItem } from '../types/orders'
 import { useUpdateOrderItemStatusMutation } from '../queries'
+import { useFormat } from '@/src/hooks/use-format'
 
 const ITEM_STATUS_CONFIG: Record<string, { label: string; color: string; icon: any }> = {
   pending: {
@@ -54,6 +53,7 @@ interface OrderItemsListProps {
 
 export function OrderItemsList({ items, orderId }: OrderItemsListProps) {
   const updateItemStatusMutation = useUpdateOrderItemStatusMutation()
+  const { formatPrice, formatTime } = useFormat()
 
   const handleMarkServed = (itemId: string) => {
     updateItemStatusMutation.mutate({
@@ -107,7 +107,7 @@ export function OrderItemsList({ items, orderId }: OrderItemsListProps) {
                           + {mod.name}
                           {mod.priceAdjustment > 0 && (
                             <span className="ml-2 font-medium text-emerald-600 dark:text-emerald-400">
-                              +{mod.priceAdjustment.toLocaleString('vi-VN')}₫
+                              +{formatPrice(mod.priceAdjustment)}
                             </span>
                           )}
                         </p>
@@ -130,18 +130,18 @@ export function OrderItemsList({ items, orderId }: OrderItemsListProps) {
                     {item.preparationStartedAt && (
                       <span>
                         Bắt đầu:{' '}
-                        {format(new Date(item.preparationStartedAt), 'HH:mm', { locale: vi })}
+                        {formatTime(item.preparationStartedAt)}
                       </span>
                     )}
                     {item.preparationCompletedAt && (
                       <span>
                         Xong:{' '}
-                        {format(new Date(item.preparationCompletedAt), 'HH:mm', { locale: vi })}
+                        {formatTime(item.preparationCompletedAt)}
                       </span>
                     )}
                     {item.servedAt && (
                       <span>
-                        Phục vụ: {format(new Date(item.servedAt), 'HH:mm', { locale: vi })}
+                        Phục vụ: {formatTime(item.servedAt)}
                       </span>
                     )}
                   </div>
@@ -152,15 +152,15 @@ export function OrderItemsList({ items, orderId }: OrderItemsListProps) {
                   {/* Price */}
                   <div className="text-right">
                     <p className="text-xs text-slate-500 dark:text-slate-400">
-                      {item.unitPrice.toLocaleString('vi-VN')}₫ × {item.quantity}
+                      {formatPrice(item.unitPrice)} × {item.quantity}
                     </p>
                     {item.modifiersTotal > 0 && (
                       <p className="text-xs text-slate-500 dark:text-slate-400">
-                        +{item.modifiersTotal.toLocaleString('vi-VN')}₫
+                        +{formatPrice(item.modifiersTotal)}
                       </p>
                     )}
                     <p className="mt-1 text-base font-semibold text-slate-900 dark:text-white">
-                      {item.subtotal.toLocaleString('vi-VN')}₫
+                      {formatPrice(item.subtotal)}
                     </p>
                   </div>
 

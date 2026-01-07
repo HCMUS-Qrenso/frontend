@@ -13,9 +13,14 @@ import { useNow } from '../hooks/use-now'
 import type { KdsOrder, OrderItemStatus } from '../types/kds.types'
 import { PRIORITY_WEIGHT } from '../types/kds.types'
 import { useTranslations } from 'next-intl'
+import { useTenantSettings } from '@/src/contexts/tenant-settings-context'
 
 export function KdsBoardClient() {
   const t = useTranslations('kds')
+  const { settings } = useTenantSettings()
+  
+  // Get default prep time from settings (for items without custom prep time)
+  const defaultPrepTime = settings.estimatedPrepTime
   
   // State
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null)
@@ -64,11 +69,12 @@ export function KdsBoardClient() {
       }
 
       // 3. Preparation Time (quick items first for throughput)
-      const aMaxPrep = Math.max(...a.items.map((i) => i.estimatedPrepTime || 15))
-      const bMaxPrep = Math.max(...b.items.map((i) => i.estimatedPrepTime || 15))
+      // Use defaultPrepTime from settings as fallback for items without custom prep time
+      const aMaxPrep = Math.max(...a.items.map((i) => i.estimatedPrepTime || defaultPrepTime))
+      const bMaxPrep = Math.max(...b.items.map((i) => i.estimatedPrepTime || defaultPrepTime))
       return aMaxPrep - bMaxPrep
     })
-  }, [data?.data.orders])
+  }, [data?.data.orders, defaultPrepTime])
 
   const stats = data?.meta || { total: 0, activeCount: 0, overdueCount: 0 }
   const lastUpdated = new Date(dataUpdatedAt)

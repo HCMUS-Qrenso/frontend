@@ -26,7 +26,7 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import type { StaffQueryParams } from '@/src/features/admin/staff/types'
 import { TablePagination } from '@/src/components/ui/table-pagination'
 import { useTranslations } from 'next-intl'
-import { useLocale } from 'next-intl'
+import { useFormat } from '@/src/hooks/use-format'
 
 interface StaffDataTableProps {
   role: 'admin' | 'waiter' | 'kitchen_staff'
@@ -36,7 +36,7 @@ export function StaffDataTable({ role }: StaffDataTableProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const t = useTranslations('staff')
-  const locale = useLocale()
+  const { formatDateTime, formatShortDate } = useFormat()
 
   // Read filters from URL params
   const search = searchParams.get('search') || ''
@@ -81,25 +81,6 @@ export function StaffDataTable({ role }: StaffDataTableProps) {
     const params = new URLSearchParams(searchParams.toString())
     params.set('page', newPage.toString())
     router.push(`/admin/staff?${params.toString()}`)
-  }
-
-  const formatDate = (date: string | null) => {
-    if (!date) return '—'
-    return new Date(date).toLocaleDateString(locale === 'vi' ? 'vi-VN' : 'en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    })
-  }
-
-  const formatDateTime = (date: string | null) => {
-    if (!date) return '—'
-    return new Date(date).toLocaleString(locale === 'vi' ? 'vi-VN' : 'en-US', {
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    })
   }
 
   const getInitials = (name: string) => {
@@ -209,7 +190,7 @@ export function StaffDataTable({ role }: StaffDataTableProps) {
                           {staff.fullName}
                         </p>
                         <p className="text-xs text-slate-500 dark:text-slate-400">
-                          {t('joinedAt', { date: formatDate(staff.createdAt) })}
+                          {t('joinedAt', { date: formatShortDate(staff.createdAt) })}
                         </p>
                       </div>
                     </div>
