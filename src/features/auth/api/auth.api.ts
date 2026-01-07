@@ -15,6 +15,7 @@ import type {
 export const authApi = {
   login: async (payload: LoginCredentials): Promise<AuthResponse> => {
     // Gửi toàn bộ payload bao gồm rememberMe lên backend
+    payload.accountType = 'staff' // Mặc định là staff
     const { data } = await apiClient.post<AuthResponse>('/auth/login', payload)
     return data
   },
@@ -35,11 +36,13 @@ export const authApi = {
   },
 
   forgotPassword: async (payload: ForgotPasswordPayload): Promise<MessageResponse> => {
+    payload.accountType = 'staff' // Mặc định là staff
     const { data } = await apiClient.post<MessageResponse>('/auth/forgot-password', payload)
     return data
   },
 
   resetPassword: async (payload: ResetPasswordPayload): Promise<MessageResponse> => {
+    payload.accountType = 'staff' // Mặc định là staff
     const { data } = await apiClient.post<MessageResponse>('/auth/reset-password', payload)
     return data
   },

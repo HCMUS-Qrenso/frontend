@@ -34,6 +34,7 @@ export interface LoginCredentials {
   email: string
   password: string
   rememberMe?: boolean
+  accountType: string
 }
 
 export interface SignupPayload {
@@ -46,11 +47,13 @@ export interface SignupPayload {
 
 export interface ForgotPasswordPayload {
   email: string
+  accountType: string
 }
 
 export interface ResetPasswordPayload {
   token: string
   newPassword: string
+  accountType: string
 }
 
 export interface VerifyEmailPayload {
