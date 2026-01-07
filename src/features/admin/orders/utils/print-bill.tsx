@@ -52,7 +52,6 @@ export async function printBill(options: PrintBillOptions): Promise<void> {
   iframe.style.top = '-10000px'
   iframe.style.left = '-10000px'
   iframe.style.width = '80mm'
-  iframe.style.height = '100vh'
   document.body.appendChild(iframe)
 
   const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document
@@ -218,7 +217,7 @@ function generateBillHTML(options: GenerateBillHTMLOptions): string {
             margin: 10px 0;
           }
           @page {
-            size: 80mm 200mm;
+            size: 80mm auto;
             margin: 5mm;
           }
           @media print {
