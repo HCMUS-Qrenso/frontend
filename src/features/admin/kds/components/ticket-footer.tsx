@@ -22,19 +22,14 @@ export function TicketFooter({ isAllDone, onCompleteAll, onShowDetail }: TicketF
             'flex-1',
             isAllDone
               ? 'cursor-not-allowed bg-slate-300 text-slate-500 hover:bg-slate-300 dark:bg-slate-700 dark:text-slate-500'
-              : 'bg-emerald-600 hover:bg-emerald-700'
+              : 'bg-emerald-600 hover:bg-emerald-700',
           )}
           disabled={isAllDone}
           onClick={onCompleteAll}
         >
           {isAllDone ? 'Đã sẵn sàng' : 'Hoàn thành tất cả'}
         </Button>
-        <Button
-          size="sm"
-          variant="outline"
-          className="shrink-0"
-          onClick={onShowDetail}
-        >
+        <Button size="sm" variant="outline" className="shrink-0" onClick={onShowDetail}>
           Chi tiết
         </Button>
       </div>

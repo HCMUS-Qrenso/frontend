@@ -10,18 +10,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/src/components/ui/dropdown-menu'
-import {
-  ArrowLeft,
-  Copy,
-  Printer,
-  MoreVertical,
-  AlertTriangle,
-  Check,
-} from 'lucide-react'
+import { ArrowLeft, Copy, Printer, MoreVertical, AlertTriangle, Check, Wallet } from 'lucide-react'
 import { cn } from '@/src/lib/utils'
 import { formatDistanceToNow } from 'date-fns'
 import { vi } from 'date-fns/locale'
 import { OverrideStatusModal } from './override-status-modal'
+import { PaymentDialog } from './payment-dialog'
 import type { OrderDetail } from '../types/orders'
 
 const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
@@ -61,6 +55,10 @@ const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
     label: 'Đã hủy',
     color: 'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400',
   },
+  abandoned: {
+    label: 'Bỏ dở',
+    color: 'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400',
+  },
 }
 
 const PRIORITY_CONFIG: Record<string, { label: string; color: string }> = {
@@ -87,6 +85,7 @@ export function OrderSummaryHeader({ order }: OrderSummaryHeaderProps) {
   const router = useRouter()
   const [copied, setCopied] = useState(false)
   const [overrideModalOpen, setOverrideModalOpen] = useState(false)
+  const [paymentDialogOpen, setPaymentDialogOpen] = useState(false)
 
   const handleCopy = () => {
     navigator.clipboard.writeText(order.orderNumber)
@@ -94,14 +93,17 @@ export function OrderSummaryHeader({ order }: OrderSummaryHeaderProps) {
     setTimeout(() => setCopied(false), 2000)
   }
 
-  const handlePrint = () => {
-    window.open(`/admin/orders/${order.id}/print`, '_blank')
-  }
+  // Check if there are any payments in process
+  const hasPaymentInProcess = order.payments?.some(
+    (payment) => payment.status === 'pending' || payment.status === 'processing',
+  )
 
-  const handleExport = (format: 'json' | 'pdf') => {
-    console.log(`[v0] Exporting order ${order.id} as ${format}`)
-    // API call to generate export
-  }
+  // Show payment button only when:
+  // - Order is completed
+  // - Payment status is unpaid
+  // - No payment in process
+  const canInitiatePayment =
+    order.status === 'completed' && order.paymentStatus === 'unpaid' && !hasPaymentInProcess
 
   return (
     <>
@@ -162,13 +164,24 @@ export function OrderSummaryHeader({ order }: OrderSummaryHeaderProps) {
 
             {/* Right: Quick Actions */}
             <div className="flex flex-wrap items-center gap-2">
-              <Button variant="outline" onClick={handlePrint} className="gap-2 bg-transparent">
-                <Printer className="h-4 w-4" />
-                In bill
-              </Button>
+              {canInitiatePayment && (
+                <Button
+                  variant="outline"
+                  onClick={() => setPaymentDialogOpen(true)}
+                  className="gap-2 bg-transparent"
+                >
+                  <Wallet className="h-4 w-4" />
+                  Tính tiền
+                </Button>
+              )}
 
               <Button
                 variant="default"
+                disabled={
+                  order.paymentStatus === 'paid' ||
+                  order.status === 'abandoned' ||
+                  hasPaymentInProcess
+                }
                 onClick={() => setOverrideModalOpen(true)}
                 className="gap-2 bg-emerald-600 hover:bg-emerald-700"
               >
@@ -176,18 +189,26 @@ export function OrderSummaryHeader({ order }: OrderSummaryHeaderProps) {
                 Thay đổi trạng thái
               </Button>
 
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon">
-                    <MoreVertical className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem>Giao cho nhân viên</DropdownMenuItem>
-                  <DropdownMenuItem>Thay đổi ưu tiên</DropdownMenuItem>
-                  <DropdownMenuItem className="text-red-600">Hủy đơn</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              {order.paymentStatus !== 'paid' && order.status !== 'abandoned' && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" disabled={hasPaymentInProcess}>
+                      <MoreVertical className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem disabled={hasPaymentInProcess}>
+                      Giao cho nhân viên
+                    </DropdownMenuItem>
+                    <DropdownMenuItem disabled={hasPaymentInProcess}>
+                      Thay đổi ưu tiên
+                    </DropdownMenuItem>
+                    <DropdownMenuItem disabled={hasPaymentInProcess} className="text-red-600">
+                      Hủy đơn
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
             </div>
           </div>
         </div>
@@ -200,6 +221,9 @@ export function OrderSummaryHeader({ order }: OrderSummaryHeaderProps) {
         open={overrideModalOpen}
         onOpenChange={setOverrideModalOpen}
       />
+
+      {/* Payment Dialog */}
+      <PaymentDialog open={paymentDialogOpen} onOpenChange={setPaymentDialogOpen} order={order} />
     </>
   )
 }

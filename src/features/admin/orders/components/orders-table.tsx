@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import {
   Table,
@@ -12,7 +13,6 @@ import {
   AdminTableHead,
   AdminTableRow,
 } from '@/src/components/ui/table'
-import { Badge } from '@/src/components/ui/badge'
 import { Button } from '@/src/components/ui/button'
 import {
   DropdownMenu,
@@ -21,7 +21,22 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/src/components/ui/dropdown-menu'
-import { Eye, MoreVertical, Printer, ChevronRight, AlertCircle, ClipboardList } from 'lucide-react'
+import {
+  Eye,
+  MoreVertical,
+  Printer,
+  ChevronRight,
+  AlertCircle,
+  ClipboardList,
+  Wallet,
+  CheckCircle,
+  X,
+  Loader2,
+} from 'lucide-react'
+import { PaymentDialog } from './payment-dialog'
+import { CancelPaymentDialog } from './cancel-payment-dialog'
+import { printBill } from '../utils/print-bill'
+import { toast } from 'sonner'
 import { cn } from '@/src/lib/utils'
 import { StatusBadge, type StatusConfig } from '@/src/components/ui/status-badge'
 import { EmptyState } from '@/src/components/ui/empty-state'
@@ -29,10 +44,16 @@ import { SkeletonTableRows } from '@/src/components/loading'
 import { formatDistanceToNow } from 'date-fns'
 import { vi, enUS } from 'date-fns/locale'
 import { TablePagination } from '@/src/components/ui/table-pagination'
-import { useOrdersQuery, useUpdateOrderStatusMutation } from '../queries'
+import {
+  useOrdersQuery,
+  useUpdateOrderStatusMutation,
+  useCompletePaymentMutation,
+  useCancelPaymentMutation,
+} from '../queries'
 import type { Order, OrderItem, OrderStatus } from '../types/orders'
 import { useTranslations } from 'next-intl'
 import { useLocale } from 'next-intl'
+import { useCurrentTenantQuery } from '../../tenants/queries/tenants.queries'
 
 // Waiter-only transitions - KDS handles accepted->in_progress->ready
 const NEXT_STATUS_MAP: Record<string, string> = {
@@ -113,6 +134,12 @@ export function OrdersTable() {
         'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-500/10 dark:text-slate-400 dark:border-slate-500/20',
     },
   }
+  const [paymentDialogOpen, setPaymentDialogOpen] = useState(false)
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false)
+  const [orderToCancel, setOrderToCancel] = useState<Order | null>(null)
+  const completePaymentMutation = useCompletePaymentMutation()
+  const { data: tenantData } = useCurrentTenantQuery()
 
   // Build query params from URL
   const timeRange = searchParams.get('timeRange') || 'all'
@@ -183,6 +210,41 @@ export function OrdersTable() {
 
   const handleViewOrder = (orderId: string) => {
     router.push(`/admin/orders/${orderId}`)
+  }
+
+  const handleOpenPaymentDialog = (order: Order) => {
+    setSelectedOrder(order)
+    setPaymentDialogOpen(true)
+  }
+
+  const handlePrintBill = (order: Order) => {
+    printBill({
+      order,
+      billType: 'final',
+      paymentMethod: 'cash',
+      tenantName: tenantData?.data?.name,
+      tenantAddress: tenantData?.data?.address,
+    })
+    toast.success('Đang in hóa đơn')
+  }
+
+  const handleCompletePayment = async (order: Order) => {
+    const activePayment = order.payments?.find(
+      (p: { status: string }) => !['cancelled', 'failed', 'paid'].includes(p.status),
+    )
+    if (!activePayment) return
+
+    try {
+      await completePaymentMutation.mutateAsync(activePayment.id)
+      toast.success('Đã hoàn tất thanh toán')
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Không thể hoàn tất thanh toán')
+    }
+  }
+
+  const handleOpenCancelDialog = (order: Order) => {
+    setOrderToCancel(order)
+    setCancelDialogOpen(true)
   }
 
   const getAgingMinutes = (createdAt: Date) => {
@@ -365,6 +427,91 @@ export function OrdersTable() {
                       onClick={(e) => e.stopPropagation()}
                     >
                       <div className="flex items-center justify-end gap-1">
+                        {/* Payment Processing Indicator */}
+                        {(() => {
+                          const activePayment = order.payments?.find(
+                            (p: { status: string; paymentMethod?: string }) =>
+                              !['cancelled', 'failed', 'paid'].includes(p.status),
+                          )
+
+                          // Show Complete/Cancel buttons for active payments
+                          if (activePayment && order.status === 'completed') {
+                            const isProcessing = completePaymentMutation.isPending
+
+                            return (
+                              <>
+                                {/* Processing indicator */}
+                                <div className="relative mr-1">
+                                  <div className="flex h-2 w-2 items-center justify-center">
+                                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-blue-400 opacity-75"></span>
+                                    <span className="relative inline-flex h-2 w-2 rounded-full bg-blue-500"></span>
+                                  </div>
+                                </div>
+
+                                {/* Complete button - only for pending cash */}
+                                {activePayment.status === 'pending' &&
+                                  activePayment.paymentMethod === 'cash' && (
+                                    <Button
+                                      variant="default"
+                                      className="h-7 gap-1 rounded-full px-2 text-xs md:h-8 md:px-3"
+                                      disabled={isProcessing}
+                                      onClick={(e) => {
+                                        e.stopPropagation()
+                                        handleCompletePayment(order)
+                                      }}
+                                    >
+                                      {isProcessing ? (
+                                        <Loader2 className="h-3 w-3 animate-spin" />
+                                      ) : (
+                                        <CheckCircle className="h-3 w-3" />
+                                      )}
+                                      {!isProcessing && (
+                                        <span className="hidden md:inline">Hoàn tất</span>
+                                      )}
+                                    </Button>
+                                  )}
+
+                                {/* Cancel button */}
+                                <Button
+                                  variant="outline"
+                                  className="h-7 gap-1 rounded-full px-2 text-xs md:h-8 md:px-3"
+                                  disabled={isProcessing}
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    handleOpenCancelDialog(order)
+                                  }}
+                                >
+                                  {isProcessing ? (
+                                    <Loader2 className="h-3 w-3 animate-spin" />
+                                  ) : (
+                                    <X className="h-3 w-3" />
+                                  )}
+                                  {!isProcessing && <span className="hidden md:inline">Hủy</span>}
+                                </Button>
+                              </>
+                            )
+                          }
+
+                          // Show Tính tiền button for completed unpaid orders without active payment
+                          if (order.status === 'completed' && order.paymentStatus !== 'paid') {
+                            return (
+                              <Button
+                                variant="default"
+                                className="h-7 gap-1 rounded-full px-2 text-xs md:h-8 md:px-3"
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  handleOpenPaymentDialog(order)
+                                }}
+                              >
+                                <Wallet className="h-3 w-3" />
+                                Tính tiền
+                              </Button>
+                            )
+                          }
+
+                          return null
+                        })()}
+
                         {/* Bump/Next Status */}
                         {NEXT_STATUS_MAP[order.status] && (
                           <Button
@@ -409,13 +556,25 @@ export function OrdersTable() {
                               <Eye className="mr-2 h-4 w-4" />
                               {t('viewDetails')}
                             </DropdownMenuItem>
-                            <DropdownMenuItem>
+                            <DropdownMenuItem
+                              disabled={order.paymentStatus !== 'paid'}
+                              onClick={() => handlePrintBill(order)}
+                            >
                               <Printer className="mr-2 h-4 w-4" />
                               {t('printBill')}
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem>{t('changeStatus')}</DropdownMenuItem>
                             <DropdownMenuItem>{t('exportPdf')}</DropdownMenuItem>
+                            <DropdownMenuItem
+                              disabled={
+                                order.status !== 'completed' || order.paymentStatus === 'paid'
+                              }
+                              onClick={() => handleOpenPaymentDialog(order)}
+                            >
+                              <Wallet className="mr-2 h-4 w-4" />
+                              Tính tiền
+                            </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </div>
@@ -439,6 +598,22 @@ export function OrdersTable() {
           onPageChange={() => {}}
         />
       )}
+
+      {/* Payment Dialog */}
+      <PaymentDialog
+        open={paymentDialogOpen}
+        onOpenChange={setPaymentDialogOpen}
+        order={selectedOrder}
+        tenantAddress={tenantData?.data?.address}
+        tenantName={tenantData?.data?.name}
+      />
+
+      {/* Cancel Payment Confirmation Dialog */}
+      <CancelPaymentDialog
+        open={cancelDialogOpen}
+        onOpenChange={setCancelDialogOpen}
+        orderToCancel={orderToCancel}
+      />
     </div>
   )
 }

@@ -122,7 +122,7 @@ export function getActionConfig(status: OrderItemStatus): ActionConfig | null {
  */
 export function filterItemsByStatus(
   items: KdsOrderItem[],
-  highlightStatus?: OrderItemStatus
+  highlightStatus?: OrderItemStatus,
 ): KdsOrderItem[] {
   if (!highlightStatus) return items
   return items.filter((item) => item.status === highlightStatus)

@@ -9,6 +9,7 @@ import { OrderNotes } from '@/src/features/admin/orders/components/order-notes'
 import { OrderStatusTimeline } from '@/src/features/admin/orders/components/order-status-timeline'
 import { PaymentCard } from '@/src/features/admin/orders/components/payment-card'
 import { Loader2 } from 'lucide-react'
+import { useCurrentTenantQuery } from '@/src/features/admin/tenants/queries/tenants.queries'
 
 function LoadingState() {
   return (
@@ -37,6 +38,7 @@ function ErrorState() {
 function OrderDetailContent({ orderId }: { orderId: string }) {
   const { data, isLoading, error } = useOrderQuery(orderId)
   const order = data?.data
+  const { data: tenantData } = useCurrentTenantQuery()
 
   // Enable socket for real-time updates from KDS
   useOrdersSocket({ enabled: true, showNotifications: true })
@@ -67,7 +69,13 @@ function OrderDetailContent({ orderId }: { orderId: string }) {
 
         {/* Right: Payment + Timeline */}
         <div className="space-y-6">
-          <PaymentCard payments={order.payments} totalAmount={order.totalAmount} />
+          <PaymentCard
+            payments={order.payments}
+            totalAmount={order.totalAmount}
+            order={order}
+            tenantName={tenantData?.data?.name}
+            tenantAddress={tenantData?.data?.address}
+          />
           <OrderStatusTimeline history={order.statusHistory} />
         </div>
       </div>

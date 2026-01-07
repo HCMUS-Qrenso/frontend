@@ -124,7 +124,7 @@ export function ConfirmActionDialog({
           <div
             className={cn(
               'mx-auto flex h-12 w-12 items-center justify-center rounded-full',
-              config.iconBg
+              config.iconBg,
             )}
           >
             {icon || <IconComponent className={cn('h-6 w-6', config.iconColor)} />}

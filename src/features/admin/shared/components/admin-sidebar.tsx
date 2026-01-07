@@ -25,7 +25,7 @@ import {
   Upload,
   MapPin,
   Construction,
-  ShipIcon
+  ShipIcon,
 } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/src/components/ui/avatar'
 import {

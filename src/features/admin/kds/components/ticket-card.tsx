@@ -1,6 +1,6 @@
 /**
  * KDS Ticket Card Component (Refactored)
- * 
+ *
  * Changes from original:
  * - Timer is passed as `now` prop (single tick at parent level)
  * - Business logic extracted to ticket.logic.ts
@@ -30,7 +30,7 @@ import type { KdsOrder, OrderItemStatus } from '../types/kds.types'
 
 interface TicketCardProps {
   order: KdsOrder
-  now: number  // Timestamp from parent's useNow hook
+  now: number // Timestamp from parent's useNow hook
   onClick: () => void
   isListView?: boolean
   highlightStatus?: OrderItemStatus
@@ -49,35 +49,26 @@ export function TicketCard({
   const [showConfirmComplete, setShowConfirmComplete] = useState(false)
 
   // Memoized calculations
-  const elapsed = useMemo(
-    () => calcElapsedSec(order.createdAt, now),
-    [order.createdAt, now]
-  )
+  const elapsed = useMemo(() => calcElapsedSec(order.createdAt, now), [order.createdAt, now])
 
-  const maxPrepTime = useMemo(
-    () => calcMaxPrepTime(order.items),
-    [order.items]
-  )
+  const maxPrepTime = useMemo(() => calcMaxPrepTime(order.items), [order.items])
 
   const { isWarning, isOverdue } = useMemo(
     () => calcTiming(elapsed, maxPrepTime),
-    [elapsed, maxPrepTime]
+    [elapsed, maxPrepTime],
   )
 
-  const allDone = useMemo(
-    () => isAllDone(order.items),
-    [order.items]
-  )
+  const allDone = useMemo(() => isAllDone(order.items), [order.items])
 
   // Count items that are not yet done (for confirm dialog)
   const pendingItemsCount = useMemo(
     () => order.items.filter((item) => !TERMINAL_STATUSES.has(item.status)).length,
-    [order.items]
+    [order.items],
   )
 
   const displayItems = useMemo(
     () => filterItemsByStatus(order.items, highlightStatus),
-    [order.items, highlightStatus]
+    [order.items, highlightStatus],
   )
 
   // Border color based on priority and overdue status
@@ -92,7 +83,7 @@ export function TicketCard({
       className={cn(
         'group rounded-2xl border-2 bg-white transition-all hover:shadow-lg dark:bg-slate-900',
         borderClass,
-        isListView && 'flex items-center gap-4'
+        isListView && 'flex items-center gap-4',
       )}
     >
       {/* Header */}
@@ -159,31 +150,31 @@ export function TicketCard({
         confirmText="Xác nhận"
         onConfirm={async () => {
           if (!onUpdateItemStatus) return
-          
+
           // Update each non-terminal item through valid status transitions
           // Backend requires: pending → accepted → preparing → ready
           for (const item of order.items) {
             if (TERMINAL_STATUSES.has(item.status)) continue
-            
+
             // Get path to ready: pending→accepted→preparing→ready
             const path: OrderItemStatus[] = []
             let current = item.status
-            
+
             while (current !== 'ready') {
               const next = NEXT_STATUS[current]
               if (!next) break
               path.push(next)
               current = next
             }
-            
+
             // Execute each transition
             for (const nextStatus of path) {
               onUpdateItemStatus(order.id, item.id, nextStatus)
               // Small delay to ensure order of execution
-              await new Promise(resolve => setTimeout(resolve, 50))
+              await new Promise((resolve) => setTimeout(resolve, 50))
             }
           }
-          
+
           setShowConfirmComplete(false)
         }}
       />

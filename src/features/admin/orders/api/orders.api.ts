@@ -7,6 +7,8 @@
  * - GET /orders/:id - Get order by ID
  * - PATCH /orders/:id/status - Update order status
  * - GET /orders/stats - Get order statistics
+ * - POST /payments - Create payment for order
+ * - POST /payments/:id/complete - Complete cash payment
  */
 
 import { apiClient } from '@/src/lib/axios'
@@ -17,6 +19,29 @@ import type {
   OrderStatsResponse,
   UpdateOrderStatusPayload,
 } from '@/src/features/admin/orders/types'
+
+export interface CreatePaymentPayload {
+  orderId: string
+  paymentMethod: 'cash' | 'qr'
+  description?: string
+  returnUrl?: string
+}
+
+export interface PaymentResponse {
+  message?: string
+  paymentId?: string
+  paymentMethod?: string
+  transactionId?: string
+  checkoutUrl?: string
+  paymentLinkId?: string
+  orderCode?: number
+  amount?: number
+  currency?: string
+  status?: string
+  qrCode?: string
+  qrCodeData?: string
+  createdAt?: string
+}
 
 export const ordersApi = {
   /**
@@ -64,6 +89,40 @@ export const ordersApi = {
     status: string,
   ): Promise<{ success: boolean; data: { id: string; status: string } }> => {
     const { data } = await apiClient.patch(`/orders/${orderId}/items/${itemId}/status`, { status })
+    return data
+  },
+
+  /**
+   * Create payment for order
+   */
+  createPayment: async (payload: CreatePaymentPayload): Promise<PaymentResponse> => {
+    const { data } = await apiClient.post<PaymentResponse>('/payments', payload)
+    return data
+  },
+
+  /**
+   * Complete cash payment
+   */
+  completePayment: async (paymentId: string): Promise<PaymentResponse> => {
+    const { data } = await apiClient.post<PaymentResponse>(`/payments/${paymentId}/complete`)
+    return data
+  },
+
+  /**
+   * Cancel payment
+   */
+  cancelPayment: async (paymentId: string, reason?: string): Promise<PaymentResponse> => {
+    const { data } = await apiClient.delete<PaymentResponse>(`/payments/${paymentId}`, {
+      params: reason ? { reason } : undefined,
+    })
+    return data
+  },
+
+  /**
+   * Check payment status by order code
+   */
+  checkPaymentStatus: async (orderCode: number): Promise<PaymentResponse> => {
+    const { data } = await apiClient.get<PaymentResponse>(`/payments/check/${orderCode}`)
     return data
   },
 }
