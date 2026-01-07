@@ -45,7 +45,7 @@ export interface ActionConfig {
  * Action button configuration for each status
  */
 export const ACTION_CONFIG: Record<OrderItemStatus, ActionConfig | null> = {
-  pending: { label: 'Nhận', iconName: 'checkCircle' },
+  pending: null, // Waiter handles pending->accepted, not KDS
   accepted: { label: 'Bắt đầu', iconName: 'play' },
   preparing: { label: 'Xong', iconName: 'checkCircle' },
   ready: null,

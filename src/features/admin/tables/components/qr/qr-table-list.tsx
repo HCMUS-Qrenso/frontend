@@ -23,6 +23,7 @@ import {
   AdminTableHead,
   AdminTableRow,
 } from '@/src/components/ui/table'
+import { useTranslations } from 'next-intl'
 
 interface QRTableListProps {
   tables: TableQR[]
@@ -38,11 +39,11 @@ interface QRTableListProps {
   isDataLoading?: boolean
 }
 
-function getStatusBadge(status: TableQR['status']) {
+function StatusBadge({ status, t }: { status: TableQR['status']; t: (key: string) => string }) {
   const statusMap: Record<TableQR['status'], string> = {
-    Ready: 'Sẵn sàng',
-    Missing: 'Thiếu',
-    Outdated: 'Lỗi thời',
+    Ready: t('qrStatusReady'),
+    Missing: t('qrStatusMissing'),
+    Outdated: t('qrStatusOutdated'),
   }
 
   const styles = {
@@ -80,6 +81,7 @@ export function QRTableList({
   isDataLoading = false,
 }: QRTableListProps) {
   const [copiedId, setCopiedId] = useState<string | null>(null)
+  const t = useTranslations('tables')
 
   const copyToClipboard = (text: string, id: string) => {
     navigator.clipboard.writeText(text)
@@ -93,7 +95,7 @@ export function QRTableList({
       {selectedTables.length > 0 && (
         <div className="flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50/50 p-3 dark:border-emerald-500/20 dark:bg-emerald-500/5">
           <span className="text-sm font-medium text-emerald-700 dark:text-emerald-400">
-            {selectedTables.length} bàn đã chọn
+            {t('tablesSelected').replace('{count}', String(selectedTables.length))}
           </span>
           <div className="flex items-center gap-2">
             {onBatchDownload && (
@@ -106,7 +108,7 @@ export function QRTableList({
                     disabled={isLoading}
                   >
                     <Download className="h-3.5 w-3.5" />
-                    Tải xuống
+                    {t('download')}
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
@@ -124,7 +126,7 @@ export function QRTableList({
                 disabled={isLoading}
               >
                 <RefreshCw className="h-3.5 w-3.5" />
-                Tạo lại
+                {t('regenerate')}
               </Button>
             )}
           </div>
@@ -141,15 +143,15 @@ export function QRTableList({
                   <Checkbox
                     checked={selectedTables.length === tables.length}
                     onCheckedChange={onSelectAll}
-                    aria-label="Chọn tất cả"
+                    aria-label={t('selectAllAria')}
                   />
                 </AdminTableHead>
-                <AdminTableHead>Bàn</AdminTableHead>
-                <AdminTableHead>Xem trước QR</AdminTableHead>
-                <AdminTableHead>Liên kết / Đích đến</AdminTableHead>
-                <AdminTableHead>Trạng thái</AdminTableHead>
-                <AdminTableHead>Cập nhật lúc</AdminTableHead>
-                <AdminTableHead align="right">Thao tác</AdminTableHead>
+                <AdminTableHead>{t('tableCol')}</AdminTableHead>
+                <AdminTableHead>{t('qrPreview')}</AdminTableHead>
+                <AdminTableHead>{t('linkDestination')}</AdminTableHead>
+                <AdminTableHead>{t('status')}</AdminTableHead>
+                <AdminTableHead>{t('updatedAtCol')}</AdminTableHead>
+                <AdminTableHead align="right">{t('actions')}</AdminTableHead>
               </AdminTableHeaderRow>
             </TableHeader>
             <TableBody>
@@ -165,7 +167,7 @@ export function QRTableList({
                   <TableCell className="px-6 py-4">
                     <div>
                       <p className="text-sm font-medium text-slate-900 dark:text-white">
-                        Bàn {table.tableNumber}
+                        {t('tableCol')} {table.tableNumber}
                       </p>
                       <p className="text-xs text-slate-500 dark:text-slate-400">
                         {table.tableArea}
@@ -192,7 +194,7 @@ export function QRTableList({
                       <div className="flex h-16 w-16 items-center justify-center rounded-lg border border-dashed border-slate-300 bg-slate-50 dark:border-slate-700 dark:bg-slate-800">
                         <Image
                           src="/placeholder.jpg"
-                          alt="QR sắp cập nhật"
+                          alt="QR placeholder"
                           width={40}
                           height={40}
                           className="object-contain opacity-80"
@@ -223,7 +225,9 @@ export function QRTableList({
                       <span className="text-xs text-slate-400 dark:text-slate-500">—</span>
                     )}
                   </TableCell>
-                  <TableCell className="px-6 py-4">{getStatusBadge(table.status)}</TableCell>
+                  <TableCell className="px-6 py-4">
+                    <StatusBadge status={table.status} t={t} />
+                  </TableCell>
                   <TableCell className="px-6 py-4">
                     <p className="text-sm text-slate-600 dark:text-slate-400">{table.updatedAt}</p>
                   </TableCell>
@@ -241,7 +245,7 @@ export function QRTableList({
                             disabled={!table.qrUrl}
                           >
                             <Eye className="mr-2 h-4 w-4" />
-                            Xem trước
+                            {t('preview')}
                           </DropdownMenuItem>
                           {onDownload && (
                             <>
@@ -250,14 +254,14 @@ export function QRTableList({
                                 disabled={!table.qrUrl || isLoading}
                               >
                                 <Download className="mr-2 h-4 w-4" />
-                                Tải xuống PNG
+                                {t('downloadPng')}
                               </DropdownMenuItem>
                               <DropdownMenuItem
                                 onClick={() => onDownload(table.id, 'pdf')}
                                 disabled={!table.qrUrl || isLoading}
                               >
                                 <Download className="mr-2 h-4 w-4" />
-                                Tải xuống PDF
+                                {t('downloadPdf')}
                               </DropdownMenuItem>
                             </>
                           )}
@@ -267,7 +271,7 @@ export function QRTableList({
                               disabled={isLoading}
                             >
                               <RefreshCw className="mr-2 h-4 w-4" />
-                              {table.qrUrl ? 'Tạo lại QR' : 'Tạo QR'}
+                              {table.qrUrl ? t('regenerateQr') : t('generateQrAction')}
                             </DropdownMenuItem>
                           )}
                         </DropdownMenuContent>
@@ -285,7 +289,7 @@ export function QRTableList({
           <div className="absolute inset-0 flex items-center justify-center rounded-2xl bg-white/80 backdrop-blur-sm dark:bg-slate-900/80">
             <div className="flex items-center gap-2">
               <Loader2 className="h-6 w-6 animate-spin text-emerald-600" />
-              <span className="text-sm text-slate-600 dark:text-slate-300">Đang tải...</span>
+              <span className="text-sm text-slate-600 dark:text-slate-300">{t('loading')}</span>
             </div>
           </div>
         )}
@@ -294,7 +298,9 @@ export function QRTableList({
       {/* Table count */}
       {tables.length > 0 && (
         <div className="flex items-center justify-between">
-          <p className="text-sm text-slate-500 dark:text-slate-400">Hiển thị {tables.length} bàn</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            {t('showingTables').replace('{count}', String(tables.length))}
+          </p>
         </div>
       )}
     </div>

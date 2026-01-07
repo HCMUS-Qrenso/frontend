@@ -14,8 +14,8 @@ interface StatusColumnsProps {
   onUpdateItemStatus?: (orderId: string, itemId: string, newStatus: OrderItemStatus) => void
 }
 
-// KDS workflow statuses (only active processing statuses)
-const KDS_STATUSES: OrderItemStatus[] = ['pending', 'accepted', 'preparing', 'ready']
+// KDS workflow statuses - waiter handles pending->accepted, KDS handles accepted->preparing->ready
+const KDS_STATUSES: OrderItemStatus[] = ['accepted', 'preparing', 'ready']
 
 export function StatusColumns({
   orders,
@@ -59,7 +59,7 @@ export function StatusColumns({
     })
 
     return (
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {statuses.map((status) => {
           const statusConfig = ITEM_STATUS_CONFIG[status]
           const statusOrders = ordersByStatus[status]

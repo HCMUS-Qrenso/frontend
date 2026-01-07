@@ -3,10 +3,11 @@
 import { Badge } from '@/src/components/ui/badge'
 import { Button } from '@/src/components/ui/button'
 import { cn } from '@/src/lib/utils'
-import { Clock, Check, XCircle, AlertCircle } from 'lucide-react'
+import { Clock, Check, XCircle, AlertCircle, Loader2 } from 'lucide-react'
 import { format } from 'date-fns'
 import { vi } from 'date-fns/locale'
 import type { OrderDetailItem } from '../types/orders'
+import { useUpdateOrderItemStatusMutation } from '../queries'
 
 const ITEM_STATUS_CONFIG: Record<string, { label: string; color: string; icon: any }> = {
   pending: {
@@ -52,17 +53,14 @@ interface OrderItemsListProps {
 }
 
 export function OrderItemsList({ items, orderId }: OrderItemsListProps) {
-  // TODO: Implement mutation when item status update API is ready
-  // const updateItemStatusMutation = useUpdateOrderItemStatusMutation()
-
-  const handleMarkReady = (itemId: string) => {
-    console.log(`[v0] Mark item ${itemId} as ready`)
-    // updateItemStatusMutation.mutate({ orderId, itemId, status: 'ready' })
-  }
+  const updateItemStatusMutation = useUpdateOrderItemStatusMutation()
 
   const handleMarkServed = (itemId: string) => {
-    console.log(`[v0] Mark item ${itemId} as served`)
-    // updateItemStatusMutation.mutate({ orderId, itemId, status: 'served' })
+    updateItemStatusMutation.mutate({
+      orderId,
+      itemId,
+      status: 'served',
+    })
   }
 
   if (!items || items.length === 0) {
@@ -172,21 +170,21 @@ export function OrderItemsList({ items, orderId }: OrderItemsListProps) {
                     {statusConfig?.label || item.status}
                   </Badge>
 
-                  {/* Actions */}
+                  {/* Actions - Only waiter can mark as served */}
                   <div className="flex gap-2">
-                    {item.status === 'preparing' && (
-                      <Button size="sm" variant="outline" onClick={() => handleMarkReady(item.id)}>
-                        Sẵn sàng
-                      </Button>
-                    )}
                     {item.status === 'ready' && (
                       <Button
                         size="sm"
                         variant="default"
                         className="bg-emerald-600 hover:bg-emerald-700"
                         onClick={() => handleMarkServed(item.id)}
+                        disabled={updateItemStatusMutation.isPending}
                       >
-                        Đã phục vụ
+                        {updateItemStatusMutation.isPending ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          'Đã phục vụ'
+                        )}
                       </Button>
                     )}
                   </div>

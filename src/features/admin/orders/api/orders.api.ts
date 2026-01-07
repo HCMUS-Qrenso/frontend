@@ -80,6 +80,19 @@ export const ordersApi = {
   },
 
   /**
+   * Update order item status (waiter marks item as served)
+   * Backend will auto-update order status when all items are served
+   */
+  updateItemStatus: async (
+    orderId: string,
+    itemId: string,
+    status: string,
+  ): Promise<{ success: boolean; data: { id: string; status: string } }> => {
+    const { data } = await apiClient.patch(`/orders/${orderId}/items/${itemId}/status`, { status })
+    return data
+  },
+
+  /**
    * Create payment for order
    */
   createPayment: async (payload: CreatePaymentPayload): Promise<PaymentResponse> => {

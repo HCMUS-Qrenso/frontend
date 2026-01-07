@@ -11,6 +11,7 @@ import {
   AlertDialogTitle,
 } from '@/src/components/ui/alert-dialog'
 import { Loader2, AlertTriangle } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 interface LayoutResetDialogProps {
   open: boolean
@@ -25,6 +26,8 @@ export function LayoutResetDialog({
   onConfirm,
   isLoading,
 }: LayoutResetDialogProps) {
+  const t = useTranslations('tables')
+
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent className="rounded-2xl">
@@ -33,11 +36,10 @@ export function LayoutResetDialog({
             <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-400" />
           </div>
           <AlertDialogTitle className="text-center text-lg font-semibold text-slate-900 dark:text-white">
-            Đặt lại layout?
+            {t('resetLayoutTitle')}
           </AlertDialogTitle>
           <AlertDialogDescription className="text-center text-sm text-slate-500 dark:text-slate-400">
-            Tất cả vị trí bàn sẽ được xóa và các bàn sẽ quay về thư viện. Hành động này không thể
-            hoàn tác.
+            {t('resetLayoutDesc')}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter className="flex-row justify-end gap-3 sm:flex-row">
@@ -46,7 +48,7 @@ export function LayoutResetDialog({
             className="m-0 rounded-full"
             onClick={() => onOpenChange(false)}
           >
-            Hủy
+            {t('cancel')}
           </AlertDialogCancel>
           <AlertDialogAction
             onClick={onConfirm}
@@ -54,7 +56,7 @@ export function LayoutResetDialog({
             className="m-0 gap-2 rounded-full bg-red-600 hover:bg-red-700"
           >
             {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
-            {isLoading ? 'Đang đặt lại...' : 'Đặt lại'}
+            {isLoading ? t('resettingLayout') : t('resetLayoutBtn')}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

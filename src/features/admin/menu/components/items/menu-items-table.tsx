@@ -23,7 +23,7 @@ import {
 import { Pencil, Trash2, Award, Clock, MoreVertical, UtensilsCrossed } from 'lucide-react'
 import { cn } from '@/src/lib/utils'
 import { formatRelativeDate, formatPrice } from '@/src/lib/helpers/format'
-import { StatusBadge, MENU_ITEM_STATUS_CONFIG } from '@/src/components/ui/status-badge'
+import { StatusBadge, type StatusConfig } from '@/src/components/ui/status-badge'
 import { ContainerLoadingState, ContainerErrorState } from '@/src/components/ui/loading-state'
 import { EmptyState } from '@/src/components/ui/empty-state'
 import { SkeletonTableRows } from '@/src/components/loading'
@@ -35,6 +35,7 @@ import type {
   MenuItemSortOrder,
   MenuItemStatus,
 } from '@/src/features/admin/menu/types'
+import { useTranslations } from 'next-intl'
 
 interface MenuItemsTableProps {
   onEditClick: (item: any) => void
@@ -44,6 +45,25 @@ interface MenuItemsTableProps {
 export function MenuItemsTable({ onEditClick, onDeleteClick }: MenuItemsTableProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const t = useTranslations('menu')
+
+  const MENU_ITEM_STATUS_CONFIG: Record<string, StatusConfig> = {
+    available: {
+      label: t('available'),
+      className:
+        'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20',
+    },
+    sold_out: {
+      label: t('soldOut'),
+      className:
+        'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20',
+    },
+    unavailable: {
+      label: t('unavailable'),
+      className:
+        'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-500/10 dark:text-slate-400 dark:border-slate-500/20',
+    },
+  }
 
   // Get query params from URL
   const page = Number.parseInt(searchParams.get('page') || '1')
@@ -98,20 +118,20 @@ export function MenuItemsTable({ onEditClick, onDeleteClick }: MenuItemsTablePro
           <Table>
             <TableHeader>
               <AdminTableHeaderRow>
-                <AdminTableHead className="min-w-50 px-2 md:px-4">Món ăn</AdminTableHead>
-                <AdminTableHead className="w-24 px-2 md:w-32 md:px-4">Danh mục</AdminTableHead>
+                <AdminTableHead className="min-w-50 px-2 md:px-4">{t('menuItem')}</AdminTableHead>
+                <AdminTableHead className="w-24 px-2 md:w-32 md:px-4">{t('category')}</AdminTableHead>
                 <AdminTableHead className="w-20 px-2 md:w-28 md:px-4" align="right">
-                  Giá
+                  {t('price')}
                 </AdminTableHead>
                 <AdminTableHead className="w-24 px-2 md:w-28 md:px-4" align="center">
-                  Trạng thái
+                  {t('status')}
                 </AdminTableHead>
                 <AdminTableHead className="w-16 px-2 md:w-20 md:px-4" align="center">
-                  Phổ biến
+                  {t('popularityScore')}
                 </AdminTableHead>
-                <AdminTableHead className="w-20 px-2 md:w-24 md:px-4">Cập nhật</AdminTableHead>
+                <AdminTableHead className="w-20 px-2 md:w-24 md:px-4">{t('updatedAt')}</AdminTableHead>
                 <AdminTableHead className="w-20 px-2 md:px-4" align="right">
-                  Thao tác
+                  {t('actions')}
                 </AdminTableHead>
               </AdminTableHeaderRow>
             </TableHeader>
@@ -139,8 +159,8 @@ export function MenuItemsTable({ onEditClick, onDeleteClick }: MenuItemsTablePro
   if (error) {
     return (
       <ContainerErrorState
-        title="Không thể tải danh sách món ăn"
-        description="Vui lòng thử lại sau"
+        title={t('cannotLoadItems')}
+        description={t('tryAgainLater')}
       />
     )
   }
@@ -151,20 +171,20 @@ export function MenuItemsTable({ onEditClick, onDeleteClick }: MenuItemsTablePro
         <Table>
           <TableHeader>
             <AdminTableHeaderRow>
-              <AdminTableHead className="min-w-50 px-2 md:px-4">Món ăn</AdminTableHead>
-              <AdminTableHead className="w-24 px-2 md:w-32 md:px-4">Danh mục</AdminTableHead>
+              <AdminTableHead className="min-w-50 px-2 md:px-4">{t('menuItem')}</AdminTableHead>
+              <AdminTableHead className="w-24 px-2 md:w-32 md:px-4">{t('category')}</AdminTableHead>
               <AdminTableHead className="w-20 px-2 md:w-28 md:px-4" align="right">
-                Giá
+                {t('price')}
               </AdminTableHead>
               <AdminTableHead className="w-24 px-2 md:w-28 md:px-4" align="center">
-                Trạng thái
+                {t('status')}
               </AdminTableHead>
               <AdminTableHead className="w-16 px-2 md:w-20 md:px-4" align="center">
-                Phổ biến
+                {t('popularityScore')}
               </AdminTableHead>
-              <AdminTableHead className="w-20 px-2 md:w-24 md:px-4">Cập nhật</AdminTableHead>
+              <AdminTableHead className="w-20 px-2 md:w-24 md:px-4">{t('updatedAt')}</AdminTableHead>
               <AdminTableHead className="w-20 px-2 md:px-4" align="right">
-                Thao tác
+                {t('actions')}
               </AdminTableHead>
             </AdminTableHeaderRow>
           </TableHeader>
@@ -174,8 +194,8 @@ export function MenuItemsTable({ onEditClick, onDeleteClick }: MenuItemsTablePro
                 <TableCell colSpan={7} className="px-2 py-0 md:px-4">
                   <EmptyState
                     icon={UtensilsCrossed}
-                    title="Chưa có món ăn nào"
-                    description="Bắt đầu bằng cách thêm món đầu tiên"
+                    title={t('noItems')}
+                    description={t('noItemsHint')}
                   />
                 </TableCell>
               </TableRow>
@@ -214,21 +234,21 @@ export function MenuItemsTable({ onEditClick, onDeleteClick }: MenuItemsTablePro
                             {item.name}
                           </span>
                           {item.is_chef_recommendation && (
-                            <span title="Chef's recommendation">
+                            <span title={t('chefRecommendation')}>
                               <Award className="h-4 w-4 text-amber-500" />
                             </span>
                           )}
                         </div>
                         <div className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400">
                           <Clock className="h-3 w-3" />
-                          <span>{item.preparation_time} phút</span>
+                          <span>{item.preparation_time} {t('prepTime')}</span>
                         </div>
                       </div>
                     </div>
                   </TableCell>
                   <TableCell className="px-2 py-3 md:px-4">
                     <span className="text-xs wrap-break-word text-slate-600 md:text-sm dark:text-slate-400">
-                      {item.category?.name || 'Chưa phân loại'}
+                      {item.category?.name || t('uncategorized')}
                     </span>
                   </TableCell>
                   <TableCell className="px-2 py-3 text-right md:px-4">
@@ -273,7 +293,7 @@ export function MenuItemsTable({ onEditClick, onDeleteClick }: MenuItemsTablePro
                             }}
                           >
                             <Pencil className="mr-2 h-4 w-4" />
-                            Chỉnh sửa
+                            {t('edit')}
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem
@@ -284,7 +304,7 @@ export function MenuItemsTable({ onEditClick, onDeleteClick }: MenuItemsTablePro
                             className="text-red-600 focus:text-red-600 dark:text-red-400"
                           >
                             <Trash2 className="mr-2 h-4 w-4" />
-                            Xóa món ăn
+                            {t('deleteItem')}
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -304,7 +324,7 @@ export function MenuItemsTable({ onEditClick, onDeleteClick }: MenuItemsTablePro
           totalPages={totalPages}
           total={total}
           limit={limit}
-          itemLabel="món"
+          itemLabel={t('itemLabel')}
           onPageChange={handlePageChange}
         />
       )}

@@ -4,9 +4,11 @@ import { UtensilsCrossed, CheckCircle2, XCircle, EyeOff, Award } from 'lucide-re
 import { useMenuItemsStatsQuery } from '@/src/features/admin/menu/queries'
 import { StatCard } from '../../../../../components/ui/stat-card'
 import { SkeletonStatCard } from '@/src/components/loading'
+import { useTranslations } from 'next-intl'
 
 export function MenuItemsOverviewStats() {
   const { data, isLoading } = useMenuItemsStatsQuery()
+  const t = useTranslations('menu')
 
   if (isLoading) {
     return <SkeletonStatCard count={5} columns={5} />
@@ -22,41 +24,41 @@ export function MenuItemsOverviewStats() {
   const stats = [
     {
       icon: UtensilsCrossed,
-      title: 'Tổng món',
+      title: t('totalItems'),
       value: String(totalMenuItems),
-      subtext: 'Đã tạo',
+      subtext: t('created'),
       iconColor: 'text-slate-600 dark:text-slate-400',
       iconBgColor: 'bg-slate-50 dark:bg-slate-800',
     },
     {
       icon: CheckCircle2,
-      title: 'Đang bán',
+      title: t('available'),
       value: String(availableItems),
-      subtext: 'Available',
+      subtext: t('availableSubtext'),
       iconColor: 'text-emerald-600 dark:text-emerald-400',
       iconBgColor: 'bg-emerald-50 dark:bg-emerald-500/10',
     },
     {
       icon: XCircle,
-      title: 'Tạm ẩn',
+      title: t('unavailable'),
       value: String(unavailableItems),
-      subtext: 'Unavailable',
+      subtext: t('unavailableSubtext'),
       iconColor: 'text-rose-600 dark:text-rose-400',
       iconBgColor: 'bg-rose-50 dark:bg-rose-500/10',
     },
     {
       icon: EyeOff,
-      title: 'Hết hàng',
+      title: t('soldOut'),
       value: '0', // Will be calculated if backend provides this info
-      subtext: 'Sold out',
+      subtext: t('soldOutSubtext'),
       iconColor: 'text-amber-600 dark:text-amber-400',
       iconBgColor: 'bg-amber-50 dark:bg-amber-500/10',
     },
     {
       icon: Award,
-      title: "Chef's picks",
+      title: t('chefPicks'),
       value: String(statsData?.chef_recommendations ?? 0),
-      subtext: 'Picks',
+      subtext: t('picks'),
       iconColor: 'text-yellow-600 dark:text-yellow-400',
       iconBgColor: 'bg-yellow-50 dark:bg-yellow-500/10',
     },

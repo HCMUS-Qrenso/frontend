@@ -4,10 +4,12 @@ import { ClipboardList, Clock, ChefHat, CheckCircle2, CreditCard } from 'lucide-
 import { StatCard } from '../../../../components/ui/stat-card'
 import { useOrderStatsQuery } from '../queries'
 import { Skeleton } from '@/src/components/ui/skeleton'
+import { useTranslations } from 'next-intl'
 
 export function OrdersOverviewStats() {
   const { data, isLoading } = useOrderStatsQuery()
   const stats = data?.data
+  const t = useTranslations('orders')
 
   if (isLoading) {
     return (
@@ -33,23 +35,23 @@ export function OrdersOverviewStats() {
   const statCards = [
     {
       icon: ClipboardList,
-      title: 'Tổng đơn hàng',
+      title: t('totalOrders'),
       value: String(stats?.totalOrders || 0),
-      subtext: 'Đơn active',
+      subtext: t('activeOrders'),
       iconColor: 'text-slate-600 dark:text-slate-400',
       iconBgColor: 'bg-slate-50 dark:bg-slate-800',
     },
     {
       icon: Clock,
-      title: 'Chờ xác nhận',
+      title: t('waitingConfirm'),
       value: String(stats?.pendingOrders || 0),
-      subtext: 'New/Pending',
+      subtext: t('newPending'),
       iconColor: 'text-amber-600 dark:text-amber-400',
       iconBgColor: 'bg-amber-50 dark:bg-amber-500/10',
     },
     {
       icon: ChefHat,
-      title: 'Đang xử lý',
+      title: t('inProgress'),
       value: String(stats?.inProgressOrders || 0),
       subtext: 'In progress',
       iconColor: 'text-blue-600 dark:text-blue-400',
@@ -57,7 +59,7 @@ export function OrdersOverviewStats() {
     },
     {
       icon: CheckCircle2,
-      title: 'Hoàn thành hôm nay',
+      title: t('completedToday'),
       value: String(stats?.completedToday || 0),
       subtext: 'Completed today',
       iconColor: 'text-emerald-600 dark:text-emerald-400',
@@ -65,7 +67,7 @@ export function OrdersOverviewStats() {
     },
     {
       icon: CreditCard,
-      title: 'Doanh thu hôm nay',
+      title: t('todayRevenue'),
       value: stats?.todayRevenue
         ? stats.todayRevenue >= 1000000
           ? `${(stats.todayRevenue / 1000000).toFixed(1)}M`

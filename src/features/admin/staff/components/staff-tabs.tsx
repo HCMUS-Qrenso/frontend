@@ -11,6 +11,7 @@ import { StatCard } from '@/src/components/ui/stat-card'
 import { useStaffStatsQuery } from '@/src/features/admin/staff/queries'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { useAuth } from '@/src/features/auth/hooks'
+import { useTranslations } from 'next-intl'
 
 type StaffRole = 'admin' | 'waiter' | 'kitchen_staff'
 
@@ -18,6 +19,7 @@ export function StaffTabs() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { user } = useAuth()
+  const t = useTranslations('staff')
 
   // Check if current user is Owner
   const isOwner = user?.role === 'owner'
@@ -50,33 +52,33 @@ export function StaffTabs() {
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard
-            title="Tổng nhân viên"
+            title={t('totalStaff')}
             value={String(stats?.total ?? 0)}
-            subtext="Tất cả nhân viên"
+            subtext={t('allStaff')}
             icon={Users}
             iconColor="text-blue-600 dark:text-blue-400"
             iconBgColor="bg-blue-100 dark:bg-blue-500/10"
           />
           <StatCard
-            title="Đang hoạt động"
+            title={t('activeStaff')}
             value={String(stats?.summary?.active ?? 0)}
-            subtext="Active"
+            subtext={t('activeLabel')}
             icon={UserCheck}
             iconColor="text-emerald-600 dark:text-emerald-400"
             iconBgColor="bg-emerald-100 dark:bg-emerald-500/10"
           />
           <StatCard
-            title="Không hoạt động"
+            title={t('inactiveStaff')}
             value={String(stats?.summary?.inactive ?? 0)}
-            subtext="Inactive"
+            subtext={t('inactiveLabel')}
             icon={UserX}
             iconColor="text-slate-600 dark:text-slate-400"
             iconBgColor="bg-slate-100 dark:bg-slate-500/10"
           />
           <StatCard
-            title="Đình chỉ"
+            title={t('suspendedStaff')}
             value={String(stats?.summary?.suspended ?? 0)}
-            subtext="Suspended"
+            subtext={t('suspendedLabel')}
             icon={UserMinus}
             iconColor="text-red-600 dark:text-red-400"
             iconBgColor="bg-red-100 dark:bg-red-500/10"
@@ -98,7 +100,7 @@ export function StaffTabs() {
             )}
           >
             <Shield className="h-4 w-4" />
-            Quản trị ({stats?.byRole?.admin?.total ?? 0})
+            {t('adminTab')} ({stats?.byRole?.admin?.total ?? 0})
           </button>
         )}
         <button
@@ -110,7 +112,7 @@ export function StaffTabs() {
               : 'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700',
           )}
         >
-          Phục vụ ({stats?.byRole?.waiter?.total ?? 0})
+          {t('waiterTab')} ({stats?.byRole?.waiter?.total ?? 0})
         </button>
         <button
           onClick={() => handleRoleChange('kitchen_staff')}
@@ -121,7 +123,7 @@ export function StaffTabs() {
               : 'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700',
           )}
         >
-          Bếp ({stats?.byRole?.kitchen_staff?.total ?? 0})
+          {t('kitchenTab')} ({stats?.byRole?.kitchen_staff?.total ?? 0})
         </button>
       </div>
 

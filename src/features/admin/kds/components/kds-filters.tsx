@@ -16,14 +16,8 @@ interface KdsFiltersProps {
   setSearchQuery: (query: string) => void
 }
 
-// Statuses to show in filter (active processing only)
-const FILTER_STATUSES: (OrderItemStatus | 'all')[] = [
-  'all',
-  'pending',
-  'accepted',
-  'preparing',
-  'ready',
-]
+// KDS filter statuses - no pending (handled by waiter)
+const FILTER_STATUSES: (OrderItemStatus | 'all')[] = ['all', 'accepted', 'preparing', 'ready']
 
 export function KdsFilters({
   groupByStatus,

@@ -1,0 +1,93 @@
+'use client'
+
+/**
+ * Next.js Error Boundary for route segments
+ *
+ * This file handles runtime errors that occur within the app directory.
+ * It will catch errors in server components, client components, and
+ * during rendering.
+ *
+ * @see https://nextjs.org/docs/app/building-your-application/routing/error-handling
+ */
+
+import { useEffect } from 'react'
+import { AlertTriangle, RefreshCw, Home } from 'lucide-react'
+import { Button } from '@/src/components/ui/button'
+import { useTranslations } from 'next-intl'
+
+interface ErrorProps {
+  error: Error & { digest?: string }
+  reset: () => void
+}
+
+export default function Error({ error, reset }: ErrorProps) {
+  const t = useTranslations('errors')
+
+  useEffect(() => {
+    // Log error to console in development
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Route Error:', error)
+    }
+
+    // TODO: Log to error monitoring service (Sentry, etc.)
+  }, [error])
+
+  return (
+    <div className="flex min-h-[400px] flex-col items-center justify-center px-4 py-16 text-center">
+      {/* Icon */}
+      <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-red-50 dark:bg-red-500/10">
+        <AlertTriangle className="h-10 w-10 text-red-600 dark:text-red-400" />
+      </div>
+
+      {/* Title */}
+      <h1 className="mb-3 text-2xl font-bold text-slate-900 dark:text-white">{t('errorTitle')}</h1>
+
+      {/* Message */}
+      <p className="mb-8 max-w-md text-slate-500 dark:text-slate-400">
+        {t('errorMessage')}
+      </p>
+
+      {/* Actions */}
+      <div className="flex flex-wrap items-center justify-center gap-4">
+        <Button onClick={reset} className="gap-2 rounded-full bg-emerald-600 hover:bg-emerald-700">
+          <RefreshCw className="h-4 w-4" />
+          {t('tryAgain')}
+        </Button>
+        <Button
+          variant="outline"
+          onClick={() => (window.location.href = '/')}
+          className="gap-2 rounded-full"
+        >
+          <Home className="h-4 w-4" />
+          {t('goHome')}
+        </Button>
+      </div>
+
+      {/* Error Details (Development only) */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="mt-12 w-full max-w-2xl text-left">
+          <details className="rounded-xl border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/20">
+            <summary className="cursor-pointer text-sm font-medium text-red-700 dark:text-red-400">
+              {t('errorDetails')}
+            </summary>
+            <div className="mt-4 space-y-3">
+              <p className="text-sm text-red-700 dark:text-red-400">
+                <strong>Message:</strong> {error.message}
+              </p>
+              {error.digest && (
+                <p className="text-sm text-red-700 dark:text-red-400">
+                  <strong>Digest:</strong> {error.digest}
+                </p>
+              )}
+              {error.stack && (
+                <pre className="overflow-x-auto rounded-lg bg-slate-900 p-3 text-xs whitespace-pre-wrap text-slate-100">
+                  {error.stack}
+                </pre>
+              )}
+            </div>
+          </details>
+        </div>
+      )}
+    </div>
+  )
+}

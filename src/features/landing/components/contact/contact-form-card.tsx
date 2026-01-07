@@ -16,6 +16,7 @@ import {
 } from '@/src/components/ui/select'
 import { Check, Loader2 } from 'lucide-react'
 import { submitContactForm } from '@/src/features/landing/actions/contact'
+import { useTranslations } from 'next-intl'
 
 type FormData = {
   fullName: string
@@ -32,6 +33,7 @@ type FormData = {
 type FormErrors = Partial<Record<keyof FormData, string>>
 
 export function ContactFormCard() {
+  const t = useTranslations('landing.contact')
   const [formData, setFormData] = useState<FormData>({
     fullName: '',
     email: '',
@@ -51,19 +53,19 @@ export function ContactFormCard() {
   const validateField = (name: keyof FormData, value: string): string | null => {
     switch (name) {
       case 'fullName':
-        if (!value.trim()) return 'Vui lòng nhập họ và tên'
-        if (value.trim().length < 2) return 'Họ tên phải có ít nhất 2 ký tự'
+        if (!value.trim()) return t('enterFullName')
+        if (value.trim().length < 2) return t('fullNameMinLength')
         return null
       case 'email':
-        if (!value.trim()) return 'Vui lòng nhập email'
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return 'Email không hợp lệ'
+        if (!value.trim()) return t('enterEmail')
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return t('invalidEmailFormat')
         return null
       case 'phone':
-        if (!value.trim()) return 'Vui lòng nhập số điện thoại'
-        if (!/^[0-9]{10,11}$/.test(value.replace(/\s/g, ''))) return 'Số điện thoại không hợp lệ'
+        if (!value.trim()) return t('enterPhone')
+        if (!/^[0-9]{10,11}$/.test(value.replace(/\s/g, ''))) return t('invalidPhoneFormat')
         return null
       case 'restaurantName':
-        if (!value.trim()) return 'Vui lòng nhập tên nhà hàng'
+        if (!value.trim()) return t('enterRestaurantName')
         return null
       default:
         return null
@@ -127,11 +129,11 @@ export function ContactFormCard() {
       if (result.success) {
         setIsSuccess(true)
       } else {
-        alert('Có lỗi xảy ra. Vui lòng thử lại sau.')
+        alert(t('errorOccurred'))
       }
     } catch (error) {
       console.error('[v0] Form submission error:', error)
-      alert('Có lỗi xảy ra. Vui lòng thử lại sau.')
+      alert(t('errorOccurred'))
     } finally {
       setIsSubmitting(false)
     }
@@ -145,14 +147,13 @@ export function ContactFormCard() {
             <Check className="h-8 w-8 text-emerald-500" />
           </div>
           <h3 className="mb-3 text-2xl font-bold text-black dark:text-white">
-            Cảm ơn bạn đã liên hệ!
+            {t('successTitle')}
           </h3>
           <p className="mb-6 text-slate-600 dark:text-slate-300">
-            Đội ngũ Qrenso sẽ liên hệ với bạn trong vòng{' '}
-            <strong className="text-black dark:text-white">24 giờ làm việc</strong>.
+            {t('successMessage')}
           </p>
           <Button className="bg-emerald-600 text-white hover:bg-emerald-700" asChild>
-            <a href="/">Quay về trang chủ</a>
+            <a href="/">{t('backToHome')}</a>
           </Button>
         </div>
       </div>
@@ -161,7 +162,7 @@ export function ContactFormCard() {
 
   return (
     <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-6 md:p-8 dark:border-slate-800 dark:bg-slate-900/70">
-      <h2 className="mb-6 text-2xl font-bold text-black dark:text-white">Gửi yêu cầu</h2>
+      <h2 className="mb-6 text-2xl font-bold text-black dark:text-white">{t('sendRequest')}</h2>
 
       <form onSubmit={handleSubmit} className="space-y-5">
         {/* Honeypot field - hidden from users */}
@@ -178,7 +179,7 @@ export function ContactFormCard() {
         {/* Full Name */}
         <div className="space-y-2">
           <Label htmlFor="fullName" className="text-slate-700 dark:text-slate-200">
-            Họ và tên <span className="text-red-500">*</span>
+            {t('fullName')} <span className="text-red-500">{t('required')}</span>
           </Label>
           <Input
             id="fullName"
@@ -196,7 +197,7 @@ export function ContactFormCard() {
         {/* Email */}
         <div className="space-y-2">
           <Label htmlFor="email" className="text-slate-700 dark:text-slate-200">
-            Email công việc <span className="text-red-500">*</span>
+            {t('workEmail')} <span className="text-red-500">{t('required')}</span>
           </Label>
           <Input
             id="email"
@@ -215,7 +216,7 @@ export function ContactFormCard() {
         {/* Phone */}
         <div className="space-y-2">
           <Label htmlFor="phone" className="text-slate-700 dark:text-slate-200">
-            Số điện thoại <span className="text-red-500">*</span>
+            {t('phone')} <span className="text-red-500">{t('required')}</span>
           </Label>
           <Input
             id="phone"
@@ -234,7 +235,7 @@ export function ContactFormCard() {
         {/* Restaurant Name */}
         <div className="space-y-2">
           <Label htmlFor="restaurantName" className="text-slate-700 dark:text-slate-200">
-            Tên nhà hàng <span className="text-red-500">*</span>
+            {t('restaurantName')} <span className="text-red-500">{t('required')}</span>
           </Label>
           <Input
             id="restaurantName"
@@ -252,8 +253,8 @@ export function ContactFormCard() {
         {/* City */}
         <div className="space-y-2">
           <Label htmlFor="city" className="text-slate-700 dark:text-slate-200">
-            Khu vực / Thành phố{' '}
-            <span className="text-sm text-slate-500 dark:text-slate-400">(Tùy chọn)</span>
+            {t('city')}{' '}
+            <span className="text-sm text-slate-500 dark:text-slate-400">({t('optional')})</span>
           </Label>
           <Input
             id="city"
@@ -267,8 +268,8 @@ export function ContactFormCard() {
         {/* Branches */}
         <div className="space-y-2">
           <Label htmlFor="branches" className="text-slate-700 dark:text-slate-200">
-            Số chi nhánh / Số bàn{' '}
-            <span className="text-sm text-slate-500 dark:text-slate-400">(Tùy chọn)</span>
+            {t('branches')}{' '}
+            <span className="text-sm text-slate-500 dark:text-slate-400">({t('optional')})</span>
           </Label>
           <Input
             id="branches"
@@ -282,17 +283,17 @@ export function ContactFormCard() {
         {/* Needs */}
         <div className="space-y-2">
           <Label htmlFor="needs" className="text-slate-700 dark:text-slate-200">
-            Nhu cầu
+            {t('needs')}
           </Label>
           <Select value={formData.needs} onValueChange={(value) => handleChange('needs', value)}>
             <SelectTrigger className="border-slate-300 bg-white text-black dark:border-slate-700 dark:bg-slate-800/50 dark:text-white">
-              <SelectValue placeholder="Chọn nhu cầu của bạn" />
+              <SelectValue placeholder={t('selectNeeds')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="trial">Dùng thử</SelectItem>
-              <SelectItem value="demo">Đặt lịch demo</SelectItem>
-              <SelectItem value="consultation">Tư vấn triển khai</SelectItem>
-              <SelectItem value="other">Khác</SelectItem>
+              <SelectItem value="trial">{t('trial')}</SelectItem>
+              <SelectItem value="demo">{t('demo')}</SelectItem>
+              <SelectItem value="consultation">{t('consultation')}</SelectItem>
+              <SelectItem value="other">{t('other')}</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -300,11 +301,11 @@ export function ContactFormCard() {
         {/* Notes */}
         <div className="space-y-2">
           <Label htmlFor="notes" className="text-slate-700 dark:text-slate-200">
-            Ghi chú <span className="text-sm text-slate-500 dark:text-slate-400">(Tùy chọn)</span>
+            {t('notes')} <span className="text-sm text-slate-500 dark:text-slate-400">({t('optional')})</span>
           </Label>
           <Textarea
             id="notes"
-            placeholder="Bạn có câu hỏi hoặc yêu cầu đặc biệt nào không?"
+            placeholder={t('notesPlaceholder')}
             value={formData.notes}
             onChange={(e) => handleChange('notes', e.target.value)}
             rows={4}
@@ -322,17 +323,16 @@ export function ContactFormCard() {
             {isSubmitting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Đang gửi...
+                {t('submitting')}
               </>
             ) : (
-              'Gửi yêu cầu'
+              t('submit')
             )}
           </Button>
 
           {/* Privacy Note */}
           <p className="text-center text-xs text-slate-500 dark:text-slate-400">
-            Chúng tôi chỉ sử dụng thông tin của bạn để liên hệ tư vấn và không chia sẻ cho bên thứ
-            ba.
+            {t('privacyNote')}
           </p>
         </div>
       </form>

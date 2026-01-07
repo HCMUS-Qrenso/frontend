@@ -17,6 +17,7 @@ import {
 } from '@dnd-kit/core'
 import { useQueryClient } from '@tanstack/react-query'
 import { tablesQueryKeys } from '@/src/features/admin/tables/queries/tables.queries'
+import { useTranslations } from 'next-intl'
 
 interface FloorPlanCanvasProps {
   tables: TableItem[]
@@ -92,6 +93,7 @@ function FloorPlanCanvasComponent({
   const [canvasSize, setCanvasSize] = useState({ width: 800, height: 600 })
   const [isHovering, setIsHovering] = useState(false)
   const queryClient = useQueryClient()
+  const t = useTranslations('tables')
 
   // Update canvas size when container resizes
   useEffect(() => {
@@ -291,7 +293,7 @@ function FloorPlanCanvasComponent({
         <div className="flex items-center justify-center py-12">
           <div className="text-center">
             <Loader2 className="mx-auto mb-2 h-8 w-8 animate-spin text-emerald-600" />
-            <p className="text-sm text-slate-500 dark:text-slate-400">Đang tải sơ đồ...</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400">{t('loadingLayout')}</p>
           </div>
         </div>
       ) : (
@@ -301,7 +303,7 @@ function FloorPlanCanvasComponent({
             <div className="text-center md:text-left">
               <h3 className="font-semibold text-slate-900 dark:text-white">{selectedArea}</h3>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Canvas không giới hạn - Kéo thả để di chuyển
+                {t('unlimitedCanvas')}
               </p>
             </div>
 
@@ -309,19 +311,19 @@ function FloorPlanCanvasComponent({
             <div className="flex items-center gap-4 text-xs">
               <div className="flex items-center gap-1.5">
                 <div className="h-3 w-3 rounded border-2 border-emerald-500" />
-                <span className="text-slate-600 dark:text-slate-400">Có sẵn</span>
+                <span className="text-slate-600 dark:text-slate-400">{t('legendAvailable')}</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <div className="h-3 w-3 rounded border-2 border-amber-500" />
-                <span className="text-slate-600 dark:text-slate-400">Đang sử dụng</span>
+                <span className="text-slate-600 dark:text-slate-400">{t('legendOccupied')}</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <div className="h-3 w-3 rounded border-2 border-violet-500" />
-                <span className="text-slate-600 dark:text-slate-400">Chờ thanh toán</span>
+                <span className="text-slate-600 dark:text-slate-400">{t('legendWaitingBill')}</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <div className="h-3 w-3 rounded border-2 border-slate-400" />
-                <span className="text-slate-600 dark:text-slate-400">Vô hiệu</span>
+                <span className="text-slate-600 dark:text-slate-400">{t('legendDisabled')}</span>
               </div>
             </div>
           </div>
@@ -377,6 +379,7 @@ function FloorPlanCanvasComponent({
                       onRotateUpdate={handleRotateUpdate}
                       onRemove={onTableRemove}
                       zoom={zoom}
+                      t={t}
                     />
                   ))}
                 </div>
@@ -385,7 +388,7 @@ function FloorPlanCanvasComponent({
                 <button
                   onClick={handleResetChanges}
                   className="absolute right-4 bottom-4 z-30 flex h-8 w-8 items-center justify-center rounded-full border border-slate-300 bg-white text-slate-600 shadow-lg hover:border-slate-400 hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-slate-500 dark:hover:bg-slate-700"
-                  title="Đặt lại thay đổi chưa lưu"
+                  title={t('resetUnsaved')}
                 >
                   <RotateCcw className="h-4 w-4" />
                 </button>
@@ -405,6 +408,7 @@ const DraggableTable = memo(function DraggableTable({
   onRotateUpdate,
   onRemove,
   zoom,
+  t,
 }: {
   table: TableItem
   isSelected: boolean
@@ -412,6 +416,7 @@ const DraggableTable = memo(function DraggableTable({
   onRotateUpdate: (tableId: string, newRotation: number, applySnap: boolean) => void
   onRemove: (id: string) => void
   zoom: number
+  t: (key: string) => string
 }) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: table.id,
@@ -586,7 +591,7 @@ const DraggableTable = memo(function DraggableTable({
         className="pointer-events-none flex h-full flex-col items-center justify-center p-2 text-center select-none"
       >
         <p className="text-xs font-semibold text-slate-900 dark:text-white">{table.name}</p>
-        <p className="text-[10px] text-slate-600 dark:text-slate-400">{table.seats} chỗ ngồi</p>
+        <p className="text-[10px] text-slate-600 dark:text-slate-400">{table.seats} {t('seats')}</p>
       </div>
 
       {/* Remove handle */}
@@ -615,7 +620,7 @@ const DraggableTable = memo(function DraggableTable({
             transform: `rotate(-${rotation}deg)`,
             transition: isRotating ? 'none' : 'transform 0.1s',
           }}
-          title="Kéo để xoay tự do"
+          title={t('dragToRotate')}
         >
           <RotateCw className="h-3 w-3" />
         </button>

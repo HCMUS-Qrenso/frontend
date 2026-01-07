@@ -1,17 +1,11 @@
 import type React from 'react'
 import type { Metadata, Viewport } from 'next'
-import { Inter } from 'next/font/google'
-import { Analytics } from '@vercel/analytics/next'
-import { QueryProvider } from '@/src/providers/query-provider'
-import { ThemeProvider } from '@/src/components/theme-provider'
-import { Toaster } from '@/src/components/ui/sonner'
-import './globals.css'
-
-const _inter = Inter({ subsets: ['latin', 'vietnamese'] })
+import './[locale]/globals.css'
 
 export const metadata: Metadata = {
   title: 'Qrenso - Admin Dashboard',
-  description: 'Hệ thống quản lý nhà hàng thông minh với QR Menu & Dine-in Ordering',
+  description:
+    'Hệ thống quản lý nhà hàng thông minh với QR Menu & Dine-in Ordering',
   generator: 'v0.app',
   icons: {
     icon: [
@@ -39,26 +33,16 @@ export const viewport: Viewport = {
   ],
 }
 
+/**
+ * Root layout for App Router.
+ * This layout does NOT include html/body tags because:
+ * 1. The [locale] layout handles html/body with dynamic lang attribute
+ * 2. Global not-found.tsx wraps itself with html/body for 404 pages outside locale context
+ */
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  return (
-    <html lang="vi" suppressHydrationWarning>
-      <body className={`font-sans antialiased ${_inter.className}`}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          storageKey="theme"
-          disableTransitionOnChange
-        >
-          <QueryProvider>{children}</QueryProvider>
-          <Toaster />
-          <Analytics />
-        </ThemeProvider>
-      </body>
-    </html>
-  )
+  return children
 }

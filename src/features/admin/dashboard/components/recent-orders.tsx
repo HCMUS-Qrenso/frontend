@@ -3,53 +3,51 @@
 import { cn } from '@/src/lib/utils'
 import { Eye } from 'lucide-react'
 import { Button } from '@/src/components/ui/button'
+import { useRecentOrdersQuery } from '../queries'
+import { Skeleton } from '@/src/components/ui/skeleton'
+import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 
-interface Order {
-  id: string
-  table: string
-  time: string
-  total: number
-  status: 'pending' | 'preparing' | 'ready' | 'served' | 'completed'
-}
+export function RecentOrders({ className }: { className?: string }) {
+  const { data: orders, isLoading } = useRecentOrdersQuery(7)
+  const t = useTranslations('dashboard')
 
-const orders: Order[] = [
-  { id: '#INV-2025-00128', table: 'Bàn 5', time: '12:45', total: 425000, status: 'preparing' },
-  { id: '#INV-2025-00127', table: 'Bàn 12', time: '12:32', total: 680000, status: 'pending' },
-  { id: '#INV-2025-00126', table: 'Bàn 3', time: '12:28', total: 312000, status: 'ready' },
-  { id: '#INV-2025-00125', table: 'Bàn 8', time: '12:15', total: 520000, status: 'served' },
-  { id: '#INV-2025-00124', table: 'Bàn 1', time: '12:02', total: 245000, status: 'completed' },
-  { id: '#INV-2025-00123', table: 'Bàn 7', time: '11:48', total: 890000, status: 'completed' },
-  { id: '#INV-2025-00122', table: 'Bàn 2', time: '11:35', total: 178000, status: 'completed' },
-]
+  const statusConfig: Record<string, { label: string; className: string }> = {
+    pending: {
+      label: t('pending'),
+      className: 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400',
+    },
+    accepted: {
+      label: t('accepted'),
+      className: 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400',
+    },
+    in_progress: {
+      label: t('inProgress'),
+      className: 'bg-sky-100 text-sky-700 dark:bg-sky-500/20 dark:text-sky-400',
+    },
+    preparing: {
+      label: t('preparing'),
+      className: 'bg-sky-100 text-sky-700 dark:bg-sky-500/20 dark:text-sky-400',
+    },
+    ready: {
+      label: t('ready'),
+      className: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400',
+    },
+    served: {
+      label: t('served'),
+      className: 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300',
+    },
+    completed: {
+      label: t('completed'),
+      className: 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400',
+    },
+  }
 
-const statusConfig = {
-  pending: {
-    label: 'Pending',
-    className: 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400',
-  },
-  preparing: {
-    label: 'Preparing',
-    className: 'bg-sky-100 text-sky-700 dark:bg-sky-500/20 dark:text-sky-400',
-  },
-  ready: {
-    label: 'Ready',
-    className: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400',
-  },
-  served: {
-    label: 'Served',
-    className: 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300',
-  },
-  completed: {
-    label: 'Completed',
-    className: 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400',
-  },
-}
+  function formatTime(dateString: string): string {
+    const date = new Date(dateString)
+    return date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
+  }
 
-interface RecentOrdersProps {
-  className?: string
-}
-
-export function RecentOrders({ className }: RecentOrdersProps) {
   return (
     <div
       className={cn(
@@ -60,12 +58,14 @@ export function RecentOrders({ className }: RecentOrdersProps) {
       {/* Header */}
       <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4 dark:border-slate-800">
         <div>
-          <h3 className="font-semibold text-slate-900 dark:text-white">Đơn hàng gần đây</h3>
-          <p className="text-sm text-slate-500 dark:text-slate-400">Theo dõi đơn hàng mới nhất</p>
+          <h3 className="font-semibold text-slate-900 dark:text-white">{t('recentOrdersTitle')}</h3>
+          <p className="text-sm text-slate-500 dark:text-slate-400">{t('trackLatestOrders')}</p>
         </div>
-        <Button variant="ghost" size="sm" className="text-emerald-600 hover:text-emerald-700">
-          Xem tất cả
-        </Button>
+        <Link href="/admin/orders">
+          <Button variant="ghost" size="sm" className="text-emerald-600 hover:text-emerald-700">
+            {t('viewAll')}
+          </Button>
+        </Link>
       </div>
 
       {/* Table */}
@@ -74,61 +74,86 @@ export function RecentOrders({ className }: RecentOrdersProps) {
           <thead>
             <tr className="border-b border-slate-100 dark:border-slate-800">
               <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-slate-500 uppercase dark:text-slate-400">
-                Order ID
+                {t('orderId')}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-slate-500 uppercase dark:text-slate-400">
-                Bàn
+                {t('table')}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-slate-500 uppercase dark:text-slate-400">
-                Thời gian
+                {t('time')}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-slate-500 uppercase dark:text-slate-400">
-                Tổng tiền
+                {t('total')}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-slate-500 uppercase dark:text-slate-400">
-                Trạng thái
+                {t('status')}
               </th>
               <th className="px-6 py-3 text-right text-xs font-medium tracking-wider text-slate-500 uppercase dark:text-slate-400"></th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-            {orders.map((order) => (
-              <tr
-                key={order.id}
-                className="transition-colors hover:bg-slate-50 dark:hover:bg-slate-800"
-              >
-                <td className="px-6 py-4 text-sm font-medium whitespace-nowrap text-slate-900 dark:text-white">
-                  {order.id}
-                </td>
-                <td className="px-6 py-4 text-sm whitespace-nowrap text-slate-600 dark:text-slate-300">
-                  {order.table}
-                </td>
-                <td className="px-6 py-4 text-sm whitespace-nowrap text-slate-600 dark:text-slate-300">
-                  {order.time}
-                </td>
-                <td className="px-6 py-4 text-sm font-medium whitespace-nowrap text-slate-900 dark:text-white">
-                  {new Intl.NumberFormat('vi-VN', {
-                    style: 'currency',
-                    currency: 'VND',
-                  }).format(order.total)}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span
-                    className={cn(
-                      'inline-flex rounded-full px-2.5 py-1 text-xs font-medium',
-                      statusConfig[order.status].className,
-                    )}
-                  >
-                    {statusConfig[order.status].label}
-                  </span>
-                </td>
-                <td className="px-6 py-4 text-right whitespace-nowrap">
-                  <Button variant="ghost" size="icon" className="h-8 w-8">
-                    <Eye className="h-4 w-4 text-slate-500" />
-                  </Button>
+            {isLoading ? (
+              // Loading skeleton
+              Array.from({ length: 5 }).map((_, i) => (
+                <tr key={i}>
+                  <td className="px-6 py-4"><Skeleton className="h-4 w-32" /></td>
+                  <td className="px-6 py-4"><Skeleton className="h-4 w-16" /></td>
+                  <td className="px-6 py-4"><Skeleton className="h-4 w-12" /></td>
+                  <td className="px-6 py-4"><Skeleton className="h-4 w-20" /></td>
+                  <td className="px-6 py-4"><Skeleton className="h-6 w-20 rounded-full" /></td>
+                  <td className="px-6 py-4"><Skeleton className="h-8 w-8 rounded" /></td>
+                </tr>
+              ))
+            ) : orders?.length === 0 ? (
+              <tr>
+                <td colSpan={6} className="px-6 py-8 text-center text-slate-500">
+                  {t('noOrdersToday')}
                 </td>
               </tr>
-            ))}
+            ) : (
+              orders?.map((order) => {
+                const status = statusConfig[order.status] || { label: order.status, className: 'bg-slate-100 text-slate-600' }
+                return (
+                  <tr
+                    key={order.id}
+                    className="transition-colors hover:bg-slate-50 dark:hover:bg-slate-800"
+                  >
+                    <td className="px-6 py-4 text-sm font-medium whitespace-nowrap text-slate-900 dark:text-white">
+                      {order.order_number}
+                    </td>
+                    <td className="px-6 py-4 text-sm whitespace-nowrap text-slate-600 dark:text-slate-300">
+                      {t('table')} {order.table_number}
+                    </td>
+                    <td className="px-6 py-4 text-sm whitespace-nowrap text-slate-600 dark:text-slate-300">
+                      {formatTime(order.created_at)}
+                    </td>
+                    <td className="px-6 py-4 text-sm font-medium whitespace-nowrap text-slate-900 dark:text-white">
+                      {new Intl.NumberFormat('vi-VN', {
+                        style: 'currency',
+                        currency: 'VND',
+                      }).format(order.total_amount)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span
+                        className={cn(
+                          'inline-flex rounded-full px-2.5 py-1 text-xs font-medium',
+                          status.className,
+                        )}
+                      >
+                        {status.label}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-right whitespace-nowrap">
+                      <Link href={`/admin/orders/${order.id}`}>
+                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <Eye className="h-4 w-4 text-slate-500" />
+                        </Button>
+                      </Link>
+                    </td>
+                  </tr>
+                )
+              })
+            )}
           </tbody>
         </table>
       </div>

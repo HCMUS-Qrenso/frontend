@@ -8,6 +8,7 @@ import {
   DropdownMenuTrigger,
 } from '@/src/components/ui/dropdown-menu'
 import { ChevronDown, Grid3x3, Minus, Plus, RotateCcw, Save, Loader2 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 interface FloorPlanToolbarProps {
   selectedArea: string
@@ -34,27 +35,29 @@ export function FloorPlanToolbar({
   onReset,
   isLoading = false,
 }: FloorPlanToolbarProps) {
+  const t = useTranslations('tables')
+
   return (
     <div className="flex flex-col items-center justify-between gap-4 rounded-2xl border border-slate-100 bg-white/80 px-6 py-4 shadow-sm md:flex-row dark:border-slate-800 dark:bg-slate-900/80">
       {/* Left: Title & Area selector */}
       <div className="flex flex-col items-center justify-center gap-4 md:flex-row">
         <div className="min-w-25">
           <h2 className="text-center text-xl font-semibold text-slate-900 md:text-left dark:text-white">
-            Sơ đồ bàn
+            {t('floorPlanTitle')}
           </h2>
-          <p className="text-sm text-slate-500 dark:text-slate-400">Sơ đồ mặt bằng & bố trí bàn</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">{t('floorPlanDesc')}</p>
         </div>
 
         {isLoading ? (
           <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 dark:border-slate-700 dark:bg-slate-800">
             <Loader2 className="h-3 w-3 animate-spin text-emerald-600" />
-            <span className="text-sm text-slate-500 dark:text-slate-400">Đang tải...</span>
+            <span className="text-sm text-slate-500 dark:text-slate-400">{t('loading')}</span>
           </div>
         ) : (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="h-8 gap-1 rounded-lg bg-transparent px-3">
-                <span className="text-sm">Khu vực: {selectedArea}</span>
+                <span className="text-sm">{t('zone')}: {selectedArea}</span>
                 <ChevronDown className="h-3 w-3" />
               </Button>
             </DropdownMenuTrigger>
@@ -101,7 +104,7 @@ export function FloorPlanToolbar({
             size="icon"
             className="rounded-full"
             onClick={() => onShowGridChange(!showGrid)}
-            title="Bật/tắt lưới"
+            title={t('toggleGrid')}
           >
             <Grid3x3 className="h-4 w-4" />
           </Button>
@@ -111,11 +114,11 @@ export function FloorPlanToolbar({
         <div className="flex items-center gap-1 rounded-full bg-slate-100 p-1 dark:bg-slate-800">
           <Button variant="ghost" size="sm" className="rounded-full text-red-600" onClick={onReset}>
             <RotateCcw className="h-4 w-4" />
-            Đặt lại
+            {t('resetBtn')}
           </Button>
           <Button size="sm" className="rounded-full" onClick={onSave}>
             <Save className="h-4 w-4" />
-            Lưu
+            {t('saveBtn')}
           </Button>
         </div>
       </div>

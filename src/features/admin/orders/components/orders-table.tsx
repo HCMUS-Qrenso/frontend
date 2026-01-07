@@ -34,6 +34,7 @@ import {
   Loader2,
 } from 'lucide-react'
 import { PaymentDialog } from './payment-dialog'
+import { CancelPaymentDialog } from './cancel-payment-dialog'
 import { printBill } from '../utils/print-bill'
 import { toast } from 'sonner'
 import { cn } from '@/src/lib/utils'
@@ -41,7 +42,7 @@ import { StatusBadge, type StatusConfig } from '@/src/components/ui/status-badge
 import { EmptyState } from '@/src/components/ui/empty-state'
 import { SkeletonTableRows } from '@/src/components/loading'
 import { formatDistanceToNow } from 'date-fns'
-import { vi } from 'date-fns/locale'
+import { vi, enUS } from 'date-fns/locale'
 import { TablePagination } from '@/src/components/ui/table-pagination'
 import {
   useOrdersQuery,
@@ -50,96 +51,89 @@ import {
   useCancelPaymentMutation,
 } from '../queries'
 import type { Order, OrderItem, OrderStatus } from '../types/orders'
-import { CancelPaymentDialog } from './cancel-payment-dialog'
+import { useTranslations } from 'next-intl'
+import { useLocale } from 'next-intl'
 import { useCurrentTenantQuery } from '../../tenants/queries/tenants.queries'
 
-const STATUS_CONFIG: Record<string, StatusConfig> = {
-  pending: {
-    label: 'Chờ xử lý',
-    className:
-      'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20',
-  },
-  accepted: {
-    label: 'Đã nhận',
-    className:
-      'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-500/10 dark:text-purple-400 dark:border-purple-500/20',
-  },
-  in_progress: {
-    label: 'Đang chuẩn bị',
-    className:
-      'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20',
-  },
-  ready: {
-    label: 'Sẵn sàng',
-    className:
-      'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20',
-  },
-  served: {
-    label: 'Đã phục vụ',
-    className:
-      'bg-teal-50 text-teal-700 border-teal-200 dark:bg-teal-500/10 dark:text-teal-400 dark:border-teal-500/20',
-  },
-  completed: {
-    label: 'Hoàn thành',
-    className:
-      'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-500/10 dark:text-slate-400 dark:border-slate-500/20',
-  },
-  rejected: {
-    label: 'Từ chối',
-    className:
-      'bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-500/10 dark:text-orange-400 dark:border-orange-500/20',
-  },
-  cancelled: {
-    label: 'Đã hủy',
-    className:
-      'bg-red-50 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20',
-  },
-  abandoned: {
-    label: 'Bỏ dở',
-    className:
-      'bg-gray-50 text-gray-700 border-gray-200 dark:bg-gray-500/10 dark:text-gray-400 dark:border-gray-500/20',
-  },
-}
-
-const PAYMENT_STATUS_CONFIG: Record<string, StatusConfig> = {
-  unpaid: {
-    label: 'Chưa TT',
-    className:
-      'bg-slate-50 text-slate-700 border-slate-200 dark:bg-slate-500/10 dark:text-slate-400 dark:border-slate-500/20',
-  },
-  initiated: {
-    label: 'Đang TT',
-    className:
-      'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20',
-  },
-  processing: {
-    label: 'Xử lý',
-    className:
-      'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20',
-  },
-  paid: {
-    label: 'Đã TT',
-    className:
-      'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20',
-  },
-  failed: {
-    label: 'Thất bại',
-    className:
-      'bg-red-50 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20',
-  },
-}
-
+// Waiter-only transitions - KDS handles accepted->in_progress->ready
 const NEXT_STATUS_MAP: Record<string, string> = {
-  pending: 'accepted',
-  accepted: 'in_progress',
-  in_progress: 'ready',
-  ready: 'served',
-  served: 'completed',
+  pending: 'accepted',    // Waiter accepts order
+  ready: 'served',        // Waiter serves ready items
+  served: 'completed',    // Waiter completes order
 }
 
 export function OrdersTable() {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const t = useTranslations('orders')
+  const locale = useLocale()
+
+  // Build status config with translations
+  const STATUS_CONFIG: Record<string, StatusConfig> = {
+    pending: {
+      label: t('pending'),
+      className:
+        'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20',
+    },
+    accepted: {
+      label: t('accepted'),
+      className:
+        'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-500/10 dark:text-purple-400 dark:border-purple-500/20',
+    },
+    in_progress: {
+      label: t('preparing'),
+      className:
+        'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20',
+    },
+    ready: {
+      label: t('ready'),
+      className:
+        'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20',
+    },
+    served: {
+      label: t('served'),
+      className:
+        'bg-teal-50 text-teal-700 border-teal-200 dark:bg-teal-500/10 dark:text-teal-400 dark:border-teal-500/20',
+    },
+    completed: {
+      label: t('completed'),
+      className:
+        'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-500/10 dark:text-slate-400 dark:border-slate-500/20',
+    },
+    rejected: {
+      label: t('rejected'),
+      className:
+        'bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-500/10 dark:text-orange-400 dark:border-orange-500/20',
+    },
+    cancelled: {
+      label: t('cancelled'),
+      className:
+        'bg-red-50 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20',
+    },
+    abandoned: {
+      label: t('abandoned'),
+      className:
+        'bg-gray-50 text-gray-700 border-gray-200 dark:bg-gray-500/10 dark:text-gray-400 dark:border-gray-500/20',
+    },
+  }
+
+  const PAYMENT_STATUS_CONFIG: Record<string, StatusConfig> = {
+    unpaid: {
+      label: t('unpaid'),
+      className:
+        'bg-red-50 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20',
+    },
+    paid: {
+      label: t('paid'),
+      className:
+        'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20',
+    },
+    refunded: {
+      label: t('refunded'),
+      className:
+        'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-500/10 dark:text-slate-400 dark:border-slate-500/20',
+    },
+  }
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false)
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false)
@@ -201,9 +195,6 @@ export function OrdersTable() {
   // Update status mutation
   const updateStatusMutation = useUpdateOrderStatusMutation()
 
-  // NOTE: WebSocket connection is managed by OrdersFilterToolbar with auto-refresh toggle
-  // The socket invalidates queries automatically, so this table will update in real-time
-
   const handleBumpStatus = (orderId: string) => {
     const order = orders.find((o: Order) => o.id === orderId)
     if (!order) return
@@ -264,6 +255,8 @@ export function OrdersTable() {
     return getAgingMinutes(createdAt) > 20
   }
 
+  const dateLocale = locale === 'vi' ? vi : enUS
+
   // Loading state - skeleton rows to avoid layout shift
   if (isLoading) {
     return (
@@ -272,19 +265,19 @@ export function OrdersTable() {
           <Table>
             <TableHeader>
               <AdminTableHeaderRow>
-                <AdminTableHead className="px-4">Mã đơn</AdminTableHead>
-                <AdminTableHead className="px-4">Bàn</AdminTableHead>
-                <AdminTableHead className="px-4">Món</AdminTableHead>
-                <AdminTableHead className="px-4">Trạng thái</AdminTableHead>
-                <AdminTableHead className="px-4">Thanh toán</AdminTableHead>
+                <AdminTableHead className="px-4">{t('orderId')}</AdminTableHead>
+                <AdminTableHead className="px-4">{t('tableHeader')}</AdminTableHead>
+                <AdminTableHead className="px-4">{t('itemsCount')}</AdminTableHead>
+                <AdminTableHead className="px-4">{t('status')}</AdminTableHead>
+                <AdminTableHead className="px-4">{t('payment')}</AdminTableHead>
                 <AdminTableHead className="px-4" align="right">
-                  Tổng tiền
+                  {t('totalAmount')}
                 </AdminTableHead>
                 <AdminTableHead className="px-4" align="center">
-                  Thời gian
+                  {t('time')}
                 </AdminTableHead>
                 <AdminTableHead className="px-4" align="right">
-                  Thao tác
+                  {t('actions')}
                 </AdminTableHead>
               </AdminTableHeaderRow>
             </TableHeader>
@@ -316,19 +309,19 @@ export function OrdersTable() {
         <Table>
           <TableHeader>
             <AdminTableHeaderRow>
-              <AdminTableHead className="px-4">Mã đơn</AdminTableHead>
-              <AdminTableHead className="px-4">Bàn</AdminTableHead>
-              <AdminTableHead className="px-4">Món</AdminTableHead>
-              <AdminTableHead className="px-4">Trạng thái</AdminTableHead>
-              <AdminTableHead className="px-4">Thanh toán</AdminTableHead>
+              <AdminTableHead className="px-4">{t('orderId')}</AdminTableHead>
+              <AdminTableHead className="px-4">{t('tableHeader')}</AdminTableHead>
+              <AdminTableHead className="px-4">{t('itemsCount')}</AdminTableHead>
+              <AdminTableHead className="px-4">{t('status')}</AdminTableHead>
+              <AdminTableHead className="px-4">{t('payment')}</AdminTableHead>
               <AdminTableHead className="px-4" align="right">
-                Tổng tiền
+                {t('totalAmount')}
               </AdminTableHead>
               <AdminTableHead className="px-4" align="center">
-                Thời gian
+                {t('time')}
               </AdminTableHead>
               <AdminTableHead className="px-4" align="right">
-                Thao tác
+                {t('actions')}
               </AdminTableHead>
             </AdminTableHeaderRow>
           </TableHeader>
@@ -338,8 +331,8 @@ export function OrdersTable() {
                 <TableCell colSpan={8} className="px-4 py-0">
                   <EmptyState
                     icon={ClipboardList}
-                    title="Chưa có đơn nào"
-                    description="Thử Reset filter hoặc chọn khoảng thời gian khác"
+                    title={t('noOrders')}
+                    description={t('noOrdersHint')}
                   />
                 </TableCell>
               </TableRow>
@@ -363,7 +356,7 @@ export function OrdersTable() {
                         <p className="text-xs text-slate-500 dark:text-slate-400">
                           {formatDistanceToNow(new Date(order.createdAt), {
                             addSuffix: true,
-                            locale: vi,
+                            locale: dateLocale,
                           })}
                         </p>
                       </div>
@@ -371,7 +364,7 @@ export function OrdersTable() {
                     <TableCell className="px-4 py-4">
                       <div>
                         <p className="text-sm font-medium text-slate-900 dark:text-white">
-                          Bàn {order.table?.tableNumber || 'N/A'}
+                          {t('tableHeader')} {order.table?.tableNumber || 'N/A'}
                         </p>
                         <p className="text-xs text-slate-500 dark:text-slate-400">
                           {order.table?.zone?.name || ''}
@@ -381,12 +374,12 @@ export function OrdersTable() {
                     <TableCell className="px-4 py-4">
                       <div className="group relative">
                         <p className="text-sm text-slate-700 dark:text-slate-300">
-                          {order.items.length} món
+                          {order.items.length} {t('itemsCount').toLowerCase()}
                         </p>
-                        {/* Tooltip */}
-                        <div className="invisible absolute bottom-full left-0 z-10 mb-2 w-64 rounded-lg border border-slate-200 bg-white p-3 opacity-0 shadow-lg transition-all group-hover:visible group-hover:opacity-100 dark:border-slate-700 dark:bg-slate-800">
+                        {/* Tooltip - position below to avoid overflow clipping */}
+                        <div className="invisible absolute top-full left-0 z-50 mt-2 w-64 rounded-lg border border-slate-200 bg-white p-3 opacity-0 shadow-lg transition-all group-hover:visible group-hover:opacity-100 dark:border-slate-700 dark:bg-slate-800">
                           <p className="mb-2 text-xs font-semibold text-slate-900 dark:text-white">
-                            Chi tiết món:
+                            {t('itemDetails')}
                           </p>
                           <ul className="space-y-1">
                             {order.items.slice(0, 3).map((item: OrderItem, idx: number) => (
@@ -396,7 +389,7 @@ export function OrdersTable() {
                             ))}
                             {order.items.length > 3 && (
                               <li className="text-xs text-slate-500 dark:text-slate-500">
-                                +{order.items.length - 3} món khác
+                                {t('moreItems', { count: order.items.length - 3 })}
                               </li>
                             )}
                           </ul>
@@ -529,7 +522,7 @@ export function OrdersTable() {
                               handleBumpStatus(order.id)
                             }}
                           >
-                            Tiếp
+                            {t('next')}
                             <ChevronRight className="h-3 w-3" />
                           </Button>
                         )}
@@ -561,16 +554,18 @@ export function OrdersTable() {
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem onClick={() => handleViewOrder(order.id)}>
                               <Eye className="mr-2 h-4 w-4" />
-                              Xem chi tiết
+                              {t('viewDetails')}
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               disabled={order.paymentStatus !== 'paid'}
                               onClick={() => handlePrintBill(order)}
                             >
                               <Printer className="mr-2 h-4 w-4" />
-                              In bill
+                              {t('printBill')}
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
+                            <DropdownMenuItem>{t('changeStatus')}</DropdownMenuItem>
+                            <DropdownMenuItem>{t('exportPdf')}</DropdownMenuItem>
                             <DropdownMenuItem
                               disabled={
                                 order.status !== 'completed' || order.paymentStatus === 'paid'
@@ -599,7 +594,7 @@ export function OrdersTable() {
           totalPages={meta.totalPages || 1}
           total={meta.total || 0}
           limit={meta.limit || 10}
-          itemLabel="đơn"
+          itemLabel={t('itemLabel')}
           onPageChange={() => {}}
         />
       )}

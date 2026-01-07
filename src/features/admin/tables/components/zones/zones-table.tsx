@@ -30,6 +30,7 @@ import {
   AdminTableRow,
 } from '@/src/components/ui/table'
 import { SkeletonTableRows } from '@/src/components/loading'
+import { useTranslations } from 'next-intl'
 
 interface ZonesTableProps {
   onEdit: (zone: Zone) => void
@@ -39,6 +40,7 @@ interface ZonesTableProps {
 export function ZonesTable({ onEdit, onDelete }: ZonesTableProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const t = useTranslations('tables')
 
   // Get filter params from URL
   const page = Number.parseInt(searchParams.get('page') || '1')
@@ -77,9 +79,9 @@ export function ZonesTable({ onEdit, onDelete }: ZonesTableProps) {
         payload: { is_active: !currentStatus },
       })
 
-      toast.success(`Khu vực đã được ${!currentStatus ? 'kích hoạt' : 'tạm ẩn'}`)
+      toast.success(!currentStatus ? t('zoneActivated') : t('zoneDeactivated'))
     } catch (error) {
-      handleErrorWithStatus(error, undefined, 'Không thể cập nhật trạng thái khu vực')
+      handleErrorWithStatus(error, undefined, t('cannotUpdateZoneStatus'))
     }
   }
 
@@ -89,16 +91,16 @@ export function ZonesTable({ onEdit, onDelete }: ZonesTableProps) {
         <Table className="w-full min-w-250 table-fixed">
           <TableHeader>
             <AdminTableHeaderRow>
-              <AdminTableHead>Tên khu vực</AdminTableHead>
-              <AdminTableHead className="w-50">Mô tả</AdminTableHead>
+              <AdminTableHead>{t('zoneName')}</AdminTableHead>
+              <AdminTableHead className="w-50">{t('description')}</AdminTableHead>
               <AdminTableHead className="w-30" align="center">
-                Thứ tự
+                {t('displayOrder')}
               </AdminTableHead>
               <AdminTableHead className="w-30" align="center">
-                Trạng thái
+                {t('status')}
               </AdminTableHead>
               <AdminTableHead className="w-37.5" align="right">
-                Thao tác
+                {t('actions')}
               </AdminTableHead>
             </AdminTableHeaderRow>
           </TableHeader>
@@ -123,7 +125,7 @@ export function ZonesTable({ onEdit, onDelete }: ZonesTableProps) {
     return (
       <div className="rounded-2xl border border-red-200 bg-red-50 p-6 dark:border-red-800 dark:bg-red-500/10">
         <p className="text-sm text-red-600 dark:text-red-400">
-          Có lỗi xảy ra khi tải danh sách khu vực. Vui lòng thử lại.
+          {t('zonesLoadError')}
         </p>
       </div>
     )
@@ -142,16 +144,16 @@ export function ZonesTable({ onEdit, onDelete }: ZonesTableProps) {
           </colgroup>
           <TableHeader>
             <AdminTableHeaderRow>
-              <AdminTableHead>Tên khu vực</AdminTableHead>
-              <AdminTableHead className="w-50">Mô tả</AdminTableHead>
+              <AdminTableHead>{t('zoneName')}</AdminTableHead>
+              <AdminTableHead className="w-50">{t('description')}</AdminTableHead>
               <AdminTableHead className="w-30" align="center">
-                Thứ tự
+                {t('displayOrder')}
               </AdminTableHead>
               <AdminTableHead className="w-30" align="center">
-                Trạng thái
+                {t('status')}
               </AdminTableHead>
               <AdminTableHead className="w-37.5" align="right">
-                Thao tác
+                {t('actions')}
               </AdminTableHead>
             </AdminTableHeaderRow>
           </TableHeader>
@@ -159,7 +161,7 @@ export function ZonesTable({ onEdit, onDelete }: ZonesTableProps) {
             {zones.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={5} className="px-6 py-0">
-                  <EmptyState title="Chưa có khu vực nào" description="Hãy tạo khu vực đầu tiên" />
+                  <EmptyState title={t('noZones')} description={t('noZonesHint')} />
                 </TableCell>
               </TableRow>
             ) : (
@@ -178,7 +180,7 @@ export function ZonesTable({ onEdit, onDelete }: ZonesTableProps) {
                   </TableCell>
                   <TableCell className="px-6 py-4">
                     <span className="max-w-xs text-sm wrap-break-word whitespace-normal text-slate-600 sm:max-w-md dark:text-slate-400">
-                      {zone.description || 'Không có mô tả'}
+                      {zone.description || t('noDescription')}
                     </span>
                   </TableCell>
                   <TableCell className="px-6 py-4 text-center text-slate-600 dark:text-slate-400">
@@ -205,7 +207,7 @@ export function ZonesTable({ onEdit, onDelete }: ZonesTableProps) {
                       <DropdownMenuContent align="end" className="w-48">
                         <DropdownMenuItem onClick={() => onEdit(zone)}>
                           <Edit2 className="mr-2 h-4 w-4" />
-                          Chỉnh sửa
+                          {t('edit')}
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() => handleToggleActive(zone.id, zone.is_active)}
@@ -213,12 +215,12 @@ export function ZonesTable({ onEdit, onDelete }: ZonesTableProps) {
                           {zone.is_active ? (
                             <>
                               <EyeOff className="mr-2 h-4 w-4" />
-                              Ẩn khu vực
+                              {t('hideZone')}
                             </>
                           ) : (
                             <>
                               <Eye className="mr-2 h-4 w-4" />
-                              Hiện khu vực
+                              {t('showZone')}
                             </>
                           )}
                         </DropdownMenuItem>
@@ -227,7 +229,7 @@ export function ZonesTable({ onEdit, onDelete }: ZonesTableProps) {
                           className="text-red-600 focus:text-red-600 dark:text-red-400"
                         >
                           <Trash2 className="mr-2 h-4 w-4" />
-                          Xóa khu vực
+                          {t('deleteZone')}
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -246,7 +248,7 @@ export function ZonesTable({ onEdit, onDelete }: ZonesTableProps) {
           totalPages={pagination.total_pages}
           total={pagination.total}
           limit={pagination.limit}
-          itemLabel="khu vực"
+          itemLabel={t('zoneLabel')}
           onPageChange={handlePageChange}
         />
       )}

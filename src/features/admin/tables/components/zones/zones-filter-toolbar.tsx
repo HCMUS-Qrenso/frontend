@@ -6,24 +6,7 @@ import { SearchInput } from '@/src/components/ui/search-input'
 import { FilterDropdown, type FilterOption } from '@/src/components/ui/filter-dropdown'
 import { Plus, ArrowUpDown } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
-
-const STATUS_OPTIONS: FilterOption[] = [
-  { value: 'all', label: 'Tất cả' },
-  { value: 'true', label: 'Hoạt động' },
-  { value: 'false', label: 'Tạm ẩn' },
-]
-
-const SORT_BY_OPTIONS: FilterOption[] = [
-  { value: 'displayOrder', label: 'Thứ tự' },
-  { value: 'name', label: 'Tên khu vực' },
-  { value: 'createdAt', label: 'Ngày tạo' },
-  { value: 'updatedAt', label: 'Ngày cập nhật' },
-]
-
-const SORT_ORDER_OPTIONS: FilterOption[] = [
-  { value: 'asc', label: 'Tăng dần' },
-  { value: 'desc', label: 'Giảm dần' },
-]
+import { useTranslations } from 'next-intl'
 
 interface ZonesFilterToolbarProps {
   onCreateZone: () => void
@@ -32,6 +15,25 @@ interface ZonesFilterToolbarProps {
 export function ZonesFilterToolbar({ onCreateZone }: ZonesFilterToolbarProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const t = useTranslations('tables')
+
+  const STATUS_OPTIONS: FilterOption[] = [
+    { value: 'all', label: t('all') },
+    { value: 'true', label: t('active') },
+    { value: 'false', label: t('inactive') },
+  ]
+
+  const SORT_BY_OPTIONS: FilterOption[] = [
+    { value: 'displayOrder', label: t('displayOrderSort') },
+    { value: 'name', label: t('zoneNameSort') },
+    { value: 'createdAt', label: t('createdAtSort') },
+    { value: 'updatedAt', label: t('updatedAtSort') },
+  ]
+
+  const SORT_ORDER_OPTIONS: FilterOption[] = [
+    { value: 'asc', label: t('ascending') },
+    { value: 'desc', label: t('descending') },
+  ]
 
   // Get filter values from URL params
   const searchQuery = searchParams.get('search') || ''
@@ -68,13 +70,13 @@ export function ZonesFilterToolbar({ onCreateZone }: ZonesFilterToolbarProps) {
       {/* Left - Filters */}
       <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
         <SearchInput
-          placeholder="Tìm theo tên khu vực..."
+          placeholder={t('searchZones')}
           value={localSearchQuery}
           onChange={setLocalSearchQuery}
         />
 
         <FilterDropdown
-          label="Trạng thái:"
+          label={`${t('status')}:`}
           value={selectedStatus}
           options={STATUS_OPTIONS}
           onChange={(value) => updateFilter('is_active', value)}
@@ -82,7 +84,7 @@ export function ZonesFilterToolbar({ onCreateZone }: ZonesFilterToolbarProps) {
         />
 
         <FilterDropdown
-          label="Sắp xếp:"
+          label=""
           value={sortBy}
           options={SORT_BY_OPTIONS}
           onChange={(value) => updateFilter('sort_by', value)}
@@ -105,7 +107,7 @@ export function ZonesFilterToolbar({ onCreateZone }: ZonesFilterToolbarProps) {
           className="h-8 gap-1 rounded-lg bg-emerald-600 px-3 hover:bg-emerald-700"
         >
           <Plus className="h-3 w-3" />
-          <span className="hidden text-sm md:inline">Thêm khu vực</span>
+          <span className="hidden text-sm md:inline">{t('addZone')}</span>
         </Button>
       </div>
     </div>
