@@ -38,7 +38,7 @@ export default function ForgotPasswordPage() {
     }
 
     try {
-      await forgotPassword({ email })
+      await forgotPassword({ email, accountType: 'staff' })
       setIsSubmitted(true)
     } catch (err) {
       setGeneralError(extractErrorMessage(err))

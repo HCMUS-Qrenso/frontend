@@ -85,7 +85,7 @@ export default function LoginPage() {
       }
 
       // Truyền rememberMe vào login call
-      await login({ ...formData, rememberMe })
+      await login({ ...formData, rememberMe, accountType: 'staff' })
       router.push('/admin/dashboard')
     } catch (err) {
       setError(extractErrorMessage(err))
