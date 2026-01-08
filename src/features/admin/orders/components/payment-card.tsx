@@ -17,6 +17,8 @@ import { Label } from '@/src/components/ui/label'
 import { cn } from '@/src/lib/utils'
 import { Copy, CreditCard, Check, CheckCircle, Printer, X, RefreshCw } from 'lucide-react'
 import { useState } from 'react'
+import type { PaymentRecord } from '../types/orders'
+import { useFormat } from '@/src/hooks/use-format'
 import { format } from 'date-fns'
 import { vi } from 'date-fns/locale'
 import {
@@ -25,7 +27,6 @@ import {
   useCheckPaymentStatusMutation,
 } from '../queries'
 import { toast } from 'sonner'
-import type { PaymentRecord } from '../types/orders'
 import { printBill } from '../utils/print-bill'
 
 const PAYMENT_STATUS_CONFIG: Record<string, { label: string; color: string }> = {
@@ -77,6 +78,7 @@ export function PaymentCard({
   tenantAddress,
 }: PaymentCardProps) {
   const [copied, setCopied] = useState(false)
+  const { formatPrice, formatDateTime } = useFormat()
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false)
   const [cancelReason, setCancelReason] = useState('')
   const completePaymentMutation = useCompletePaymentMutation()
@@ -202,7 +204,7 @@ export function PaymentCard({
         <div className="flex items-center justify-between">
           <p className="text-sm text-slate-500 dark:text-slate-400">Tổng tiền</p>
           <p className="text-xl font-bold text-slate-900 dark:text-white">
-            {totalAmount.toLocaleString('vi-VN')} VND
+            {formatPrice(totalAmount)}
           </p>
         </div>
 
@@ -230,7 +232,7 @@ export function PaymentCard({
           <div className="space-y-1">
             <p className="text-sm text-slate-500 dark:text-slate-400">Thời gian thanh toán</p>
             <p className="text-sm text-slate-900 dark:text-white">
-              {format(new Date(payment.paidAt), 'HH:mm, dd/MM/yyyy', { locale: vi })}
+              {formatDateTime(payment.paidAt)}
             </p>
           </div>
         )}
@@ -242,10 +244,10 @@ export function PaymentCard({
             <div className="rounded-lg bg-amber-50 p-3 dark:bg-amber-500/10">
               <p className="text-sm font-medium text-amber-900 dark:text-amber-400">Đã hoàn tiền</p>
               <p className="mt-1 text-sm text-amber-700 dark:text-amber-300">
-                Số tiền: {payment.refundAmount.toLocaleString('vi-VN')} VND
+                Số tiền: {formatPrice(payment.refundAmount)}
               </p>
               <p className="text-xs text-amber-600 dark:text-amber-400">
-                {format(new Date(payment.refundedAt), 'HH:mm, dd/MM/yyyy', { locale: vi })}
+                {formatDateTime(payment.refundedAt)}
               </p>
             </div>
           </>

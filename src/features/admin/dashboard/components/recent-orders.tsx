@@ -7,10 +7,12 @@ import { useRecentOrdersQuery } from '../queries'
 import { Skeleton } from '@/src/components/ui/skeleton'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
+import { useFormat } from '@/src/hooks/use-format'
 
 export function RecentOrders({ className }: { className?: string }) {
   const { data: orders, isLoading } = useRecentOrdersQuery(7)
   const t = useTranslations('dashboard')
+  const { formatPrice, formatTime } = useFormat()
 
   const statusConfig: Record<string, { label: string; className: string }> = {
     pending: {
@@ -41,11 +43,6 @@ export function RecentOrders({ className }: { className?: string }) {
       label: t('completed'),
       className: 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400',
     },
-  }
-
-  function formatTime(dateString: string): string {
-    const date = new Date(dateString)
-    return date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
   }
 
   return (
@@ -143,10 +140,7 @@ export function RecentOrders({ className }: { className?: string }) {
                       {formatTime(order.created_at)}
                     </td>
                     <td className="px-6 py-4 text-sm font-medium whitespace-nowrap text-slate-900 dark:text-white">
-                      {new Intl.NumberFormat('vi-VN', {
-                        style: 'currency',
-                        currency: 'VND',
-                      }).format(order.total_amount)}
+                      {formatPrice(order.total_amount)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span

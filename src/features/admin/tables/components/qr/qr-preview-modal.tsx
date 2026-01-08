@@ -39,7 +39,7 @@ export function QRPreviewModal({ table, open, onOpenChange }: QRPreviewModalProp
       const blob = await tablesApi.downloadQR(table.id, format)
       const filename = `table-${table.tableNumber}-qr.${format}`
       downloadBlob(blob, filename)
-      toast.success(t('downloadedFormat').replace('{format}', format.toUpperCase()))
+      toast.success(t('downloadedFormat', { format: format.toUpperCase() }))
     } catch (error: any) {
       handleError(error, t('downloadQrError'))
     } finally {
@@ -112,7 +112,7 @@ export function QRPreviewModal({ table, open, onOpenChange }: QRPreviewModalProp
           </div>
           <div className="rounded-lg bg-emerald-50 p-3 dark:bg-emerald-500/10">
             <p className="text-xs text-emerald-700 dark:text-emerald-400">
-              {t('qrScanNote').replace('{tableNumber}', table?.tableNumber || '')}
+              {t('qrScanNote', { tableNumber: table?.tableNumber || '' })}
             </p>
           </div>
         </div>

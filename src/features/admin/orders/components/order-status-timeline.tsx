@@ -1,10 +1,9 @@
 'use client'
 
 import { cn } from '@/src/lib/utils'
-import { format } from 'date-fns'
-import { vi } from 'date-fns/locale'
 import { Check, Clock, XCircle, AlertCircle } from 'lucide-react'
 import type { StatusHistoryEntry } from '../types/orders'
+import { useFormat } from '@/src/hooks/use-format'
 
 const STATUS_ICON_MAP: Record<string, any> = {
   pending: Clock,
@@ -61,6 +60,8 @@ interface OrderStatusTimelineProps {
 }
 
 export function OrderStatusTimeline({ history }: OrderStatusTimelineProps) {
+  const { formatDateTime } = useFormat()
+
   if (!history || history.length === 0) {
     return (
       <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
@@ -133,7 +134,7 @@ export function OrderStatusTimeline({ history }: OrderStatusTimelineProps) {
                   <div className="mt-1 flex items-center gap-2 text-xs text-slate-500 dark:text-slate-500">
                     <span>{entry.user?.fullName || 'Hệ thống'}</span>
                     <span>•</span>
-                    <span>{format(new Date(entry.createdAt), 'HH:mm, dd/MM', { locale: vi })}</span>
+                    <span>{formatDateTime(entry.createdAt)}</span>
                   </div>
                 </div>
               </div>

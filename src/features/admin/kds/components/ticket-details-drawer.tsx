@@ -13,8 +13,7 @@ import { Badge } from '@/components/ui/badge'
 import { StatusBadge } from './status-badge'
 import { PRIORITY_CONFIG } from '../types/kds.types'
 import { Clock, User, Printer, Play, CheckCircle2, MapPin } from 'lucide-react'
-import { formatDistanceToNow } from 'date-fns'
-import { vi } from 'date-fns/locale'
+import { useFormat } from '@/src/hooks/use-format'
 
 interface TicketDetailsDrawerProps {
   open: boolean
@@ -57,6 +56,8 @@ export function TicketDetailsDrawer({
   order,
   onUpdateItemStatus,
 }: TicketDetailsDrawerProps) {
+  const { formatRelativeDate } = useFormat()
+
   if (!order) return null
 
   // Check if all items are already ready or beyond (served, cancelled, returned)
@@ -105,9 +106,7 @@ export function TicketDetailsDrawer({
                     )}
                     <div className="flex items-center gap-1.5">
                       <Clock className="h-4 w-4" />
-                      <span>
-                        {formatDistanceToNow(order.createdAt, { addSuffix: true, locale: vi })}
-                      </span>
+                      <span>{formatRelativeDate(new Date(order.createdAt).toISOString())}</span>
                     </div>
                   </div>
                 </div>

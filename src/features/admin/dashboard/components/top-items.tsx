@@ -4,6 +4,7 @@ import { cn } from '@/src/lib/utils'
 import { useTopItemsQuery } from '../queries'
 import { Skeleton } from '@/src/components/ui/skeleton'
 import { useTranslations } from 'next-intl'
+import { useFormat } from '@/src/hooks/use-format'
 
 interface TopItemsProps {
   className?: string
@@ -12,6 +13,7 @@ interface TopItemsProps {
 export function TopItems({ className }: TopItemsProps) {
   const { data: items, isLoading } = useTopItemsQuery(6)
   const t = useTranslations('dashboard')
+  const { formatPrice } = useFormat()
 
   const maxSold = items ? Math.max(...items.map((item) => item.quantity_sold), 1) : 1
 
@@ -73,12 +75,9 @@ export function TopItems({ className }: TopItemsProps) {
                     {item.quantity_sold} {t('sold')}
                   </span>
                   <span>
-                    {new Intl.NumberFormat('vi-VN', {
-                      style: 'currency',
-                      currency: 'VND',
-                      notation: 'compact',
-                    }).format(item.revenue)}
+                    {item.quantity_sold} {t('sold')}
                   </span>
+                  <span>{formatPrice(item.revenue)}</span>
                 </div>
 
                 {/* Progress bar */}

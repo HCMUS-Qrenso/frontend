@@ -22,7 +22,7 @@ import {
 } from '@/src/components/ui/dropdown-menu'
 import { Pencil, Trash2, Award, Clock, MoreVertical, UtensilsCrossed } from 'lucide-react'
 import { cn } from '@/src/lib/utils'
-import { formatRelativeDate, formatPrice } from '@/src/lib/helpers/format'
+import { useFormat } from '@/src/hooks/use-format'
 import { StatusBadge, type StatusConfig } from '@/src/components/ui/status-badge'
 import { ContainerLoadingState, ContainerErrorState } from '@/src/components/ui/loading-state'
 import { EmptyState } from '@/src/components/ui/empty-state'
@@ -46,6 +46,7 @@ export function MenuItemsTable({ onEditClick, onDeleteClick }: MenuItemsTablePro
   const router = useRouter()
   const searchParams = useSearchParams()
   const t = useTranslations('menu')
+  const { formatPrice, formatRelativeDate } = useFormat()
 
   const MENU_ITEM_STATUS_CONFIG: Record<string, StatusConfig> = {
     available: {

@@ -3,8 +3,7 @@
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Grid3x3, List, Volume2, VolumeX, Maximize, Loader2 } from 'lucide-react'
-import { formatDistanceToNow } from 'date-fns'
-import { vi } from 'date-fns/locale'
+import { useFormat } from '@/src/hooks/use-format'
 
 interface KdsTopBarProps {
   activeTickets: number
@@ -33,6 +32,8 @@ export function KdsTopBar({
   isLoading,
   socketConnected,
 }: KdsTopBarProps) {
+  const { formatRelativeDate } = useFormat()
+
   return (
     <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
       {/* Left: KPIs + Status */}
@@ -50,7 +51,7 @@ export function KdsTopBar({
               ? 'Đang tải...'
               : socketConnected
                 ? 'Realtime'
-                : `Cập nhật ${formatDistanceToNow(lastUpdated, { addSuffix: true, locale: vi })}`}
+                : `Cập nhật ${formatRelativeDate(lastUpdated.toISOString())}`}
           </p>
         </div>
 

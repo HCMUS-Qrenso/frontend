@@ -57,6 +57,8 @@
     "staffDesc": "管理服务员和厨房员工账号",
     "kdsTitle": "KDS - 全局视图",
     "kdsDesc": "实时订单处理厨房显示",
+    "settingsTitle": "设置",
+    "settingsDesc": "管理餐厅的系统设置",
     "menuCategories": "菜单 / 分类",
     "menuCategoriesDesc": "管理菜品分类",
     "menuItems": "菜单 / 菜品",
@@ -1225,6 +1227,98 @@
       "invalidPhoneFormat": "电话号码格式无效",
       "enterRestaurantName": "请输入餐厅名称",
       "errorOccurred": "发生错误。请稍后重试。"
+    }
+  },
+  "settings": {
+    "title": "设置",
+    "subtitle": "{name} 的设置管理",
+    "saveChanges": "保存更改",
+    "saving": "正在保存...",
+    "saveSuccess": "设置已成功更新",
+    "saveError": "无法更新设置",
+    "loadError": "无法加载设置。请稍后再试。",
+    "general": {
+      "title": "常规设置",
+      "description": "基本信息和显示格式",
+      "currency": "货币",
+      "currencyPlaceholder": "选择货币",
+      "timezone": "时区",
+      "timezonePlaceholder": "选择时区",
+      "language": "语言",
+      "languagePlaceholder": "选择语言",
+      "dateFormat": "日期格式",
+      "dateFormatPlaceholder": "选择日期格式",
+      "phone": "联系电话",
+      "phonePlaceholder": "+86 123 456 7890",
+      "contactEmail": "联系邮箱",
+      "contactEmailPlaceholder": "contact@restaurant.com"
+    },
+    "tax": {
+      "title": "税务设置",
+      "description": "配置增值税和价格显示",
+      "rate": "税率 (%)",
+      "label": "税款标签",
+      "labelPlaceholder": "增值税",
+      "inclusive": "价格已含税",
+      "inclusiveDescription": "启用后，菜单价格已包含税款。禁用时，税款将另行添加。"
+    },
+    "serviceCharge": {
+      "title": "服务费",
+      "description": "配置自动服务费",
+      "enabled": "启用服务费",
+      "enabledDescription": "自动向账单添加服务费",
+      "rate": "费率 (%)",
+      "minParty": "最小就餐人数",
+      "minPartyPlaceholder": "适用于所有桌台",
+      "minPartyHint": "留空表示适用于所有",
+      "taxable": "服务费需纳税",
+      "taxableDescription": "对服务费征税"
+    },
+    "order": {
+      "title": "订单设置",
+      "description": "自定义订餐流程和会话",
+      "minValue": "最低订单金额",
+      "minValuePlaceholder": "无最低限制",
+      "minValueHint": "如不需要请留空",
+      "prepTime": "准备时间（分钟）",
+      "prepTimeHint": "用于没有自定义准备时间的菜品",
+      "sessionTimeout": "会话超时（分钟）",
+      "sessionTimeoutHint": "桌台会话将在此时间后过期",
+      "allowSpecialInstructions": "允许特殊说明",
+      "allowSpecialInstructionsDescription": "顾客可以为每道菜添加备注",
+      "requireGuestCount": "要求填写就餐人数",
+      "requireGuestCountDescription": "开始会话时必须填写就餐人数"
+    },
+    "notifications": {
+      "title": "通知",
+      "description": "配置声音和邮件通知",
+      "soundEnabled": "声音通知",
+      "soundDescription": "新订单到达时播放声音",
+      "emailEnabled": "邮件通知",
+      "emailDescription": "新订单到达时发送邮件",
+      "email": "通知邮箱",
+      "emailPlaceholder": "orders@restaurant.com"
+    },
+    "receipt": {
+      "title": "发票与收据",
+      "description": "自定义发票显示内容",
+      "invoicePrefix": "发票前缀",
+      "invoicePrefixPlaceholder": "QR-",
+      "invoicePrefixHint": "例如：QR-001、INV-001",
+      "header": "收据头部文字",
+      "headerPlaceholder": "感谢您的光临！",
+      "footer": "收据底部文字",
+      "footerPlaceholder": "期待再次为您服务！",
+      "showLogo": "显示标志",
+      "showLogoDescription": "在收据上打印餐厅标志"
+    },
+    "sidebar": {
+      "general": "常规",
+      "tax": "税务",
+      "serviceCharge": "服务费",
+      "order": "订单",
+      "notifications": "通知",
+      "receipt": "发票"
     }
   }
 }

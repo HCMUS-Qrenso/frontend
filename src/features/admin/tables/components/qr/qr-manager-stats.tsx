@@ -5,6 +5,7 @@ import type { TableQR } from '@/src/features/admin/tables/types/tables'
 import { StatCard } from '../../../../../components/ui/stat-card'
 import { SkeletonStatCard } from '@/src/components/loading'
 import { useTranslations } from 'next-intl'
+import { useFormat } from '@/src/hooks/use-format'
 
 interface QRManagerStatsProps {
   total_active_tables?: number
@@ -22,19 +23,12 @@ export function QRManagerStats({
   isLoading = false,
 }: QRManagerStatsProps) {
   const t = useTranslations('tables')
+  const { formatDateTime } = useFormat()
 
   if (isLoading) {
     return <SkeletonStatCard count={4} columns={4} />
   }
-  const latestQrUpdateFormatted = latest_qr_update
-    ? new Date(latest_qr_update).toLocaleDateString('vi-VN', {
-        day: '2-digit',
-        month: '2-digit',
-        year: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-      })
-    : '—'
+  const latestQrUpdateFormatted = latest_qr_update ? formatDateTime(latest_qr_update) : '—'
 
   const stats = [
     {

@@ -12,11 +12,10 @@ import {
 } from '@/src/components/ui/dropdown-menu'
 import { ArrowLeft, Copy, Printer, MoreVertical, AlertTriangle, Check, Wallet } from 'lucide-react'
 import { cn } from '@/src/lib/utils'
-import { formatDistanceToNow } from 'date-fns'
-import { vi } from 'date-fns/locale'
 import { OverrideStatusModal } from './override-status-modal'
 import { PaymentDialog } from './payment-dialog'
 import type { OrderDetail } from '../types/orders'
+import { useFormat } from '@/src/hooks/use-format'
 
 const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
   pending: {
@@ -85,6 +84,7 @@ export function OrderSummaryHeader({ order }: OrderSummaryHeaderProps) {
   const router = useRouter()
   const [copied, setCopied] = useState(false)
   const [overrideModalOpen, setOverrideModalOpen] = useState(false)
+  const { formatRelativeDate } = useFormat()
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false)
 
   const handleCopy = () => {
@@ -157,7 +157,7 @@ export function OrderSummaryHeader({ order }: OrderSummaryHeaderProps) {
                 </Badge>
 
                 <span className="text-sm text-slate-500 dark:text-slate-400">
-                  {formatDistanceToNow(new Date(order.createdAt), { addSuffix: true, locale: vi })}
+                  {formatRelativeDate(order.createdAt)}
                 </span>
               </div>
             </div>
