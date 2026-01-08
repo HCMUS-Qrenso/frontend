@@ -50,25 +50,15 @@ export function StaffLockDialog({ open, onOpenChange, staff, action }: StaffLock
         <AlertDialogHeader>
           <AlertDialogTitle>{isLocking ? t('lockTitle') : t('unlockTitle')}</AlertDialogTitle>
           <AlertDialogDescription>
-            {isLocking ? (
-              <span
-                dangerouslySetInnerHTML={{
-                  __html: t('lockDesc', { name: staff.fullName }).replace(
-                    '<strong>',
-                    '<strong class="font-semibold">',
-                  ),
-                }}
-              />
-            ) : (
-              <span
-                dangerouslySetInnerHTML={{
-                  __html: t('unlockDesc', { name: staff.fullName }).replace(
-                    '<strong>',
-                    '<strong class="font-semibold">',
-                  ),
-                }}
-              />
-            )}
+            {isLocking
+              ? t.rich('lockDesc', {
+                  name: staff.fullName,
+                  strong: (chunks) => <strong className="font-semibold">{chunks}</strong>,
+                })
+              : t.rich('unlockDesc', {
+                  name: staff.fullName,
+                  strong: (chunks) => <strong className="font-semibold">{chunks}</strong>,
+                })}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

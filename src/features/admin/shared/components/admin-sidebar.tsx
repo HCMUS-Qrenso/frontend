@@ -309,22 +309,24 @@ export function AdminSidebar({
 
           {/* Bottom */}
           <div className="border-t border-slate-200 p-4 dark:border-slate-800">
-            <div className="flex items-center gap-3 rounded-xl bg-slate-50 px-4 py-3 dark:bg-slate-800">
-              <Avatar className="h-9 w-9">
-                <AvatarImage src={userProfile?.avatarUrl || undefined} />
-                <AvatarFallback>
-                  {userProfile ? getInitials(userProfile.fullName) : 'U'}
-                </AvatarFallback>
-              </Avatar>
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium text-slate-900 dark:text-white">
-                  {userProfile?.fullName || t('defaultUser')}
-                </p>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
-                  {userProfile ? getRoleLabel(userProfile.role) : t('loadingUser')}
-                </p>
+            <Link href="/admin/profile" className="block">
+              <div className="flex items-center gap-3 rounded-xl bg-slate-50 px-4 py-3 transition-colors hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700">
+                <Avatar className="h-9 w-9">
+                  <AvatarImage src={userProfile?.avatarUrl || undefined} />
+                  <AvatarFallback>
+                    {userProfile ? getInitials(userProfile.fullName) : 'U'}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium text-slate-900 dark:text-white">
+                    {userProfile?.fullName || t('defaultUser')}
+                  </p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    {userProfile ? getRoleLabel(userProfile.role) : t('loadingUser')}
+                  </p>
+                </div>
               </div>
-            </div>
+            </Link>
             <button
               onClick={() => setLogoutDialogOpen(true)}
               disabled={logoutPending}

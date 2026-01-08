@@ -23,6 +23,7 @@ export interface UserProfile {
   tenantId: string | null
   createdAt: string
   lastLoginAt: string | null
+  updatedAt: string
 }
 
 export interface AuthResponse {
@@ -65,4 +66,9 @@ export interface SetupPasswordPayload {
   email: string
   token: string
   password: string
+}
+
+export interface ChangePasswordPayload {
+  currentPassword: string
+  newPassword: string
 }

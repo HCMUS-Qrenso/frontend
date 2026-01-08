@@ -92,6 +92,15 @@ export interface ReceiptSettings {
 }
 
 /**
+ * QR Payment settings
+ */
+export interface QrPaymentSettings {
+  payos_api_key: string | null
+  payos_checksum_key: string | null
+  payos_client_id: string | null
+}
+
+/**
  * Complete tenant settings response from API
  */
 export interface TenantSettings {
@@ -106,6 +115,7 @@ export interface TenantSettings {
   order: OrderSettings
   notifications: NotificationSettings
   receipt: ReceiptSettings
+  qr_payment: QrPaymentSettings
 }
 
 /**
@@ -160,4 +170,9 @@ export interface UpdateTenantSettingsPayload {
   receiptFooter?: string
   receiptShowLogo?: boolean
   invoicePrefix?: string
+
+  // QR Payment
+  qrPayosApiKey?: string
+  qrPayosChecksumKey?: string
+  qrPayosClientId?: string
 }

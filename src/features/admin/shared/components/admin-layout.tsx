@@ -28,6 +28,7 @@ import { AdminSidebar } from './admin-sidebar'
 import { getInitials } from '../utils'
 import { useTranslations } from 'next-intl'
 import { TenantSettingsProvider } from '@/src/contexts/tenant-settings-context'
+import { useRouter } from '@/src/i18n/navigation'
 
 interface AdminLayoutProps {
   children: React.ReactNode
@@ -42,6 +43,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   const userProfileQuery = useUserProfileQuery(isAuthenticated && isHydrated)
   const userProfile = userProfileQuery.data
   const hasProfile = !!userProfile
+  const router = useRouter()
 
   const isOwner = hasProfile && userProfile.role === 'owner'
   const isStaff = hasProfile && userProfile.role !== 'owner'
@@ -180,6 +182,10 @@ export function AdminLayout({ children }: AdminLayoutProps) {
     if (path === '/admin/kds' || path.startsWith('/admin/kds/')) {
       return { title: t('kdsTitle'), description: t('kdsDesc') }
     }
+    // Profile
+    if (path === '/admin/profile' || path.startsWith('/admin/profile/')) {
+      return { title: t('profileTitle'), description: t('profileDesc') }
+    }
     // Settings
     if (path === '/admin/settings' || path.startsWith('/admin/settings/')) {
       return { title: t('settingsTitle'), description: t('settingsDesc') }
@@ -313,11 +319,21 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => {
+                      // Navigate to profile page
+                      router.push('/admin/profile')
+                    }}
+                  >
                     <User className="mr-2 h-4 w-4" />
                     {t('profile')}
                   </DropdownMenuItem>
-                  <DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => {
+                      // Navigate to settings page
+                      router.push('/admin/settings')
+                    }}
+                  >
                     <Settings className="mr-2 h-4 w-4" />
                     {t('settings')}
                   </DropdownMenuItem>
