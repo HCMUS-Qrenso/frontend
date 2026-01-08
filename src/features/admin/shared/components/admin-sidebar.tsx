@@ -25,7 +25,7 @@ import {
   Upload,
   MapPin,
   Construction,
-  ShipIcon
+  ShipIcon,
 } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/src/components/ui/avatar'
 import {
@@ -73,37 +73,40 @@ export function AdminSidebar({
   const tCommon = useTranslations('common')
 
   // Menu items with translation keys
-  const menuItems = useMemo(() => [
-    { icon: LayoutDashboard, labelKey: 'menuOverview', href: '/admin/dashboard'},
-    { icon: ClipboardList, labelKey: 'menuOrders', href: '/admin/orders'},
-    { icon: ShipIcon, labelKey: 'menuKds', href: '/admin/kds'},
-    {
-      icon: UtensilsCrossed,
-      labelKey: 'menuLabel',
-      href: '/admin/menu',
-      subItems: [
-        { icon: FolderOpen, labelKey: 'menuCateg', href: '/admin/menu/categories' },
-        { icon: UtensilsCrossed, labelKey: 'menuItemsLabel', href: '/admin/menu/items' },
-        { icon: Settings, labelKey: 'menuModifiersLabel', href: '/admin/menu/modifiers' },
-        { icon: Upload, labelKey: 'menuImportLabel', href: '/admin/menu/import-export' },
-        { icon: LayoutGrid, labelKey: 'menuTemplatesLabel', href: '/admin/menu/templates' },
-      ],
-    },
-    {
-      icon: QrCode,
-      labelKey: 'menuTablesQr',
-      href: '/admin/tables/list',
-      subItems: [
-        { icon: Table, labelKey: 'menuTablesList', href: '/admin/tables/list' },
-        { icon: LayoutGrid, labelKey: 'menuLayout', href: '/admin/tables/layout' },
-        { icon: QrCode, labelKey: 'menuQrManager', href: '/admin/tables/qr' },
-        { icon: MapPin, labelKey: 'menuZones', href: '/admin/tables/zones' },
-      ],
-    },
-    { icon: Users, labelKey: 'menuStaff', href: '/admin/staff' },
-    { icon: BarChart3, labelKey: 'menuReports', href: '/admin/reports', wip: true },
-    { icon: Settings, labelKey: 'menuSettings', href: '/admin/settings', wip: true },
-  ], [])
+  const menuItems = useMemo(
+    () => [
+      { icon: LayoutDashboard, labelKey: 'menuOverview', href: '/admin/dashboard' },
+      { icon: ClipboardList, labelKey: 'menuOrders', href: '/admin/orders' },
+      { icon: ShipIcon, labelKey: 'menuKds', href: '/admin/kds' },
+      {
+        icon: UtensilsCrossed,
+        labelKey: 'menuLabel',
+        href: '/admin/menu',
+        subItems: [
+          { icon: FolderOpen, labelKey: 'menuCateg', href: '/admin/menu/categories' },
+          { icon: UtensilsCrossed, labelKey: 'menuItemsLabel', href: '/admin/menu/items' },
+          { icon: Settings, labelKey: 'menuModifiersLabel', href: '/admin/menu/modifiers' },
+          { icon: Upload, labelKey: 'menuImportLabel', href: '/admin/menu/import-export' },
+          { icon: LayoutGrid, labelKey: 'menuTemplatesLabel', href: '/admin/menu/templates' },
+        ],
+      },
+      {
+        icon: QrCode,
+        labelKey: 'menuTablesQr',
+        href: '/admin/tables/list',
+        subItems: [
+          { icon: Table, labelKey: 'menuTablesList', href: '/admin/tables/list' },
+          { icon: LayoutGrid, labelKey: 'menuLayout', href: '/admin/tables/layout' },
+          { icon: QrCode, labelKey: 'menuQrManager', href: '/admin/tables/qr' },
+          { icon: MapPin, labelKey: 'menuZones', href: '/admin/tables/zones' },
+        ],
+      },
+      { icon: Users, labelKey: 'menuStaff', href: '/admin/staff' },
+      { icon: BarChart3, labelKey: 'menuReports', href: '/admin/reports', wip: true },
+      { icon: Settings, labelKey: 'menuSettings', href: '/admin/settings', wip: true },
+    ],
+    [],
+  )
 
   // Use controlled state if provided, otherwise use internal state
   const logoutDialogOpen =
@@ -343,9 +346,7 @@ export function AdminSidebar({
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{t('logoutConfirmTitle')}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {t('logoutConfirmDesc')}
-            </AlertDialogDescription>
+            <AlertDialogDescription>{t('logoutConfirmDesc')}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={logoutPending}>{tCommon('cancel')}</AlertDialogCancel>

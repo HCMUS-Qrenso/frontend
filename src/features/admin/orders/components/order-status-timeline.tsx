@@ -127,7 +127,9 @@ export function OrderStatusTimeline({ history }: OrderStatusTimelineProps) {
                     </p>
                   </div>
                   {localizedNotes && (
-                    <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">{localizedNotes}</p>
+                    <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+                      {localizedNotes}
+                    </p>
                   )}
                   <div className="mt-1 flex items-center gap-2 text-xs text-slate-500 dark:text-slate-500">
                     <span>{entry.user?.fullName || 'Hệ thống'}</span>
@@ -143,4 +145,3 @@ export function OrderStatusTimeline({ history }: OrderStatusTimelineProps) {
     </div>
   )
 }
-

@@ -29,9 +29,7 @@ export function TemplateGallery({ templates, onSelectTemplate }: TemplateGallery
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h3 className="font-semibold text-slate-900 dark:text-white">{t('selectTemplate')}</h3>
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-            {t('templateGallery')}
-          </p>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{t('templateGallery')}</p>
         </div>
       </div>
 

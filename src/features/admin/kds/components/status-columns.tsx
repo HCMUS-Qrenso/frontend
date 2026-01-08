@@ -6,7 +6,7 @@ import { TicketCard } from './ticket-card'
 
 interface StatusColumnsProps {
   orders: KdsOrder[]
-  now: number  // Timestamp from parent's useNow hook
+  now: number // Timestamp from parent's useNow hook
   viewMode: 'grid' | 'list'
   groupByStatus: boolean
   selectedStatus: OrderItemStatus | 'all'
@@ -36,9 +36,7 @@ export function StatusColumns({
       <div className="flex min-h-[50vh] flex-col items-center justify-center gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-12 dark:border-slate-800 dark:bg-slate-900">
         <div className="text-6xl">🍳</div>
         <div className="text-center">
-          <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
-            Không có đơn nào
-          </h3>
+          <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Không có đơn nào</h3>
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
             Đang chờ đơn hàng mới...
           </p>
@@ -49,8 +47,7 @@ export function StatusColumns({
 
   // Group by item status
   if (groupByStatus) {
-    const statuses =
-      selectedStatus === 'all' ? KDS_STATUSES : [selectedStatus as OrderItemStatus]
+    const statuses = selectedStatus === 'all' ? KDS_STATUSES : [selectedStatus as OrderItemStatus]
 
     // Group orders by whether they have items in each status
     const ordersByStatus: Record<string, KdsOrder[]> = {}

@@ -225,9 +225,7 @@ function ResetPasswordContent() {
           <h1 className="text-2xl font-bold text-slate-900 lg:text-3xl dark:text-white">
             {t('resetPasswordTitle')}
           </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400">
-            {t('resetPasswordSubtitle')}
-          </p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">{t('resetPasswordSubtitle')}</p>
         </div>
 
         {/* Info Alert */}
@@ -317,9 +315,7 @@ function ResetPasswordContent() {
             {fieldErrors.password && (
               <p className="text-xs text-red-600 dark:text-red-400">{fieldErrors.password}</p>
             )}
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              {t('passwordHintStrong')}
-            </p>
+            <p className="text-xs text-slate-500 dark:text-slate-400">{t('passwordHintStrong')}</p>
           </div>
 
           {/* Confirm Password Field */}

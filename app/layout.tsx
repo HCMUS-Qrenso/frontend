@@ -4,8 +4,7 @@ import './[locale]/globals.css'
 
 export const metadata: Metadata = {
   title: 'Qrenso - Admin Dashboard',
-  description:
-    'Hệ thống quản lý nhà hàng thông minh với QR Menu & Dine-in Ordering',
+  description: 'Hệ thống quản lý nhà hàng thông minh với QR Menu & Dine-in Ordering',
   generator: 'v0.app',
   icons: {
     icon: [

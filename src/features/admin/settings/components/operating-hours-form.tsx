@@ -17,15 +17,7 @@ import {
 } from '@/src/components/ui/dropdown-menu'
 
 // Days of the week in order
-const DAYS = [
-  'monday',
-  'tuesday',
-  'wednesday',
-  'thursday',
-  'friday',
-  'saturday',
-  'sunday',
-] as const
+const DAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] as const
 
 type DayKey = (typeof DAYS)[number]
 
@@ -43,10 +35,7 @@ interface OperatingHoursFormProps {
   onChange: (settings: OperatingHours) => void
 }
 
-export function OperatingHoursForm({
-  settings,
-  onChange,
-}: OperatingHoursFormProps) {
+export function OperatingHoursForm({ settings, onChange }: OperatingHoursFormProps) {
   const t = useTranslations('settings.operatingHours')
 
   // Get day settings with defaults
@@ -158,23 +147,13 @@ export function OperatingHoursForm({
           const isOpen = daySettings.isOpen
 
           return (
-            <div
-              key={day}
-              className="flex flex-col gap-3 rounded-lg border p-4"
-            >
+            <div key={day} className="flex flex-col gap-3 rounded-lg border p-4">
               {/* Day header */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <Switch
-                    checked={isOpen}
-                    onCheckedChange={(checked) => toggleDay(day, checked)}
-                  />
+                  <Switch checked={isOpen} onCheckedChange={(checked) => toggleDay(day, checked)} />
                   <Label className="font-medium">{getDayLabel(day)}</Label>
-                  {!isOpen && (
-                    <span className="text-sm text-muted-foreground">
-                      {t('closed')}
-                    </span>
-                  )}
+                  {!isOpen && <span className="text-muted-foreground text-sm">{t('closed')}</span>}
                 </div>
 
                 {/* Copy dropdown */}
@@ -228,25 +207,18 @@ export function OperatingHoursForm({
               {isOpen && (
                 <div className="ml-10 space-y-2">
                   {daySettings.slots.map((slot, slotIndex) => (
-                    <div
-                      key={slotIndex}
-                      className="flex items-center gap-2"
-                    >
+                    <div key={slotIndex} className="flex items-center gap-2">
                       <Input
                         type="time"
                         value={slot.open}
-                        onChange={(e) =>
-                          updateSlot(day, slotIndex, 'open', e.target.value)
-                        }
+                        onChange={(e) => updateSlot(day, slotIndex, 'open', e.target.value)}
                         className="w-36"
                       />
                       <span className="text-muted-foreground">—</span>
                       <Input
                         type="time"
                         value={slot.close}
-                        onChange={(e) =>
-                          updateSlot(day, slotIndex, 'close', e.target.value)
-                        }
+                        onChange={(e) => updateSlot(day, slotIndex, 'close', e.target.value)}
                         className="w-36"
                       />
                       {daySettings.slots.length > 1 && (
@@ -254,7 +226,7 @@ export function OperatingHoursForm({
                           type="button"
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                          className="text-muted-foreground hover:text-destructive h-8 w-8"
                           onClick={() => removeSlot(day, slotIndex)}
                         >
                           <Trash2 className="h-4 w-4" />
@@ -268,7 +240,7 @@ export function OperatingHoursForm({
                     type="button"
                     variant="ghost"
                     size="sm"
-                    className="h-8 gap-1 text-muted-foreground"
+                    className="text-muted-foreground h-8 gap-1"
                     onClick={() => addSlot(day)}
                   >
                     <Plus className="h-3.5 w-3.5" />

@@ -49,9 +49,7 @@ export function Hero() {
 
           {/* Social Proof */}
           <div className="mt-16">
-            <p className="text-sm text-slate-500 dark:text-slate-400">
-              {t('hero.socialProof')}
-            </p>
+            <p className="text-sm text-slate-500 dark:text-slate-400">{t('hero.socialProof')}</p>
             <div className="mt-6 flex flex-wrap items-center justify-center gap-8 opacity-60 grayscale">
               {[1, 2, 3, 4].map((i) => (
                 <div
@@ -92,4 +90,3 @@ export function Hero() {
     </section>
   )
 }
-

@@ -32,22 +32,20 @@ export function SettingsSection({
       <CardHeader className="border-b">
         <div className="flex items-center gap-3">
           {Icon && (
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-              <Icon className="h-5 w-5 text-primary" />
+            <div className="bg-primary/10 flex h-10 w-10 items-center justify-center rounded-lg">
+              <Icon className="text-primary h-5 w-5" />
             </div>
           )}
           <div className="flex-1">
             <div className="flex items-center gap-2">
               <CardTitle className="text-lg">{title}</CardTitle>
               {comingSoon && (
-                <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100 dark:bg-amber-500/20 dark:text-amber-400 text-xs font-medium">
+                <Badge className="bg-amber-100 text-xs font-medium text-amber-700 hover:bg-amber-100 dark:bg-amber-500/20 dark:text-amber-400">
                   Coming Soon
                 </Badge>
               )}
             </div>
-            {description && (
-              <CardDescription className="mt-1">{description}</CardDescription>
-            )}
+            {description && <CardDescription className="mt-1">{description}</CardDescription>}
           </div>
         </div>
       </CardHeader>
@@ -55,4 +53,3 @@ export function SettingsSection({
     </Card>
   )
 }
-

@@ -1,6 +1,6 @@
 /**
  * Price Calculator Unit Tests
- * 
+ *
  * Comprehensive tests for tax and service charge calculations
  */
 

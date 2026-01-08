@@ -120,7 +120,9 @@ export function MenuItemsTable({ onEditClick, onDeleteClick }: MenuItemsTablePro
             <TableHeader>
               <AdminTableHeaderRow>
                 <AdminTableHead className="min-w-50 px-2 md:px-4">{t('menuItem')}</AdminTableHead>
-                <AdminTableHead className="w-24 px-2 md:w-32 md:px-4">{t('category')}</AdminTableHead>
+                <AdminTableHead className="w-24 px-2 md:w-32 md:px-4">
+                  {t('category')}
+                </AdminTableHead>
                 <AdminTableHead className="w-20 px-2 md:w-28 md:px-4" align="right">
                   {t('price')}
                 </AdminTableHead>
@@ -130,7 +132,9 @@ export function MenuItemsTable({ onEditClick, onDeleteClick }: MenuItemsTablePro
                 <AdminTableHead className="w-16 px-2 md:w-20 md:px-4" align="center">
                   {t('popularityScore')}
                 </AdminTableHead>
-                <AdminTableHead className="w-20 px-2 md:w-24 md:px-4">{t('updatedAt')}</AdminTableHead>
+                <AdminTableHead className="w-20 px-2 md:w-24 md:px-4">
+                  {t('updatedAt')}
+                </AdminTableHead>
                 <AdminTableHead className="w-20 px-2 md:px-4" align="right">
                   {t('actions')}
                 </AdminTableHead>
@@ -158,12 +162,7 @@ export function MenuItemsTable({ onEditClick, onDeleteClick }: MenuItemsTablePro
 
   // Error state
   if (error) {
-    return (
-      <ContainerErrorState
-        title={t('cannotLoadItems')}
-        description={t('tryAgainLater')}
-      />
-    )
+    return <ContainerErrorState title={t('cannotLoadItems')} description={t('tryAgainLater')} />
   }
 
   return (
@@ -183,7 +182,9 @@ export function MenuItemsTable({ onEditClick, onDeleteClick }: MenuItemsTablePro
               <AdminTableHead className="w-16 px-2 md:w-20 md:px-4" align="center">
                 {t('popularityScore')}
               </AdminTableHead>
-              <AdminTableHead className="w-20 px-2 md:w-24 md:px-4">{t('updatedAt')}</AdminTableHead>
+              <AdminTableHead className="w-20 px-2 md:w-24 md:px-4">
+                {t('updatedAt')}
+              </AdminTableHead>
               <AdminTableHead className="w-20 px-2 md:px-4" align="right">
                 {t('actions')}
               </AdminTableHead>
@@ -242,7 +243,9 @@ export function MenuItemsTable({ onEditClick, onDeleteClick }: MenuItemsTablePro
                         </div>
                         <div className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400">
                           <Clock className="h-3 w-3" />
-                          <span>{item.preparation_time} {t('prepTime')}</span>
+                          <span>
+                            {item.preparation_time} {t('prepTime')}
+                          </span>
                         </div>
                       </div>
                     </div>

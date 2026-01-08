@@ -43,9 +43,7 @@ export default function AdminError({ error, reset }: ErrorProps) {
       </h1>
 
       {/* Message */}
-      <p className="mb-8 max-w-md text-slate-500 dark:text-slate-400">
-        {t('adminErrorMessage')}
-      </p>
+      <p className="mb-8 max-w-md text-slate-500 dark:text-slate-400">{t('adminErrorMessage')}</p>
 
       {/* Actions */}
       <div className="flex flex-wrap items-center justify-center gap-3">

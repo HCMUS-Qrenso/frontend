@@ -28,9 +28,7 @@ export function QRManagerStats({
   if (isLoading) {
     return <SkeletonStatCard count={4} columns={4} />
   }
-  const latestQrUpdateFormatted = latest_qr_update
-    ? formatDateTime(latest_qr_update)
-    : '—'
+  const latestQrUpdateFormatted = latest_qr_update ? formatDateTime(latest_qr_update) : '—'
 
   const stats = [
     {

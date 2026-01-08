@@ -63,10 +63,7 @@ export function languageToLocale(language: string): string {
  * formatPrice(100000) // "100.000 ₫"
  * formatPrice(100, { currency: 'USD', symbol: '$' }) // "100 $"
  */
-export function formatPrice(
-  price: string | number,
-  options?: PriceFormatOptions,
-): string {
+export function formatPrice(price: string | number, options?: PriceFormatOptions): string {
   const numPrice = typeof price === 'string' ? parseFloat(price) : price
 
   if (isNaN(numPrice)) {
@@ -96,10 +93,7 @@ export function formatPrice(
  * formatDateTime('2024-12-24T10:30:00Z') // "24/12/2024, 17:30"
  * formatDateTime('2024-12-24T10:30:00Z', { dateFormat: 'YYYY-MM-DD' }) // "2024-12-24, 17:30"
  */
-export function formatDateTime(
-  dateString: string | null,
-  options?: DateFormatOptions,
-): string {
+export function formatDateTime(dateString: string | null, options?: DateFormatOptions): string {
   if (!dateString) return '—'
 
   const date = new Date(dateString)
@@ -120,16 +114,16 @@ export function formatDateTime(
       hour12: false,
       timeZone: timezone,
     })
-    
+
     const parts = formatter.formatToParts(date)
-    const getPart = (type: string) => parts.find(p => p.type === type)?.value || ''
-    
+    const getPart = (type: string) => parts.find((p) => p.type === type)?.value || ''
+
     const day = getPart('day')
     const month = getPart('month')
     const year = getPart('year')
     const hour = getPart('hour')
     const minute = getPart('minute')
-    
+
     // Format date according to dateFormat setting
     let formattedDate: string
     switch (dateFormat) {
@@ -144,11 +138,11 @@ export function formatDateTime(
         formattedDate = `${day}/${month}/${year}`
         break
     }
-    
+
     if (includeTime && hour && minute) {
       return `${formattedDate}, ${hour}:${minute}`
     }
-    
+
     return formattedDate
   } catch {
     // Fallback to simple format
@@ -165,10 +159,7 @@ export function formatDateTime(
  * @example
  * formatShortDate('2024-12-24T10:30:00Z') // "24/12/2024"
  */
-export function formatShortDate(
-  dateString: string,
-  options?: DateFormatOptions,
-): string {
+export function formatShortDate(dateString: string, options?: DateFormatOptions): string {
   return formatDateTime(dateString, { ...options, includeTime: false })
 }
 
@@ -181,10 +172,7 @@ export function formatShortDate(
  * @example
  * formatTime('2024-12-24T10:30:00Z') // "17:30" (in Asia/Ho_Chi_Minh)
  */
-export function formatTime(
-  dateString: string,
-  options?: DateFormatOptions,
-): string {
+export function formatTime(dateString: string, options?: DateFormatOptions): string {
   if (!dateString) return '—'
 
   const date = new Date(dateString)
@@ -218,10 +206,7 @@ export function formatTime(
  * formatRelativeDate('2024-12-24T10:30:00Z') // "2h trước"
  * formatRelativeDate('2024-12-24T10:30:00Z', 'en') // "2h ago"
  */
-export function formatRelativeDate(
-  dateString: string,
-  locale: string = 'vi',
-): string {
+export function formatRelativeDate(dateString: string, locale: string = 'vi'): string {
   const date = new Date(dateString)
   const now = new Date()
   const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60))
@@ -245,4 +230,3 @@ export function formatRelativeDate(
     return formatShortDate(dateString, { locale: languageToLocale(locale) })
   }
 }
-

@@ -52,10 +52,7 @@ export function StaffPasswordDialog({
       }
       onOpenChange(false)
     } catch (error) {
-      handleError(
-        error,
-        isReset ? t('resetPasswordError') : t('resendInviteError'),
-      )
+      handleError(error, isReset ? t('resetPasswordError') : t('resendInviteError'))
     }
   }
 
@@ -63,22 +60,28 @@ export function StaffPasswordDialog({
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>{isReset ? t('resetPasswordTitle') : t('resendInviteTitle')}</AlertDialogTitle>
+          <AlertDialogTitle>
+            {isReset ? t('resetPasswordTitle') : t('resendInviteTitle')}
+          </AlertDialogTitle>
           <AlertDialogDescription>
             {isReset ? (
-              <span dangerouslySetInnerHTML={{ 
-                __html: t('resetPasswordDesc', { email: staff.email }).replace(
-                  '<strong>',
-                  '<strong class="font-semibold">'
-                )
-              }} />
+              <span
+                dangerouslySetInnerHTML={{
+                  __html: t('resetPasswordDesc', { email: staff.email }).replace(
+                    '<strong>',
+                    '<strong class="font-semibold">',
+                  ),
+                }}
+              />
             ) : (
-              <span dangerouslySetInnerHTML={{ 
-                __html: t('resendInviteDesc', { email: staff.email }).replace(
-                  '<strong>',
-                  '<strong class="font-semibold">'
-                )
-              }} />
+              <span
+                dangerouslySetInnerHTML={{
+                  __html: t('resendInviteDesc', { email: staff.email }).replace(
+                    '<strong>',
+                    '<strong class="font-semibold">',
+                  ),
+                }}
+              />
             )}
           </AlertDialogDescription>
         </AlertDialogHeader>

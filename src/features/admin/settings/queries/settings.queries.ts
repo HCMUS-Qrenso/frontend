@@ -24,8 +24,7 @@ export function useUpdateSettingsMutation() {
   const t = useTranslations('settings')
 
   return useMutation({
-    mutationFn: (payload: UpdateTenantSettingsPayload) =>
-      updateSettings(payload),
+    mutationFn: (payload: UpdateTenantSettingsPayload) => updateSettings(payload),
     onSuccess: () => {
       // Invalidate and refetch settings
       queryClient.invalidateQueries({ queryKey: settingsKeys.all })
@@ -36,4 +35,3 @@ export function useUpdateSettingsMutation() {
     },
   })
 }
-

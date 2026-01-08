@@ -189,11 +189,7 @@ export function TableUpsertModal({
       open={open}
       onOpenChange={onOpenChange}
       title={mode === 'create' ? t('addNewTable') : t('editTableTitle')}
-      description={
-        mode === 'create'
-          ? t('addTableDesc')
-          : t('editTableDesc')
-      }
+      description={mode === 'create' ? t('addTableDesc') : t('editTableDesc')}
       onSubmit={handleSubmit}
       isSubmitting={isLoading}
       submitText={t('saveTable')}
@@ -270,10 +266,7 @@ export function TableUpsertModal({
       </FormDialogField>
 
       {/* Trạng thái */}
-      <FormDialogField
-        label={t('operationStatus')}
-        hint={t('operationStatusHint')}
-      >
+      <FormDialogField label={t('operationStatus')} hint={t('operationStatusHint')}>
         <Select
           value={formData.status}
           onValueChange={(value) =>
@@ -298,9 +291,7 @@ export function TableUpsertModal({
           <Label htmlFor="is_active" className="cursor-pointer text-sm font-medium">
             {t('activateTable')}
           </Label>
-          <p className="text-xs text-slate-500 dark:text-slate-400">
-            {t('activateTableHint')}
-          </p>
+          <p className="text-xs text-slate-500 dark:text-slate-400">{t('activateTableHint')}</p>
         </div>
         <Switch
           id="is_active"
@@ -316,9 +307,7 @@ export function TableUpsertModal({
             <Label htmlFor="autoGenerateQR" className="cursor-pointer text-sm font-medium">
               {t('autoGenerateQR')}
             </Label>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              {t('autoGenerateQRHint')}
-            </p>
+            <p className="text-xs text-slate-500 dark:text-slate-400">{t('autoGenerateQRHint')}</p>
           </div>
           <Switch
             id="autoGenerateQR"
@@ -331,7 +320,9 @@ export function TableUpsertModal({
       {/* ID bàn (read-only) - Chỉ hiển thị ở chế độ chỉnh sửa */}
       {mode === 'edit' && table && (
         <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-800/50">
-          <Label className="text-xs text-slate-500 dark:text-slate-400">{t('tableIdReadonly')}</Label>
+          <Label className="text-xs text-slate-500 dark:text-slate-400">
+            {t('tableIdReadonly')}
+          </Label>
           <p className="mt-1 font-mono text-sm text-slate-700 dark:text-slate-300">{table.id}</p>
         </div>
       )}

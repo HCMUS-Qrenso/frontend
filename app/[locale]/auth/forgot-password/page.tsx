@@ -66,9 +66,7 @@ export default function ForgotPasswordPage() {
               {t('checkEmailMessage')}{' '}
               <span className="font-medium text-slate-900 dark:text-white">{email}</span>
             </p>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              {t('checkSpam')}
-            </p>
+            <p className="text-xs text-slate-500 dark:text-slate-400">{t('checkSpam')}</p>
           </div>
 
           {/* Info Box */}

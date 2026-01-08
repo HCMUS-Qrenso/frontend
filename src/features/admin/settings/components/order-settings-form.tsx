@@ -13,10 +13,7 @@ interface OrderSettingsFormProps {
   onChange: (settings: Partial<OrderSettings>) => void
 }
 
-export function OrderSettingsForm({
-  settings,
-  onChange,
-}: OrderSettingsFormProps) {
+export function OrderSettingsForm({ settings, onChange }: OrderSettingsFormProps) {
   const t = useTranslations('settings.order')
 
   return (
@@ -43,7 +40,7 @@ export function OrderSettingsForm({
               }
               placeholder={t('minValuePlaceholder')}
             />
-            <p className="text-xs text-muted-foreground">{t('minValueHint')}</p>
+            <p className="text-muted-foreground text-xs">{t('minValueHint')}</p>
           </div>
 
           {/* Estimated Prep Time */}
@@ -55,13 +52,9 @@ export function OrderSettingsForm({
               min={1}
               max={180}
               value={settings.estimated_prep_time}
-              onChange={(e) =>
-                onChange({ estimated_prep_time: Number(e.target.value) })
-              }
+              onChange={(e) => onChange({ estimated_prep_time: Number(e.target.value) })}
             />
-            <p className="text-xs text-muted-foreground">
-              {t('prepTimeHint')}
-            </p>
+            <p className="text-muted-foreground text-xs">{t('prepTimeHint')}</p>
           </div>
 
           {/* Session Timeout */}
@@ -73,13 +66,9 @@ export function OrderSettingsForm({
               min={15}
               max={480}
               value={settings.session_timeout_minutes}
-              onChange={(e) =>
-                onChange({ session_timeout_minutes: Number(e.target.value) })
-              }
+              onChange={(e) => onChange({ session_timeout_minutes: Number(e.target.value) })}
             />
-            <p className="text-xs text-muted-foreground">
-              {t('sessionTimeoutHint')}
-            </p>
+            <p className="text-muted-foreground text-xs">{t('sessionTimeoutHint')}</p>
           </div>
         </div>
 
@@ -87,15 +76,13 @@ export function OrderSettingsForm({
         <div className="flex items-center justify-between rounded-lg border p-4">
           <div className="space-y-0.5">
             <Label>{t('allowSpecialInstructions')}</Label>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               {t('allowSpecialInstructionsDescription')}
             </p>
           </div>
           <Switch
             checked={settings.allow_special_instructions}
-            onCheckedChange={(checked) =>
-              onChange({ allow_special_instructions: checked })
-            }
+            onCheckedChange={(checked) => onChange({ allow_special_instructions: checked })}
           />
         </div>
 
@@ -103,19 +90,14 @@ export function OrderSettingsForm({
         <div className="flex items-center justify-between rounded-lg border p-4">
           <div className="space-y-0.5">
             <Label>{t('requireGuestCount')}</Label>
-            <p className="text-sm text-muted-foreground">
-              {t('requireGuestCountDescription')}
-            </p>
+            <p className="text-muted-foreground text-sm">{t('requireGuestCountDescription')}</p>
           </div>
           <Switch
             checked={settings.require_guest_count}
-            onCheckedChange={(checked) =>
-              onChange({ require_guest_count: checked })
-            }
+            onCheckedChange={(checked) => onChange({ require_guest_count: checked })}
           />
         </div>
       </div>
     </SettingsSection>
   )
 }
-

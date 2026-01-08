@@ -27,7 +27,7 @@ export function SettingsPage() {
 
   const [formData, setFormData] = useState<TenantSettings | null>(null)
   const [hasChanges, setHasChanges] = useState(false)
-  
+
   // Store original language to detect if it changed after save
   const originalLanguageRef = useRef<string | null>(null)
 
@@ -86,7 +86,7 @@ export function SettingsPage() {
     updateMutation.mutate(payload, {
       onSuccess: () => {
         setHasChanges(false)
-        
+
         // If language changed, redirect to new locale URL
         const newLanguage = formData.general.language
         if (newLanguage !== currentLocale) {
@@ -99,76 +99,44 @@ export function SettingsPage() {
   }, [formData, updateMutation, currentLocale, router, pathname])
 
   // Update form data helpers
-  const updateGeneral = useCallback(
-    (partial: Partial<TenantSettings['general']>) => {
-      setFormData((prev) =>
-        prev ? { ...prev, general: { ...prev.general, ...partial } } : prev,
-      )
-      setHasChanges(true)
-    },
-    [],
-  )
+  const updateGeneral = useCallback((partial: Partial<TenantSettings['general']>) => {
+    setFormData((prev) => (prev ? { ...prev, general: { ...prev.general, ...partial } } : prev))
+    setHasChanges(true)
+  }, [])
 
   const updateTax = useCallback((partial: Partial<TenantSettings['tax']>) => {
+    setFormData((prev) => (prev ? { ...prev, tax: { ...prev.tax, ...partial } } : prev))
+    setHasChanges(true)
+  }, [])
+
+  const updateServiceCharge = useCallback((partial: Partial<TenantSettings['service_charge']>) => {
     setFormData((prev) =>
-      prev ? { ...prev, tax: { ...prev.tax, ...partial } } : prev,
+      prev ? { ...prev, service_charge: { ...prev.service_charge, ...partial } } : prev,
     )
     setHasChanges(true)
   }, [])
 
-  const updateServiceCharge = useCallback(
-    (partial: Partial<TenantSettings['service_charge']>) => {
-      setFormData((prev) =>
-        prev
-          ? { ...prev, service_charge: { ...prev.service_charge, ...partial } }
-          : prev,
-      )
-      setHasChanges(true)
-    },
-    [],
-  )
+  const updateOrder = useCallback((partial: Partial<TenantSettings['order']>) => {
+    setFormData((prev) => (prev ? { ...prev, order: { ...prev.order, ...partial } } : prev))
+    setHasChanges(true)
+  }, [])
 
-  const updateOrder = useCallback(
-    (partial: Partial<TenantSettings['order']>) => {
-      setFormData((prev) =>
-        prev ? { ...prev, order: { ...prev.order, ...partial } } : prev,
-      )
-      setHasChanges(true)
-    },
-    [],
-  )
+  const updateNotifications = useCallback((partial: Partial<TenantSettings['notifications']>) => {
+    setFormData((prev) =>
+      prev ? { ...prev, notifications: { ...prev.notifications, ...partial } } : prev,
+    )
+    setHasChanges(true)
+  }, [])
 
-  const updateNotifications = useCallback(
-    (partial: Partial<TenantSettings['notifications']>) => {
-      setFormData((prev) =>
-        prev
-          ? { ...prev, notifications: { ...prev.notifications, ...partial } }
-          : prev,
-      )
-      setHasChanges(true)
-    },
-    [],
-  )
+  const updateReceipt = useCallback((partial: Partial<TenantSettings['receipt']>) => {
+    setFormData((prev) => (prev ? { ...prev, receipt: { ...prev.receipt, ...partial } } : prev))
+    setHasChanges(true)
+  }, [])
 
-  const updateReceipt = useCallback(
-    (partial: Partial<TenantSettings['receipt']>) => {
-      setFormData((prev) =>
-        prev ? { ...prev, receipt: { ...prev.receipt, ...partial } } : prev,
-      )
-      setHasChanges(true)
-    },
-    [],
-  )
-
-  const updateOperatingHours = useCallback(
-    (operatingHours: TenantSettings['operating_hours']) => {
-      setFormData((prev) =>
-        prev ? { ...prev, operating_hours: operatingHours } : prev,
-      )
-      setHasChanges(true)
-    },
-    [],
-  )
+  const updateOperatingHours = useCallback((operatingHours: TenantSettings['operating_hours']) => {
+    setFormData((prev) => (prev ? { ...prev, operating_hours: operatingHours } : prev))
+    setHasChanges(true)
+  }, [])
 
   if (isLoading) {
     return <SettingsPageSkeleton />
@@ -186,11 +154,7 @@ export function SettingsPage() {
     <div className="space-y-6">
       {/* Save Button - Fixed at top right */}
       <div className="flex justify-end">
-        <Button
-          onClick={handleSave}
-          disabled={!hasChanges || updateMutation.isPending}
-          size="lg"
-        >
+        <Button onClick={handleSave} disabled={!hasChanges || updateMutation.isPending} size="lg">
           {updateMutation.isPending ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -209,29 +173,20 @@ export function SettingsPage() {
       <div className="grid gap-6 lg:grid-cols-2">
         {/* General Settings - Full width on first row */}
         <div className="lg:col-span-2">
-          <GeneralSettingsForm
-            settings={formData.general}
-            onChange={updateGeneral}
-          />
+          <GeneralSettingsForm settings={formData.general} onChange={updateGeneral} />
         </div>
 
         {/* Tax Settings */}
         <TaxSettingsForm settings={formData.tax} onChange={updateTax} />
 
         {/* Service Charge */}
-        <ServiceChargeForm
-          settings={formData.service_charge}
-          onChange={updateServiceCharge}
-        />
+        <ServiceChargeForm settings={formData.service_charge} onChange={updateServiceCharge} />
 
         {/* Order Settings */}
         <OrderSettingsForm settings={formData.order} onChange={updateOrder} />
 
         {/* Operating Hours */}
-        <OperatingHoursForm
-          settings={formData.operating_hours}
-          onChange={updateOperatingHours}
-        />
+        <OperatingHoursForm settings={formData.operating_hours} onChange={updateOperatingHours} />
 
         {/* Notifications */}
         <NotificationSettingsForm
@@ -241,10 +196,7 @@ export function SettingsPage() {
 
         {/* Receipt - Full width */}
         <div className="lg:col-span-2">
-          <ReceiptSettingsForm
-            settings={formData.receipt}
-            onChange={updateReceipt}
-          />
+          <ReceiptSettingsForm settings={formData.receipt} onChange={updateReceipt} />
         </div>
       </div>
     </div>
@@ -263,7 +215,7 @@ function SettingsPageSkeleton() {
 
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Full width card */}
-        <div className="lg:col-span-2 rounded-xl border p-6">
+        <div className="rounded-xl border p-6 lg:col-span-2">
           <Skeleton className="mb-4 h-6 w-40" />
           <div className="grid gap-4 sm:grid-cols-2">
             <Skeleton className="h-10 w-full" />
@@ -285,7 +237,7 @@ function SettingsPageSkeleton() {
         ))}
 
         {/* Full width card */}
-        <div className="lg:col-span-2 rounded-xl border p-6">
+        <div className="rounded-xl border p-6 lg:col-span-2">
           <Skeleton className="mb-4 h-6 w-40" />
           <div className="space-y-4">
             <Skeleton className="h-10 w-full" />
@@ -296,5 +248,3 @@ function SettingsPageSkeleton() {
     </div>
   )
 }
-
-

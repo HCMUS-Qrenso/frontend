@@ -13,7 +13,7 @@ import { useFormat } from './use-format'
 /**
  * Hook that provides price calculation with tenant settings.
  * Automatically uses tenant tax and service charge settings.
- * 
+ *
  * @example
  * const { calculatePrice, formatBreakdown } = usePriceCalculation()
  * const breakdown = calculatePrice([{ price: 100000, quantity: 2 }], 4) // party size = 4
@@ -28,12 +28,7 @@ export function usePriceCalculation() {
    */
   const calculatePrice = useCallback(
     (items: OrderItem[], partySize?: number): PriceBreakdown => {
-      return calculateOrderTotal(
-        items,
-        settings.tax,
-        settings.serviceCharge,
-        partySize,
-      )
+      return calculateOrderTotal(items, settings.tax, settings.serviceCharge, partySize)
     },
     [settings.tax, settings.serviceCharge],
   )

@@ -1062,11 +1062,7 @@
             "Don't know which dish to prioritize",
             "Miss orders when overwhelmed"
           ],
-          "solutions": [
-            "Clear KDS display",
-            "Automatic priority sorting",
-            "Cooking time countdown"
-          ]
+          "solutions": ["Clear KDS display", "Automatic priority sorting", "Cooking time countdown"]
         }
       }
     },
@@ -1372,5 +1368,3 @@
     }
   }
 }
-
-

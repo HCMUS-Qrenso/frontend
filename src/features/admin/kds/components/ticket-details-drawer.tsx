@@ -1,7 +1,13 @@
 'use client'
 
 import type { KdsOrder, OrderItemStatus } from '../types/kds.types'
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet'
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+} from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { StatusBadge } from './status-badge'
@@ -64,9 +70,7 @@ export function TicketDetailsDrawer({
         {/* Header */}
         <SheetHeader className="space-y-1 pb-4">
           <SheetTitle className="text-2xl">Chi tiết đơn hàng</SheetTitle>
-          <SheetDescription>
-            Thông tin chi tiết và lịch sử đơn {order.orderNumber}
-          </SheetDescription>
+          <SheetDescription>Thông tin chi tiết và lịch sử đơn {order.orderNumber}</SheetDescription>
         </SheetHeader>
 
         {/* Scrollable Content */}
@@ -108,7 +112,9 @@ export function TicketDetailsDrawer({
                 </div>
 
                 {/* Priority Badge */}
-                <Badge className={`shrink-0 px-3 py-1 text-sm ${PRIORITY_CONFIG[order.priority].color}`}>
+                <Badge
+                  className={`shrink-0 px-3 py-1 text-sm ${PRIORITY_CONFIG[order.priority].color}`}
+                >
                   {PRIORITY_CONFIG[order.priority].label}
                 </Badge>
               </div>
@@ -147,7 +153,8 @@ export function TicketDetailsDrawer({
                           {/* Modifiers */}
                           {item.modifiers.length > 0 && (
                             <p className="text-sm text-slate-500 dark:text-slate-400">
-                              <span className="font-medium">+</span> {item.modifiers.map((m) => m.modifierName).join(', ')}
+                              <span className="font-medium">+</span>{' '}
+                              {item.modifiers.map((m) => m.modifierName).join(', ')}
                             </p>
                           )}
                         </div>
@@ -175,7 +182,7 @@ export function TicketDetailsDrawer({
 
                       {/* Item Action Button */}
                       {actionConfig && nextStatus && onUpdateItemStatus && (
-                        <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-700">
+                        <div className="mt-4 border-t border-slate-100 pt-4 dark:border-slate-700">
                           <Button
                             className="w-full bg-emerald-600 hover:bg-emerald-700"
                             onClick={() => onUpdateItemStatus(order.id, item.id, nextStatus)}

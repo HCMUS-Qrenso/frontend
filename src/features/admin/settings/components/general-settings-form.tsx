@@ -46,10 +46,7 @@ const DATE_FORMATS = [
   { value: 'YYYY-MM-DD', label: 'YYYY-MM-DD' },
 ]
 
-export function GeneralSettingsForm({
-  settings,
-  onChange,
-}: GeneralSettingsFormProps) {
+export function GeneralSettingsForm({ settings, onChange }: GeneralSettingsFormProps) {
   const t = useTranslations('settings.general')
 
   return (
@@ -173,4 +170,3 @@ export function GeneralSettingsForm({
     </SettingsSection>
   )
 }
-

@@ -1,8 +1,5 @@
 import { apiClient } from '@/src/lib/axios'
-import type {
-  TenantSettingsResponse,
-  UpdateTenantSettingsPayload,
-} from '../types'
+import type { TenantSettingsResponse, UpdateTenantSettingsPayload } from '../types'
 
 const SETTINGS_ENDPOINT = '/tenants/settings'
 
@@ -20,10 +17,6 @@ export async function getSettings(): Promise<TenantSettingsResponse> {
 export async function updateSettings(
   payload: UpdateTenantSettingsPayload,
 ): Promise<TenantSettingsResponse> {
-  const response = await apiClient.patch<TenantSettingsResponse>(
-    SETTINGS_ENDPOINT,
-    payload,
-  )
+  const response = await apiClient.patch<TenantSettingsResponse>(SETTINGS_ENDPOINT, payload)
   return response.data
 }
-

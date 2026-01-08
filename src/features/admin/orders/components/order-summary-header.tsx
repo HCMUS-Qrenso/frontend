@@ -10,14 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/src/components/ui/dropdown-menu'
-import {
-  ArrowLeft,
-  Copy,
-  Printer,
-  MoreVertical,
-  AlertTriangle,
-  Check,
-} from 'lucide-react'
+import { ArrowLeft, Copy, Printer, MoreVertical, AlertTriangle, Check } from 'lucide-react'
 import { cn } from '@/src/lib/utils'
 import { OverrideStatusModal } from './override-status-modal'
 import type { OrderDetail } from '../types/orders'

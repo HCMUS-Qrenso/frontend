@@ -83,29 +83,32 @@ export function useKdsSocket(options: UseKdsSocketOptions = {}): UseKdsSocketRet
   /**
    * Optimistically update item status in cache
    */
-  const updateItemStatusInCache = useCallback((orderId: string, itemId: string, newStatus: OrderItemStatus) => {
-    // Update all KDS query caches
-    queryClientRef.current.setQueriesData<KdsOrdersResponse>(
-      { queryKey: kdsQueryKeys.all },
-      (oldData) => {
-        if (!oldData) return oldData
-        return {
-          ...oldData,
-          data: {
-            orders: oldData.data.orders.map((order) => {
-              if (order.id !== orderId) return order
-              return {
-                ...order,
-                items: order.items.map((item) =>
-                  item.id === itemId ? { ...item, status: newStatus } : item
-                ),
-              }
-            }),
-          },
-        }
-      }
-    )
-  }, [])
+  const updateItemStatusInCache = useCallback(
+    (orderId: string, itemId: string, newStatus: OrderItemStatus) => {
+      // Update all KDS query caches
+      queryClientRef.current.setQueriesData<KdsOrdersResponse>(
+        { queryKey: kdsQueryKeys.all },
+        (oldData) => {
+          if (!oldData) return oldData
+          return {
+            ...oldData,
+            data: {
+              orders: oldData.data.orders.map((order) => {
+                if (order.id !== orderId) return order
+                return {
+                  ...order,
+                  items: order.items.map((item) =>
+                    item.id === itemId ? { ...item, status: newStatus } : item,
+                  ),
+                }
+              }),
+            },
+          }
+        },
+      )
+    },
+    [],
+  )
 
   const connect = useCallback(() => {
     if (!enabled || !accessToken) {
@@ -130,7 +133,7 @@ export function useKdsSocket(options: UseKdsSocketOptions = {}): UseKdsSocketRet
     socket.on('connect', () => {
       console.log('[KdsSocket] Connected, socket.id=', socket.id)
       setIsConnected(true)
-      
+
       // Subscribe to kitchen events
       socket.emit('subscribeKitchen')
     })

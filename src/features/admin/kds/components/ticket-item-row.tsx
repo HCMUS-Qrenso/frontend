@@ -42,7 +42,7 @@ export function TicketItemRow({ item, orderId, onUpdateStatus }: TicketItemRowPr
             {item.quantity}x {item.menuItemName}
           </span>
         </div>
-        
+
         {/* Status badge */}
         <StatusBadge status={item.status} />
 

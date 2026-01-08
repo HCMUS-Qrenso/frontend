@@ -13,10 +13,7 @@ interface NotificationSettingsFormProps {
   onChange: (settings: Partial<NotificationSettings>) => void
 }
 
-export function NotificationSettingsForm({
-  settings,
-  onChange,
-}: NotificationSettingsFormProps) {
+export function NotificationSettingsForm({ settings, onChange }: NotificationSettingsFormProps) {
   const t = useTranslations('settings.notifications')
 
   return (
@@ -31,9 +28,7 @@ export function NotificationSettingsForm({
         <div className="flex items-center justify-between rounded-lg border p-4">
           <div className="space-y-0.5">
             <Label>{t('soundEnabled')}</Label>
-            <p className="text-sm text-muted-foreground">
-              {t('soundDescription')}
-            </p>
+            <p className="text-muted-foreground text-sm">{t('soundDescription')}</p>
           </div>
           <Switch
             checked={settings.sound_enabled}
@@ -50,9 +45,7 @@ export function NotificationSettingsForm({
                 Coming Soon
               </span>
             </div>
-            <p className="text-sm text-muted-foreground">
-              {t('emailDescription')}
-            </p>
+            <p className="text-muted-foreground text-sm">{t('emailDescription')}</p>
           </div>
           <Switch
             checked={settings.email_enabled}
@@ -77,4 +70,3 @@ export function NotificationSettingsForm({
     </SettingsSection>
   )
 }
-

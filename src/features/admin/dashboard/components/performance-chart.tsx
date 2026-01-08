@@ -57,9 +57,7 @@ export function PerformanceChart() {
           <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
             {t('performanceOverTime')}
           </h3>
-          <p className="text-sm text-slate-500 dark:text-slate-400">
-            {t('trackRevenueOrders')}
-          </p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">{t('trackRevenueOrders')}</p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
@@ -185,16 +183,19 @@ export function PerformanceChart() {
           {isLoading ? (
             <Skeleton className="mt-1 h-7 w-20" />
           ) : (
-            <p className={cn(
-              'mt-1 flex items-center gap-1 text-xl font-semibold',
-              (summary?.growth_percentage || 0) >= 0 ? 'text-emerald-600' : 'text-red-500'
-            )}>
+            <p
+              className={cn(
+                'mt-1 flex items-center gap-1 text-xl font-semibold',
+                (summary?.growth_percentage || 0) >= 0 ? 'text-emerald-600' : 'text-red-500',
+              )}
+            >
               {(summary?.growth_percentage || 0) >= 0 ? (
                 <TrendingUp className="h-5 w-5" />
               ) : (
                 <TrendingDown className="h-5 w-5" />
               )}
-              {(summary?.growth_percentage ?? 0) >= 0 ? '+' : ''}{summary?.growth_percentage ?? 0}%
+              {(summary?.growth_percentage ?? 0) >= 0 ? '+' : ''}
+              {summary?.growth_percentage ?? 0}%
             </p>
           )}
         </div>

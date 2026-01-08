@@ -83,22 +83,26 @@ export function TenantSettingsProvider({ children }: TenantSettingsProviderProps
     const tenantSettings = data.data
     return {
       currency: tenantSettings.general?.currency || DEFAULT_FORMAT_SETTINGS.currency,
-      currencySymbol: tenantSettings.general?.currency_symbol || DEFAULT_FORMAT_SETTINGS.currencySymbol,
+      currencySymbol:
+        tenantSettings.general?.currency_symbol || DEFAULT_FORMAT_SETTINGS.currencySymbol,
       timezone: tenantSettings.general?.timezone || DEFAULT_FORMAT_SETTINGS.timezone,
       dateFormat: tenantSettings.general?.date_format || DEFAULT_FORMAT_SETTINGS.dateFormat,
       language: tenantSettings.general?.language || DEFAULT_FORMAT_SETTINGS.language,
       phone: tenantSettings.general?.phone || null,
       contactEmail: tenantSettings.general?.contact_email || null,
-      estimatedPrepTime: tenantSettings.order?.estimated_prep_time ?? DEFAULT_FORMAT_SETTINGS.estimatedPrepTime,
+      estimatedPrepTime:
+        tenantSettings.order?.estimated_prep_time ?? DEFAULT_FORMAT_SETTINGS.estimatedPrepTime,
       tax: {
         rate: tenantSettings.tax?.rate ?? DEFAULT_FORMAT_SETTINGS.tax.rate,
         inclusive: tenantSettings.tax?.inclusive ?? DEFAULT_FORMAT_SETTINGS.tax.inclusive,
         label: tenantSettings.tax?.label || DEFAULT_FORMAT_SETTINGS.tax.label,
       },
       serviceCharge: {
-        enabled: tenantSettings.service_charge?.enabled ?? DEFAULT_FORMAT_SETTINGS.serviceCharge.enabled,
+        enabled:
+          tenantSettings.service_charge?.enabled ?? DEFAULT_FORMAT_SETTINGS.serviceCharge.enabled,
         rate: tenantSettings.service_charge?.rate ?? DEFAULT_FORMAT_SETTINGS.serviceCharge.rate,
-        taxable: tenantSettings.service_charge?.taxable ?? DEFAULT_FORMAT_SETTINGS.serviceCharge.taxable,
+        taxable:
+          tenantSettings.service_charge?.taxable ?? DEFAULT_FORMAT_SETTINGS.serviceCharge.taxable,
         min_party: tenantSettings.service_charge?.min_party ?? null,
       },
     }
@@ -109,11 +113,7 @@ export function TenantSettingsProvider({ children }: TenantSettingsProviderProps
     [settings, isLoading, isError],
   )
 
-  return (
-    <TenantSettingsContext.Provider value={value}>
-      {children}
-    </TenantSettingsContext.Provider>
-  )
+  return <TenantSettingsContext.Provider value={value}>{children}</TenantSettingsContext.Provider>
 }
 
 /**
@@ -134,4 +134,3 @@ export function useTenantSettings(): TenantSettingsContextValue {
 
   return context
 }
-

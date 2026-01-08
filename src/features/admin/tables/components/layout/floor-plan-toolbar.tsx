@@ -57,7 +57,9 @@ export function FloorPlanToolbar({
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="h-8 gap-1 rounded-lg bg-transparent px-3">
-                <span className="text-sm">{t('zone')}: {selectedArea}</span>
+                <span className="text-sm">
+                  {t('zone')}: {selectedArea}
+                </span>
                 <ChevronDown className="h-3 w-3" />
               </Button>
             </DropdownMenuTrigger>

@@ -83,11 +83,11 @@ function FloorPlanSidePanelComponent({
         <TabsContent value="library" className="p-6">
           <div className="space-y-4">
             <div>
-              <h3 className="mb-1 font-semibold text-slate-900 dark:text-white">{t('tableItem')}</h3>
+              <h3 className="mb-1 font-semibold text-slate-900 dark:text-white">
+                {t('tableItem')}
+              </h3>
               <p className="text-sm text-slate-500 dark:text-slate-400">
-                {libraryTables.length > 0
-                  ? t('clickToAdd')
-                  : t('noTablesInLibrary')}
+                {libraryTables.length > 0 ? t('clickToAdd') : t('noTablesInLibrary')}
               </p>
             </div>
 
@@ -271,7 +271,9 @@ function FloorPlanSidePanelComponent({
               <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-100 dark:bg-slate-800">
                 <Square className="h-8 w-8 text-slate-400" />
               </div>
-              <p className="mb-2 font-medium text-slate-900 dark:text-white">{t('noTableSelected')}</p>
+              <p className="mb-2 font-medium text-slate-900 dark:text-white">
+                {t('noTableSelected')}
+              </p>
               <p className="max-w-xs text-sm text-slate-500 dark:text-slate-400">
                 {t('noTableSelectedHint')}
               </p>

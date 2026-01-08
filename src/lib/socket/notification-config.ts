@@ -42,21 +42,21 @@ export const SOCKET_EVENT_NOTIFICATIONS: Record<string, SocketNotificationConfig
   'order:created': {
     severity: 'success',
     title: (data) => `Đơn mới: ${data.orderNumber || 'N/A'}`,
-    description: (data) => data.table?.tableNumber ? `Bàn ${data.table.tableNumber}` : undefined,
+    description: (data) => (data.table?.tableNumber ? `Bàn ${data.table.tableNumber}` : undefined),
     duration: 5000,
   },
 
   'order:updated': {
     severity: 'info',
     title: (data) => `Cập nhật: ${data.orderNumber || 'N/A'}`,
-    description: (data) => data.status ? `Trạng thái: ${data.status}` : undefined,
+    description: (data) => (data.status ? `Trạng thái: ${data.status}` : undefined),
     duration: 3000,
   },
 
   'order:items:added': {
     severity: 'info',
     title: (data) => `Thêm món: ${data.orderNumber || 'N/A'}`,
-    description: (data) => data.itemCount ? `${data.itemCount} món mới` : undefined,
+    description: (data) => (data.itemCount ? `${data.itemCount} món mới` : undefined),
     duration: 3000,
   },
 
@@ -76,7 +76,7 @@ export const SOCKET_EVENT_NOTIFICATIONS: Record<string, SocketNotificationConfig
   'item:status:ready': {
     severity: 'success',
     title: (data) => `Sẵn sàng: ${data.menuItemName || 'Món ăn'}`,
-    description: (data) => data.table?.tableNumber ? `Bàn ${data.table.tableNumber}` : undefined,
+    description: (data) => (data.table?.tableNumber ? `Bàn ${data.table.tableNumber}` : undefined),
     duration: 4000,
   },
 

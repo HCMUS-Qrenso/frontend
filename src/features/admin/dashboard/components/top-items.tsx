@@ -46,9 +46,7 @@ export function TopItems({ className }: TopItemsProps) {
             </div>
           ))
         ) : items?.length === 0 ? (
-          <div className="px-6 py-8 text-center text-slate-500">
-            {t('noSalesDataToday')}
-          </div>
+          <div className="px-6 py-8 text-center text-slate-500">{t('noSalesDataToday')}</div>
         ) : (
           items?.map((item, index) => (
             <div
@@ -73,7 +71,9 @@ export function TopItems({ className }: TopItemsProps) {
                   {item.name}
                 </p>
                 <div className="mt-1 flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
-                  <span>{item.quantity_sold} {t('sold')}</span>
+                  <span>
+                    {item.quantity_sold} {t('sold')}
+                  </span>
                   <span>{formatPrice(item.revenue)}</span>
                 </div>
 

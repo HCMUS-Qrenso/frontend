@@ -1,6 +1,6 @@
 /**
  * Price Calculator
- * 
+ *
  * Centralized price calculation logic for orders with tax and service charge.
  * Handles both tax-inclusive and tax-exclusive pricing, service charge with party size rules,
  * and proper tax application on service charges.
@@ -92,10 +92,7 @@ function calculateSubtotal(items: OrderItem[]): number {
 /**
  * Check if service charge should be applied based on party size
  */
-function shouldApplyServiceCharge(
-  settings: ServiceChargeSettings,
-  partySize?: number,
-): boolean {
+function shouldApplyServiceCharge(settings: ServiceChargeSettings, partySize?: number): boolean {
   if (!settings.enabled) return false
   if (settings.min_party === null) return true
   if (partySize === undefined) return true // Apply if party size unknown
@@ -131,13 +128,13 @@ function reverseCalculateSubtotal(totalAmount: number, taxRate: number): number 
 
 /**
  * Calculate order total with tax and service charge
- * 
+ *
  * @param items - Array of order items
  * @param taxSettings - Tax configuration (optional, uses defaults if not provided)
  * @param serviceChargeSettings - Service charge configuration (optional, uses defaults)
  * @param partySize - Number of guests (optional, needed for min_party rule)
  * @returns Complete price breakdown
- * 
+ *
  * @example
  * // Tax exclusive + service charge taxable
  * const result = calculateOrderTotal(
@@ -146,7 +143,7 @@ function reverseCalculateSubtotal(totalAmount: number, taxRate: number): number 
  *   { enabled: true, rate: 5, taxable: true, min_party: null }
  * )
  * // Result: { subtotal: 100000, serviceCharge: 5000, taxAmount: 10500, total: 115500 }
- * 
+ *
  * @example
  * // Tax inclusive + service charge non-taxable
  * const result = calculateOrderTotal(
@@ -196,9 +193,7 @@ export function calculateOrderTotal(
     subtotal = reverseCalculateSubtotal(itemsTotal, taxSettings.rate)
 
     // Step 2: Calculate service charge on subtotal
-    serviceCharge = applyServiceCharge
-      ? (subtotal * serviceChargeSettings.rate) / 100
-      : 0
+    serviceCharge = applyServiceCharge ? (subtotal * serviceChargeSettings.rate) / 100 : 0
 
     // Step 3: Calculate tax and taxable amount
     if (serviceChargeSettings.taxable && applyServiceCharge) {
@@ -213,7 +208,6 @@ export function calculateOrderTotal(
 
     // Step 4: Total
     total = subtotal + serviceCharge + taxAmount
-
   } else {
     // TAX EXCLUSIVE - Tax is added on top
 
@@ -221,9 +215,7 @@ export function calculateOrderTotal(
     subtotal = itemsTotal
 
     // Step 2: Calculate service charge on subtotal
-    serviceCharge = applyServiceCharge
-      ? (subtotal * serviceChargeSettings.rate) / 100
-      : 0
+    serviceCharge = applyServiceCharge ? (subtotal * serviceChargeSettings.rate) / 100 : 0
 
     // Step 3: Determine taxable amount
     if (serviceChargeSettings.taxable && applyServiceCharge) {

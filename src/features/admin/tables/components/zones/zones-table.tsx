@@ -124,9 +124,7 @@ export function ZonesTable({ onEdit, onDelete }: ZonesTableProps) {
   if (error) {
     return (
       <div className="rounded-2xl border border-red-200 bg-red-50 p-6 dark:border-red-800 dark:bg-red-500/10">
-        <p className="text-sm text-red-600 dark:text-red-400">
-          {t('zonesLoadError')}
-        </p>
+        <p className="text-sm text-red-600 dark:text-red-400">{t('zonesLoadError')}</p>
       </div>
     )
   }

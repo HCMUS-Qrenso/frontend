@@ -14,10 +14,7 @@ interface ReceiptSettingsFormProps {
   onChange: (settings: Partial<ReceiptSettings>) => void
 }
 
-export function ReceiptSettingsForm({
-  settings,
-  onChange,
-}: ReceiptSettingsFormProps) {
+export function ReceiptSettingsForm({ settings, onChange }: ReceiptSettingsFormProps) {
   const t = useTranslations('settings.receipt')
 
   return (
@@ -41,9 +38,7 @@ export function ReceiptSettingsForm({
               maxLength={10}
               disabled
             />
-            <p className="text-xs text-muted-foreground">
-              {t('invoicePrefixHint')}
-            </p>
+            <p className="text-muted-foreground text-xs">{t('invoicePrefixHint')}</p>
           </div>
         </div>
 
@@ -79,9 +74,7 @@ export function ReceiptSettingsForm({
         <div className="flex items-center justify-between rounded-lg border p-4">
           <div className="space-y-0.5">
             <Label>{t('showLogo')}</Label>
-            <p className="text-sm text-muted-foreground">
-              {t('showLogoDescription')}
-            </p>
+            <p className="text-muted-foreground text-sm">{t('showLogoDescription')}</p>
           </div>
           <Switch
             checked={settings.show_logo}
@@ -93,5 +86,3 @@ export function ReceiptSettingsForm({
     </SettingsSection>
   )
 }
-
-

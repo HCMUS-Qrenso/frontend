@@ -13,10 +13,7 @@ interface ServiceChargeFormProps {
   onChange: (settings: Partial<ServiceChargeSettings>) => void
 }
 
-export function ServiceChargeForm({
-  settings,
-  onChange,
-}: ServiceChargeFormProps) {
+export function ServiceChargeForm({ settings, onChange }: ServiceChargeFormProps) {
   const t = useTranslations('settings.serviceCharge')
 
   return (
@@ -31,9 +28,7 @@ export function ServiceChargeForm({
         <div className="flex items-center justify-between rounded-lg border p-4">
           <div className="space-y-0.5">
             <Label>{t('enabled')}</Label>
-            <p className="text-sm text-muted-foreground">
-              {t('enabledDescription')}
-            </p>
+            <p className="text-muted-foreground text-sm">{t('enabledDescription')}</p>
           </div>
           <Switch
             checked={settings.enabled}
@@ -58,7 +53,7 @@ export function ServiceChargeForm({
                     onChange={(e) => onChange({ rate: Number(e.target.value) })}
                     className="pr-8"
                   />
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                  <span className="text-muted-foreground absolute top-1/2 right-3 -translate-y-1/2">
                     %
                   </span>
                 </div>
@@ -74,16 +69,12 @@ export function ServiceChargeForm({
                   value={settings.min_party || ''}
                   onChange={(e) =>
                     onChange({
-                      min_party: e.target.value
-                        ? Number(e.target.value)
-                        : null,
+                      min_party: e.target.value ? Number(e.target.value) : null,
                     })
                   }
                   placeholder={t('minPartyPlaceholder')}
                 />
-                <p className="text-xs text-muted-foreground">
-                  {t('minPartyHint')}
-                </p>
+                <p className="text-muted-foreground text-xs">{t('minPartyHint')}</p>
               </div>
             </div>
 
@@ -91,9 +82,7 @@ export function ServiceChargeForm({
             <div className="flex items-center justify-between rounded-lg border p-4">
               <div className="space-y-0.5">
                 <Label>{t('taxable')}</Label>
-                <p className="text-sm text-muted-foreground">
-                  {t('taxableDescription')}
-                </p>
+                <p className="text-muted-foreground text-sm">{t('taxableDescription')}</p>
               </div>
               <Switch
                 checked={settings.taxable}
@@ -106,4 +95,3 @@ export function ServiceChargeForm({
     </SettingsSection>
   )
 }
-

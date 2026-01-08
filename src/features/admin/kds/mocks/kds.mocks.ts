@@ -3,7 +3,8 @@
 import type { KdsOrder, KdsOrderItem } from '../types/kds.types'
 
 // Helper to create ISO date strings relative to now
-const minutesAgo = (minutes: number): string => new Date(Date.now() - minutes * 60 * 1000).toISOString()
+const minutesAgo = (minutes: number): string =>
+  new Date(Date.now() - minutes * 60 * 1000).toISOString()
 
 // Mock order items
 const createMockItems = (orderId: string, items: Partial<KdsOrderItem>[]): KdsOrderItem[] =>
@@ -244,4 +245,3 @@ export function getMockKdsStats(orders: KdsOrder[]) {
     overdueCount: overdueOrders.length,
   }
 }
-

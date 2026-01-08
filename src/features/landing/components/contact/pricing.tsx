@@ -21,9 +21,7 @@ export function Pricing() {
             <h2 className="text-3xl font-bold text-slate-900 md:text-4xl dark:text-white">
               {t('title')}
             </h2>
-            <p className="mt-4 text-lg text-slate-500 dark:text-slate-400">
-              {t('subtitle')}
-            </p>
+            <p className="mt-4 text-lg text-slate-500 dark:text-slate-400">{t('subtitle')}</p>
           </div>
 
           {/* Pricing Cards */}
@@ -31,7 +29,7 @@ export function Pricing() {
             {planKeys.map((planKey, index) => {
               const isHighlighted = planKey === 'pro'
               const isEnterprise = planKey === 'enterprise'
-              
+
               return (
                 <div
                   key={index}
@@ -78,8 +76,8 @@ export function Pricing() {
 
                   {/* Features */}
                   <ul className="mt-8 space-y-3">
-                    {Array.from({ 
-                      length: planKey === 'starter' ? 6 : planKey === 'pro' ? 8 : 7 
+                    {Array.from({
+                      length: planKey === 'starter' ? 6 : planKey === 'pro' ? 8 : 7,
                     }).map((_, featureIndex) => (
                       <li key={featureIndex} className="flex items-start gap-3">
                         <Check className="mt-0.5 h-5 w-5 shrink-0 text-emerald-500" />
@@ -103,4 +101,3 @@ export function Pricing() {
     </section>
   )
 }
-

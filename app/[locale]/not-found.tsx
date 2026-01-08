@@ -37,9 +37,7 @@ export default function NotFound() {
 
         {/* Description */}
         <div className="mb-8">
-          <p className="text-slate-600 dark:text-slate-400">
-            {t('notFoundMessage')}
-          </p>
+          <p className="text-slate-600 dark:text-slate-400">{t('notFoundMessage')}</p>
         </div>
 
         {/* Action Buttons */}

@@ -29,7 +29,7 @@ export function TicketHeader({
     <div
       className={cn(
         'border-b border-slate-100 p-4 dark:border-slate-800',
-        isListView && 'flex-none border-0'
+        isListView && 'flex-none border-0',
       )}
     >
       <div className="flex items-start justify-between gap-3">
@@ -38,9 +38,7 @@ export function TicketHeader({
             <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
               Bàn {order.tableNumber}
             </h3>
-            {isOverdue && (
-              <AlertTriangle className="h-5 w-5 animate-pulse text-red-500" />
-            )}
+            {isOverdue && <AlertTriangle className="h-5 w-5 animate-pulse text-red-500" />}
           </div>
           <p className="mt-0.5 font-mono text-sm font-semibold text-slate-600 dark:text-slate-400">
             {order.orderNumber}

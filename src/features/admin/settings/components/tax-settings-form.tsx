@@ -17,12 +17,7 @@ export function TaxSettingsForm({ settings, onChange }: TaxSettingsFormProps) {
   const t = useTranslations('settings.tax')
 
   return (
-    <SettingsSection
-      id="tax"
-      title={t('title')}
-      description={t('description')}
-      icon={Percent}
-    >
+    <SettingsSection id="tax" title={t('title')} description={t('description')} icon={Percent}>
       <div className="space-y-6">
         {/* Tax Rate */}
         <div className="grid gap-6 sm:grid-cols-2">
@@ -39,7 +34,7 @@ export function TaxSettingsForm({ settings, onChange }: TaxSettingsFormProps) {
                 onChange={(e) => onChange({ rate: Number(e.target.value) })}
                 className="pr-8"
               />
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+              <span className="text-muted-foreground absolute top-1/2 right-3 -translate-y-1/2">
                 %
               </span>
             </div>
@@ -60,9 +55,7 @@ export function TaxSettingsForm({ settings, onChange }: TaxSettingsFormProps) {
         <div className="flex items-center justify-between rounded-lg border p-4">
           <div className="space-y-0.5">
             <Label>{t('inclusive')}</Label>
-            <p className="text-sm text-muted-foreground">
-              {t('inclusiveDescription')}
-            </p>
+            <p className="text-muted-foreground text-sm">{t('inclusiveDescription')}</p>
           </div>
           <Switch
             checked={settings.inclusive}
@@ -73,4 +66,3 @@ export function TaxSettingsForm({ settings, onChange }: TaxSettingsFormProps) {
     </SettingsSection>
   )
 }
-

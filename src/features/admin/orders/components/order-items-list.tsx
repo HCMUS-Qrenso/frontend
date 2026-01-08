@@ -128,22 +128,12 @@ export function OrderItemsList({ items, orderId }: OrderItemsListProps) {
                   {/* Timeline */}
                   <div className="ml-11 flex flex-wrap items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
                     {item.preparationStartedAt && (
-                      <span>
-                        Bắt đầu:{' '}
-                        {formatTime(item.preparationStartedAt)}
-                      </span>
+                      <span>Bắt đầu: {formatTime(item.preparationStartedAt)}</span>
                     )}
                     {item.preparationCompletedAt && (
-                      <span>
-                        Xong:{' '}
-                        {formatTime(item.preparationCompletedAt)}
-                      </span>
+                      <span>Xong: {formatTime(item.preparationCompletedAt)}</span>
                     )}
-                    {item.servedAt && (
-                      <span>
-                        Phục vụ: {formatTime(item.servedAt)}
-                      </span>
-                    )}
+                    {item.servedAt && <span>Phục vụ: {formatTime(item.servedAt)}</span>}
                   </div>
                 </div>
 

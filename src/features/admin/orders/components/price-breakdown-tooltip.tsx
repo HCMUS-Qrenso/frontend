@@ -22,10 +22,7 @@ interface PriceBreakdownTooltipProps {
  * Displays subtotal, service charge, tax (with label from settings), discount, and total.
  * Uses CSS-based hover tooltip (same pattern as items tooltip in orders-table).
  */
-export function PriceBreakdownTooltip({
-  children,
-  price,
-}: PriceBreakdownTooltipProps) {
+export function PriceBreakdownTooltip({ children, price }: PriceBreakdownTooltipProps) {
   const { formatPrice } = useFormat()
   const { settings } = useTenantSettings()
 
@@ -70,7 +67,8 @@ export function PriceBreakdownTooltip({
   }, [price, settings])
 
   // Don't show tooltip if there's nothing interesting to show
-  const shouldShowTooltip = breakdown.length > 1 || price.taxAmount > 0 || (price.serviceCharge && price.serviceCharge > 0)
+  const shouldShowTooltip =
+    breakdown.length > 1 || price.taxAmount > 0 || (price.serviceCharge && price.serviceCharge > 0)
 
   if (!shouldShowTooltip) {
     return <>{children}</>
@@ -80,16 +78,12 @@ export function PriceBreakdownTooltip({
     <div className="group relative inline-block">
       {children}
       {/* Tooltip - position left to avoid overflow */}
-      <div className="invisible absolute right-0 top-full z-50 mt-2 w-56 rounded-lg border border-slate-200 bg-white p-3 opacity-0 shadow-lg transition-all group-hover:visible group-hover:opacity-100 dark:border-slate-700 dark:bg-slate-800">
+      <div className="invisible absolute top-full right-0 z-50 mt-2 w-56 rounded-lg border border-slate-200 bg-white p-3 opacity-0 shadow-lg transition-all group-hover:visible group-hover:opacity-100 dark:border-slate-700 dark:bg-slate-800">
         <div className="space-y-1.5">
-          <p className="mb-2 text-xs font-semibold text-slate-900 dark:text-white">
-            Chi tiết giá
-          </p>
+          <p className="mb-2 text-xs font-semibold text-slate-900 dark:text-white">Chi tiết giá</p>
           {breakdown.map((item, index) => (
             <div key={index} className="flex justify-between text-xs">
-              <span className="text-slate-600 dark:text-slate-400">
-                {item.label}
-              </span>
+              <span className="text-slate-600 dark:text-slate-400">{item.label}</span>
               <span
                 className={
                   item.isNegative
@@ -102,7 +96,7 @@ export function PriceBreakdownTooltip({
               </span>
             </div>
           ))}
-          <div className="border-t border-slate-200 dark:border-slate-700 pt-1.5 mt-1.5">
+          <div className="mt-1.5 border-t border-slate-200 pt-1.5 dark:border-slate-700">
             <div className="flex justify-between text-xs font-semibold">
               <span className="text-slate-900 dark:text-white">Tổng cộng</span>
               <span className="text-slate-900 dark:text-white">
@@ -115,4 +109,3 @@ export function PriceBreakdownTooltip({
     </div>
   )
 }
-
