@@ -2,9 +2,10 @@
 
 import React, { useCallback, useRef, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
+import { Button } from '@/src/components/ui/button'
 import { Input } from '@/src/components/ui/input'
 import { Label } from '@/src/components/ui/label'
-import { User } from 'lucide-react'
+import { User, Camera } from 'lucide-react'
 import { cn } from '@/src/lib/utils'
 import type { UserProfile, UpdateProfilePayload } from '../types'
 
@@ -13,6 +14,9 @@ interface ProfileEditFormProps {
   formData: Partial<UserProfile>
   setFormData: React.Dispatch<React.SetStateAction<Partial<UserProfile>>>
   setHasChanges: (hasChanges: boolean) => void
+  hasChanges: boolean
+  onSave: () => Promise<void>
+  isSaving: boolean
 }
 
 export function ProfileEditForm({
@@ -20,6 +24,9 @@ export function ProfileEditForm({
   formData,
   setFormData,
   setHasChanges,
+  hasChanges,
+  onSave,
+  isSaving,
 }: ProfileEditFormProps) {
   const t = useTranslations('profile')
   const originalDataRef = useRef<Partial<UserProfile>>({})
@@ -92,6 +99,23 @@ export function ProfileEditForm({
             onChange={(e) => handleInputChange('phone', e.target.value)}
             placeholder={t('phonePlaceholder')}
           />
+        </div>
+
+        {/* Save Button */}
+        <div className="flex justify-end pt-4">
+          <Button onClick={onSave} disabled={!hasChanges || isSaving} className="gap-2">
+            {isSaving ? (
+              <>
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                {t('saving')}
+              </>
+            ) : (
+              <>
+                <Camera className="h-4 w-4" />
+                {t('saveChanges')}
+              </>
+            )}
+          </Button>
         </div>
       </div>
     </div>

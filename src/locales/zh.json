@@ -1391,6 +1391,24 @@
     "lastNameRequired": "姓是必填项",
     "emailRequired": "邮箱是必填项",
     "emailInvalid": "请输入有效的邮箱地址",
-    "phoneInvalid": "请输入有效的电话号码"
+    "phoneInvalid": "请输入有效的电话号码",
+    "changePassword": "更改密码",
+    "currentPassword": "当前密码",
+    "currentPasswordPlaceholder": "输入您的当前密码",
+    "currentPasswordRequired": "当前密码是必填项",
+    "newPassword": "新密码",
+    "newPasswordPlaceholder": "输入您的新密码",
+    "newPasswordRequired": "新密码是必填项",
+    "confirmPassword": "确认密码",
+    "confirmPasswordPlaceholder": "确认您的新密码",
+    "confirmPasswordRequired": "密码确认是必填项",
+    "passwordsDoNotMatch": "密码不匹配",
+    "passwordTooShort": "密码必须至少8个字符",
+    "passwordRequirements": "密码必须包含大写字母、小写字母、数字和特殊字符",
+    "passwordRequirementsText": "密码必须至少8个字符，包含大写字母、小写字母、数字和特殊字符",
+    "changingPassword": "正在更改密码...",
+    "passwordChangedSuccess": "密码更改成功",
+    "passwordChangeError": "密码更改失败",
+    "incorrectCurrentPassword": "当前密码不正确"
   }
 }

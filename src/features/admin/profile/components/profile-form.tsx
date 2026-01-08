@@ -2,14 +2,13 @@
 
 import React, { useState, useCallback } from 'react'
 import { useTranslations } from 'next-intl'
-import { Button } from '@/src/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/src/components/ui/card'
-import { Camera } from 'lucide-react'
 import { useProfileQuery, useUpdateProfileMutation } from '../queries'
 import { Skeleton } from '@/src/components/ui/skeleton'
 import { toast } from 'sonner'
 import { ProfileOverviewCard } from './profile-overview-card'
 import { ProfileEditForm } from './profile-edit-form'
+import { ChangePasswordForm } from './change-password-form'
 import type { UserProfile, UpdateProfilePayload } from '../types'
 
 export function ProfileForm() {
@@ -68,29 +67,14 @@ export function ProfileForm() {
           formData={formData}
           setFormData={setFormData}
           setHasChanges={setHasChanges}
+          hasChanges={hasChanges}
+          onSave={handleSave}
+          isSaving={updateMutation.isPending}
         />
       </div>
 
-      {/* Save Button */}
-      <div className="flex justify-end">
-        <Button
-          onClick={handleSave}
-          disabled={!hasChanges || updateMutation.isPending}
-          className="gap-2"
-        >
-          {updateMutation.isPending ? (
-            <>
-              <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-              {t('saving')}
-            </>
-          ) : (
-            <>
-              <Camera className="h-4 w-4" />
-              {t('saveChanges')}
-            </>
-          )}
-        </Button>
-      </div>
+      {/* Change Password Section */}
+      <ChangePasswordForm />
     </div>
   )
 }

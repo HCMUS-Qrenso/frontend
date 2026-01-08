@@ -2,6 +2,7 @@ import { apiClient } from '@/src/lib/axios'
 import type {
   ApiErrorResponse,
   AuthResponse,
+  ChangePasswordPayload,
   ForgotPasswordPayload,
   LoginCredentials,
   MessageResponse,
@@ -56,6 +57,11 @@ export const authApi = {
 
   setupPassword: async (payload: SetupPasswordPayload): Promise<MessageResponse> => {
     const { data } = await apiClient.post<MessageResponse>('/auth/setup-password', payload)
+    return data
+  },
+
+  changePassword: async (payload: ChangePasswordPayload): Promise<MessageResponse> => {
+    const { data } = await apiClient.post<MessageResponse>('/auth/change-password', payload)
     return data
   },
 }

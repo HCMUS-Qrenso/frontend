@@ -1423,6 +1423,24 @@
     "lastNameRequired": "Le nom est requis",
     "emailRequired": "L'email est requis",
     "emailInvalid": "Veuillez saisir une adresse email valide",
-    "phoneInvalid": "Veuillez saisir un numéro de téléphone valide"
+    "phoneInvalid": "Veuillez saisir un numéro de téléphone valide",
+    "changePassword": "Changer le mot de passe",
+    "currentPassword": "Mot de passe actuel",
+    "currentPasswordPlaceholder": "Entrez votre mot de passe actuel",
+    "currentPasswordRequired": "Le mot de passe actuel est requis",
+    "newPassword": "Nouveau mot de passe",
+    "newPasswordPlaceholder": "Entrez votre nouveau mot de passe",
+    "newPasswordRequired": "Le nouveau mot de passe est requis",
+    "confirmPassword": "Confirmer le mot de passe",
+    "confirmPasswordPlaceholder": "Confirmez votre nouveau mot de passe",
+    "confirmPasswordRequired": "La confirmation du mot de passe est requise",
+    "passwordsDoNotMatch": "Les mots de passe ne correspondent pas",
+    "passwordTooShort": "Le mot de passe doit contenir au moins 8 caractères",
+    "passwordRequirements": "Le mot de passe doit contenir des majuscules, minuscules, chiffres et caractères spéciaux",
+    "passwordRequirementsText": "Le mot de passe doit contenir au moins 8 caractères avec majuscules, minuscules, chiffres et caractères spéciaux",
+    "changingPassword": "Changement du mot de passe...",
+    "passwordChangedSuccess": "Mot de passe changé avec succès",
+    "passwordChangeError": "Échec du changement de mot de passe",
+    "incorrectCurrentPassword": "Le mot de passe actuel est incorrect"
   }
 }

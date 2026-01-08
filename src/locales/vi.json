@@ -1423,6 +1423,24 @@
     "lastNameRequired": "Họ là bắt buộc",
     "emailRequired": "Email là bắt buộc",
     "emailInvalid": "Vui lòng nhập địa chỉ email hợp lệ",
-    "phoneInvalid": "Vui lòng nhập số điện thoại hợp lệ"
+    "phoneInvalid": "Vui lòng nhập số điện thoại hợp lệ",
+    "changePassword": "Đổi mật khẩu",
+    "currentPassword": "Mật khẩu hiện tại",
+    "currentPasswordPlaceholder": "Nhập mật khẩu hiện tại",
+    "currentPasswordRequired": "Mật khẩu hiện tại là bắt buộc",
+    "newPassword": "Mật khẩu mới",
+    "newPasswordPlaceholder": "Nhập mật khẩu mới",
+    "newPasswordRequired": "Mật khẩu mới là bắt buộc",
+    "confirmPassword": "Xác nhận mật khẩu",
+    "confirmPasswordPlaceholder": "Xác nhận mật khẩu mới",
+    "confirmPasswordRequired": "Xác nhận mật khẩu là bắt buộc",
+    "passwordsDoNotMatch": "Mật khẩu không khớp",
+    "passwordTooShort": "Mật khẩu phải có ít nhất 8 ký tự",
+    "passwordRequirements": "Mật khẩu phải chứa chữ hoa, chữ thường, số và ký tự đặc biệt",
+    "passwordRequirementsText": "Mật khẩu phải có ít nhất 8 ký tự với chữ hoa, chữ thường, số và ký tự đặc biệt",
+    "changingPassword": "Đang đổi mật khẩu...",
+    "passwordChangedSuccess": "Đổi mật khẩu thành công",
+    "passwordChangeError": "Đổi mật khẩu thất bại",
+    "incorrectCurrentPassword": "Mật khẩu hiện tại không đúng"
   }
 }

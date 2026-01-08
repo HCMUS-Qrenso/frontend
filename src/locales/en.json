@@ -1419,6 +1419,24 @@
     "lastNameRequired": "Last name is required",
     "emailRequired": "Email is required",
     "emailInvalid": "Please enter a valid email address",
-    "phoneInvalid": "Please enter a valid phone number"
+    "phoneInvalid": "Please enter a valid phone number",
+    "changePassword": "Change Password",
+    "currentPassword": "Current Password",
+    "currentPasswordPlaceholder": "Enter your current password",
+    "currentPasswordRequired": "Current password is required",
+    "newPassword": "New Password",
+    "newPasswordPlaceholder": "Enter your new password",
+    "newPasswordRequired": "New password is required",
+    "confirmPassword": "Confirm Password",
+    "confirmPasswordPlaceholder": "Confirm your new password",
+    "confirmPasswordRequired": "Password confirmation is required",
+    "passwordsDoNotMatch": "Passwords do not match",
+    "passwordTooShort": "Password must be at least 8 characters",
+    "passwordRequirements": "Password must contain uppercase, lowercase, number, and special character",
+    "passwordRequirementsText": "Password must be at least 8 characters with uppercase, lowercase, number, and special character",
+    "changingPassword": "Changing password...",
+    "passwordChangedSuccess": "Password changed successfully",
+    "passwordChangeError": "Failed to change password",
+    "incorrectCurrentPassword": "Current password is incorrect"
   }
 }
