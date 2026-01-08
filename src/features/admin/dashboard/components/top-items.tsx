@@ -74,6 +74,9 @@ export function TopItems({ className }: TopItemsProps) {
                   <span>
                     {item.quantity_sold} {t('sold')}
                   </span>
+                  <span>
+                    {item.quantity_sold} {t('sold')}
+                  </span>
                   <span>{formatPrice(item.revenue)}</span>
                 </div>
 

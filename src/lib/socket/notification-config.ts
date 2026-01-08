@@ -112,6 +112,14 @@ export const SOCKET_EVENT_NOTIFICATIONS: Record<string, SocketNotificationConfig
     description: (data) => data.message || 'Không thể kết nối đến server',
     duration: 5000,
   },
+
+  // ========== Payment Events ==========
+  'payment:updated': {
+    severity: 'success',
+    title: (data) => 'Thanh toán thành công',
+    description: (data) => (data.orderId ? `Đơn hàng đã được thanh toán` : undefined),
+    duration: 5000,
+  },
 }
 
 /**

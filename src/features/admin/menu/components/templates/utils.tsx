@@ -56,6 +56,24 @@ const loadImageAsDataURI = async (url: string): Promise<string> => {
   })
 }
 
+/// Calculate approximate items per page based on template and font size
+export const getMaxItemsPerPage = (templateId: string, fontSize: 'small' | 'medium' | 'large') => {
+  const fontMultiplier = {
+    small: 1.2, // More items fit with smaller font
+    medium: 1,
+    large: 0.8, // Fewer items with larger font
+  }
+  const baseItems = {
+    '1': 20,
+    '2': 5,
+    '3': 13,
+    '4': 3,
+    default: 10,
+  }
+  const base = baseItems[templateId as keyof typeof baseItems] || baseItems.default
+  return Math.floor(base * fontMultiplier[fontSize])
+}
+
 // Helper function to generate PDF blob
 export const generatePDFBlob = async (
   restaurantInfo: any,
@@ -67,6 +85,7 @@ export const generatePDFBlob = async (
   templateId: string,
   fontSize: 'small' | 'medium' | 'large' = 'medium',
   chefIcon: string = '⭐',
+  maxItemsPerPage?: number,
 ): Promise<Blob> => {
   // Collect all unique image URLs that need conversion (unsupported formats)
   const allItems = Object.values(menuItemsByCategory).flat()
@@ -110,6 +129,7 @@ export const generatePDFBlob = async (
       fontSize={fontSize}
       chefIcon={' ' + chefIcon}
       imageData={imageData}
+      maxItemsPerPage={maxItemsPerPage}
     />
   )
 
@@ -128,6 +148,7 @@ const MenuPDFDocument = ({
   fontSize = 'medium',
   chefIcon = '⭐',
   imageData = {},
+  maxItemsPerPage,
 }: {
   restaurantInfo: any
   menuItemsByCategory: Record<string, any[]>
@@ -139,6 +160,7 @@ const MenuPDFDocument = ({
   fontSize?: 'small' | 'medium' | 'large'
   chefIcon?: string
   imageData?: Record<string, string>
+  maxItemsPerPage?: number
 }) => {
   const getSelectedImageUrl = (images: any[]) => {
     const primary = images.find((img: any) => img.is_primary)
@@ -294,33 +316,13 @@ const MenuPDFDocument = ({
     const effectiveTheme = theme
     const effectiveAccent = categoryColor
 
-    /// Calculate approximate items per page based on template and font size
-    const getMaxItemsPerPage = (templateId: string, fontSize: 'small' | 'medium' | 'large') => {
-      const fontMultiplier = {
-        small: 1.2, // More items fit with smaller font
-        medium: 1,
-        large: 0.8, // Fewer items with larger font
-      }
-      const baseItems = {
-        '1': 20,
-        '2': 5,
-        '3': 13,
-        '4': 15,
-        default: 10,
-      }
-      const base = baseItems[templateId as keyof typeof baseItems] || baseItems.default
-      return Math.floor(base * fontMultiplier[fontSize])
-    }
-
-    const maxItemsPerPage = getMaxItemsPerPage(templateId || '', fontSize)
-
     // Flatten all items for pagination
     const allItems = Object.entries(menuItemsByCategory).flatMap(([categoryId, items]) =>
       items.map((item) => ({ ...item, categoryId })),
     )
 
     const totalItems = allItems.length
-    const itemsPerPage = maxItemsPerPage
+    const itemsPerPage = maxItemsPerPage || getMaxItemsPerPage(templateId, fontSize)
 
     switch (templateId) {
       case '1': {
@@ -387,7 +389,7 @@ const MenuPDFDocument = ({
                   </Text>
                 </View>
               )}
-              <View style={{ flexDirection: 'row', gap: 20, marginTop: pageIndex === 0 ? 0 : 40 }}>
+              <View style={{ flexDirection: 'row', gap: 20 }}>
                 <View style={{ flex: 1 }}>
                   {columns[0].map(([categoryId, items]) => {
                     const category = categories.find((c) => c.id === categoryId)

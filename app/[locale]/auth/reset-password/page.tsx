@@ -109,7 +109,11 @@ function ResetPasswordContent() {
     }
 
     try {
-      await resetPassword({ token: token ?? '', newPassword: formData.password })
+      await resetPassword({
+        token: token ?? '',
+        newPassword: formData.password,
+        accountType: 'staff',
+      })
       setIsSuccess(true)
     } catch (err) {
       const message = extractErrorMessage(err)
