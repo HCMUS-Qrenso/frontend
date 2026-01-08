@@ -26,6 +26,7 @@ export function ReceiptSettingsForm({
       title={t('title')}
       description={t('description')}
       icon={Receipt}
+      comingSoon
     >
       <div className="space-y-6">
         <div className="grid gap-6 sm:grid-cols-2">
@@ -38,6 +39,7 @@ export function ReceiptSettingsForm({
               onChange={(e) => onChange({ invoice_prefix: e.target.value })}
               placeholder={t('invoicePrefixPlaceholder')}
               maxLength={10}
+              disabled
             />
             <p className="text-xs text-muted-foreground">
               {t('invoicePrefixHint')}
@@ -55,6 +57,7 @@ export function ReceiptSettingsForm({
             placeholder={t('headerPlaceholder')}
             rows={2}
             maxLength={500}
+            disabled
           />
         </div>
 
@@ -68,6 +71,7 @@ export function ReceiptSettingsForm({
             placeholder={t('footerPlaceholder')}
             rows={2}
             maxLength={500}
+            disabled
           />
         </div>
 
@@ -82,10 +86,12 @@ export function ReceiptSettingsForm({
           <Switch
             checked={settings.show_logo}
             onCheckedChange={(checked) => onChange({ show_logo: checked })}
+            disabled
           />
         </div>
       </div>
     </SettingsSection>
   )
 }
+
 

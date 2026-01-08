@@ -95,7 +95,7 @@ export function QRTableList({
       {selectedTables.length > 0 && (
         <div className="flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50/50 p-3 dark:border-emerald-500/20 dark:bg-emerald-500/5">
           <span className="text-sm font-medium text-emerald-700 dark:text-emerald-400">
-            {t('tablesSelected').replace('{count}', String(selectedTables.length))}
+            {t('tablesSelected', { count: selectedTables.length })}
           </span>
           <div className="flex items-center gap-2">
             {onBatchDownload && (
@@ -299,7 +299,7 @@ export function QRTableList({
       {tables.length > 0 && (
         <div className="flex items-center justify-between">
           <p className="text-sm text-slate-500 dark:text-slate-400">
-            {t('showingTables').replace('{count}', String(tables.length))}
+            {t('showingTables', { count: tables.length })}
           </p>
         </div>
       )}
