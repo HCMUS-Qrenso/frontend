@@ -13,6 +13,7 @@ import { OrderSettingsForm } from './order-settings-form'
 import { NotificationSettingsForm } from './notification-settings-form'
 import { ReceiptSettingsForm } from './receipt-settings-form'
 import { OperatingHoursForm } from './operating-hours-form'
+import { QrPaymentSettingsForm } from './qr-payment-settings-form'
 import { useSettingsQuery, useUpdateSettingsMutation } from '../queries'
 import { Save, Loader2 } from 'lucide-react'
 import type { TenantSettings, UpdateTenantSettingsPayload } from '../types'
@@ -81,6 +82,10 @@ export function SettingsPage() {
       receiptFooter: formData.receipt.footer || undefined,
       receiptShowLogo: formData.receipt.show_logo,
       invoicePrefix: formData.receipt.invoice_prefix,
+      // QR Payment
+      qrPayosClientId: formData.qr_payment.payos_client_id || undefined,
+      qrPayosApiKey: formData.qr_payment.payos_api_key || undefined,
+      qrPayosChecksumKey: formData.qr_payment.payos_checksum_key || undefined,
     }
 
     updateMutation.mutate(payload, {
@@ -138,6 +143,13 @@ export function SettingsPage() {
     setHasChanges(true)
   }, [])
 
+  const updateQrPayment = useCallback((partial: Partial<TenantSettings['qr_payment']>) => {
+    setFormData((prev) =>
+      prev ? { ...prev, qr_payment: { ...prev.qr_payment, ...partial } } : prev,
+    )
+    setHasChanges(true)
+  }, [])
+
   if (isLoading) {
     return <SettingsPageSkeleton />
   }
@@ -152,23 +164,6 @@ export function SettingsPage() {
 
   return (
     <div className="space-y-6">
-      {/* Save Button - Fixed at top right */}
-      <div className="flex justify-end">
-        <Button onClick={handleSave} disabled={!hasChanges || updateMutation.isPending} size="lg">
-          {updateMutation.isPending ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              {t('saving')}
-            </>
-          ) : (
-            <>
-              <Save className="mr-2 h-4 w-4" />
-              {t('saveChanges')}
-            </>
-          )}
-        </Button>
-      </div>
-
       {/* Grid Layout for Settings Cards */}
       <div className="grid gap-6 lg:grid-cols-2">
         {/* General Settings - Full width on first row */}
@@ -188,6 +183,9 @@ export function SettingsPage() {
         {/* Operating Hours */}
         <OperatingHoursForm settings={formData.operating_hours} onChange={updateOperatingHours} />
 
+        {/* QR Payment Settings */}
+        <QrPaymentSettingsForm settings={formData.qr_payment} onChange={updateQrPayment} />
+
         {/* Notifications */}
         <NotificationSettingsForm
           settings={formData.notifications}
@@ -199,6 +197,23 @@ export function SettingsPage() {
           <ReceiptSettingsForm settings={formData.receipt} onChange={updateReceipt} />
         </div>
       </div>
+
+      {/* Save Button - Fixed at bottom right */}
+      <div className="flex justify-end">
+        <Button onClick={handleSave} disabled={!hasChanges || updateMutation.isPending} size="lg">
+          {updateMutation.isPending ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              {t('saving')}
+            </>
+          ) : (
+            <>
+              <Save className="mr-2 h-4 w-4" />
+              {t('saveChanges')}
+            </>
+          )}
+        </Button>
+      </div>
     </div>
   )
 }
@@ -209,10 +224,6 @@ export function SettingsPage() {
 function SettingsPageSkeleton() {
   return (
     <div className="space-y-6">
-      <div className="flex justify-end">
-        <Skeleton className="h-10 w-32" />
-      </div>
-
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Full width card */}
         <div className="rounded-xl border p-6 lg:col-span-2">
@@ -244,6 +255,10 @@ function SettingsPageSkeleton() {
             <Skeleton className="h-20 w-full" />
           </div>
         </div>
+      </div>
+
+      <div className="flex justify-end">
+        <Skeleton className="h-10 w-32" />
       </div>
     </div>
   )

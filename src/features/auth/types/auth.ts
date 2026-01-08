@@ -23,6 +23,7 @@ export interface UserProfile {
   tenantId: string | null
   createdAt: string
   lastLoginAt: string | null
+  updatedAt: string
 }
 
 export interface AuthResponse {

@@ -64,25 +64,15 @@ export function StaffPasswordDialog({
             {isReset ? t('resetPasswordTitle') : t('resendInviteTitle')}
           </AlertDialogTitle>
           <AlertDialogDescription>
-            {isReset ? (
-              <span
-                dangerouslySetInnerHTML={{
-                  __html: t('resetPasswordDesc', { email: staff.email }).replace(
-                    '<strong>',
-                    '<strong class="font-semibold">',
-                  ),
-                }}
-              />
-            ) : (
-              <span
-                dangerouslySetInnerHTML={{
-                  __html: t('resendInviteDesc', { email: staff.email }).replace(
-                    '<strong>',
-                    '<strong class="font-semibold">',
-                  ),
-                }}
-              />
-            )}
+            {isReset
+              ? t.rich('resetPasswordDesc', {
+                  email: staff.email,
+                  strong: (chunks) => <strong className="font-semibold">{chunks}</strong>,
+                })
+              : t.rich('resendInviteDesc', {
+                  email: staff.email,
+                  strong: (chunks) => <strong className="font-semibold">{chunks}</strong>,
+                })}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
