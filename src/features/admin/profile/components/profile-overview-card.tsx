@@ -12,6 +12,7 @@ import { useUpdateProfileMutation } from '../queries'
 import { toast } from 'sonner'
 import { cn } from '@/src/lib/utils'
 import { AvatarCropDialog } from './avatar-crop-dialog'
+import { UserProfile } from '../types/profile.types'
 
 interface ProfileOverviewCardProps {
   profile: UserProfile

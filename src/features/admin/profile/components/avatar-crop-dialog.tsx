@@ -30,7 +30,12 @@ export function AvatarCropDialog({
   const t = useTranslations('profile')
   const [crop, setCrop] = useState({ x: 0, y: 0 })
   const [zoom, setZoom] = useState(1)
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null)
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<{
+    x: number
+    y: number
+    width: number
+    height: number
+  } | null>(null)
 
   const onCropChange = useCallback((crop: { x: number; y: number }) => {
     setCrop(crop)
@@ -40,9 +45,15 @@ export function AvatarCropDialog({
     setZoom(zoom)
   }, [])
 
-  const onCropAreaChange = useCallback((croppedArea: any, croppedAreaPixels: any) => {
-    setCroppedAreaPixels(croppedAreaPixels)
-  }, [])
+  const onCropAreaChange = useCallback(
+    (
+      croppedArea: { x: number; y: number; width: number; height: number },
+      croppedAreaPixels: { x: number; y: number; width: number; height: number },
+    ) => {
+      setCroppedAreaPixels(croppedAreaPixels)
+    },
+    [],
+  )
 
   const createCroppedImage = useCallback(async () => {
     if (!imageSrc || !croppedAreaPixels) return
