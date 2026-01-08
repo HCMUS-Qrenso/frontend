@@ -27,7 +27,6 @@ import {
   useCheckPaymentStatusMutation,
 } from '../queries'
 import { toast } from 'sonner'
-import type { PaymentRecord } from '../types/orders'
 import { printBill } from '../utils/print-bill'
 
 const PAYMENT_STATUS_CONFIG: Record<string, { label: string; color: string }> = {
