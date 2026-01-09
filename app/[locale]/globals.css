@@ -176,3 +176,12 @@
 input[type='password']::-ms-reveal {
   display: none;
 }
+
+/* KDS Fullscreen Mode */
+body.kds-fullscreen .kds-fullscreen\:hidden {
+  display: none !important;
+}
+
+body.kds-fullscreen .kds-fullscreen\:\!pl-0 {
+  padding-left: 0 !important;
+}

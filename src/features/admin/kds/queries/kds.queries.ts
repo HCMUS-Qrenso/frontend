@@ -10,6 +10,7 @@ import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tansta
 import { kdsApi } from '../api/kds.api'
 import { kdsQueryKeys } from './kds.keys'
 import type { KdsFilters, KdsOrdersResponse, OrderItemStatus } from '../types/kds.types'
+import { ordersQueryKeys } from '../../orders/queries'
 
 // Re-export query keys
 export { kdsQueryKeys }
@@ -81,6 +82,7 @@ export function useUpdateItemStatusMutation() {
     onSettled: () => {
       // Refetch to ensure consistency
       queryClient.invalidateQueries({ queryKey: kdsQueryKeys.all })
+      queryClient.invalidateQueries({ queryKey: ordersQueryKeys.all })
     },
   })
 }

@@ -4,9 +4,12 @@ import { useTranslations } from 'next-intl'
 import { Input } from '@/src/components/ui/input'
 import { Label } from '@/src/components/ui/label'
 import { Switch } from '@/src/components/ui/switch'
+import { RadioGroup, RadioGroupItem } from '@/src/components/ui/radio-group'
 import { SettingsSection } from './settings-section'
-import { Bell } from 'lucide-react'
+import { Bell, Volume2 } from 'lucide-react'
 import type { NotificationSettings } from '../types'
+import { playNotificationSound } from '../../shared/utils'
+import { useTenantSettings } from '@/src/contexts/tenant-settings-context'
 
 interface NotificationSettingsFormProps {
   settings: NotificationSettings
@@ -15,6 +18,16 @@ interface NotificationSettingsFormProps {
 
 export function NotificationSettingsForm({ settings, onChange }: NotificationSettingsFormProps) {
   const t = useTranslations('settings.notifications')
+  const { settings: tenantSettings } = useTenantSettings()
+
+  const getSoundInfo = (soundId: number) => {
+    const soundKeys = ['bell', 'chime', 'ding', 'pop', 'ping'] as const
+    const soundKey = soundKeys[soundId - 1] // Convert 1-based ID to 0-based array index
+    return {
+      name: t(`sounds.${soundKey}.name`),
+      description: t(`sounds.${soundKey}.description`),
+    }
+  }
 
   return (
     <SettingsSection
@@ -35,6 +48,42 @@ export function NotificationSettingsForm({ settings, onChange }: NotificationSet
             onCheckedChange={(checked) => onChange({ sound_enabled: checked })}
           />
         </div>
+
+        {/* Sound Selection */}
+        {settings.sound_enabled && (
+          <div className="space-y-4 rounded-lg border p-4">
+            <div className="flex items-center gap-2">
+              <Volume2 className="text-muted-foreground h-4 w-4" />
+              <Label>{t('soundType')}</Label>
+            </div>
+            <RadioGroup
+              value={String(settings.sound || 1)}
+              onValueChange={(value) => onChange({ sound: Number(value) })}
+              className="space-y-3"
+            >
+              {[1, 2, 3, 4, 5].map((soundId) => {
+                const soundInfo = getSoundInfo(soundId)
+                return (
+                  <div key={soundId} className="flex items-center space-x-3">
+                    <RadioGroupItem value={String(soundId)} id={`sound-${soundId}`} />
+                    <Label
+                      htmlFor={`sound-${soundId}`}
+                      className="flex-1 cursor-pointer font-normal"
+                      onClick={() => playNotificationSound(tenantSettings, soundId, true)}
+                    >
+                      <div className="flex flex-col">
+                        <span className="font-medium">{soundInfo.name}</span>
+                        <span className="text-muted-foreground text-xs">
+                          {soundInfo.description}
+                        </span>
+                      </div>
+                    </Label>
+                  </div>
+                )
+              })}
+            </RadioGroup>
+          </div>
+        )}
 
         {/* Email Notifications */}
         <div className="flex items-center justify-between rounded-lg border p-4 opacity-60">

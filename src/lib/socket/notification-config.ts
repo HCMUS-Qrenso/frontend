@@ -120,6 +120,20 @@ export const SOCKET_EVENT_NOTIFICATIONS: Record<string, SocketNotificationConfig
     description: (data) => (data.orderId ? `Đơn hàng đã được thanh toán` : undefined),
     duration: 5000,
   },
+
+  // ========== Bill Request Events ==========
+  'bill:requested': {
+    severity: 'warning',
+    title: (data) => `🔔 Yêu cầu tính tiền - Bàn ${data.tableNumber || 'N/A'}`,
+    description: (data) => {
+      const parts = []
+      if (data.zoneName) parts.push(data.zoneName)
+      if (data.orderNumber) parts.push(`#${data.orderNumber}`)
+      if (data.notes) parts.push(data.notes)
+      return parts.length > 0 ? parts.join(' • ') : undefined
+    },
+    duration: 8000, // Longer duration for important notification
+  },
 }
 
 /**

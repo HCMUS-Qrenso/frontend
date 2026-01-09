@@ -443,7 +443,8 @@
     "paid": "Paid",
     "partialPaid": "Partial",
     "refunded": "Refunded",
-    "itemLabel": "orders"
+    "itemLabel": "orders",
+    "paymentRequested": "Customer requested payment"
   },
   "tables": {
     "title": "Tables Management",
@@ -1324,6 +1325,29 @@
       "description": "Configure sound and email notifications",
       "soundEnabled": "Sound notifications",
       "soundDescription": "Play sound when new order arrives",
+      "soundType": "Notification Sound",
+      "sounds": {
+        "bell": {
+          "name": "Bell",
+          "description": "Classic bell notification"
+        },
+        "chime": {
+          "name": "Chime",
+          "description": "Gentle chime sound"
+        },
+        "ding": {
+          "name": "Ding",
+          "description": "Quick ding notification"
+        },
+        "pop": {
+          "name": "Pop",
+          "description": "Modern pop sound"
+        },
+        "ping": {
+          "name": "Ping",
+          "description": "Sharp ping alert"
+        }
+      },
       "emailEnabled": "Email notifications",
       "emailDescription": "Send email when new order arrives",
       "email": "Notification email",

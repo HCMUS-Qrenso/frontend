@@ -75,6 +75,7 @@ export function SettingsPage() {
       requireGuestCount: formData.order.require_guest_count,
       // Notifications
       notifySoundEnabled: formData.notifications.sound_enabled,
+      notifySound: formData.notifications.sound,
       notifyEmailEnabled: formData.notifications.email_enabled,
       notifyEmail: formData.notifications.email || undefined,
       // Receipt

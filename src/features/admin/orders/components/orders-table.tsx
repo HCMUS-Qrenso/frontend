@@ -22,6 +22,12 @@ import {
   DropdownMenuTrigger,
 } from '@/src/components/ui/dropdown-menu'
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/src/components/ui/tooltip'
+import {
   Eye,
   MoreVertical,
   Printer,
@@ -32,6 +38,9 @@ import {
   CheckCircle,
   X,
   Loader2,
+  Bell,
+  DollarSign,
+  QrCode,
 } from 'lucide-react'
 import { PaymentDialog } from './payment-dialog'
 import { CancelPaymentDialog } from './cancel-payment-dialog'
@@ -352,16 +361,51 @@ export function OrdersTable() {
                     onClick={() => handleViewOrder(order.id)}
                   >
                     <TableCell className="px-4 py-4">
-                      <div>
-                        <p className="font-mono text-sm font-semibold text-slate-900 dark:text-white">
-                          {order.orderNumber}
-                        </p>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">
-                          {formatDistanceToNow(new Date(order.createdAt), {
-                            addSuffix: true,
-                            locale: dateLocale,
-                          })}
-                        </p>
+                      <div className="flex items-center gap-2">
+                        <div>
+                          <p className="font-mono text-sm font-semibold text-slate-900 dark:text-white">
+                            {order.orderNumber}
+                          </p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400">
+                            {formatDistanceToNow(new Date(order.createdAt), {
+                              addSuffix: true,
+                              locale: dateLocale,
+                            })}
+                          </p>
+                        </div>
+                        {order.paymentRequestedAt && order.paymentStatus !== 'paid' && (
+                          <TooltipProvider>
+                            <div className="flex shrink-0 items-center gap-1">
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Bell className="h-4 w-4 animate-pulse cursor-help text-amber-500" />
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>{t('paymentRequested')}</p>
+                                </TooltipContent>
+                              </Tooltip>
+                              {order.paymentMethod === 'qr' ? (
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <QrCode className="h-4 w-4 cursor-help text-blue-600 dark:text-blue-400" />
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>QR Payment</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              ) : order.paymentMethod === 'cash' ? (
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <DollarSign className="h-4 w-4 cursor-help text-emerald-600 dark:text-emerald-400" />
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>Cash Payment</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              ) : null}
+                            </div>
+                          </TooltipProvider>
+                        )}
                       </div>
                     </TableCell>
                     <TableCell className="px-4 py-4">

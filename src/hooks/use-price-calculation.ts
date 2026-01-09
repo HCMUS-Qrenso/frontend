@@ -28,9 +28,9 @@ export function usePriceCalculation() {
    */
   const calculatePrice = useCallback(
     (items: OrderItem[], partySize?: number): PriceBreakdown => {
-      return calculateOrderTotal(items, settings.tax, settings.serviceCharge, partySize)
+      return calculateOrderTotal(items, settings.tax, settings.service_charge, partySize)
     },
-    [settings.tax, settings.serviceCharge],
+    [settings.tax, settings.service_charge],
   )
 
   /**
@@ -51,6 +51,6 @@ export function usePriceCalculation() {
     /** Access tax settings directly */
     taxSettings: settings.tax,
     /** Access service charge settings directly */
-    serviceChargeSettings: settings.serviceCharge,
+    serviceChargeSettings: settings.service_charge,
   }
 }
