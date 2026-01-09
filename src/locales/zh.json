@@ -328,7 +328,6 @@
     "ascending": "升序",
     "descending": "降序",
     "searchPlaceholder": "搜索菜品名称...",
-    "importExport": "导入/导出",
     "totalItems": "菜品总数",
     "created": "已创建",
     "availableSubtext": "供应中",
@@ -350,7 +349,6 @@
     "exportData": "导出数据",
     "export": "导出",
     "modifierGroups": "加料组",
-    "modifiers": "加料",
     "createGroup": "创建组",
     "editGroup": "编辑组",
     "deleteGroup": "删除组",
@@ -385,7 +383,6 @@
     "optionShown": "选项已显示",
     "cannotUpdateStatus": "无法更新状态",
     "hiddenLabel": "已隐藏",
-    "templates": "模板",
     "templateGallery": "适合餐厅的精美打印菜单模板",
     "selectTemplate": "使用此模板",
     "previewTemplate": "预览",
@@ -820,11 +817,8 @@
     "orderDate": "下单日期",
     "orderTime": "下单时间",
     "statusLabel": "状态",
-    "status": "状态",
     "total": "总计",
-    "items": "菜品",
     "quantity": "数量",
-    "notes": "备注",
     "table": "桌台",
     "customer": "顾客",
     "pending": "待处理",
@@ -1043,7 +1037,7 @@
       "paymentProcessing": "支付处理中",
       "paymentInProgress": "订单正在处理支付。请先完成或取消当前支付。",
       "cannotCreateNewPayment": "无法创建新支付。请先完成或取消当前支付。"
-    }
+    },
     "paymentRequested": "客户请求付款"
   },
   "tables": {

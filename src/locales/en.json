@@ -328,7 +328,6 @@
     "ascending": "Ascending",
     "descending": "Descending",
     "searchPlaceholder": "Search by item name...",
-    "importExport": "Import/Export",
     "totalItems": "Total items",
     "created": "Created",
     "availableSubtext": "Available",
@@ -350,7 +349,6 @@
     "exportData": "Export Data",
     "export": "Export",
     "modifierGroups": "Modifier Groups",
-    "modifiers": "Modifiers",
     "createGroup": "Create Group",
     "editGroup": "Edit Group",
     "deleteGroup": "Delete Group",
@@ -385,7 +383,6 @@
     "optionShown": "Option shown",
     "cannotUpdateStatus": "Cannot update status",
     "hiddenLabel": "Hidden",
-    "templates": "Templates",
     "templateGallery": "Beautiful, print-ready menu templates for restaurants",
     "selectTemplate": "Use this template",
     "previewTemplate": "Preview",
@@ -821,9 +818,7 @@
     "orderTime": "Order Time",
     "statusLabel": "Status",
     "total": "Total",
-    "items": "Items",
     "quantity": "Quantity",
-    "notes": "Notes",
     "table": "Table",
     "customer": "Customer",
     "pending": "Pending",
@@ -1054,7 +1049,7 @@
       "paymentProcessing": "Payment Processing",
       "paymentProcessingDesc": "Cannot create new payment. Please complete or cancel the current payment.",
       "cannotCreateNewPayment": "Cannot create new payment. Please complete or cancel the current payment."
-    }
+    },
     "paymentRequested": "Customer requested payment"
   },
   "tables": {

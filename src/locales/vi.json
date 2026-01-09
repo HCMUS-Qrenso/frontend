@@ -328,7 +328,6 @@
     "ascending": "Tăng dần",
     "descending": "Giảm dần",
     "searchPlaceholder": "Tìm theo tên món...",
-    "importExport": "Import/Export",
     "totalItems": "Tổng món",
     "created": "Đã tạo",
     "availableSubtext": "Available",
@@ -385,7 +384,6 @@
     "optionShown": "Đã hiện option",
     "cannotUpdateStatus": "Không thể cập nhật trạng thái",
     "hiddenLabel": "Ẩn",
-    "templates": "Templates",
     "templateGallery": "Các mẫu menu đẹp, print-ready cho nhà hàng",
     "selectTemplate": "Dùng template này",
     "previewTemplate": "Xem trước",
@@ -827,9 +825,7 @@
     "orderTime": "Giờ đặt",
     "statusLabel": "Trạng thái",
     "total": "Tổng tiền",
-    "items": "Món ăn",
     "quantity": "Số lượng",
-    "notes": "Ghi chú",
     "table": "Bàn",
     "customer": "Khách hàng",
     "pending": "Chờ xử lý",
@@ -1060,7 +1056,7 @@
       "paymentProcessing": "Thanh toán đang xử lý",
       "paymentProcessingDesc": "Không thể tạo thanh toán mới. Vui lòng hoàn tất hoặc hủy thanh toán hiện tại.",
       "cannotCreateNewPayment": "Không thể tạo thanh toán mới. Vui lòng hoàn tất hoặc hủy thanh toán hiện tại."
-    }
+    },
     "paymentRequested": "Khách yêu cầu thanh toán"
   },
   "tables": {

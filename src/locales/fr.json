@@ -328,7 +328,6 @@
     "ascending": "Croissant",
     "descending": "Décroissant",
     "searchPlaceholder": "Rechercher un article...",
-    "importExport": "Import/Export",
     "totalItems": "Total articles",
     "created": "Créé",
     "availableSubtext": "Disponible",
@@ -350,7 +349,6 @@
     "exportData": "Exporter les données",
     "export": "Exporter",
     "modifierGroups": "Groupes de modificateurs",
-    "modifiers": "Modificateurs",
     "createGroup": "Créer un Groupe",
     "editGroup": "Modifier le Groupe",
     "deleteGroup": "Supprimer le Groupe",
@@ -385,7 +383,6 @@
     "optionShown": "Option affichée",
     "cannotUpdateStatus": "Impossible de mettre à jour le statut",
     "hiddenLabel": "Masqué",
-    "templates": "Modèles",
     "templateGallery": "Modèles de menu prêts à imprimer pour restaurants",
     "selectTemplate": "Utiliser ce modèle",
     "previewTemplate": "Aperçu",
@@ -820,11 +817,8 @@
     "orderDate": "Date de commande",
     "orderTime": "Heure de commande",
     "statusLabel": "Statut",
-    "status": "Statut",
     "total": "Total",
-    "items": "Articles",
     "quantity": "Quantité",
-    "notes": "Notes",
     "table": "Table",
     "customer": "Client",
     "pending": "En attente",
@@ -1043,7 +1037,7 @@
       "paymentProcessing": "Paiement en cours",
       "paymentInProgress": "La commande a un paiement en cours. Veuillez d'abord le finaliser ou l'annuler.",
       "cannotCreateNewPayment": "Impossible de créer un nouveau paiement. Veuillez d'abord finaliser ou annuler le paiement en cours."
-    }
+    },
     "paymentRequested": "Demande de paiement client"
   },
   "tables": {
