@@ -73,7 +73,7 @@ export function useKdsSocket(options: UseKdsSocketOptions = {}): UseKdsSocketRet
   const queryClient = useQueryClient()
   const accessToken = useAuthStore((state) => state.accessToken)
 
-  const { tenantSettings } = useTenantSettings()
+  const { settings: tenantSettings } = useTenantSettings()
 
   // Use refs to avoid dependency changes causing reconnect loops
   const queryClientRef = useRef<QueryClient>(queryClient)
