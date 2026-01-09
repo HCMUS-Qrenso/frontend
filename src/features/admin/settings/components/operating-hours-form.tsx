@@ -44,7 +44,12 @@ export function OperatingHoursForm({ settings, onChange }: OperatingHoursFormPro
       if (!settings || !settings[day]) {
         return { isOpen: false, slots: [] }
       }
-      return settings[day] as DayOperatingHours
+      const dayData = settings[day] as DayOperatingHours
+      // Ensure slots is always an array (handle malformed data from database)
+      return {
+        isOpen: dayData.isOpen ?? false,
+        slots: Array.isArray(dayData.slots) ? dayData.slots : [],
+      }
     },
     [settings],
   )

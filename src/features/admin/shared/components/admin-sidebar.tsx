@@ -103,7 +103,7 @@ export function AdminSidebar({
       },
       { icon: Users, labelKey: 'menuStaff', href: '/admin/staff' },
       { icon: BarChart3, labelKey: 'menuReports', href: '/admin/reports', wip: true },
-      { icon: Settings, labelKey: 'menuSettings', href: '/admin/settings', wip: true },
+      { icon: Settings, labelKey: 'menuSettings', href: '/admin/settings'},
     ],
     [],
   )

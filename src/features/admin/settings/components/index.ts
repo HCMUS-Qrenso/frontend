@@ -1,5 +1,6 @@
 export * from './settings-page'
 export * from './settings-section'
+export * from './restaurant-info-form'
 export * from './general-settings-form'
 export * from './tax-settings-form'
 export * from './service-charge-form'
@@ -8,3 +9,4 @@ export * from './notification-settings-form'
 export * from './receipt-settings-form'
 export * from './operating-hours-form'
 export * from './qr-payment-settings-form'
+

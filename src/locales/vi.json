@@ -1356,6 +1356,24 @@
       "operatingHours": "Giờ hoạt động",
       "qrPayment": "Thanh toán QR"
     },
+    "restaurantInfo": {
+      "title": "Thông tin nhà hàng",
+      "description": "Cập nhật tên, địa chỉ và hình ảnh của nhà hàng",
+      "name": "Tên nhà hàng",
+      "namePlaceholder": "Nhập tên nhà hàng",
+      "address": "Địa chỉ",
+      "addressPlaceholder": "Nhập địa chỉ nhà hàng",
+      "image": "Hình ảnh nhà hàng",
+      "clickToUpload": "Nhấn để tải lên hình ảnh",
+      "imageHint": "JPG, PNG, GIF - Tối đa 5MB",
+      "changeImage": "Đổi hình ảnh",
+      "removeImage": "Xóa hình ảnh",
+      "uploading": "Đang tải lên...",
+      "uploadSuccess": "Tải lên hình ảnh thành công",
+      "uploadError": "Có lỗi khi tải lên hình ảnh",
+      "invalidFileType": "Vui lòng chọn tệp hình ảnh hợp lệ",
+      "fileTooLarge": "Tệp hình ảnh quá lớn (tối đa 5MB)"
+    },
     "operatingHours": {
       "title": "Giờ hoạt động",
       "description": "Cấu hình giờ mở cửa của cửa hàng theo từng ngày",

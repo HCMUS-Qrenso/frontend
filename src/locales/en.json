@@ -1352,6 +1352,24 @@
       "operatingHours": "Operating Hours",
       "qrPayment": "QR Payment"
     },
+    "restaurantInfo": {
+      "title": "Restaurant Information",
+      "description": "Update your restaurant name, address and image",
+      "name": "Restaurant Name",
+      "namePlaceholder": "Enter restaurant name",
+      "address": "Address",
+      "addressPlaceholder": "Enter restaurant address",
+      "image": "Restaurant Image",
+      "clickToUpload": "Click to upload an image",
+      "imageHint": "JPG, PNG, GIF - Max 5MB",
+      "changeImage": "Change Image",
+      "removeImage": "Remove Image",
+      "uploading": "Uploading...",
+      "uploadSuccess": "Image uploaded successfully",
+      "uploadError": "Failed to upload image",
+      "invalidFileType": "Please select a valid image file",
+      "fileTooLarge": "Image file is too large (max 5MB)"
+    },
     "operatingHours": {
       "title": "Operating Hours",
       "description": "Configure store opening hours by day",

@@ -6,6 +6,7 @@ import { useRouter, usePathname } from '@/src/i18n/navigation'
 import type { Locale } from '@/src/i18n/config'
 import { Button } from '@/src/components/ui/button'
 import { Skeleton } from '@/src/components/ui/skeleton'
+import { RestaurantInfoForm } from './restaurant-info-form'
 import { GeneralSettingsForm } from './general-settings-form'
 import { TaxSettingsForm } from './tax-settings-form'
 import { ServiceChargeForm } from './service-charge-form'
@@ -48,6 +49,10 @@ export function SettingsPage() {
 
     // Build payload with all changed fields
     const payload: UpdateTenantSettingsPayload = {
+      // Restaurant Info
+      name: formData.name,
+      address: formData.address || undefined,
+      image: formData.image || undefined,
       // General
       currency: formData.general.currency,
       currencySymbol: formData.general.currency_symbol,
@@ -150,6 +155,14 @@ export function SettingsPage() {
     setHasChanges(true)
   }, [])
 
+  const updateRestaurantInfo = useCallback(
+    (partial: { name?: string; address?: string | null; image?: string | null }) => {
+      setFormData((prev) => (prev ? { ...prev, ...partial } : prev))
+      setHasChanges(true)
+    },
+    [],
+  )
+
   if (isLoading) {
     return <SettingsPageSkeleton />
   }
@@ -166,7 +179,15 @@ export function SettingsPage() {
     <div className="space-y-6">
       {/* Grid Layout for Settings Cards */}
       <div className="grid gap-6 lg:grid-cols-2">
-        {/* General Settings - Full width on first row */}
+        {/* Restaurant Info - Full width on first row */}
+        <div className="lg:col-span-2">
+          <RestaurantInfoForm
+            settings={{ name: formData.name, address: formData.address, image: formData.image }}
+            onChange={updateRestaurantInfo}
+          />
+        </div>
+
+        {/* General Settings - Full width */}
         <div className="lg:col-span-2">
           <GeneralSettingsForm settings={formData.general} onChange={updateGeneral} />
         </div>
