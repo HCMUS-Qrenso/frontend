@@ -27,6 +27,7 @@ import { TicketItemRow } from './ticket-item-row'
 import { TicketFooter } from './ticket-footer'
 import { ConfirmActionDialog } from '@/components/ui/confirm-action-dialog'
 import type { KdsOrder, OrderItemStatus } from '../types/kds.types'
+import { useTranslations } from 'next-intl'
 
 interface TicketCardProps {
   order: KdsOrder
@@ -45,6 +46,7 @@ export function TicketCard({
   highlightStatus,
   onUpdateItemStatus,
 }: TicketCardProps) {
+  const t = useTranslations('kds')
   const [showNote, setShowNote] = useState(false)
   const [showConfirmComplete, setShowConfirmComplete] = useState(false)
 
@@ -114,7 +116,7 @@ export function TicketCard({
               onClick={() => setShowNote(!showNote)}
             >
               <span className="text-xs font-medium text-slate-600 dark:text-slate-400">
-                Ghi chú khách
+                {t('customerNote')}
               </span>
               {showNote ? (
                 <ChevronUp className="h-3 w-3 text-slate-400" />
@@ -144,10 +146,10 @@ export function TicketCard({
       <ConfirmActionDialog
         open={showConfirmComplete}
         onOpenChange={setShowConfirmComplete}
-        title="Hoàn thành tất cả?"
-        description={`Tất cả ${pendingItemsCount} món trong đơn ${order.orderNumber} sẽ được đánh dấu là sẵn sàng phục vụ.`}
+        title={t('confirmCompleteTitle')}
+        description={t('confirmCompleteDesc', { count: pendingItemsCount, orderNumber: order.orderNumber })}
         variant="success"
-        confirmText="Xác nhận"
+        confirmText={t('confirm')}
         onConfirm={async () => {
           if (!onUpdateItemStatus) return
 

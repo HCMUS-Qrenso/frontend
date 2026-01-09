@@ -14,6 +14,7 @@ import { useErrorHandler } from '@/src/hooks/use-error-handler'
 import { toast } from 'sonner'
 import type { Category } from '@/src/features/admin/menu/types'
 import { createCategorySchema } from '@/src/features/admin/menu/schemas'
+import { useTranslations } from 'next-intl'
 
 interface CategoryUpsertModalProps {
   open: boolean
@@ -29,6 +30,7 @@ export function CategoryUpsertModal({
   onOpenChange,
 }: CategoryUpsertModalProps) {
   const { handleErrorWithStatus } = useErrorHandler()
+  const t = useTranslations('menu.upsert')
 
   const [formData, setFormData] = useState({
     name: '',
@@ -87,7 +89,7 @@ export function CategoryUpsertModal({
           description: validData.description,
           is_active: validData.is_active,
         })
-        toast.success('Đã tạo danh mục thành công')
+        toast.success(t('createSuccess'))
       } else if (mode === 'edit' && category) {
         await updateMutation.mutateAsync({
           id: category.id,
@@ -97,12 +99,12 @@ export function CategoryUpsertModal({
             is_active: validData.is_active,
           },
         })
-        toast.success('Đã cập nhật danh mục thành công')
+        toast.success(t('updateSuccess'))
       }
 
       onOpenChange(false)
     } catch (error) {
-      handleErrorWithStatus(error, undefined, 'Không thể lưu danh mục')
+      handleErrorWithStatus(error, undefined, t('saveError'))
     }
   }
 
@@ -110,36 +112,32 @@ export function CategoryUpsertModal({
     <FormDialog
       open={open}
       onOpenChange={onOpenChange}
-      title={mode === 'create' ? 'Thêm danh mục mới' : 'Chỉnh sửa danh mục'}
-      description={
-        mode === 'create'
-          ? 'Tạo danh mục mới để nhóm các món ăn theo loại'
-          : 'Cập nhật thông tin danh mục'
-      }
+      title={mode === 'create' ? t('createTitle') : t('editTitle')}
+      description={mode === 'create' ? t('createDesc') : t('editDesc')}
       onSubmit={handleSubmit}
       isSubmitting={isSubmitting}
-      submitText="Lưu"
-      loadingText="Đang lưu..."
+      submitText={t('save')}
+      loadingText={t('saving')}
       size="md"
     >
       {/* Tên danh mục */}
-      <FormDialogField label="Tên danh mục" required error={errors.name}>
+      <FormDialogField label={t('nameLabel')} required error={errors.name}>
         <Input
           id="name"
           value={formData.name || ''}
           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          placeholder="Ví dụ: Khai vị, Món chính, Tráng miệng..."
+          placeholder={t('namePlaceholder')}
           disabled={isSubmitting}
         />
       </FormDialogField>
 
       {/* Mô tả */}
-      <FormDialogField label="Mô tả">
+      <FormDialogField label={t('descriptionLabel')}>
         <Textarea
           id="description"
           value={formData.description || ''}
           onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-          placeholder="Mô tả ngắn về danh mục này..."
+          placeholder={t('descriptionPlaceholder')}
           rows={3}
           disabled={isSubmitting}
         />
@@ -149,11 +147,9 @@ export function CategoryUpsertModal({
       <FormDialogSection>
         <div className="space-y-0.5">
           <Label htmlFor="is_active" className="text-sm font-medium">
-            Hiển thị danh mục
+            {t('visibilityLabel')}
           </Label>
-          <p className="text-xs text-slate-500 dark:text-slate-400">
-            Bật để hiển thị danh mục trong menu
-          </p>
+          <p className="text-xs text-slate-500 dark:text-slate-400">{t('visibilityHint')}</p>
         </div>
         <Switch
           id="is_active"

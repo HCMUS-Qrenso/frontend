@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Search } from 'lucide-react'
 import type { OrderItemStatus } from '../types/kds.types'
-import { ITEM_STATUS_CONFIG } from '../types/kds.types'
+import { useTranslations } from 'next-intl'
 
 interface KdsFiltersProps {
   groupByStatus: boolean
@@ -27,6 +27,8 @@ export function KdsFilters({
   searchQuery,
   setSearchQuery,
 }: KdsFiltersProps) {
+  const t = useTranslations('kds')
+
   return (
     <div className="flex flex-wrap items-center gap-3 rounded-xl border border-slate-200 bg-white p-3 dark:border-slate-800 dark:bg-slate-900">
       {/* Group by Status Toggle */}
@@ -36,7 +38,7 @@ export function KdsFilters({
         className={groupByStatus ? 'bg-emerald-600 hover:bg-emerald-700' : ''}
         onClick={() => setGroupByStatus(!groupByStatus)}
       >
-        Nhóm theo trạng thái
+        {t('groupByStatus')}
       </Button>
 
       {/* Status Chips */}
@@ -44,8 +46,7 @@ export function KdsFilters({
         <div className="flex flex-wrap items-center gap-2">
           {FILTER_STATUSES.map((status) => {
             const isAll = status === 'all'
-            const config = isAll ? null : ITEM_STATUS_CONFIG[status]
-            const label = isAll ? 'Tất cả' : config?.label
+            const label = isAll ? t('allStatuses') : t(status)
 
             return (
               <Badge
@@ -68,7 +69,7 @@ export function KdsFilters({
       <div className="relative ml-auto w-64">
         <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400" />
         <Input
-          placeholder="Tìm đơn, bàn..."
+          placeholder={t('searchPlaceholder')}
           className="pl-9"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
@@ -77,3 +78,4 @@ export function KdsFilters({
     </div>
   )
 }
+

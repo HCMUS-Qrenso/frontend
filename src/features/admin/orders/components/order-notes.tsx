@@ -1,6 +1,7 @@
 'use client'
 
 import { AlertCircle, StickyNote } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 interface OrderNotesProps {
   specialInstructions?: string
@@ -8,6 +9,8 @@ interface OrderNotesProps {
 }
 
 export function OrderNotes({ specialInstructions, rejectionReason }: OrderNotesProps) {
+  const t = useTranslations('orders')
+  
   if (!specialInstructions && !rejectionReason) {
     return null
   }
@@ -23,7 +26,7 @@ export function OrderNotes({ specialInstructions, rejectionReason }: OrderNotesP
             </div>
             <div className="flex-1">
               <h3 className="mb-1 font-semibold text-slate-900 dark:text-white">
-                Ghi chú đơn hàng
+                {t('notes.orderNotes')}
               </h3>
               <p className="text-sm text-slate-600 dark:text-slate-400">{specialInstructions}</p>
             </div>
@@ -39,7 +42,7 @@ export function OrderNotes({ specialInstructions, rejectionReason }: OrderNotesP
               <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
             </div>
             <div className="flex-1">
-              <h3 className="mb-1 font-semibold text-red-900 dark:text-red-400">Lý do từ chối</h3>
+              <h3 className="mb-1 font-semibold text-red-900 dark:text-red-400">{t('notes.rejectionReason')}</h3>
               <p className="text-sm text-red-700 dark:text-red-300">{rejectionReason}</p>
             </div>
           </div>

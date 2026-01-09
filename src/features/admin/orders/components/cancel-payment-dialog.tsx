@@ -15,6 +15,7 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 import { Order } from '../types'
 import { useCancelPaymentMutation } from '../queries'
+import { useTranslations } from 'next-intl'
 
 interface CancelPaymentDialogProps {
   open: boolean
@@ -29,6 +30,7 @@ export function CancelPaymentDialog({
 }: CancelPaymentDialogProps) {
   const [cancelReason, setCancelReason] = useState('')
   const cancelPaymentMutation = useCancelPaymentMutation()
+  const t = useTranslations('orders')
 
   const handleCancelPayment = async () => {
     if (!orderToCancel) return
@@ -43,9 +45,9 @@ export function CancelPaymentDialog({
         paymentId: activePayment.id,
         reason: cancelReason || undefined,
       })
-      toast.success('Đã hủy thanh toán')
+      toast.success(t('toast.paymentCancelled'))
     } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Không thể hủy thanh toán')
+      toast.error(error.response?.data?.message || t('toast.errorCancelPayment'))
     }
 
     onOpenChange(false)
@@ -56,17 +58,17 @@ export function CancelPaymentDialog({
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent className="flex max-h-[90vh] max-w-lg flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-700 dark:bg-slate-900">
         <AlertDialogHeader className="border-b border-slate-200 pb-2 dark:border-slate-800">
-          <AlertDialogTitle>Xác nhận hủy thanh toán</AlertDialogTitle>
+          <AlertDialogTitle>{t('dialog.cancelPaymentTitle')}</AlertDialogTitle>
           <AlertDialogDescription>
-            Bạn có chắc chắn muốn hủy thanh toán này không? Hành động này không thể hoàn tác.
+            {t('dialog.cancelPaymentDesc')}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <div className="flex-1 space-y-6 overflow-y-auto">
           <div className="space-y-2">
-            <Label htmlFor="cancel-reason">Lý do hủy (tùy chọn)</Label>
+            <Label htmlFor="cancel-reason">{t('dialog.cancelReason')}</Label>
             <Textarea
               id="cancel-reason"
-              placeholder="Nhập lý do hủy thanh toán..."
+              placeholder={t('dialog.cancelReasonPlaceholder')}
               value={cancelReason}
               onChange={(e) => setCancelReason(e.target.value)}
               rows={5}
@@ -74,13 +76,13 @@ export function CancelPaymentDialog({
           </div>
         </div>
         <AlertDialogFooter className="border-t border-slate-200 pt-4 dark:border-slate-800">
-          <AlertDialogCancel disabled={cancelPaymentMutation.isPending}>Không</AlertDialogCancel>
+          <AlertDialogCancel disabled={cancelPaymentMutation.isPending}>{t('dialog.no')}</AlertDialogCancel>
           <AlertDialogAction
             onClick={handleCancelPayment}
             disabled={cancelPaymentMutation.isPending || !cancelReason.trim()}
             className="bg-amber-600 hover:bg-amber-700"
           >
-            {cancelPaymentMutation.isPending ? 'Đang hủy...' : 'Hủy thanh toán'}
+            {cancelPaymentMutation.isPending ? t('paymentCard.processing') : t('paymentCard.cancelPayment')}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

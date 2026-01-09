@@ -4,6 +4,7 @@ import { cn } from '@/src/lib/utils'
 import { Check, Clock, XCircle, AlertCircle } from 'lucide-react'
 import type { StatusHistoryEntry } from '../types/orders'
 import { useFormat } from '@/src/hooks/use-format'
+import { useTranslations } from 'next-intl'
 
 const STATUS_ICON_MAP: Record<string, any> = {
   pending: Clock,
@@ -29,46 +30,39 @@ const STATUS_COLOR_MAP: Record<string, string> = {
   cancelled: 'bg-red-500',
 }
 
-// Vietnamese status labels
-const STATUS_LABEL_VI: Record<string, string> = {
-  pending: 'Chờ xử lý',
-  accepted: 'Đã nhận',
-  in_progress: 'Đang xử lý',
-  preparing: 'Đang chuẩn bị',
-  ready: 'Sẵn sàng',
-  served: 'Đã phục vụ',
-  completed: 'Hoàn thành',
-  rejected: 'Từ chối',
-  cancelled: 'Đã hủy',
-}
-
-// Localize notes that come from backend
-const localizeNotes = (notes: string | null): string | null => {
-  if (!notes) return null
-  const notesMap: Record<string, string> = {
-    'Order placed by customer': 'Đơn hàng được đặt bởi khách hàng',
-    'Order accepted': 'Đơn hàng đã được nhận',
-    'Order completed': 'Đơn hàng hoàn thành',
-    'Order cancelled': 'Đơn hàng đã hủy',
-    'Order rejected': 'Đơn hàng bị từ chối',
-  }
-  return notesMap[notes] || notes
-}
-
 interface OrderStatusTimelineProps {
   history: StatusHistoryEntry[]
 }
 
 export function OrderStatusTimeline({ history }: OrderStatusTimelineProps) {
   const { formatDateTime } = useFormat()
+  const t = useTranslations('orders')
+
+  // Get localized status label
+  const getStatusLabel = (status: string): string => {
+    return t(`status.${status}` as any) || status
+  }
+
+  // Localize notes that come from backend
+  const localizeNotes = (notes: string | null): string | null => {
+    if (!notes) return null
+    const notesMap: Record<string, string> = {
+      'Order placed by customer': t('timeline.orderPlaced'),
+      'Order accepted': t('timeline.orderAccepted'),
+      'Order completed': t('timeline.orderCompleted'),
+      'Order cancelled': t('timeline.orderCancelled'),
+      'Order rejected': t('timeline.orderRejected'),
+    }
+    return notesMap[notes] || notes
+  }
 
   if (!history || history.length === 0) {
     return (
       <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
         <h2 className="mb-4 text-lg font-semibold text-slate-900 dark:text-white">
-          Lịch sử trạng thái
+          {t('timeline.title')}
         </h2>
-        <p className="text-sm text-slate-500 dark:text-slate-400">Chưa có lịch sử</p>
+        <p className="text-sm text-slate-500 dark:text-slate-400">{t('timeline.empty')}</p>
       </div>
     )
   }
@@ -87,9 +81,9 @@ export function OrderStatusTimeline({ history }: OrderStatusTimelineProps) {
 
           // Get localized status labels
           const fromLabel = entry.fromStatus
-            ? STATUS_LABEL_VI[entry.fromStatus] || entry.fromStatus
+            ? getStatusLabel(entry.fromStatus)
             : null
-          const toLabel = STATUS_LABEL_VI[entry.toStatus] || entry.toStatus
+          const toLabel = getStatusLabel(entry.toStatus)
           const localizedNotes = localizeNotes(entry.notes ?? null)
 
           return (
@@ -132,7 +126,7 @@ export function OrderStatusTimeline({ history }: OrderStatusTimelineProps) {
                     </p>
                   )}
                   <div className="mt-1 flex items-center gap-2 text-xs text-slate-500 dark:text-slate-500">
-                    <span>{entry.user?.fullName || 'Hệ thống'}</span>
+                    <span>{entry.user?.fullName || t('timeline.system')}</span>
                     <span>•</span>
                     <span>{formatDateTime(entry.createdAt)}</span>
                   </div>

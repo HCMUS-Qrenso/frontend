@@ -12,17 +12,19 @@ import {
 import { Textarea } from '@/src/components/ui/textarea'
 import { Label } from '@/src/components/ui/label'
 import { Checkbox } from '@/src/components/ui/checkbox'
+import { useTranslations } from 'next-intl'
+import { toast } from 'sonner'
 
-const ORDER_STATUSES = [
-  { value: 'pending', label: 'Chờ xử lý' },
-  { value: 'accepted', label: 'Đã nhận' },
-  { value: 'in_progress', label: 'Đang xử lý' },
-  { value: 'preparing', label: 'Đang chuẩn bị' },
-  { value: 'ready', label: 'Sẵn sàng' },
-  { value: 'served', label: 'Đã phục vụ' },
-  { value: 'completed', label: 'Hoàn thành' },
-  { value: 'rejected', label: 'Từ chối' },
-  { value: 'cancelled', label: 'Đã hủy' },
+const STATUS_VALUES = [
+  'pending',
+  'accepted',
+  'in_progress',
+  'preparing',
+  'ready',
+  'served',
+  'completed',
+  'rejected',
+  'cancelled',
 ]
 
 interface OverrideStatusModalProps {
@@ -42,10 +44,13 @@ export function OverrideStatusModal({
   const [reason, setReason] = useState('')
   const [notifyStaff, setNotifyStaff] = useState(false)
   const [loading, setLoading] = useState(false)
+  const t = useTranslations('orders')
+
+  const getStatusLabel = (status: string) => t(`status.${status}` as any) || status
 
   const handleSubmit = async () => {
     if (!newStatus || !reason.trim()) {
-      alert('Vui lòng chọn trạng thái mới và nhập lý do')
+      toast.error(t('toast.selectStatusAndReason'))
       return
     }
 
@@ -63,60 +68,59 @@ export function OverrideStatusModal({
     setReason('')
     setNotifyStaff(false)
 
-    // Show success toast (would use toast library in real app)
-    alert('Đã cập nhật trạng thái thành công!')
+    toast.success(t('toast.statusUpdated'))
   }
 
   return (
     <FormDialog
       open={open}
       onOpenChange={onOpenChange}
-      title="Thay đổi trạng thái đơn hàng"
-      description={`Thay đổi trạng thái đơn hàng #${orderId}. Vui lòng nhập lý do để ghi vào lịch sử.`}
+      title={t('dialog.changeStatusTitle')}
+      description={t('dialog.changeStatusDesc', { orderId })}
       onSubmit={handleSubmit}
       isSubmitting={loading}
-      submitText="Xác nhận"
-      loadingText="Đang xử lý..."
+      submitText={t('dialog.confirm')}
+      loadingText={t('paymentCard.processing')}
       size="md"
     >
-      {/* Trạng thái hiện tại */}
+      {/* Current Status */}
       <div className="space-y-2">
-        <Label>Trạng thái hiện tại</Label>
+        <Label>{t('dialog.currentStatus')}</Label>
         <div className="rounded-lg bg-slate-100 px-3 py-2 dark:bg-slate-800">
           <p className="text-sm font-medium text-slate-900 capitalize dark:text-white">
-            {currentStatus}
+            {getStatusLabel(currentStatus)}
           </p>
         </div>
       </div>
 
-      {/* Trạng thái mới */}
-      <FormDialogField label="Trạng thái mới" required>
+      {/* New Status */}
+      <FormDialogField label={t('dialog.newStatus')} required>
         <Select value={newStatus} onValueChange={setNewStatus}>
           <SelectTrigger id="new-status">
-            <SelectValue placeholder="Chọn trạng thái mới" />
+            <SelectValue placeholder={t('dialog.selectNewStatus')} />
           </SelectTrigger>
           <SelectContent>
-            {ORDER_STATUSES.filter((s) => s.value !== currentStatus).map((status) => (
-              <SelectItem key={status.value} value={status.value}>
-                {status.label}
+            {STATUS_VALUES.filter((s) => s !== currentStatus).map((status) => (
+              <SelectItem key={status} value={status}>
+                {getStatusLabel(status)}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
       </FormDialogField>
 
-      {/* Lý do */}
-      <FormDialogField label="Lý do" required>
+      {/* Reason */}
+      <FormDialogField label={t('dialog.reason')} required>
         <Textarea
           id="reason"
-          placeholder="Nhập lý do thay đổi trạng thái..."
+          placeholder={t('dialog.reasonPlaceholder')}
           value={reason}
           onChange={(e) => setReason(e.target.value)}
           rows={3}
         />
       </FormDialogField>
 
-      {/* Thông báo cho nhân viên */}
+      {/* Notify Staff */}
       <div className="flex items-center space-x-2">
         <Checkbox
           id="notify"
@@ -127,7 +131,7 @@ export function OverrideStatusModal({
           htmlFor="notify"
           className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
         >
-          Thông báo cho nhân viên
+          {t('dialog.notifyStaff')}
         </label>
       </div>
     </FormDialog>

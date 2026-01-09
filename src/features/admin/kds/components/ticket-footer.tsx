@@ -1,10 +1,11 @@
 /**
  * Ticket Footer Component
- * Displays: "Hoàn thành tất cả" button + "Chi tiết" button
+ * Displays: "Complete all" button + "Details" button
  */
 
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { useTranslations } from 'next-intl'
 
 interface TicketFooterProps {
   isAllDone: boolean
@@ -13,6 +14,8 @@ interface TicketFooterProps {
 }
 
 export function TicketFooter({ isAllDone, onCompleteAll, onShowDetail }: TicketFooterProps) {
+  const t = useTranslations('kds')
+
   return (
     <div className="border-t border-slate-100 p-3 dark:border-slate-800">
       <div className="flex items-center gap-3">
@@ -27,12 +30,13 @@ export function TicketFooter({ isAllDone, onCompleteAll, onShowDetail }: TicketF
           disabled={isAllDone}
           onClick={onCompleteAll}
         >
-          {isAllDone ? 'Đã sẵn sàng' : 'Hoàn thành tất cả'}
+          {isAllDone ? t('allReady') : t('completeAll')}
         </Button>
         <Button size="sm" variant="outline" className="shrink-0" onClick={onShowDetail}>
-          Chi tiết
+          {t('details')}
         </Button>
       </div>
     </div>
   )
 }
+

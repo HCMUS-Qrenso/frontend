@@ -14,7 +14,7 @@ import {
 } from '@/src/components/ui/table'
 import { Avatar, AvatarFallback, AvatarImage } from '@/src/components/ui/avatar'
 import { Button } from '@/src/components/ui/button'
-import { StatusBadge, USER_ROLE_CONFIG, USER_STATUS_CONFIG } from '@/src/components/ui/status-badge'
+import { StatusBadge, createUserStatusConfig, createUserRoleConfig } from '@/src/components/ui/status-badge'
 import { StaffRowActions } from '@/src/features/admin/staff/components/staff-row-actions'
 import { LoadingState } from '@/src/components/ui/loading-state'
 import { EmptyState } from '@/src/components/ui/empty-state'
@@ -36,7 +36,21 @@ export function StaffDataTable({ role }: StaffDataTableProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const t = useTranslations('staff')
+  const tUserStatus = useTranslations('statusBadge.user')
+  const tRole = useTranslations('statusBadge.role')
   const { formatDateTime, formatShortDate } = useFormat()
+
+  // Create localized status configs
+  const userStatusConfig = createUserStatusConfig({
+    active: tUserStatus('active'),
+    inactive: tUserStatus('inactive'),
+    suspended: tUserStatus('suspended'),
+  })
+
+  const userRoleConfig = createUserRoleConfig({
+    waiter: tRole('waiter'),
+    kitchen_staff: tRole('kitchen_staff'),
+  })
 
   // Read filters from URL params
   const search = searchParams.get('search') || ''
@@ -202,12 +216,12 @@ export function StaffDataTable({ role }: StaffDataTableProps) {
 
                   {/* Role */}
                   <TableCell className="px-6 py-4">
-                    <StatusBadge status={staff.role} config={USER_ROLE_CONFIG} />
+                    <StatusBadge status={staff.role} config={userRoleConfig} />
                   </TableCell>
 
                   {/* Status */}
                   <TableCell className="px-6 py-4">
-                    <StatusBadge status={staff.status} config={USER_STATUS_CONFIG} />
+                    <StatusBadge status={staff.status} config={userStatusConfig} />
                   </TableCell>
 
                   {/* Email Verified */}

@@ -8,6 +8,7 @@ import { X, Loader2, Package } from 'lucide-react'
 import { cn } from '@/src/lib/utils'
 import { useModifierGroupsQuery } from '@/src/features/admin/menu/queries'
 import { FormDialog } from '@/src/components/ui/form-dialog'
+import { useTranslations } from 'next-intl'
 
 interface ModifierGroupSelectorProps {
   selectedGroupIds: string[]
@@ -21,6 +22,7 @@ export function ModifierGroupSelector({
   disabled = false,
 }: ModifierGroupSelectorProps) {
   const [open, setOpen] = useState(false)
+  const t = useTranslations('menu.items.modifierSelector')
   // Temporary state for selections inside dialog (only applied on submit)
   const [tempSelectedIds, setTempSelectedIds] = useState<string[]>([])
 
@@ -86,7 +88,7 @@ export function ModifierGroupSelector({
               <Package className="h-3 w-3" />
               {group.name}
               <span className="text-xs text-slate-500">
-                ({group.type === 'single_choice' ? 'Single' : 'Multiple'})
+                ({group.type === 'single_choice' ? t('single') : t('multiple')})
               </span>
               {!disabled && (
                 <Button
@@ -115,14 +117,14 @@ export function ModifierGroupSelector({
         {isLoading ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Đang tải...
+            {t('loading')}
           </>
         ) : (
           <>
             <Package className="mr-2 h-4 w-4" />
             {selectedGroups.length > 0
-              ? `Đã chọn ${selectedGroups.length} nhóm`
-              : 'Chọn nhóm tuỳ chọn'}
+              ? t('selectedCount', { count: selectedGroups.length })
+              : t('select')}
           </>
         )}
       </Button>
@@ -131,11 +133,11 @@ export function ModifierGroupSelector({
       <FormDialog
         open={open}
         onOpenChange={handleOpenChange}
-        title="Chọn nhóm tuỳ chọn"
-        description="Chọn các nhóm tuỳ chọn có thể áp dụng cho món này"
+        title={t('title')}
+        description={t('description')}
         onSubmit={handleSubmit}
-        submitText="Xong"
-        cancelText="Huỷ"
+        submitText={t('done')}
+        cancelText={t('cancel')}
         size="md"
       >
         <div className="max-h-[400px] space-y-2 overflow-y-auto pr-2">
@@ -146,12 +148,8 @@ export function ModifierGroupSelector({
           ) : modifierGroups.length === 0 ? (
             <div className="py-8 text-center">
               <Package className="mx-auto h-12 w-12 text-slate-300 dark:text-slate-600" />
-              <p className="mt-4 text-sm text-slate-500 dark:text-slate-400">
-                Chưa có nhóm tuỳ chọn nào
-              </p>
-              <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">
-                Tạo nhóm tuỳ chọn từ trang Modifiers trước
-              </p>
+              <p className="mt-4 text-sm text-slate-500 dark:text-slate-400">{t('empty')}</p>
+              <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">{t('emptyHint')}</p>
             </div>
           ) : (
             modifierGroups.map((group) => (
@@ -181,16 +179,20 @@ export function ModifierGroupSelector({
                       variant={group.type === 'single_choice' ? 'default' : 'secondary'}
                       className="text-xs"
                     >
-                      {group.type === 'single_choice' ? 'Single Choice' : 'Multiple Choice'}
+                      {group.type === 'single_choice'
+                        ? `${t('single')} ${t('choice')}`
+                        : `${t('multiple')} ${t('choice')}`}
                     </Badge>
                     {group.is_required && (
                       <Badge variant="destructive" className="text-xs">
-                        Required
+                        {t('required')}
                       </Badge>
                     )}
                     <span className="text-xs text-slate-500 dark:text-slate-400">
-                      Min: {group.min_selections} | Max:{' '}
-                      {group.max_selections === null ? '∞' : group.max_selections}
+                      {t('minMax', {
+                        min: group.min_selections,
+                        max: group.max_selections === null ? '∞' : group.max_selections,
+                      })}
                     </span>
                   </div>
                 </div>

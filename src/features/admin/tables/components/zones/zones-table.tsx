@@ -2,7 +2,7 @@
 
 import { cn } from '@/src/lib/utils'
 import { Button } from '@/src/components/ui/button'
-import { StatusBadge, ZONE_ACTIVE_CONFIG } from '@/src/components/ui/status-badge'
+import { StatusBadge, createZoneActiveConfig } from '@/src/components/ui/status-badge'
 import { EmptyState } from '@/src/components/ui/empty-state'
 import {
   DropdownMenu,
@@ -41,6 +41,13 @@ export function ZonesTable({ onEdit, onDelete }: ZonesTableProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const t = useTranslations('tables')
+  const tZoneStatus = useTranslations('statusBadge.zone')
+
+  // Create localized status config
+  const zoneActiveConfig = createZoneActiveConfig({
+    active: tZoneStatus('active'),
+    inactive: tZoneStatus('inactive'),
+  })
 
   // Get filter params from URL
   const page = Number.parseInt(searchParams.get('page') || '1')
@@ -187,7 +194,7 @@ export function ZonesTable({ onEdit, onDelete }: ZonesTableProps) {
                   <TableCell className="px-6 py-4 text-center">
                     <StatusBadge
                       status={zone.is_active ? 'active' : 'inactive'}
-                      config={ZONE_ACTIVE_CONFIG}
+                      config={zoneActiveConfig}
                     />
                   </TableCell>
                   <TableCell className="px-6 py-4 text-right">

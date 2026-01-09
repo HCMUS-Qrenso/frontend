@@ -12,6 +12,7 @@ import {
 import { useErrorHandler } from '@/src/hooks/use-error-handler'
 import { toast } from 'sonner'
 import type { Modifier } from '@/src/features/admin/menu/types/modifiers'
+import { useTranslations } from 'next-intl'
 
 interface ModifierModalProps {
   open: boolean
@@ -29,6 +30,7 @@ export function ModifierModal({
   onOpenChange,
 }: ModifierModalProps) {
   const { handleErrorWithStatus } = useErrorHandler()
+  const t = useTranslations('menu.modifiers.optionModal')
 
   // Mutations
   const createMutation = useCreateModifierMutation()
@@ -67,17 +69,17 @@ export function ModifierModal({
 
     // Validation
     if (!formData.name.trim()) {
-      setErrors({ name: 'Vui lòng nhập tên option' })
+      setErrors({ name: t('nameRequired') })
       return
     }
 
     if (formData.name.length > 100) {
-      setErrors({ name: 'Tên option không được vượt quá 100 ký tự' })
+      setErrors({ name: t('nameMaxLength') })
       return
     }
 
     if (!selectedGroupId) {
-      toast.error('Vui lòng chọn nhóm trước')
+      toast.error(t('selectGroupFirst'))
       return
     }
 
@@ -92,12 +94,12 @@ export function ModifierModal({
         { groupId: selectedGroupId, payload },
         {
           onSuccess: () => {
-            toast.success('Đã tạo option')
+            toast.success(t('createSuccess'))
             onOpenChange(false)
           },
           onError: (error) => {
             handleErrorWithStatus(error)
-            toast.error('Không thể tạo option')
+            toast.error(t('createError'))
           },
         },
       )
@@ -106,12 +108,12 @@ export function ModifierModal({
         { id: modifier.id, groupId: selectedGroupId, payload },
         {
           onSuccess: () => {
-            toast.success('Đã cập nhật option')
+            toast.success(t('updateSuccess'))
             onOpenChange(false)
           },
           onError: (error) => {
             handleErrorWithStatus(error)
-            toast.error('Không thể cập nhật option')
+            toast.error(t('updateError'))
           },
         },
       )
@@ -122,29 +124,29 @@ export function ModifierModal({
     <FormDialog
       open={open}
       onOpenChange={onOpenChange}
-      title={mode === 'create' ? 'Thêm option mới' : 'Chỉnh sửa option'}
-      description={mode === 'create' ? 'Tạo tuỳ chọn mới cho nhóm' : 'Cập nhật thông tin tuỳ chọn'}
+      title={mode === 'create' ? t('createTitle') : t('editTitle')}
+      description={mode === 'create' ? t('createDesc') : t('editDesc')}
       onSubmit={handleSubmit}
       isSubmitting={isSubmitting}
-      submitText="Lưu"
-      loadingText="Đang lưu..."
+      submitText={t('save')}
+      loadingText={t('saving')}
       size="md"
     >
       {/* Tên option */}
-      <FormDialogField label="Tên option" required error={errors.name}>
+      <FormDialogField label={t('nameLabel')} required error={errors.name}>
         <Input
           id="name"
           value={formData.name}
           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          placeholder="Ví dụ: Lớn (Large), Phô mai thêm..."
+          placeholder={t('namePlaceholder')}
           disabled={isSubmitting}
         />
       </FormDialogField>
 
       {/* Điều chỉnh giá */}
       <FormDialogField
-        label="Điều chỉnh giá"
-        hint="Số dương để tăng giá, số âm để giảm giá. Để 0 nếu không thay đổi."
+        label={t('priceAdjustment')}
+        hint={t('priceHint')}
       >
         <div className="relative">
           <Input
@@ -169,9 +171,9 @@ export function ModifierModal({
       <FormDialogSection>
         <div className="space-y-0.5">
           <Label htmlFor="is_available" className="text-sm font-medium">
-            Có sẵn
+            {t('isAvailable')}
           </Label>
-          <p className="text-xs text-slate-500 dark:text-slate-400">Tắt nếu tạm thời hết hàng</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400">{t('isAvailableHint')}</p>
         </div>
         <Switch
           id="is_available"
@@ -183,3 +185,4 @@ export function ModifierModal({
     </FormDialog>
   )
 }
+

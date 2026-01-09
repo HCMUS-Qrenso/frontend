@@ -7,30 +7,13 @@ import { SearchInput } from '@/src/components/ui/search-input'
 import { FilterDropdown, type FilterOption } from '@/src/components/ui/filter-dropdown'
 import { AdminFilterToolbarWrapper } from '../../../shared/components/admin-filter-toolbar-wrapper'
 import { Plus, ArrowUpDown } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 interface CategoriesFilterToolbarProps {
   reorderMode: boolean
   setReorderMode: (value: boolean) => void
   onCreateClick: () => void
 }
-
-const STATUS_OPTIONS: FilterOption[] = [
-  { value: 'all', label: 'Tất cả' },
-  { value: 'active', label: 'Đang hiển thị' },
-  { value: 'inactive', label: 'Đang ẩn' },
-]
-
-const SORT_BY_OPTIONS: FilterOption[] = [
-  { value: 'display_order', label: 'Thứ tự hiển thị' },
-  { value: 'name', label: 'Tên danh mục' },
-  { value: 'created_at', label: 'Ngày tạo' },
-  { value: 'updated_at', label: 'Ngày cập nhật' },
-]
-
-const SORT_ORDER_OPTIONS: FilterOption[] = [
-  { value: 'asc', label: 'Tăng dần' },
-  { value: 'desc', label: 'Giảm dần' },
-]
 
 export function CategoriesFilterToolbar({
   reorderMode,
@@ -39,6 +22,27 @@ export function CategoriesFilterToolbar({
 }: CategoriesFilterToolbarProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const t = useTranslations('menu.filters')
+  const tMenu = useTranslations('menu')
+
+  // Build filter options using translations
+  const STATUS_OPTIONS: FilterOption[] = [
+    { value: 'all', label: t('allStatuses') },
+    { value: 'active', label: t('activeStatus') },
+    { value: 'inactive', label: t('hiddenStatus') },
+  ]
+
+  const SORT_BY_OPTIONS: FilterOption[] = [
+    { value: 'display_order', label: t('sortDisplayOrder') },
+    { value: 'name', label: t('sortName') },
+    { value: 'created_at', label: t('sortCreatedAt') },
+    { value: 'updated_at', label: t('sortUpdatedAt') },
+  ]
+
+  const SORT_ORDER_OPTIONS: FilterOption[] = [
+    { value: 'asc', label: t('sortAsc') },
+    { value: 'desc', label: t('sortDesc') },
+  ]
 
   // Get filter values from URL params
   const searchQuery = searchParams.get('search') || ''
@@ -81,35 +85,35 @@ export function CategoriesFilterToolbar({
       {/* Left: Search and Filters */}
       <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
         <SearchInput
-          placeholder="Tìm theo tên danh mục..."
+          placeholder={t('searchCategoryPlaceholder')}
           value={localSearchQuery}
           onChange={setLocalSearchQuery}
         />
 
         <FilterDropdown
-          label="Trạng thái:"
+          label={t('statusLabel')}
           value={selectedStatus}
           options={STATUS_OPTIONS}
           onChange={(value) => updateFilter('status', value)}
         />
 
         <FilterDropdown
-          label="Sắp xếp:"
+          label={t('sortByLabel')}
           value={selectedSortBy}
           options={SORT_BY_OPTIONS}
           onChange={(value) => updateFilter('sort_by', value)}
           disabled={reorderMode}
-          disabledTooltip="Vui lòng tắt chế độ sắp xếp để dùng tính năng này"
+          disabledTooltip={t('disabledInReorderMode')}
         />
 
         <FilterDropdown
-          label="Thứ tự:"
+          label={t('orderLabel')}
           value={selectedSortOrder}
           options={SORT_ORDER_OPTIONS}
           onChange={(value) => updateFilter('sort_order', value)}
           menuWidth="w-40"
           disabled={reorderMode}
-          disabledTooltip="Vui lòng tắt chế độ sắp xếp để dùng tính năng này"
+          disabledTooltip={t('disabledInReorderMode')}
         />
       </div>
 
@@ -121,14 +125,14 @@ export function CategoriesFilterToolbar({
           className="h-8 gap-1 rounded-lg bg-transparent px-3"
         >
           <ArrowUpDown className="h-3 w-3" />
-          <span className="text-sm">{reorderMode ? 'Hủy sắp xếp' : 'Sắp xếp'}</span>
+          <span className="text-sm">{reorderMode ? t('cancelReorder') : t('reorder')}</span>
         </Button>
         <Button
           onClick={onCreateClick}
           className="h-8 gap-1 rounded-lg bg-emerald-600 px-3 hover:bg-emerald-700"
         >
           <Plus className="h-3 w-3" />
-          <span className="hidden text-sm sm:inline">Thêm danh mục</span>
+          <span className="hidden text-sm sm:inline">{tMenu('addCategory')}</span>
         </Button>
       </div>
     </AdminFilterToolbarWrapper>

@@ -32,6 +32,8 @@ export interface ConfirmDeleteDialogProps {
   confirmText?: string
   /** Text for cancel button */
   cancelText?: string
+  /** Text shown while loading */
+  loadingText?: string
   /** Additional warning content (e.g., for items with children) */
   warningContent?: ReactNode
   /** Disable confirm button (e.g., when force delete required) */
@@ -51,9 +53,9 @@ export interface ConfirmDeleteDialogProps {
  * <ConfirmDeleteDialog
  *   open={open}
  *   onOpenChange={setOpen}
- *   title="Xóa món ăn?"
- *   description="Hành động này không thể hoàn tác."
- *   itemName="Phở bò"
+ *   title="Delete item?"
+ *   description="This action cannot be undone."
+ *   itemName="Pho Bo"
  *   onConfirm={handleDelete}
  *   isLoading={isDeleting}
  * />
@@ -64,14 +66,14 @@ export interface ConfirmDeleteDialogProps {
  * <ConfirmDeleteDialog
  *   open={open}
  *   onOpenChange={setOpen}
- *   title="Xóa danh mục?"
- *   description="Danh mục sẽ bị xóa vĩnh viễn."
- *   itemName="Đồ uống"
+ *   title="Delete category?"
+ *   description="Category will be permanently deleted."
+ *   itemName="Beverages"
  *   onConfirm={handleDelete}
  *   isLoading={isDeleting}
  *   warningContent={
  *     <Alert variant="destructive">
- *       Danh mục đang chứa 5 món ăn.
+ *       Category contains 5 items.
  *     </Alert>
  *   }
  * />
@@ -85,11 +87,12 @@ export function ConfirmDeleteDialog({
   itemName,
   onConfirm,
   isLoading = false,
-  confirmText = 'Xóa',
-  cancelText = 'Hủy',
+  confirmText = 'Delete',
+  cancelText = 'Cancel',
+  loadingText = 'Deleting...',
   warningContent,
   confirmDisabled = false,
-  forceDeleteText,
+  forceDeleteText = 'Force Delete',
   onForceDelete,
 }: ConfirmDeleteDialogProps) {
   const handleConfirm = () => {
@@ -115,19 +118,7 @@ export function ConfirmDeleteDialog({
             {title}
           </AlertDialogTitle>
           <AlertDialogDescription className="text-center text-sm text-slate-500 dark:text-slate-400">
-            {itemName ? (
-              <>
-                {description.includes('{itemName}') ? (
-                  description.replace('{itemName}', `"${itemName}"`)
-                ) : (
-                  <>
-                    Bạn có chắc chắn muốn xóa &quot;{itemName}&quot; không? {description}
-                  </>
-                )}
-              </>
-            ) : (
-              description
-            )}
+            {description}
           </AlertDialogDescription>
         </AlertDialogHeader>
 
@@ -144,7 +135,7 @@ export function ConfirmDeleteDialog({
               className="m-0 gap-2 rounded-lg bg-amber-600 hover:bg-amber-700"
             >
               {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
-              {forceDeleteText || 'Xóa buộc'}
+              {forceDeleteText}
             </AlertDialogAction>
           )}
           <AlertDialogAction
@@ -154,10 +145,11 @@ export function ConfirmDeleteDialog({
           >
             {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
             <Trash2 className="h-4 w-4" />
-            {isLoading ? 'Đang xóa...' : confirmText}
+            {isLoading ? loadingText : confirmText}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
   )
 }
+

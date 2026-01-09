@@ -10,26 +10,29 @@ import { OrderStatusTimeline } from '@/src/features/admin/orders/components/orde
 import { PaymentCard } from '@/src/features/admin/orders/components/payment-card'
 import { Loader2 } from 'lucide-react'
 import { useCurrentTenantQuery } from '@/src/features/admin/tenants/queries/tenants.queries'
+import { useTranslations } from 'next-intl'
 
 function LoadingState() {
+  const t = useTranslations('orders')
   return (
     <div className="flex h-64 items-center justify-center">
       <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
       <span className="ml-3 text-slate-600 dark:text-slate-400">
-        Đang tải thông tin đơn hàng...
+        {t('page.loadingOrder')}
       </span>
     </div>
   )
 }
 
 function ErrorState() {
+  const t = useTranslations('orders')
   return (
     <div className="flex h-64 flex-col items-center justify-center rounded-2xl border border-red-200 bg-red-50 dark:border-red-900/50 dark:bg-red-500/10">
       <h2 className="text-lg font-semibold text-red-900 dark:text-red-400">
-        Không tìm thấy đơn hàng
+        {t('page.notFound')}
       </h2>
       <p className="mt-2 text-sm text-red-700 dark:text-red-300">
-        Đơn hàng không tồn tại hoặc đã bị xóa.
+        {t('page.notFoundDesc')}
       </p>
     </div>
   )

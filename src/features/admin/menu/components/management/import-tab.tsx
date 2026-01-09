@@ -19,6 +19,7 @@ import { useImportMenuMutation } from '@/src/features/admin/menu/queries'
 import { useErrorHandler } from '@/src/hooks/use-error-handler'
 import { toast } from 'sonner'
 import type { ImportMenuMode, ImportMenuResult } from '@/src/features/admin/menu/types'
+import { useTranslations } from 'next-intl'
 
 type ImportStep = 1 | 2
 
@@ -36,10 +37,11 @@ export function ImportTab() {
 
   const { handleErrorWithStatus } = useErrorHandler()
   const importMutation = useImportMenuMutation()
+  const t = useTranslations('menu.importExport')
 
   const steps = [
-    { number: 1, title: 'Upload file', description: 'Chọn file và chế độ import' },
-    { number: 2, title: 'Kết quả', description: 'Xem kết quả import' },
+    { number: 1, title: t('steps.upload'), description: t('steps.uploadDesc') },
+    { number: 2, title: t('steps.result'), description: t('steps.resultDesc') },
   ]
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -47,13 +49,13 @@ export function ImportTab() {
     if (file) {
       // Validate file size (max 10MB)
       if (file.size > 10 * 1024 * 1024) {
-        toast.error('File quá lớn. Tối đa 10MB')
+        toast.error(t('import.fileTooLarge'))
         return
       }
       // Validate file type
       const ext = file.name.toLowerCase()
       if (!ext.endsWith('.csv') && !ext.endsWith('.xlsx') && !ext.endsWith('.xls')) {
-        toast.error('Chỉ hỗ trợ file CSV hoặc Excel')
+        toast.error(t('import.invalidFormat'))
         return
       }
       setUploadedFile({
@@ -75,10 +77,10 @@ export function ImportTab() {
       setImportResult(result)
       setCurrentStep(2)
       toast.success(
-        `Import thành công: ${result.data.created} tạo mới, ${result.data.updated} cập nhật`,
+        t('import.success', { created: result.data.created, updated: result.data.updated }),
       )
     } catch (error) {
-      handleErrorWithStatus(error, undefined, 'Import thất bại')
+      handleErrorWithStatus(error, undefined, t('import.error'))
     }
   }
 
@@ -158,10 +160,10 @@ export function ImportTab() {
                   </div>
                   <div className="text-center">
                     <p className="text-lg font-medium text-slate-900 dark:text-white">
-                      Kéo thả file vào đây hoặc click để chọn
+                      {t('import.dropZone')}
                     </p>
                     <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                      Hỗ trợ CSV, XLSX (tối đa 10MB)
+                      {t('import.supportedFormats')}
                     </p>
                   </div>
                 </div>
@@ -192,24 +194,24 @@ export function ImportTab() {
 
                 <div className="space-y-3">
                   <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                    Chế độ import
+                    {t('import.importMode')}
                   </label>
                   <div className="grid gap-3 sm:grid-cols-3">
                     {[
                       {
                         value: 'create',
-                        label: 'Tạo mới',
-                        description: 'Chỉ tạo records mới, bỏ qua nếu đã tồn tại',
+                        label: t('import.modeCreate'),
+                        description: t('import.modeCreateDesc'),
                       },
                       {
                         value: 'update',
-                        label: 'Cập nhật',
-                        description: 'Cập nhật theo tên, bỏ qua nếu chưa tồn tại',
+                        label: t('import.modeUpdate'),
+                        description: t('import.modeUpdateDesc'),
                       },
                       {
                         value: 'upsert',
-                        label: 'Upsert',
-                        description: 'Tạo mới hoặc cập nhật tự động',
+                        label: t('import.modeUpsert'),
+                        description: t('import.modeUpsertDesc'),
                       },
                     ].map((mode) => (
                       <button
@@ -241,15 +243,13 @@ export function ImportTab() {
                 <Download className="h-5 w-5" />
               </div>
               <div className="flex-1">
-                <h3 className="font-medium text-slate-900 dark:text-white">Tải file mẫu</h3>
+                <h3 className="font-medium text-slate-900 dark:text-white">{t('import.downloadTemplate')}</h3>
                 <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                  Download template để xem cấu trúc cột. Các cột bắt buộc: <strong>name</strong>,{' '}
-                  <strong>base_price</strong>
+                  {t('import.templateHint')}
                 </p>
                 <div className="mt-3">
                   <p className="text-xs text-slate-500 dark:text-slate-400">
-                    Các cột hỗ trợ: name, description, base_price, preparation_time, status,
-                    is_chef_recommendation, category, images, modifiers (JSON)
+                    {t('import.supportedColumns')}
                   </p>
                 </div>
               </div>
@@ -265,12 +265,12 @@ export function ImportTab() {
               {importMutation.isPending ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Đang import...
+                  {t('import.importing')}
                 </>
               ) : (
                 <>
                   <Upload className="mr-2 h-4 w-4" />
-                  Import ngay
+                  {t('import.importNow')}
                 </>
               )}
             </Button>
@@ -292,7 +292,7 @@ export function ImportTab() {
                   <p className="text-2xl font-bold text-slate-900 dark:text-white">
                     {importResult.data.created}
                   </p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">Tạo mới</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">{t('import.created')}</p>
                 </div>
               </div>
             </Card>
@@ -305,7 +305,7 @@ export function ImportTab() {
                   <p className="text-2xl font-bold text-slate-900 dark:text-white">
                     {importResult.data.updated}
                   </p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">Cập nhật</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">{t('import.updated')}</p>
                 </div>
               </div>
             </Card>
@@ -318,7 +318,7 @@ export function ImportTab() {
                   <p className="text-2xl font-bold text-slate-900 dark:text-white">
                     {importResult.data.skipped}
                   </p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">Bỏ qua</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">{t('import.skipped')}</p>
                 </div>
               </div>
             </Card>
@@ -331,7 +331,7 @@ export function ImportTab() {
                   <p className="text-2xl font-bold text-slate-900 dark:text-white">
                     {importResult.data.errors?.length || 0}
                   </p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">Lỗi</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">{t('import.errors')}</p>
                 </div>
               </div>
             </Card>
@@ -341,20 +341,20 @@ export function ImportTab() {
           {importResult.data.errors && importResult.data.errors.length > 0 && (
             <Card className="rounded-2xl border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
               <h3 className="mb-4 font-semibold text-slate-900 dark:text-white">
-                Chi tiết lỗi ({importResult.data.errors.length})
+                {t('import.errorDetails')} ({importResult.data.errors.length})
               </h3>
               <div className="max-h-64 overflow-y-auto rounded-lg border border-slate-200 dark:border-slate-800">
                 <table className="w-full text-sm">
                   <thead className="bg-slate-50 dark:bg-slate-800/50">
                     <tr>
                       <th className="px-4 py-2 text-left font-medium text-slate-700 dark:text-slate-300">
-                        Dòng
+                        {t('import.row')}
                       </th>
                       <th className="px-4 py-2 text-left font-medium text-slate-700 dark:text-slate-300">
-                        Trường
+                        {t('import.field')}
                       </th>
                       <th className="px-4 py-2 text-left font-medium text-slate-700 dark:text-slate-300">
-                        Lỗi
+                        {t('import.errors')}
                       </th>
                     </tr>
                   </thead>
@@ -385,10 +385,10 @@ export function ImportTab() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-emerald-800 dark:text-emerald-200">
-                    Import hoàn tất!
+                    {t('import.complete')}
                   </h3>
                   <p className="text-sm text-emerald-700 dark:text-emerald-300">
-                    Tất cả dữ liệu đã được import thành công.
+                    {t('import.allSuccess')}
                   </p>
                 </div>
               </div>
@@ -397,7 +397,7 @@ export function ImportTab() {
 
           <div className="flex justify-end">
             <Button onClick={handleReset} className="bg-emerald-600 hover:bg-emerald-700">
-              Import file khác
+              {t('import.importAnother')}
             </Button>
           </div>
         </div>
@@ -405,3 +405,4 @@ export function ImportTab() {
     </div>
   )
 }
+

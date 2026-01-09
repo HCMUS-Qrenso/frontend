@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils'
 import { PRIORITY_CONFIG } from '../types/kds.types'
 import { TimerPill } from './timer-pill'
 import type { KdsOrder } from '../types/kds.types'
+import { useTranslations } from 'next-intl'
 
 interface TicketHeaderProps {
   order: KdsOrder
@@ -25,6 +26,8 @@ export function TicketHeader({
   isOverdue,
   isListView,
 }: TicketHeaderProps) {
+  const t = useTranslations('kds')
+
   return (
     <div
       className={cn(
@@ -36,7 +39,7 @@ export function TicketHeader({
         <div className="flex-1">
           <div className="flex items-center gap-2">
             <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
-              Bàn {order.tableNumber}
+              {t('table')} {order.tableNumber}
             </h3>
             {isOverdue && <AlertTriangle className="h-5 w-5 animate-pulse text-red-500" />}
           </div>
@@ -54,7 +57,7 @@ export function TicketHeader({
         </div>
         <div className="flex flex-col items-end gap-2">
           <Badge className={cn('text-xs font-medium', PRIORITY_CONFIG[order.priority].color)}>
-            {PRIORITY_CONFIG[order.priority].label}
+            {t(`priorityLabel.${order.priority}`)}
           </Badge>
           <TimerPill elapsed={elapsed} isOverdue={isOverdue} isWarning={isWarning} />
         </div>
@@ -62,3 +65,4 @@ export function TicketHeader({
     </div>
   )
 }
+

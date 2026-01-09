@@ -16,64 +16,26 @@ import { OverrideStatusModal } from './override-status-modal'
 import { PaymentDialog } from './payment-dialog'
 import type { OrderDetail } from '../types/orders'
 import { useFormat } from '@/src/hooks/use-format'
+import { useTranslations } from 'next-intl'
 
-const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
-  pending: {
-    label: 'Chờ xử lý',
-    color: 'bg-slate-100 text-slate-700 dark:bg-slate-500/10 dark:text-slate-400',
-  },
-  accepted: {
-    label: 'Đã nhận',
-    color: 'bg-purple-100 text-purple-700 dark:bg-purple-500/10 dark:text-purple-400',
-  },
-  in_progress: {
-    label: 'Đang xử lý',
-    color: 'bg-blue-100 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400',
-  },
-  preparing: {
-    label: 'Đang chuẩn bị',
-    color: 'bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400',
-  },
-  ready: {
-    label: 'Sẵn sàng',
-    color: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400',
-  },
-  served: {
-    label: 'Đã phục vụ',
-    color: 'bg-teal-100 text-teal-700 dark:bg-teal-500/10 dark:text-teal-400',
-  },
-  completed: {
-    label: 'Hoàn thành',
-    color: 'bg-slate-100 text-slate-700 dark:bg-slate-500/10 dark:text-slate-400',
-  },
-  rejected: {
-    label: 'Từ chối',
-    color: 'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400',
-  },
-  cancelled: {
-    label: 'Đã hủy',
-    color: 'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400',
-  },
-  abandoned: {
-    label: 'Bỏ dở',
-    color: 'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400',
-  },
+const STATUS_COLORS: Record<string, string> = {
+  pending: 'bg-slate-100 text-slate-700 dark:bg-slate-500/10 dark:text-slate-400',
+  accepted: 'bg-purple-100 text-purple-700 dark:bg-purple-500/10 dark:text-purple-400',
+  in_progress: 'bg-blue-100 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400',
+  preparing: 'bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400',
+  ready: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400',
+  served: 'bg-teal-100 text-teal-700 dark:bg-teal-500/10 dark:text-teal-400',
+  completed: 'bg-slate-100 text-slate-700 dark:bg-slate-500/10 dark:text-slate-400',
+  rejected: 'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400',
+  cancelled: 'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400',
+  abandoned: 'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400',
 }
 
-const PRIORITY_CONFIG: Record<string, { label: string; color: string }> = {
-  normal: {
-    label: 'Bình thường',
-    color: 'bg-slate-100 text-slate-600 dark:bg-slate-500/10 dark:text-slate-400',
-  },
-  high: {
-    label: 'Cao',
-    color: 'bg-orange-100 text-orange-700 dark:bg-orange-500/10 dark:text-orange-400',
-  },
-  urgent: { label: 'Gấp', color: 'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400' },
-  vip: {
-    label: 'VIP',
-    color: 'bg-purple-100 text-purple-700 dark:bg-purple-500/10 dark:text-purple-400',
-  },
+const PRIORITY_COLORS: Record<string, string> = {
+  normal: 'bg-slate-100 text-slate-600 dark:bg-slate-500/10 dark:text-slate-400',
+  high: 'bg-orange-100 text-orange-700 dark:bg-orange-500/10 dark:text-orange-400',
+  urgent: 'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400',
+  vip: 'bg-purple-100 text-purple-700 dark:bg-purple-500/10 dark:text-purple-400',
 }
 
 interface OrderSummaryHeaderProps {
@@ -86,6 +48,7 @@ export function OrderSummaryHeader({ order }: OrderSummaryHeaderProps) {
   const [overrideModalOpen, setOverrideModalOpen] = useState(false)
   const { formatRelativeDate } = useFormat()
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false)
+  const t = useTranslations('orders')
 
   const handleCopy = () => {
     navigator.clipboard.writeText(order.orderNumber)
@@ -93,15 +56,15 @@ export function OrderSummaryHeader({ order }: OrderSummaryHeaderProps) {
     setTimeout(() => setCopied(false), 2000)
   }
 
+  // Get localized labels
+  const getStatusLabel = (status: string) => t(`status.${status}` as any) || status
+  const getPriorityLabel = (priority: string) => t(`priority.${priority}` as any) || priority
+
   // Check if there are any payments in process
   const hasPaymentInProcess = order.payments?.some(
     (payment) => payment.status === 'pending' || payment.status === 'processing',
   )
 
-  // Show payment button only when:
-  // - Order is completed
-  // - Payment status is unpaid
-  // - No payment in process
   const canInitiatePayment =
     order.status === 'completed' && order.paymentStatus === 'unpaid' && !hasPaymentInProcess
 
@@ -111,7 +74,7 @@ export function OrderSummaryHeader({ order }: OrderSummaryHeaderProps) {
         {/* Back Button */}
         <Button variant="ghost" onClick={() => router.push('/admin/orders')} className="gap-2">
           <ArrowLeft className="h-4 w-4" />
-          Đơn hàng
+          {t('header.orders')}
         </Button>
 
         {/* Header Card */}
@@ -122,7 +85,7 @@ export function OrderSummaryHeader({ order }: OrderSummaryHeaderProps) {
               {/* Title */}
               <div className="flex items-center gap-3">
                 <h1 className="font-mono text-2xl font-bold text-slate-900 dark:text-white">
-                  Đơn hàng #{order.orderNumber}
+                  {t('header.orders')} #{order.orderNumber}
                 </h1>
                 <Button variant="ghost" size="sm" onClick={handleCopy} className="gap-2">
                   {copied ? (
@@ -133,9 +96,8 @@ export function OrderSummaryHeader({ order }: OrderSummaryHeaderProps) {
                 </Button>
               </div>
 
-              {/* Table Info */}
               <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
-                <span className="text-lg font-medium">Bàn {order.table?.tableNumber}</span>
+                <span className="text-lg font-medium">{t('table')} {order.table?.tableNumber}</span>
                 {order.table?.zone?.name && (
                   <>
                     <span className="text-sm">•</span>
@@ -144,16 +106,16 @@ export function OrderSummaryHeader({ order }: OrderSummaryHeaderProps) {
                 )}
               </div>
 
-              {/* Meta Chips */}
               <div className="flex flex-wrap items-center gap-2">
-                <Badge className={cn('text-xs font-medium', STATUS_CONFIG[order.status]?.color)}>
-                  {STATUS_CONFIG[order.status]?.label || order.status}
+                <Badge className={cn('text-xs font-medium', STATUS_COLORS[order.status])}
+                >
+                  {getStatusLabel(order.status)}
                 </Badge>
 
                 <Badge
-                  className={cn('text-xs font-medium', PRIORITY_CONFIG[order.priority]?.color)}
+                  className={cn('text-xs font-medium', PRIORITY_COLORS[order.priority])}
                 >
-                  {PRIORITY_CONFIG[order.priority]?.label || order.priority}
+                  {getPriorityLabel(order.priority)}
                 </Badge>
 
                 <span className="text-sm text-slate-500 dark:text-slate-400">
@@ -171,7 +133,7 @@ export function OrderSummaryHeader({ order }: OrderSummaryHeaderProps) {
                   className="gap-2 bg-transparent"
                 >
                   <Wallet className="h-4 w-4" />
-                  Tính tiền
+                  {t('header.payment')}
                 </Button>
               )}
 
@@ -186,7 +148,7 @@ export function OrderSummaryHeader({ order }: OrderSummaryHeaderProps) {
                 className="gap-2 bg-emerald-600 hover:bg-emerald-700"
               >
                 <AlertTriangle className="h-4 w-4" />
-                Thay đổi trạng thái
+                {t('header.changeStatus')}
               </Button>
 
               {order.paymentStatus !== 'paid' && order.status !== 'abandoned' && (
@@ -198,13 +160,13 @@ export function OrderSummaryHeader({ order }: OrderSummaryHeaderProps) {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem disabled={hasPaymentInProcess}>
-                      Giao cho nhân viên
+                      {t('header.assignStaff')}
                     </DropdownMenuItem>
                     <DropdownMenuItem disabled={hasPaymentInProcess}>
-                      Thay đổi ưu tiên
+                      {t('header.changePriority')}
                     </DropdownMenuItem>
                     <DropdownMenuItem disabled={hasPaymentInProcess} className="text-red-600">
-                      Hủy đơn
+                      {t('header.cancel')}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>

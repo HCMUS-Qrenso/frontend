@@ -228,7 +228,7 @@ export function OrdersTable() {
       tenantName: tenantData?.data?.name,
       tenantAddress: tenantData?.data?.address,
     })
-    toast.success('Đang in hóa đơn')
+    toast.success(t('toast.printingBill'))
   }
 
   const handleCompletePayment = async (order: Order) => {
@@ -239,9 +239,9 @@ export function OrdersTable() {
 
     try {
       await completePaymentMutation.mutateAsync(activePayment.id)
-      toast.success('Đã hoàn tất thanh toán')
+      toast.success(t('toast.paymentCompleted'))
     } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Không thể hoàn tất thanh toán')
+      toast.error(error.response?.data?.message || t('toast.errorCompletePayment'))
     }
   }
 
@@ -271,7 +271,7 @@ export function OrdersTable() {
                 <AdminTableHead className="px-4">{t('orderId')}</AdminTableHead>
                 <AdminTableHead className="px-4">{t('tableHeader')}</AdminTableHead>
                 <AdminTableHead className="px-4">{t('itemsCount')}</AdminTableHead>
-                <AdminTableHead className="px-4">{t('status')}</AdminTableHead>
+                <AdminTableHead className="px-4">{t('statusLabel')}</AdminTableHead>
                 <AdminTableHead className="px-4">{t('payment')}</AdminTableHead>
                 <AdminTableHead className="px-4" align="right">
                   {t('totalAmount')}
@@ -315,7 +315,7 @@ export function OrdersTable() {
               <AdminTableHead className="px-4">{t('orderId')}</AdminTableHead>
               <AdminTableHead className="px-4">{t('tableHeader')}</AdminTableHead>
               <AdminTableHead className="px-4">{t('itemsCount')}</AdminTableHead>
-              <AdminTableHead className="px-4">{t('status')}</AdminTableHead>
+              <AdminTableHead className="px-4">{t('statusLabel')}</AdminTableHead>
               <AdminTableHead className="px-4">{t('payment')}</AdminTableHead>
               <AdminTableHead className="px-4" align="right">
                 {t('totalAmount')}
@@ -478,7 +478,7 @@ export function OrdersTable() {
                                         <CheckCircle className="h-3 w-3" />
                                       )}
                                       {!isProcessing && (
-                                        <span className="hidden md:inline">Hoàn tất</span>
+                                        <span className="hidden md:inline">{t('paymentCard.complete')}</span>
                                       )}
                                     </Button>
                                   )}
@@ -498,7 +498,7 @@ export function OrdersTable() {
                                   ) : (
                                     <X className="h-3 w-3" />
                                   )}
-                                  {!isProcessing && <span className="hidden md:inline">Hủy</span>}
+                                  {!isProcessing && <span className="hidden md:inline">{t('paymentCard.cancel')}</span>}
                                 </Button>
                               </>
                             )
@@ -516,7 +516,7 @@ export function OrdersTable() {
                                 }}
                               >
                                 <Wallet className="h-3 w-3" />
-                                Tính tiền
+                                {t('header.initiatePayment')}
                               </Button>
                             )
                           }
@@ -585,7 +585,7 @@ export function OrdersTable() {
                               onClick={() => handleOpenPaymentDialog(order)}
                             >
                               <Wallet className="mr-2 h-4 w-4" />
-                              Tính tiền
+                              {t('header.initiatePayment')}
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
