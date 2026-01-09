@@ -7,6 +7,7 @@ import { CategoriesTable } from '@/src/features/admin/menu/components/categories
 import { CategoryUpsertModal } from '@/src/features/admin/menu/components/categories/category-upsert-modal'
 import { CategoryDeleteDialog } from '@/src/features/admin/menu/components/categories/category-delete-dialog'
 import { Category } from '@/src/features/admin/menu/types/categories'
+import { PageContentSkeleton } from '@/src/components/loading'
 
 function CategoriesContent() {
   const [reorderMode, setReorderMode] = useState(false)
@@ -65,8 +66,9 @@ function CategoriesContent() {
 
 export default function CategoriesPage() {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<PageContentSkeleton />}>
       <CategoriesContent />
     </Suspense>
   )
 }
+

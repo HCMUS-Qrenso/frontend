@@ -10,6 +10,7 @@ import { useSearchParams } from 'next/navigation'
 import { MenuItem } from '@/src/features/admin/menu/types/menu-items'
 import { Category } from '@/src/features/admin/menu/types/categories'
 import { useCategoriesQuery } from '@/src/features/admin/menu/queries/categories.queries'
+import { PageContentSkeleton } from '@/src/components/loading'
 
 function MenuItemsContent() {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
@@ -69,8 +70,9 @@ function MenuItemsContent() {
 
 export default function MenuItemsPage() {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<PageContentSkeleton />}>
       <MenuItemsContent />
     </Suspense>
   )
 }
+

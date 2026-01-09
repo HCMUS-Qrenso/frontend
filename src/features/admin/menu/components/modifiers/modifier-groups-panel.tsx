@@ -156,7 +156,7 @@ function SortableGroupItem({
   onSelect: () => void
   onDelete: () => void
   onEdit: () => void
-  t: (key: string) => string
+  t: ReturnType<typeof useTranslations>
 }) {
   const router = useRouter()
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({

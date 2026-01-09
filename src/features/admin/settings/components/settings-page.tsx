@@ -163,10 +163,12 @@ export function SettingsPage() {
     [],
   )
 
-  if (isLoading) {
+  // Show skeleton while loading OR while formData is still null (initial render)
+  if (isLoading || (!formData && !isError)) {
     return <SettingsPageSkeleton />
   }
 
+  // Only show error when loading is done but still no data, or explicit error
   if (isError || !formData) {
     return (
       <div className="flex h-[50vh] items-center justify-center">
@@ -247,7 +249,7 @@ function SettingsPageSkeleton() {
     <div className="space-y-6">
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Full width card */}
-        <div className="rounded-xl border p-6 lg:col-span-2">
+        <div className="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900 lg:col-span-2">
           <Skeleton className="mb-4 h-6 w-40" />
           <div className="grid gap-4 sm:grid-cols-2">
             <Skeleton className="h-10 w-full" />
@@ -259,7 +261,10 @@ function SettingsPageSkeleton() {
 
         {/* 2x2 cards */}
         {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="rounded-xl border p-6">
+          <div
+            key={i}
+            className="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900"
+          >
             <Skeleton className="mb-4 h-6 w-40" />
             <div className="space-y-4">
               <Skeleton className="h-10 w-full" />
@@ -269,7 +274,7 @@ function SettingsPageSkeleton() {
         ))}
 
         {/* Full width card */}
-        <div className="rounded-xl border p-6 lg:col-span-2">
+        <div className="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900 lg:col-span-2">
           <Skeleton className="mb-4 h-6 w-40" />
           <div className="space-y-4">
             <Skeleton className="h-10 w-full" />
@@ -284,3 +289,4 @@ function SettingsPageSkeleton() {
     </div>
   )
 }
+

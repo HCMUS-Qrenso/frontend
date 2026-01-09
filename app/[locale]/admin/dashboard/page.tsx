@@ -5,13 +5,11 @@ import { TodayStats } from '@/src/features/admin/dashboard/components/today-stat
 import { PerformanceChart } from '@/src/features/admin/dashboard/components/performance-chart'
 import { RecentOrders } from '@/src/features/admin/dashboard/components/recent-orders'
 import { TopItems } from '@/src/features/admin/dashboard/components/top-items'
-import { useTranslations } from 'next-intl'
+import { PageContentSkeleton } from '@/src/components/loading'
 
 export default function AdminDashboardPage() {
-  const t = useTranslations('errors')
-
   return (
-    <Suspense fallback={<div>{t('loading')}</div>}>
+    <Suspense fallback={<PageContentSkeleton />}>
       <div className="space-y-6">
         {/* KPI Cards */}
         <TodayStats />
@@ -28,3 +26,4 @@ export default function AdminDashboardPage() {
     </Suspense>
   )
 }
+

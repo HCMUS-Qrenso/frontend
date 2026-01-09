@@ -6,6 +6,7 @@ import { ImportTab } from '@/src/features/admin/menu/components/management/impor
 import { ExportDataTab } from '@/src/features/admin/menu/components/management/export-data-tab'
 import { Upload, Download } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import { PageContentSkeleton } from '@/src/components/loading'
 
 function ImportExportContent() {
   const [activeTab, setActiveTab] = useState('import')
@@ -42,8 +43,9 @@ function ImportExportContent() {
 
 export default function ImportExportPage() {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<PageContentSkeleton />}>
       <ImportExportContent />
     </Suspense>
   )
 }
+

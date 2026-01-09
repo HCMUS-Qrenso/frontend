@@ -1,13 +1,15 @@
 'use client'
 
+import { Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { FloorPlanCanvas } from '@/src/features/admin/tables/components/layout/floor-plan-canvas'
 import { FloorPlanToolbar } from '@/src/features/admin/tables/components/layout/floor-plan-toolbar'
 import { FloorPlanSidePanel } from '@/src/features/admin/tables/components/layout/floor-plan-side-panel'
 import { LayoutResetDialog } from '@/src/features/admin/tables/components/layout/layout-reset-dialog'
 import { useTableLayout } from '@/src/features/admin/tables/hooks/use-table-layout'
+import { FloorPlanSkeleton } from '@/src/components/loading'
 
-export default function TableLayoutPage() {
+function FloorPlanContent() {
   const searchParams = useSearchParams()
   const zoneParam = searchParams.get('zone')
   const tableIdParam = searchParams.get('tableId')
@@ -104,3 +106,12 @@ export default function TableLayoutPage() {
     </div>
   )
 }
+
+export default function TableLayoutPage() {
+  return (
+    <Suspense fallback={<FloorPlanSkeleton />}>
+      <FloorPlanContent />
+    </Suspense>
+  )
+}
+
