@@ -38,7 +38,7 @@ export function PriceBreakdownTooltip({ children, price }: PriceBreakdownTooltip
     // Service charge (if applicable)
     if (price.serviceCharge && price.serviceCharge > 0) {
       items.push({
-        label: `Phí dịch vụ (${settings.serviceCharge.rate}%)`,
+        label: `Phí dịch vụ (${settings.service_charge.rate}%)`,
         amount: price.serviceCharge,
       })
     }

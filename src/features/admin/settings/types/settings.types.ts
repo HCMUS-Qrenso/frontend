@@ -77,6 +77,7 @@ export interface OrderSettings {
  */
 export interface NotificationSettings {
   sound_enabled: boolean
+  sound: number
   email_enabled: boolean
   email: string | null
 }
@@ -167,6 +168,7 @@ export interface UpdateTenantSettingsPayload {
 
   // Notifications
   notifySoundEnabled?: boolean
+  notifySound?: number
   notifyEmailEnabled?: boolean
   notifyEmail?: string
 

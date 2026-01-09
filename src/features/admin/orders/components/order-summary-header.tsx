@@ -10,7 +10,24 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/src/components/ui/dropdown-menu'
-import { ArrowLeft, Copy, Printer, MoreVertical, AlertTriangle, Check, Wallet } from 'lucide-react'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/src/components/ui/tooltip'
+import {
+  ArrowLeft,
+  Copy,
+  Printer,
+  MoreVertical,
+  AlertTriangle,
+  Check,
+  Wallet,
+  QrCode,
+  Bell,
+  DollarSign,
+} from 'lucide-react'
 import { cn } from '@/src/lib/utils'
 import { OverrideStatusModal } from './override-status-modal'
 import { PaymentDialog } from './payment-dialog'
@@ -94,6 +111,35 @@ export function OrderSummaryHeader({ order }: OrderSummaryHeaderProps) {
                     <Copy className="h-4 w-4" />
                   )}
                 </Button>
+                {order.paymentRequestedAt && order.paymentStatus !== 'paid' && (
+                  <TooltipProvider>
+                    <div className="flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1.5 dark:bg-amber-900/30">
+                      <Bell className="h-4 w-4 animate-pulse text-amber-600 dark:text-amber-400" />
+                      <span className="text-xs font-medium text-amber-700 dark:text-amber-300">
+                        Yêu cầu thanh toán
+                      </span>
+                      {order.paymentMethod === 'qr' ? (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <QrCode className="h-4 w-4 cursor-help text-blue-600 dark:text-blue-400" />
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>QR Payment</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      ) : order.paymentMethod === 'cash' ? (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <DollarSign className="h-4 w-4 cursor-help text-emerald-600 dark:text-emerald-400" />
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Cash Payment</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      ) : null}
+                    </div>
+                  </TooltipProvider>
+                )}
               </div>
 
               <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">

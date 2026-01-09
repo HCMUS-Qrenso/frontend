@@ -1061,6 +1061,7 @@
       "paymentProcessingDesc": "Không thể tạo thanh toán mới. Vui lòng hoàn tất hoặc hủy thanh toán hiện tại.",
       "cannotCreateNewPayment": "Không thể tạo thanh toán mới. Vui lòng hoàn tất hoặc hủy thanh toán hiện tại."
     }
+    "paymentRequested": "Khách yêu cầu thanh toán"
   },
   "tables": {
     "title": "Quản lý bàn",
@@ -1945,6 +1946,29 @@
       "description": "Cấu hình âm thanh và email thông báo",
       "soundEnabled": "Âm thanh thông báo",
       "soundDescription": "Phát âm thanh khi có đơn hàng mới",
+      "soundType": "Loại âm thanh",
+      "sounds": {
+        "bell": {
+          "name": "Chuông",
+          "description": "Chuông cổ điển"
+        },
+        "chime": {
+          "name": "Tiếng leng keng",
+          "description": "Tiếng leng keng nhẹ nhàng"
+        },
+        "ding": {
+          "name": "Tiếng ding",
+          "description": "Tiếng ding nhanh"
+        },
+        "pop": {
+          "name": "Tiếng pop",
+          "description": "Tiếng pop hiện đại"
+        },
+        "ping": {
+          "name": "Tiếng ping",
+          "description": "Tiếng ping sắc nét"
+        }
+      },
       "emailEnabled": "Thông báo email",
       "emailDescription": "Gửi email khi có đơn hàng mới",
       "email": "Email nhận thông báo",

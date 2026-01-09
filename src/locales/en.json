@@ -1055,6 +1055,7 @@
       "paymentProcessingDesc": "Cannot create new payment. Please complete or cancel the current payment.",
       "cannotCreateNewPayment": "Cannot create new payment. Please complete or cancel the current payment."
     }
+    "paymentRequested": "Customer requested payment"
   },
   "tables": {
     "title": "Tables Management",
@@ -1935,6 +1936,29 @@
       "description": "Configure sound and email notifications",
       "soundEnabled": "Sound notifications",
       "soundDescription": "Play sound when new order arrives",
+      "soundType": "Notification Sound",
+      "sounds": {
+        "bell": {
+          "name": "Bell",
+          "description": "Classic bell notification"
+        },
+        "chime": {
+          "name": "Chime",
+          "description": "Gentle chime sound"
+        },
+        "ding": {
+          "name": "Ding",
+          "description": "Quick ding notification"
+        },
+        "pop": {
+          "name": "Pop",
+          "description": "Modern pop sound"
+        },
+        "ping": {
+          "name": "Ping",
+          "description": "Sharp ping alert"
+        }
+      },
       "emailEnabled": "Email notifications",
       "emailDescription": "Send email when new order arrives",
       "email": "Notification email",
