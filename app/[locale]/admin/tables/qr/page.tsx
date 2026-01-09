@@ -21,6 +21,7 @@ import { toast } from 'sonner'
 import { useErrorHandler } from '@/src/hooks/use-error-handler'
 import { QrStats, type QRStatus, type TableQR } from '@/src/features/admin/tables/types/tables'
 import { useTranslations } from 'next-intl'
+import { PageContentSkeleton } from '@/src/components/loading'
 
 // Helper function to map backend QR status to UI status
 // API returns title case: "Missing", "Ready", "Outdated"
@@ -299,7 +300,7 @@ function QRManagerContent() {
 
 export default function QRManagerPage() {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<PageContentSkeleton />}>
       <QRManagerContent />
     </Suspense>
   )

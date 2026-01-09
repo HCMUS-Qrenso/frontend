@@ -18,6 +18,7 @@ import type { MenuItem, Template } from '../../types'
 import { generatePDFBlob, getMaxItemsPerPage } from './utils'
 import { useRouter } from 'next/navigation'
 import { ContainerLoadingState, ContainerErrorState } from '@/components/ui/loading-state'
+import { useTranslations } from 'next-intl'
 
 interface TemplateExportProps {
   templates: Template[]
@@ -33,6 +34,7 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
   const [isMouseOverCanvas, setIsMouseOverCanvas] = useState(false)
   const canvasRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
+  const t = useTranslations('menu.templates.export')
 
   // Global wheel event handler to prevent page scroll when over canvas
   useEffect(() => {
@@ -1021,7 +1023,7 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
       URL.revokeObjectURL(url)
     } catch (error) {
       console.error('Export failed:', error)
-      alert('Xuất thất bại. Vui lòng thử lại hoặc liên hệ hỗ trợ nếu vấn đề vẫn tiếp tục.')
+      alert(t('exportError'))
     } finally {
       setIsExporting(false)
     }
@@ -1053,8 +1055,8 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
   if (!templates || templates.length === 0) {
     return (
       <ContainerErrorState
-        title="Không tìm thấy mẫu menu"
-        description="Không có mẫu menu nào khả dụng. Vui lòng tạo mẫu menu trước."
+        title={t('noTemplates')}
+        description={t('noTemplatesDesc')}
         withCard={false}
       />
     )
@@ -1064,8 +1066,8 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
   if (!selectedTemplateData) {
     return (
       <ContainerErrorState
-        title="Mẫu menu không tồn tại"
-        description="Mẫu menu đã chọn không tìm thấy. Vui lòng chọn mẫu khác."
+        title={t('templateNotFound')}
+        description={t('templateNotFoundDesc')}
         withCard={false}
       />
     )
@@ -1073,15 +1075,15 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
 
   // Check for loading states
   if (categoriesLoading || menuItemsLoading || tenantLoading) {
-    return <ContainerLoadingState text="Đang tải dữ liệu menu..." withCard={false} />
+    return <ContainerLoadingState text={t('loadingMenu')} withCard={false} />
   }
 
   // Check for error states
   if (categoriesError || menuItemsError || tenantError) {
     return (
       <ContainerErrorState
-        title="Lỗi tải dữ liệu"
-        description="Không thể tải dữ liệu menu. Vui lòng thử lại."
+        title={t('loadError')}
+        description={t('loadErrorDesc')}
         onRetry={() => {
           // Invalidate queries to retry
           // Note: This would require queryClient, but for simplicity we'll just show the error
@@ -1099,7 +1101,7 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
           <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
             {templates.find((t) => t.id === selectedTemplate)?.name}
           </h3>
-          <p className="text-sm text-slate-500 dark:text-slate-400">Thiết kế menu của bạn</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">{t('designYourMenu')}</p>
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -1140,7 +1142,7 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
                     : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400'
                 }`}
               >
-                Nguồn dữ liệu
+                {t('dataSource')}
               </button>
               <button
                 onClick={() => setActiveTab('style')}
@@ -1150,7 +1152,7 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
                     : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400'
                 }`}
               >
-                Tuỳ chỉnh style
+                {t('styleCustomization')}
               </button>
             </div>
           </div>
@@ -1162,11 +1164,11 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
                 {/* Restaurant Info */}
                 <div className="space-y-2">
                   <p className="text-xs font-medium text-slate-700 dark:text-slate-300">
-                    Thông tin nhà hàng
+                    {t('restaurantInfo')}
                   </p>
                   <input
                     type="text"
-                    placeholder="Tên nhà hàng"
+                    placeholder={t('restaurantName')}
                     value={restaurantInfo.name}
                     onChange={(e) =>
                       setRestaurantInfo((prev) => ({ ...prev, name: e.target.value }))
@@ -1175,7 +1177,7 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
                   />
                   <input
                     type="text"
-                    placeholder="Địa chỉ"
+                    placeholder={t('address')}
                     value={restaurantInfo.address}
                     onChange={(e) =>
                       setRestaurantInfo((prev) => ({ ...prev, address: e.target.value }))
@@ -1184,7 +1186,7 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
                   />
                   <input
                     type="text"
-                    placeholder="Hotline"
+                    placeholder={t('phone')}
                     value={restaurantInfo.phone}
                     onChange={(e) =>
                       setRestaurantInfo((prev) => ({ ...prev, phone: e.target.value }))
@@ -1195,7 +1197,7 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
 
                 <div className="space-y-2">
                   <p className="text-xs font-medium text-slate-700 dark:text-slate-300">
-                    Danh mục ({categories.length})
+                    {t('categories')} ({categories.length})
                   </p>
                   <div className="max-h-48 space-y-1 overflow-y-auto">
                     {/* All categories checkbox */}
@@ -1224,7 +1226,7 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
                         className="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
                       />
                       <span className="text-slate-700 dark:text-slate-300">
-                        Tất cả ({selectedCategories.size}/{categories.length})
+                        {t('selectAll')} ({selectedCategories.size}/{categories.length})
                       </span>
                     </label>
                     {categories.map((category) => (
@@ -1253,7 +1255,7 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
 
                 <div className="space-y-2">
                   <p className="text-xs font-medium text-slate-700 dark:text-slate-300">
-                    Trạng thái
+                    {t('status')}
                   </p>
                   <label className="flex items-center gap-2 text-sm">
                     <input
@@ -1262,17 +1264,17 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
                       className="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
                     />
                     <span className="text-slate-700 dark:text-slate-300">
-                      Ẩn món hết hàng/không khả dụng
+                      {t('hideUnavailable')}
                     </span>
                   </label>
                 </div>
 
                 <div className="rounded-lg bg-slate-50 p-3 dark:bg-slate-800">
                   <p className="text-xs font-medium text-slate-700 dark:text-slate-300">
-                    Tổng số món: {filteredMenuItems.length}
+                    {t('totalItems')}: {filteredMenuItems.length}
                   </p>
                   <p className="text-xs text-slate-500 dark:text-slate-400">
-                    {Object.keys(menuItemsByCategory).length} danh mục được chọn
+                    {Object.keys(menuItemsByCategory).length} {t('categoriesSelected')}
                   </p>
                 </div>
               </div>
@@ -1283,7 +1285,7 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
                 {/* Theme */}
                 <div className="space-y-2">
                   <p className="text-xs font-medium text-slate-700 dark:text-slate-300">
-                    Giao diện
+                    {t('theme')}
                   </p>
                   <div className="grid grid-cols-2 gap-2">
                     <button
@@ -1295,7 +1297,7 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
                           : 'border-slate-200 dark:border-slate-700',
                       )}
                     >
-                      Sáng
+                      {t('light')}
                     </button>
                     <button
                       onClick={() => setTheme('dark')}
@@ -1306,14 +1308,16 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
                           : 'border-slate-200 dark:border-slate-700',
                       )}
                     >
-                      Tối
+                      {t('dark')}
                     </button>
                   </div>
                 </div>
 
                 {/* Accent Color */}
                 <div className="space-y-2">
-                  <p className="text-xs font-medium text-slate-700 dark:text-slate-300">Màu nhấn</p>
+                  <p className="text-xs font-medium text-slate-700 dark:text-slate-300">
+                    {t('accentColor')}
+                  </p>
                   <div className="flex gap-2">
                     {['emerald', 'blue', 'amber', 'rose'].map((color) => (
                       <button
@@ -1336,7 +1340,9 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
 
                 {/* Options */}
                 <div className="space-y-2">
-                  <p className="text-xs font-medium text-slate-700 dark:text-slate-300">Hiển thị</p>
+                  <p className="text-xs font-medium text-slate-700 dark:text-slate-300">
+                    {t('display')}
+                  </p>
                   <div className="space-y-2 text-sm">
                     <label className="flex items-center gap-2">
                       <input
@@ -1347,7 +1353,7 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
                         }
                         className="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
                       />
-                      <span className="text-slate-700 dark:text-slate-300">Hiển thị giá</span>
+                      <span className="text-slate-700 dark:text-slate-300">{t('showPrices')}</span>
                     </label>
                     <label className="flex items-center gap-2">
                       <input
@@ -1361,7 +1367,9 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
                         }
                         className="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
                       />
-                      <span className="text-slate-700 dark:text-slate-300">Hiển thị mô tả</span>
+                      <span className="text-slate-700 dark:text-slate-300">
+                        {t('showDescriptions')}
+                      </span>
                     </label>
                     <label className="flex items-center gap-2">
                       <input
@@ -1376,7 +1384,7 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
                         className="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
                       />
                       <span className="text-slate-700 dark:text-slate-300">
-                        Biểu tượng món chef yêu thích
+                        {t('showChefBadge')}
                       </span>
                     </label>
                   </div>
@@ -1385,9 +1393,7 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
                 {/* Max Items Per Page */}
                 <div className="space-y-2">
                   <p className="text-xs font-medium text-slate-700 dark:text-slate-300">
-                    {selectedTemplate !== '4'
-                      ? 'Số món tối đa mỗi trang'
-                      : 'Số món tối đa mỗi danh mục'}
+                    {selectedTemplate !== '4' ? t('maxItemsPerPage') : t('maxItemsPerCategory')}
                   </p>
                   <input
                     type="number"
@@ -1402,13 +1408,13 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
                 {/* Font Size */}
                 <div className="space-y-2">
                   <p className="text-xs font-medium text-slate-700 dark:text-slate-300">
-                    Kích thước chữ
+                    {t('fontSize')}
                   </p>
                   <div className="grid grid-cols-3 gap-2">
                     {[
-                      { value: 'small', label: 'Nhỏ' },
-                      { value: 'medium', label: 'Trung bình' },
-                      { value: 'large', label: 'Lớn' },
+                      { value: 'small', label: t('fontSmall') },
+                      { value: 'medium', label: t('fontMedium') },
+                      { value: 'large', label: t('fontLarge') },
                     ].map((size) => (
                       <button
                         key={size.value}
@@ -1430,7 +1436,7 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
                 {displayOptions.showChefRecommendations && (
                   <div className="space-y-2">
                     <p className="text-xs font-medium text-slate-700 dark:text-slate-300">
-                      Chọn biểu tượng chef
+                      {t('selectChefIcon')}
                     </p>
                     <div className="grid grid-cols-6 gap-2">
                       {['⭐', '👨‍🍳', '🔥', '❤️', '🌟', '👑', '🥇', '💎', '🎯', '🏆', '✨', '💫'].map(
@@ -1474,14 +1480,14 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
                       ? 1
                       : Math.ceil(allItems.length / maxItemsPerPage)
                   })()}{' '}
-                  trang
+                  {t('pages')}
                 </Badge>
               </div>
               <div className="flex items-center gap-2">
                 {/* Reset View */}
                 <Button variant="ghost" size="sm" onClick={resetView} className="h-8">
                   <Eye className="mr-1 h-4 w-4" />
-                  Đặt lại
+                  {t('resetView')}
                 </Button>
 
                 {/* Font Size */}
@@ -1489,16 +1495,24 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline" size="sm">
                       Font:{' '}
-                      {fontSize === 'small' ? 'Nhỏ' : fontSize === 'medium' ? 'Trung bình' : 'Lớn'}{' '}
+                      {fontSize === 'small'
+                        ? t('fontSmall')
+                        : fontSize === 'medium'
+                          ? t('fontMedium')
+                          : t('fontLarge')}{' '}
                       <ChevronDown className="ml-1 h-3 w-3" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => setFontSize('small')}>Nhỏ</DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setFontSize('medium')}>
-                      Trung bình
+                    <DropdownMenuItem onClick={() => setFontSize('small')}>
+                      {t('fontSmall')}
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setFontSize('large')}>Lớn</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setFontSize('medium')}>
+                      {t('fontMedium')}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setFontSize('large')}>
+                      {t('fontLarge')}
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
 
@@ -1513,12 +1527,12 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
                     {isExporting ? (
                       <>
                         <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                        Đang xuất...
+                        {t('exporting')}
                       </>
                     ) : (
                       <>
                         <Download className="mr-2 h-4 w-4" />
-                        Xuất PDF
+                        {t('exportPdf')}
                       </>
                     )}
                   </Button>

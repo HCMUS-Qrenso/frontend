@@ -2,7 +2,7 @@
 
 import { cn } from '@/src/lib/utils'
 import { Button } from '@/src/components/ui/button'
-import { StatusBadge, TABLE_STATUS_CONFIG } from '@/src/components/ui/status-badge'
+import { StatusBadge, createTableStatusConfig } from '@/src/components/ui/status-badge'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -53,6 +53,15 @@ export function TablesListTable({
   const router = useRouter()
   const searchParams = useSearchParams()
   const t = useTranslations('tables')
+  const tStatus = useTranslations('statusBadge.table')
+
+  // Create localized status config
+  const tableStatusConfig = createTableStatusConfig({
+    available: tStatus('available'),
+    occupied: tStatus('occupied'),
+    reserved: tStatus('reserved'),
+    maintenance: tStatus('maintenance'),
+  })
 
   // Get query params
   const page = Number.parseInt(searchParams.get('page') || '1')
@@ -233,7 +242,7 @@ export function TablesListTable({
                     <p className="text-sm text-slate-700 dark:text-slate-300">{table.capacity}</p>
                   </TableCell>
                   <TableCell className="px-6 py-4">
-                    <StatusBadge status={table.status} config={TABLE_STATUS_CONFIG} />
+                    <StatusBadge status={table.status} config={tableStatusConfig} />
                   </TableCell>
                   <TableCell className="px-6 py-4">
                     {table.current_order ? (

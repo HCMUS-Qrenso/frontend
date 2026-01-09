@@ -6,6 +6,7 @@ import { useRouter, usePathname } from '@/src/i18n/navigation'
 import type { Locale } from '@/src/i18n/config'
 import { Button } from '@/src/components/ui/button'
 import { Skeleton } from '@/src/components/ui/skeleton'
+import { RestaurantInfoForm } from './restaurant-info-form'
 import { GeneralSettingsForm } from './general-settings-form'
 import { TaxSettingsForm } from './tax-settings-form'
 import { ServiceChargeForm } from './service-charge-form'
@@ -48,6 +49,10 @@ export function SettingsPage() {
 
     // Build payload with all changed fields
     const payload: UpdateTenantSettingsPayload = {
+      // Restaurant Info
+      name: formData.name,
+      address: formData.address || undefined,
+      image: formData.image || undefined,
       // General
       currency: formData.general.currency,
       currencySymbol: formData.general.currency_symbol,
@@ -151,10 +156,20 @@ export function SettingsPage() {
     setHasChanges(true)
   }, [])
 
-  if (isLoading) {
+  const updateRestaurantInfo = useCallback(
+    (partial: { name?: string; address?: string | null; image?: string | null }) => {
+      setFormData((prev) => (prev ? { ...prev, ...partial } : prev))
+      setHasChanges(true)
+    },
+    [],
+  )
+
+  // Show skeleton while loading OR while formData is still null (initial render)
+  if (isLoading || (!formData && !isError)) {
     return <SettingsPageSkeleton />
   }
 
+  // Only show error when loading is done but still no data, or explicit error
   if (isError || !formData) {
     return (
       <div className="flex h-[50vh] items-center justify-center">
@@ -167,7 +182,15 @@ export function SettingsPage() {
     <div className="space-y-6">
       {/* Grid Layout for Settings Cards */}
       <div className="grid gap-6 lg:grid-cols-2">
-        {/* General Settings - Full width on first row */}
+        {/* Restaurant Info - Full width on first row */}
+        <div className="lg:col-span-2">
+          <RestaurantInfoForm
+            settings={{ name: formData.name, address: formData.address, image: formData.image }}
+            onChange={updateRestaurantInfo}
+          />
+        </div>
+
+        {/* General Settings - Full width */}
         <div className="lg:col-span-2">
           <GeneralSettingsForm settings={formData.general} onChange={updateGeneral} />
         </div>
@@ -227,7 +250,7 @@ function SettingsPageSkeleton() {
     <div className="space-y-6">
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Full width card */}
-        <div className="rounded-xl border p-6 lg:col-span-2">
+        <div className="rounded-xl border border-slate-200 bg-white p-6 lg:col-span-2 dark:border-slate-800 dark:bg-slate-900">
           <Skeleton className="mb-4 h-6 w-40" />
           <div className="grid gap-4 sm:grid-cols-2">
             <Skeleton className="h-10 w-full" />
@@ -239,7 +262,10 @@ function SettingsPageSkeleton() {
 
         {/* 2x2 cards */}
         {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="rounded-xl border p-6">
+          <div
+            key={i}
+            className="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900"
+          >
             <Skeleton className="mb-4 h-6 w-40" />
             <div className="space-y-4">
               <Skeleton className="h-10 w-full" />
@@ -249,7 +275,7 @@ function SettingsPageSkeleton() {
         ))}
 
         {/* Full width card */}
-        <div className="rounded-xl border p-6 lg:col-span-2">
+        <div className="rounded-xl border border-slate-200 bg-white p-6 lg:col-span-2 dark:border-slate-800 dark:bg-slate-900">
           <Skeleton className="mb-4 h-6 w-40" />
           <div className="space-y-4">
             <Skeleton className="h-10 w-full" />

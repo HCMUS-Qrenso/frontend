@@ -13,6 +13,7 @@ import { Button } from '@/src/components/ui/button'
 import { toast } from 'sonner'
 import { RefreshCw } from 'lucide-react'
 import { useCheckPaymentStatusMutation, useOrderQuery } from '../queries'
+import { useTranslations } from 'next-intl'
 
 interface QrPaymentModalProps {
   open: boolean
@@ -37,6 +38,7 @@ export function QrPaymentModal({
 }: QrPaymentModalProps) {
   const checkPaymentStatusMutation = useCheckPaymentStatusMutation()
   const { data: orderData } = useOrderQuery(orderId)
+  const t = useTranslations('orders')
 
   // Auto-close when payment is confirmed via socket
   useEffect(() => {
@@ -54,29 +56,29 @@ export function QrPaymentModal({
 
     if (hasPaidPayment && order.paymentStatus === 'paid') {
       console.log('[QR Modal] Payment confirmed, closing modal')
-      toast.success('Thanh toán đã được xác nhận!')
+      toast.success(t('toast.paymentConfirmed'))
       onClose()
     }
-  }, [open, orderData, onClose])
+  }, [open, orderData, onClose, t])
 
   const handleCheckStatus = async () => {
     if (!transactionId) {
-      toast.error('Không có mã giao dịch')
+      toast.error(t('toast.errorNoTransactionId'))
       return
     }
 
     try {
       const result = await checkPaymentStatusMutation.mutateAsync(transactionId)
       if (result.status === 'paid') {
-        toast.success('Thanh toán đã được xác nhận!')
+        toast.success(t('toast.paymentConfirmed'))
         onClose()
       } else if (result.status === 'pending') {
-        toast.info('Đang chờ thanh toán...')
+        toast.info(t('toast.paymentPending'))
       } else {
-        toast.warning(`Trạng thái: ${result.status}`)
+        toast.warning(`${t('dialog.currentStatus')}: ${result.status}`)
       }
     } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Không thể kiểm tra trạng thái thanh toán')
+      toast.error(error.response?.data?.message || t('toast.errorCheckStatus'))
     }
   }
 
@@ -84,10 +86,8 @@ export function QrPaymentModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="flex max-h-[90vh] w-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl sm:max-w-md dark:border-slate-700 dark:bg-slate-900">
         <DialogHeader className="border-b border-slate-200 p-6 dark:border-slate-800">
-          <DialogTitle>Mã QR Thanh Toán</DialogTitle>
-          <DialogDescription>
-            Hiển thị mã QR này cho khách hàng quét để thanh toán
-          </DialogDescription>
+          <DialogTitle>{t('dialog.qrPaymentTitle')}</DialogTitle>
+          <DialogDescription>{t('dialog.qrPaymentDesc')}</DialogDescription>
         </DialogHeader>
         <div className="flex-1 space-y-6 overflow-y-auto p-6">
           <div className="flex flex-col items-center justify-center space-y-4">
@@ -99,18 +99,20 @@ export function QrPaymentModal({
                   className="h-64 w-64"
                   onError={(e) => {
                     e.currentTarget.style.display = 'none'
-                    toast.error('Không thể tải mã QR')
+                    toast.error(t('toast.errorLoadQr'))
                   }}
                 />
               ) : (
                 <div className="text-muted-foreground flex h-64 w-64 items-center justify-center">
-                  Không có mã QR
+                  {t('dialog.noQrCode')}
                 </div>
               )}
             </div>
             <div className="text-center">
               <p className="text-lg font-semibold">{amount.toLocaleString('vi-VN')}₫</p>
-              <p className="text-muted-foreground text-sm">Đơn hàng {orderNumber}</p>
+              <p className="text-muted-foreground text-sm">
+                {t('header.orders')} {orderNumber}
+              </p>
             </div>
           </div>
         </div>
@@ -125,18 +127,18 @@ export function QrPaymentModal({
               {checkPaymentStatusMutation.isPending ? (
                 <>
                   <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                  Đang kiểm tra...
+                  {t('paymentCard.checking')}
                 </>
               ) : (
                 <>
                   <RefreshCw className="mr-2 h-4 w-4" />
-                  Kiểm tra trạng thái
+                  {t('paymentCard.checkStatus')}
                 </>
               )}
             </Button>
           )}
           <Button onClick={onClose} className="flex-1">
-            Đóng
+            {t('dialog.close')}
           </Button>
         </DialogFooter>
       </DialogContent>

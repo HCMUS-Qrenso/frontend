@@ -131,6 +131,11 @@ export interface TenantSettingsResponse {
  * Update settings payload - all fields optional
  */
 export interface UpdateTenantSettingsPayload {
+  // Restaurant Info
+  name?: string
+  address?: string
+  image?: string
+
   // General
   currency?: string
   currencySymbol?: string

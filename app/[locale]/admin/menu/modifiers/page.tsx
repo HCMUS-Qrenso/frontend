@@ -12,6 +12,7 @@ import { useModifierGroupsQuery } from '@/src/features/admin/menu/queries/modifi
 import { useErrorHandler } from '@/src/hooks/use-error-handler'
 import { Modifier, type ModifierGroup } from '@/src/features/admin/menu/types/modifiers'
 import { useTranslations } from 'next-intl'
+import { PageContentSkeleton } from '@/src/components/loading'
 
 function ModifiersContent() {
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null)
@@ -144,7 +145,7 @@ function ModifiersContent() {
 
 export default function ModifiersPage() {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<PageContentSkeleton />}>
       <ModifiersContent />
     </Suspense>
   )

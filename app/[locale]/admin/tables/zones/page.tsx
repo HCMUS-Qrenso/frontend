@@ -8,6 +8,7 @@ import { ZoneUpsertModal } from '@/src/features/admin/tables/components/zones/zo
 import { ZoneDeleteModal } from '@/src/features/admin/tables/components/zones/zone-delete-modal'
 import { useSearchParams } from 'next/navigation'
 import { Zone } from '@/src/features/admin/tables/types/zones'
+import { PageContentSkeleton } from '@/src/components/loading'
 
 function ZonesContent() {
   const searchParams = useSearchParams()
@@ -62,7 +63,7 @@ function ZonesContent() {
 
 export default function ZonesPage() {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<PageContentSkeleton />}>
       <ZonesContent />
     </Suspense>
   )

@@ -6,6 +6,7 @@ import { useDeleteModifierGroupMutation } from '@/src/features/admin/menu/querie
 import { useErrorHandler } from '@/src/hooks/use-error-handler'
 import { toast } from 'sonner'
 import type { ModifierGroup } from '@/src/features/admin/menu/types/modifiers'
+import { useTranslations } from 'next-intl'
 
 interface ModifierGroupDeleteDialogProps {
   open: boolean
@@ -19,6 +20,7 @@ export function ModifierGroupDeleteDialog({
   onOpenChange,
 }: ModifierGroupDeleteDialogProps) {
   const { handleErrorWithStatus } = useErrorHandler()
+  const t = useTranslations('menu.modifiers.groupDeleteDialog')
 
   // Mutation
   const deleteMutation = useDeleteModifierGroupMutation()
@@ -37,12 +39,12 @@ export function ModifierGroupDeleteDialog({
       { id: modifierGroup.id, force },
       {
         onSuccess: () => {
-          toast.success('Đã xoá nhóm tuỳ chọn')
+          toast.success(t('success'))
           onOpenChange(false)
         },
         onError: (error: any) => {
           handleErrorWithStatus(error)
-          toast.error('Không thể xoá nhóm')
+          toast.error(t('error'))
         },
       },
     )
@@ -54,12 +56,10 @@ export function ModifierGroupDeleteDialog({
       <div className="flex gap-2">
         <AlertCircle className="h-5 w-5 shrink-0 text-amber-600 dark:text-amber-400" />
         <div className="space-y-1 text-sm">
-          <p className="font-medium text-amber-900 dark:text-amber-200">
-            Hành động này sẽ xoá toàn bộ options trong nhóm
-          </p>
+          <p className="font-medium text-amber-900 dark:text-amber-200">{t('warning')}</p>
           {usedByCount > 0 && (
             <p className="text-amber-700 dark:text-amber-300">
-              Nhóm này đang được dùng bởi {usedByCount} món. Nhóm sẽ tự động bị gỡ khỏi các món.
+              {t('usedByWarning', { count: usedByCount })}
             </p>
           )}
         </div>
@@ -71,11 +71,11 @@ export function ModifierGroupDeleteDialog({
     <ConfirmDeleteDialog
       open={open}
       onOpenChange={onOpenChange}
-      title="Xác nhận xoá nhóm tuỳ chọn"
-      description={`Bạn có chắc muốn xoá nhóm "${groupName}"?`}
+      title={t('title')}
+      description={t('description', { name: groupName })}
       onConfirm={handleDelete}
       isLoading={isDeleting}
-      confirmText="Xoá nhóm"
+      confirmText={t('confirmText')}
       warningContent={warningContent}
     />
   )

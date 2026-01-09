@@ -28,38 +28,15 @@ import {
 } from '../queries'
 import { toast } from 'sonner'
 import { printBill } from '../utils/print-bill'
+import { useTranslations } from 'next-intl'
 
-const PAYMENT_STATUS_CONFIG: Record<string, { label: string; color: string }> = {
-  pending: {
-    label: 'Chưa thanh toán',
-    color: 'bg-slate-100 text-slate-700 dark:bg-slate-500/10 dark:text-slate-400',
-  },
-  processing: {
-    label: 'Đang xử lý',
-    color: 'bg-blue-100 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400',
-  },
-  paid: {
-    label: 'Đã thanh toán',
-    color: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400',
-  },
-  failed: {
-    label: 'Thất bại',
-    color: 'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400',
-  },
-  cancelled: {
-    label: 'Đã hủy',
-    color: 'bg-gray-100 text-gray-700 dark:bg-gray-500/10 dark:text-gray-400',
-  },
-  refunded: {
-    label: 'Đã hoàn tiền',
-    color: 'bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400',
-  },
-}
-
-const PAYMENT_METHOD_LABELS: Record<string, string> = {
-  cash: 'Tiền mặt',
-  qr: 'VietQR',
-  payos: 'VietQR', // Backward compatibility
+const PAYMENT_STATUS_COLORS: Record<string, string> = {
+  pending: 'bg-slate-100 text-slate-700 dark:bg-slate-500/10 dark:text-slate-400',
+  processing: 'bg-blue-100 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400',
+  paid: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400',
+  failed: 'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400',
+  cancelled: 'bg-gray-100 text-gray-700 dark:bg-gray-500/10 dark:text-gray-400',
+  refunded: 'bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400',
 }
 
 interface PaymentCardProps {
@@ -84,6 +61,11 @@ export function PaymentCard({
   const completePaymentMutation = useCompletePaymentMutation()
   const cancelPaymentMutation = useCancelPaymentMutation()
   const checkPaymentStatusMutation = useCheckPaymentStatusMutation()
+  const t = useTranslations('orders')
+
+  // Helper functions for translation
+  const getPaymentStatusLabel = (status: string) => t(`paymentStatus.${status}` as any) || status
+  const getPaymentMethodLabel = (method: string) => t(`paymentMethod.${method}` as any) || method
 
   // Get the most recent paid payment first, otherwise get the most recent non-cancelled/non-failed payment
   const paidPayment = payments.find((p) => p.status === 'paid')
@@ -109,9 +91,9 @@ export function PaymentCard({
 
     try {
       await completePaymentMutation.mutateAsync(payment.id)
-      toast.success('Đã hoàn tất thanh toán')
+      toast.success(t('toast.paymentCompleted'))
     } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Không thể hoàn tất thanh toán')
+      toast.error(error.response?.data?.message || t('toast.errorCompletePayment'))
     }
   }
 
@@ -123,11 +105,11 @@ export function PaymentCard({
         paymentId: payment.id,
         reason: cancelReason || undefined,
       })
-      toast.success('Đã hủy thanh toán')
+      toast.success(t('toast.paymentCancelled'))
       setCancelDialogOpen(false)
       setCancelReason('')
     } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Không thể hủy thanh toán')
+      toast.error(error.response?.data?.message || t('toast.errorCancelPayment'))
     }
   }
 
@@ -138,7 +120,7 @@ export function PaymentCard({
 
   const handlePrintBill = () => {
     if (!order) {
-      toast.error('Không có thông tin đơn hàng')
+      toast.error(t('toast.errorNoOrderInfo'))
       return
     }
 
@@ -149,35 +131,37 @@ export function PaymentCard({
       tenantName,
       tenantAddress,
     })
-    toast.success('Đang in hóa đơn')
+    toast.success(t('toast.printingBill'))
   }
 
   const handleCheckPaymentStatus = async () => {
     if (!payment?.transactionId) {
-      toast.error('Không có mã giao dịch')
+      toast.error(t('toast.errorNoTransactionId'))
       return
     }
 
     try {
       const result = await checkPaymentStatusMutation.mutateAsync(payment.transactionId)
       if (result.status === 'paid') {
-        toast.success('Thanh toán đã được xác nhận!')
+        toast.success(t('toast.paymentConfirmed'))
       } else if (result.status === 'pending') {
-        toast.info('Đang chờ thanh toán...')
+        toast.info(t('toast.paymentPending'))
       } else {
-        toast.warning(`Trạng thái: ${result.status}`)
+        toast.warning(`${t('dialog.currentStatus')}: ${getPaymentStatusLabel(result.status || '')}`)
       }
     } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Không thể kiểm tra trạng thái thanh toán')
+      toast.error(error.response?.data?.message || t('toast.errorCheckStatus'))
     }
   }
 
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Thanh toán</h2>
-        <Badge className={cn('text-xs font-medium', PAYMENT_STATUS_CONFIG[paymentStatus]?.color)}>
-          {PAYMENT_STATUS_CONFIG[paymentStatus]?.label || paymentStatus}
+        <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
+          {t('paymentCard.title')}
+        </h2>
+        <Badge className={cn('text-xs font-medium', PAYMENT_STATUS_COLORS[paymentStatus])}>
+          {getPaymentStatusLabel(paymentStatus)}
         </Badge>
       </div>
 
@@ -188,11 +172,11 @@ export function PaymentCard({
             <CreditCard className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
           </div>
           <div className="flex-1">
-            <p className="text-sm text-slate-500 dark:text-slate-400">Phương thức</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400">{t('paymentCard.method')}</p>
             <p className="font-medium text-slate-900 dark:text-white">
               {hasPayment && payment.paymentMethod
-                ? PAYMENT_METHOD_LABELS[payment.paymentMethod] || payment.paymentMethod
-                : 'Chưa xác định'}
+                ? getPaymentMethodLabel(payment.paymentMethod)
+                : t('paymentMethod.undefined')}
             </p>
           </div>
         </div>
@@ -202,16 +186,17 @@ export function PaymentCard({
 
         {/* Amount */}
         <div className="flex items-center justify-between">
-          <p className="text-sm text-slate-500 dark:text-slate-400">Tổng tiền</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">{t('paymentCard.total')}</p>
           <p className="text-xl font-bold text-slate-900 dark:text-white">
             {formatPrice(totalAmount)}
           </p>
         </div>
 
-        {/* Transaction ID */}
         {hasPayment && payment.transactionId && (
           <div className="space-y-1">
-            <p className="text-sm text-slate-500 dark:text-slate-400">Mã giao dịch</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400">
+              {t('paymentCard.transactionId')}
+            </p>
             <div className="flex items-center gap-2">
               <p className="flex-1 font-mono text-sm text-slate-900 dark:text-white">
                 {payment.transactionId}
@@ -230,7 +215,7 @@ export function PaymentCard({
         {/* Paid At */}
         {hasPayment && payment.paidAt && (
           <div className="space-y-1">
-            <p className="text-sm text-slate-500 dark:text-slate-400">Thời gian thanh toán</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400">{t('paymentCard.paidAt')}</p>
             <p className="text-sm text-slate-900 dark:text-white">
               {formatDateTime(payment.paidAt)}
             </p>
@@ -242,9 +227,11 @@ export function PaymentCard({
           <>
             <div className="border-t border-slate-200 dark:border-slate-700" />
             <div className="rounded-lg bg-amber-50 p-3 dark:bg-amber-500/10">
-              <p className="text-sm font-medium text-amber-900 dark:text-amber-400">Đã hoàn tiền</p>
+              <p className="text-sm font-medium text-amber-900 dark:text-amber-400">
+                {t('paymentCard.refunded')}
+              </p>
               <p className="mt-1 text-sm text-amber-700 dark:text-amber-300">
-                Số tiền: {formatPrice(payment.refundAmount)}
+                {t('paymentCard.amount')}: {formatPrice(payment.refundAmount)}
               </p>
               <p className="text-xs text-amber-600 dark:text-amber-400">
                 {formatDateTime(payment.refundedAt)}
@@ -259,10 +246,10 @@ export function PaymentCard({
             <div className="border-t border-slate-200 dark:border-slate-700" />
             <div className="rounded-lg bg-gray-50 p-3 dark:bg-gray-500/10">
               <p className="text-sm font-medium text-gray-900 dark:text-gray-400">
-                Thanh toán đã bị hủy
+                {t('paymentCard.cancelled')}
               </p>
               <p className="text-xs text-gray-600 dark:text-gray-500">
-                Giao dịch đã bị hủy. Vui lòng tạo giao dịch mới.
+                {t('paymentCard.cancelledDesc')}
               </p>
             </div>
           </>
@@ -274,10 +261,10 @@ export function PaymentCard({
             <div className="border-t border-slate-200 dark:border-slate-700" />
             <div className="rounded-lg bg-red-50 p-3 dark:bg-red-500/10">
               <p className="text-sm font-medium text-red-900 dark:text-red-400">
-                Thanh toán thất bại
+                {t('paymentCard.failed')}
               </p>
               <p className="mt-1 text-xs text-red-700 dark:text-red-300">
-                Vui lòng thử lại hoặc chọn phương thức thanh toán khác
+                {t('paymentCard.failedDesc')}
               </p>
             </div>
           </>
@@ -295,7 +282,9 @@ export function PaymentCard({
                 size="lg"
               >
                 <CheckCircle className="mr-2 h-4 w-4" />
-                {completePaymentMutation.isPending ? 'Đang xử lý...' : 'Hoàn tất thanh toán'}
+                {completePaymentMutation.isPending
+                  ? t('paymentCard.processing')
+                  : t('paymentCard.complete')}
               </Button>
               <Button
                 onClick={handleOpenCancelDialog}
@@ -304,7 +293,7 @@ export function PaymentCard({
                 size="lg"
               >
                 <X className="mr-2 h-4 w-4" />
-                Hủy
+                {t('paymentCard.cancel')}
               </Button>
             </div>
           </>
@@ -331,8 +320,8 @@ export function PaymentCard({
                     )}
                   />
                   {checkPaymentStatusMutation.isPending
-                    ? 'Đang kiểm tra...'
-                    : 'Kiểm tra trạng thái'}
+                    ? t('paymentCard.checking')
+                    : t('paymentCard.checkStatus')}
                 </Button>
                 <Button
                   onClick={handleOpenCancelDialog}
@@ -342,7 +331,7 @@ export function PaymentCard({
                   size="lg"
                 >
                   <X className="mr-2 h-4 w-4" />
-                  Hủy thanh toán
+                  {t('paymentCard.cancelPayment')}
                 </Button>
               </div>
             </>
@@ -354,7 +343,7 @@ export function PaymentCard({
             <div className="border-t border-slate-200 dark:border-slate-700" />
             <Button onClick={handlePrintBill} variant="outline" className="w-full" size="lg">
               <Printer className="mr-2 h-4 w-4" />
-              In hóa đơn
+              {t('paymentCard.printBill')}
             </Button>
           </>
         )}
@@ -364,29 +353,31 @@ export function PaymentCard({
       <AlertDialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Xác nhận hủy thanh toán</AlertDialogTitle>
-            <AlertDialogDescription>
-              Bạn có chắc chắn muốn hủy thanh toán này không? Hành động này không thể hoàn tác.
-            </AlertDialogDescription>
+            <AlertDialogTitle>{t('dialog.cancelPaymentTitle')}</AlertDialogTitle>
+            <AlertDialogDescription>{t('dialog.cancelPaymentDesc')}</AlertDialogDescription>
           </AlertDialogHeader>
           <div className="space-y-2 py-4">
-            <Label htmlFor="cancel-reason">Lý do hủy (tùy chọn)</Label>
+            <Label htmlFor="cancel-reason">{t('dialog.cancelReason')}</Label>
             <Textarea
               id="cancel-reason"
-              placeholder="Nhập lý do hủy thanh toán..."
+              placeholder={t('dialog.cancelReasonPlaceholder')}
               value={cancelReason}
               onChange={(e) => setCancelReason(e.target.value)}
               rows={3}
             />
           </div>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={cancelPaymentMutation.isPending}>Không</AlertDialogCancel>
+            <AlertDialogCancel disabled={cancelPaymentMutation.isPending}>
+              {t('dialog.no')}
+            </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleCancelPayment}
               disabled={cancelPaymentMutation.isPending}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {cancelPaymentMutation.isPending ? 'Đang hủy...' : 'Hủy thanh toán'}
+              {cancelPaymentMutation.isPending
+                ? t('paymentCard.processing')
+                : t('paymentCard.cancelPayment')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

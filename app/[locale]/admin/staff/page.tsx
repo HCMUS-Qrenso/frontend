@@ -2,6 +2,7 @@
 
 import { Suspense } from 'react'
 import { StaffTabs } from '@/src/features/admin/staff/components/staff-tabs'
+import { PageContentSkeleton } from '@/src/components/loading'
 
 function StaffContent() {
   return (
@@ -14,7 +15,7 @@ function StaffContent() {
 
 export default function StaffPage() {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<PageContentSkeleton />}>
       <StaffContent />
     </Suspense>
   )

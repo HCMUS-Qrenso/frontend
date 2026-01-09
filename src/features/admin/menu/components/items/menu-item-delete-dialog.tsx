@@ -5,6 +5,7 @@ import { useDeleteMenuItemMutation } from '@/src/features/admin/menu/queries'
 import { useErrorHandler } from '@/src/hooks/use-error-handler'
 import { toast } from 'sonner'
 import type { MenuItem } from '@/src/features/admin/menu/types'
+import { useTranslations } from 'next-intl'
 
 interface MenuItemDeleteDialogProps {
   open: boolean
@@ -14,6 +15,7 @@ interface MenuItemDeleteDialogProps {
 
 export function MenuItemDeleteDialog({ open, item, onOpenChange }: MenuItemDeleteDialogProps) {
   const { handleErrorWithStatus } = useErrorHandler()
+  const t = useTranslations('menu.items.deleteDialog')
 
   // Mutation
   const deleteMutation = useDeleteMenuItemMutation()
@@ -24,9 +26,9 @@ export function MenuItemDeleteDialog({ open, item, onOpenChange }: MenuItemDelet
     try {
       await deleteMutation.mutateAsync(item.id)
       onOpenChange(false)
-      toast.success('Đã xóa món ăn thành công')
+      toast.success(t('success'))
     } catch (error) {
-      handleErrorWithStatus(error, undefined, 'Không thể xóa món ăn')
+      handleErrorWithStatus(error, undefined, t('error'))
     }
   }
 
@@ -34,12 +36,12 @@ export function MenuItemDeleteDialog({ open, item, onOpenChange }: MenuItemDelet
     <ConfirmDeleteDialog
       open={open}
       onOpenChange={onOpenChange}
-      title="Xóa món"
-      description="Hành động này không thể hoàn tác. Món ăn sẽ bị xóa vĩnh viễn khỏi menu."
+      title={t('title', { name: item?.name || '' })}
+      description={t('description')}
       itemName={item?.name}
       onConfirm={handleDelete}
       isLoading={deleteMutation.isPending}
-      confirmText="Xóa món ăn"
+      confirmText={t('confirmText')}
     />
   )
 }

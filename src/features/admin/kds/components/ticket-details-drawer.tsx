@@ -14,6 +14,7 @@ import { StatusBadge } from './status-badge'
 import { PRIORITY_CONFIG } from '../types/kds.types'
 import { Clock, User, Printer, Play, CheckCircle2, MapPin } from 'lucide-react'
 import { useFormat } from '@/src/hooks/use-format'
+import { useTranslations } from 'next-intl'
 
 interface TicketDetailsDrawerProps {
   open: boolean
@@ -36,15 +37,17 @@ function getNextStatus(currentStatus: OrderItemStatus): OrderItemStatus | null {
   }
 }
 
-// Get action button config for a status
-function getActionConfig(status: OrderItemStatus): { label: string; icon: React.ReactNode } | null {
+// Get action button config key for a status
+function getActionConfigKey(
+  status: OrderItemStatus,
+): { labelKey: string; icon: React.ReactNode } | null {
   switch (status) {
     case 'pending':
-      return { label: 'Nhận đơn', icon: <CheckCircle2 className="mr-2 h-4 w-4" /> }
+      return { labelKey: 'acceptOrder', icon: <CheckCircle2 className="mr-2 h-4 w-4" /> }
     case 'accepted':
-      return { label: 'Bắt đầu làm', icon: <Play className="mr-2 h-4 w-4" /> }
+      return { labelKey: 'action.start', icon: <Play className="mr-2 h-4 w-4" /> }
     case 'preparing':
-      return { label: 'Hoàn thành', icon: <CheckCircle2 className="mr-2 h-4 w-4" /> }
+      return { labelKey: 'action.done', icon: <CheckCircle2 className="mr-2 h-4 w-4" /> }
     default:
       return null
   }
@@ -57,6 +60,7 @@ export function TicketDetailsDrawer({
   onUpdateItemStatus,
 }: TicketDetailsDrawerProps) {
   const { formatRelativeDate } = useFormat()
+  const t = useTranslations('kds')
 
   if (!order) return null
 
@@ -69,8 +73,10 @@ export function TicketDetailsDrawer({
       <SheetContent side="right" className="flex w-full flex-col px-6 sm:max-w-xl">
         {/* Header */}
         <SheetHeader className="space-y-1 pb-4">
-          <SheetTitle className="text-2xl">Chi tiết đơn hàng</SheetTitle>
-          <SheetDescription>Thông tin chi tiết và lịch sử đơn {order.orderNumber}</SheetDescription>
+          <SheetTitle className="text-2xl">{t('orderDetails')}</SheetTitle>
+          <SheetDescription>
+            {t('orderDetailsDesc', { orderNumber: order.orderNumber })}
+          </SheetDescription>
         </SheetHeader>
 
         {/* Scrollable Content */}
@@ -83,7 +89,7 @@ export function TicketDetailsDrawer({
                   {/* Table Number */}
                   <div>
                     <h3 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
-                      Bàn {order.tableNumber}
+                      {t('table')} {order.tableNumber}
                     </h3>
                     <p className="mt-1 font-mono text-sm font-medium text-slate-500 dark:text-slate-400">
                       {order.orderNumber}
@@ -115,7 +121,7 @@ export function TicketDetailsDrawer({
                 <Badge
                   className={`shrink-0 px-3 py-1 text-sm ${PRIORITY_CONFIG[order.priority].color}`}
                 >
-                  {PRIORITY_CONFIG[order.priority].label}
+                  {t(`priorityLabel.${order.priority}`)}
                 </Badge>
               </div>
             </div>
@@ -126,12 +132,12 @@ export function TicketDetailsDrawer({
             {/* Items Section */}
             <div className="space-y-4">
               <h4 className="text-lg font-semibold text-slate-900 dark:text-white">
-                Món ăn ({order.items.length})
+                {t('itemsCount', { count: order.items.length })}
               </h4>
 
               <div className="space-y-4">
                 {order.items.map((item) => {
-                  const actionConfig = getActionConfig(item.status)
+                  const actionConfig = getActionConfigKey(item.status)
                   const nextStatus = getNextStatus(item.status)
 
                   return (
@@ -166,7 +172,7 @@ export function TicketDetailsDrawer({
                         {item.estimatedPrepTime && (
                           <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
                             <Clock className="h-4 w-4" />
-                            <span>Thời gian ước tính: {item.estimatedPrepTime} phút</span>
+                            <span>{t('estimatedTime', { time: item.estimatedPrepTime })}</span>
                           </div>
                         )}
 
@@ -174,7 +180,7 @@ export function TicketDetailsDrawer({
                         {item.specialInstructions && (
                           <div className="rounded-lg bg-amber-50 p-3 dark:bg-amber-950/30">
                             <p className="text-sm font-medium text-amber-700 dark:text-amber-400">
-                              📝 Ghi chú: {item.specialInstructions}
+                              📝 {t('notes')}: {item.specialInstructions}
                             </p>
                           </div>
                         )}
@@ -188,7 +194,7 @@ export function TicketDetailsDrawer({
                             onClick={() => onUpdateItemStatus(order.id, item.id, nextStatus)}
                           >
                             {actionConfig.icon}
-                            {actionConfig.label}
+                            {t(actionConfig.labelKey)}
                           </Button>
                         </div>
                       )}
@@ -205,7 +211,7 @@ export function TicketDetailsDrawer({
                 <div className="h-px bg-slate-200 dark:bg-slate-700" />
                 <div className="rounded-xl border border-amber-200 bg-amber-50 p-5 dark:border-amber-800 dark:bg-amber-950/30">
                   <h4 className="font-semibold text-amber-900 dark:text-amber-200">
-                    Ghi chú từ khách hàng
+                    {t('customerNoteTitle')}
                   </h4>
                   <p className="mt-2 text-sm leading-relaxed text-amber-700 dark:text-amber-400">
                     {order.specialInstructions}
@@ -228,7 +234,7 @@ export function TicketDetailsDrawer({
               disabled={isAllReady}
             >
               <CheckCircle2 className="mr-2 h-4 w-4" />
-              {isAllReady ? 'Đã sẵn sàng' : 'Hoàn thành tất cả'}
+              {isAllReady ? t('allReady') : t('completeAll')}
             </Button>
             <Button variant="outline" size="icon" className="shrink-0">
               <Printer className="h-4 w-4" />

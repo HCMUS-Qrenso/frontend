@@ -21,6 +21,7 @@ import { printBill } from '../utils/print-bill'
 import { toast } from 'sonner'
 import type { Order, OrderDetail } from '../types/orders'
 import { QrPaymentModal } from './qr-payment-modal'
+import { useTranslations } from 'next-intl'
 
 interface PaymentDialogProps {
   open: boolean
@@ -48,6 +49,7 @@ export function PaymentDialog({
   const [transactionId, setTransactionId] = useState<string | undefined>(undefined)
 
   const createPaymentMutation = useCreatePaymentMutation()
+  const t = useTranslations('orders')
 
   useEffect(() => {
     if (open) {
@@ -63,7 +65,7 @@ export function PaymentDialog({
 
     // Validate order status
     if (order.status !== 'completed') {
-      toast.error('Chỉ có thể thanh toán cho đơn hàng đã hoàn thành')
+      toast.error(t('warning.orderNotCompleted'))
       return
     }
 
@@ -72,9 +74,7 @@ export function PaymentDialog({
       (p) => !['cancelled', 'failed', 'paid'].includes(p.status),
     )
     if (activePayment) {
-      toast.error(
-        'Đơn hàng đang có thanh toán đang xử lý. Vui lòng hoàn tất hoặc hủy thanh toán hiện tại trước.',
-      )
+      toast.error(t('warning.paymentInProgress'))
       return
     }
 
@@ -100,9 +100,9 @@ export function PaymentDialog({
         })
 
         if (paymentMethod === 'cash') {
-          toast.success('Đã in phiếu tạm tính. Mang ra bàn và nhận tiền, sau đó nhấn "Hoàn tất".')
+          toast.success(t('toast.printedCashBill'))
         } else {
-          toast.success('Đã in phiếu tạm tính với mã QR. Mang ra bàn cho khách quét.')
+          toast.success(t('toast.printedQrBill'))
         }
 
         onOpenChange(false)
@@ -112,7 +112,7 @@ export function PaymentDialog({
         setAction('print')
         setDescription('')
       } catch (error: any) {
-        toast.error(error.response?.data?.message || 'Không thể tạo thanh toán')
+        toast.error(error.response?.data?.message || t('toast.errorCreatePayment'))
       }
       return
     }
@@ -126,7 +126,7 @@ export function PaymentDialog({
       })
 
       if (paymentMethod === 'cash') {
-        toast.success('Đã tạo thanh toán. Nhận tiền và nhấn "Hoàn tất".')
+        toast.success(t('toast.createdCashPayment'))
         onOpenChange(false)
       } else {
         // For QR payment at counter, show QR modal
@@ -134,7 +134,7 @@ export function PaymentDialog({
           setQrCode(result.qrCode)
           setTransactionId(result.transactionId)
           setQrModalOpen(true)
-          toast.success('Đã tạo mã QR thanh toán')
+          toast.success(t('toast.createdQrPayment'))
         }
       }
 
@@ -145,7 +145,7 @@ export function PaymentDialog({
         setDescription('')
       }
     } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Không thể tạo thanh toán')
+      toast.error(error.response?.data?.message || t('toast.errorCreatePayment'))
     }
   }
 
@@ -155,9 +155,10 @@ export function PaymentDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-700 dark:bg-slate-900">
         <DialogHeader className="border-b border-slate-200 pb-2 dark:border-slate-800">
-          <DialogTitle>Tính tiền - {order.orderNumber}</DialogTitle>
+          <DialogTitle>{t('dialog.paymentTitle', { orderNumber: order.orderNumber })}</DialogTitle>
           <DialogDescription>
-            Bàn {order.table?.tableNumber} - Tổng: {order.totalAmount.toLocaleString('vi-VN')}₫
+            {t('header.table')} {order.table?.tableNumber} - {t('paymentCard.total')}:{' '}
+            {order.totalAmount.toLocaleString('vi-VN')}₫
           </DialogDescription>
         </DialogHeader>
 
@@ -167,11 +168,10 @@ export function PaymentDialog({
             {order.status !== 'completed' && (
               <div className="rounded-lg bg-amber-50 p-4 dark:bg-amber-500/10">
                 <p className="text-sm font-medium text-amber-900 dark:text-amber-400">
-                  ⚠️ Đơn hàng chưa hoàn thành
+                  ⚠️ {t('warning.orderNotCompletedTitle')}
                 </p>
                 <p className="mt-1 text-xs text-amber-700 dark:text-amber-300">
-                  Chỉ có thể in phiếu tạm tính. Tạo thanh toán chỉ khả dụng khi đơn hàng đã hoàn
-                  thành.
+                  {t('warning.orderNotCompletedDesc')}
                 </p>
               </div>
             )}
@@ -182,27 +182,20 @@ export function PaymentDialog({
                 (p) => !['cancelled', 'failed', 'paid'].includes(p.status),
               )
               if (activePayment) {
-                const statusLabels: Record<string, string> = {
-                  pending: 'chờ thanh toán',
-                  processing: 'đang xử lý',
-                }
-                const methodLabels: Record<string, string> = {
-                  cash: 'Tiền mặt',
-                  payos: 'VietQR',
-                }
                 return (
                   <div className="rounded-lg bg-blue-50 p-4 dark:bg-blue-500/10">
                     <p className="text-sm font-medium text-blue-900 dark:text-blue-400">
-                      💳 Thanh toán đang xử lý
+                      💳 {t('warning.paymentProcessing')}
                     </p>
                     <p className="mt-1 text-xs text-blue-700 dark:text-blue-300">
-                      Phương thức:{' '}
-                      {methodLabels[activePayment.paymentMethod || ''] ||
+                      {t('paymentCard.method')}:{' '}
+                      {t(`paymentMethod.${activePayment.paymentMethod}` as any) ||
                         activePayment.paymentMethod}{' '}
-                      - Trạng thái: {statusLabels[activePayment.status] || activePayment.status}
+                      - {t('dialog.currentStatus')}:{' '}
+                      {t(`paymentStatus.${activePayment.status}` as any) || activePayment.status}
                     </p>
                     <p className="mt-1 text-xs text-blue-600 dark:text-blue-400">
-                      Không thể tạo thanh toán mới. Vui lòng hoàn tất hoặc hủy thanh toán hiện tại.
+                      {t('warning.cannotCreateNewPayment')}
                     </p>
                   </div>
                 )
@@ -212,7 +205,7 @@ export function PaymentDialog({
 
             {/* Action Selection */}
             <div className="space-y-3">
-              <Label className="text-base font-semibold">Hành động</Label>
+              <Label className="text-base font-semibold">{t('dialog.action')}</Label>
               <RadioGroup
                 value={action}
                 onValueChange={(value) => setAction(value as DialogAction)}
@@ -225,9 +218,9 @@ export function PaymentDialog({
                   >
                     <Printer className="h-4 w-4" />
                     <div>
-                      <div className="font-medium">In phiếu tạm tính</div>
+                      <div className="font-medium">{t('dialog.printBill')}</div>
                       <div className="text-muted-foreground text-xs">
-                        Tạo thanh toán và in phiếu mang ra bàn
+                        {t('dialog.printBillDesc')}
                       </div>
                     </div>
                   </Label>
@@ -247,9 +240,9 @@ export function PaymentDialog({
                   >
                     <Banknote className="h-4 w-4" />
                     <div>
-                      <div className="font-medium">Tạo thanh toán</div>
+                      <div className="font-medium">{t('dialog.createPayment')}</div>
                       <div className="text-muted-foreground text-xs">
-                        Tạo thanh toán không in phiếu (thanh toán ngay)
+                        {t('dialog.createPaymentDesc')}
                       </div>
                     </div>
                   </Label>
@@ -262,7 +255,7 @@ export function PaymentDialog({
               <>
                 <Separator />
                 <div className="space-y-3">
-                  <Label className="text-base font-semibold">Phương thức thanh toán</Label>
+                  <Label className="text-base font-semibold">{t('dialog.paymentMethod')}</Label>
                   <RadioGroup
                     value={paymentMethod}
                     onValueChange={(value) => setPaymentMethod(value as PaymentMethod)}
@@ -284,9 +277,9 @@ export function PaymentDialog({
                           <Banknote className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
                         </div>
                         <div className="flex-1">
-                          <div className="font-medium">Tiền mặt</div>
+                          <div className="font-medium">{t('paymentMethod.cash')}</div>
                           <div className="text-muted-foreground text-xs">
-                            Nhận tiền, sau đó nhấn "Hoàn tất"
+                            {t('dialog.cashDesc')}
                           </div>
                         </div>
                       </Label>
@@ -306,10 +299,8 @@ export function PaymentDialog({
                           <QrCode className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                         </div>
                         <div className="flex-1">
-                          <div className="font-medium">VietQR</div>
-                          <div className="text-muted-foreground text-xs">
-                            Tạo mã QR, khách quét để thanh toán
-                          </div>
+                          <div className="font-medium">{t('paymentMethod.qr')}</div>
+                          <div className="text-muted-foreground text-xs">{t('dialog.qrDesc')}</div>
                         </div>
                       </Label>
                     </div>
@@ -318,12 +309,11 @@ export function PaymentDialog({
 
                 <Separator />
 
-                {/* Description */}
                 <div className="space-y-2">
-                  <Label htmlFor="description">Ghi chú (tuỳ chọn)</Label>
+                  <Label htmlFor="description">{t('dialog.notes')}</Label>
                   <Textarea
                     id="description"
-                    placeholder="Nhập ghi chú cho giao dịch..."
+                    placeholder={t('dialog.notesPlaceholder')}
                     maxLength={25}
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
@@ -335,7 +325,7 @@ export function PaymentDialog({
 
             {/* Order Summary */}
             <div className="bg-muted/50 rounded-lg border p-4">
-              <div className="mb-3 text-sm font-semibold">Tóm tắt đơn hàng</div>
+              <div className="mb-3 text-sm font-semibold">{t('dialog.orderSummary')}</div>
               <div className="space-y-2 text-sm">
                 {order.items.slice(0, 3).map((item, idx) => (
                   <div key={idx} className="flex justify-between">
@@ -347,12 +337,12 @@ export function PaymentDialog({
                 ))}
                 {order.items.length > 3 && (
                   <div className="text-muted-foreground text-xs">
-                    +{order.items.length - 3} món khác
+                    +{order.items.length - 3} {t('dialog.moreItems')}
                   </div>
                 )}
                 <Separator />
                 <div className="flex justify-between text-base font-bold">
-                  <span>Tổng cộng:</span>
+                  <span>{t('dialog.total')}:</span>
                   <span>{order.totalAmount.toLocaleString('vi-VN')}₫</span>
                 </div>
               </div>
@@ -366,7 +356,7 @@ export function PaymentDialog({
             onClick={() => onOpenChange(false)}
             disabled={createPaymentMutation.isPending}
           >
-            Huỷ
+            {t('dialog.cancel')}
           </Button>
           <Button
             onClick={handleProcessPayment}
@@ -378,12 +368,12 @@ export function PaymentDialog({
             {createPaymentMutation.isPending ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Đang xử lý...
+                {t('paymentCard.processing')}
               </>
             ) : (
               <>
                 <Printer className="mr-2 h-4 w-4" />
-                {action === 'print' ? 'Tạo thanh toán & In phiếu' : 'Tạo thanh toán'}
+                {action === 'print' ? t('dialog.createAndPrint') : t('dialog.createPayment')}
               </>
             )}
           </Button>

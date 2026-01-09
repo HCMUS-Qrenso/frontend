@@ -6,43 +6,45 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { Template } from '@/src/features/admin/menu/types'
 import { TemplateGallery } from '@/src/features/admin/menu/components/templates/template-gallery'
 import { TemplateExport } from '@/src/features/admin/menu/components/templates/template-export'
+import { useTranslations } from 'next-intl'
 
 function TemplatesContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const templateId = searchParams.get('id')
+  const t = useTranslations('menu.templates')
 
   const templates: Template[] = [
     {
       id: '1',
-      name: '2 Cột Tối Giản',
+      name: t('items.template1Name'),
       thumbnail: '/menu-template/01.png',
-      tags: ['A4', '2 Cột', 'Không Ảnh'],
-      description: 'Thiết kế tối giản, 2 cột, phù hợp menu đơn giản',
+      tags: [t('tags.a4'), t('tags.2col'), t('tags.noImage')],
+      description: t('items.template1Desc'),
       format: 'A4',
     },
     {
       id: '2',
-      name: 'Menu Kèm Ảnh',
+      name: t('items.template2Name'),
       thumbnail: '/menu-template/02.png',
-      tags: ['A4', 'Có Ảnh', '1 Cột'],
-      description: 'Ảnh món nổi bật, phong cách cao cấp',
+      tags: [t('tags.a4'), t('tags.withImage'), t('tags.1col')],
+      description: t('items.template2Desc'),
       format: 'A4',
     },
     {
       id: '3',
-      name: 'Đen Đơn Giản',
+      name: t('items.template3Name'),
       thumbnail: '/menu-template/03.png',
-      tags: ['A4', 'Dark', 'Vintage', 'Không Ảnh'],
-      description: 'Phong cách bảng đen cổ điển, không cần ảnh',
+      tags: [t('tags.a4'), t('tags.dark'), t('tags.vintage'), t('tags.noImage')],
+      description: t('items.template3Desc'),
       format: 'A4',
     },
     {
       id: '4',
-      name: 'Gấp 3 Cổ Điển',
+      name: t('items.template4Name'),
       thumbnail: '/menu-template/04.png',
-      tags: ['Ngang', '3 Phần', 'A4', 'Không Ảnh'],
-      description: 'Menu ngang A4 với 3 phần, gọn gàng cho nhà hàng nhỏ',
+      tags: [t('tags.horizontal'), t('tags.3parts'), t('tags.a4'), t('tags.noImage')],
+      description: t('items.template4Desc'),
       format: 'A4',
     },
   ]

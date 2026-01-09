@@ -12,6 +12,7 @@ import { TableDeleteModal } from '@/src/features/admin/tables/components/list/ta
 import { Table } from '@/src/features/admin/tables/types/tables'
 import { useZonesSimpleQuery } from '@/src/features/admin/tables/queries/zones.queries'
 import { SimpleZone } from '@/src/features/admin/tables/types/zones'
+import { PageContentSkeleton } from '@/src/components/loading'
 import { useTranslations } from 'next-intl'
 
 function TablesListContent() {
@@ -119,7 +120,7 @@ function TablesListContent() {
 
 export default function TablesListPage() {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<PageContentSkeleton />}>
       <TablesListContent />
     </Suspense>
   )

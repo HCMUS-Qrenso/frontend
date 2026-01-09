@@ -5,6 +5,7 @@ import { OrdersOverviewStats } from '@/src/features/admin/orders/components/orde
 import { OrdersFilterToolbar } from '@/src/features/admin/orders/components/orders-filter-toolbar'
 import { OrdersTable } from '@/src/features/admin/orders/components/orders-table'
 import { useSearchParams } from 'next/navigation'
+import { PageContentSkeleton } from '@/src/components/loading'
 
 function OrdersContent() {
   const searchParams = useSearchParams()
@@ -25,7 +26,7 @@ function OrdersContent() {
 
 export default function OrdersPage() {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<PageContentSkeleton />}>
       <OrdersContent />
     </Suspense>
   )

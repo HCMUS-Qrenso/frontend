@@ -6,8 +6,9 @@
 import { Button } from '@/components/ui/button'
 import { Play, CheckCircle2 } from 'lucide-react'
 import { StatusBadge } from './status-badge'
-import { getActionConfig, getNextStatus } from '../logic/ticket.logic'
+import { getNextStatus } from '../logic/ticket.logic'
 import type { KdsOrderItem, OrderItemStatus } from '../types/kds.types'
+import { useTranslations } from 'next-intl'
 
 interface TicketItemRowProps {
   item: KdsOrderItem
@@ -29,8 +30,23 @@ function ActionIcon({ iconName }: { iconName: 'check' | 'play' | 'checkCircle' }
   }
 }
 
+// Action config for each status
+const ACTION_CONFIG: Record<
+  OrderItemStatus,
+  { labelKey: string; iconName: 'check' | 'play' | 'checkCircle' } | null
+> = {
+  pending: null, // Waiter handles pending->accepted, not KDS
+  accepted: { labelKey: 'action.start', iconName: 'play' },
+  preparing: { labelKey: 'action.done', iconName: 'checkCircle' },
+  ready: null,
+  served: null,
+  cancelled: null,
+  returned: null,
+}
+
 export function TicketItemRow({ item, orderId, onUpdateStatus }: TicketItemRowProps) {
-  const actionConfig = getActionConfig(item.status)
+  const t = useTranslations('kds')
+  const actionConfig = ACTION_CONFIG[item.status]
   const nextStatus = getNextStatus(item.status)
 
   return (
@@ -57,7 +73,7 @@ export function TicketItemRow({ item, orderId, onUpdateStatus }: TicketItemRowPr
         {item.specialInstructions && (
           <div className="mt-2 rounded-lg bg-amber-50 px-3 py-2 dark:bg-amber-950/30">
             <p className="text-xs font-medium text-amber-700 dark:text-amber-400">
-              Ghi chú: {item.specialInstructions}
+              {t('notes')}: {item.specialInstructions}
             </p>
           </div>
         )}
@@ -72,7 +88,7 @@ export function TicketItemRow({ item, orderId, onUpdateStatus }: TicketItemRowPr
           onClick={() => onUpdateStatus(orderId, item.id, nextStatus)}
         >
           <ActionIcon iconName={actionConfig.iconName} />
-          {actionConfig.label}
+          {t(actionConfig.labelKey)}
         </Button>
       )}
     </div>

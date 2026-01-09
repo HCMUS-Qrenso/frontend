@@ -66,9 +66,9 @@ export function FormDialog({
   description,
   onSubmit,
   isSubmitting = false,
-  submitText = 'Lưu',
-  cancelText = 'Huỷ',
-  loadingText = 'Đang lưu...',
+  submitText = 'Save',
+  cancelText = 'Cancel',
+  loadingText = 'Saving...',
   size = 'lg',
   scrollable = false,
   children,
@@ -135,7 +135,7 @@ export function FormDialog({
               )}
             >
               <X className="h-4 w-4" />
-              <span className="sr-only">Đóng</span>
+              <span className="sr-only">Close</span>
             </DialogPrimitive.Close>
           </div>
 

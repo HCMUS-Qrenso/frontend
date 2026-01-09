@@ -156,7 +156,7 @@ function SortableGroupItem({
   onSelect: () => void
   onDelete: () => void
   onEdit: () => void
-  t: (key: string) => string
+  t: ReturnType<typeof useTranslations>
 }) {
   const router = useRouter()
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
@@ -244,7 +244,7 @@ function SortableGroupItem({
             className="mt-3 flex items-center gap-1.5 text-xs text-emerald-600 hover:text-emerald-700 dark:text-emerald-400"
           >
             <Users className="h-3.5 w-3.5" />
-            {t('usageCount').replace('{count}', String(group.used_by_count))}
+            {t('usageCount', { count: group.used_by_count })}
           </button>
         )}
       </div>

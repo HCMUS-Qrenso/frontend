@@ -7,40 +7,34 @@ import { Clock, Check, XCircle, AlertCircle, Loader2 } from 'lucide-react'
 import type { OrderDetailItem } from '../types/orders'
 import { useUpdateOrderItemStatusMutation } from '../queries'
 import { useFormat } from '@/src/hooks/use-format'
+import { useTranslations } from 'next-intl'
 
-const ITEM_STATUS_CONFIG: Record<string, { label: string; color: string; icon: any }> = {
+const ITEM_STATUS_CONFIG: Record<string, { color: string; icon: any }> = {
   pending: {
-    label: 'Chờ xử lý',
     color: 'bg-slate-100 text-slate-700 dark:bg-slate-500/10 dark:text-slate-400',
     icon: Clock,
   },
   accepted: {
-    label: 'Đã nhận',
     color: 'bg-purple-100 text-purple-700 dark:bg-purple-500/10 dark:text-purple-400',
     icon: Check,
   },
   preparing: {
-    label: 'Đang chuẩn bị',
     color: 'bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400',
     icon: Clock,
   },
   ready: {
-    label: 'Sẵn sàng',
     color: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400',
     icon: Check,
   },
   served: {
-    label: 'Đã phục vụ',
     color: 'bg-teal-100 text-teal-700 dark:bg-teal-500/10 dark:text-teal-400',
     icon: Check,
   },
   cancelled: {
-    label: 'Đã hủy',
     color: 'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400',
     icon: XCircle,
   },
   returned: {
-    label: 'Trả lại',
     color: 'bg-orange-100 text-orange-700 dark:bg-orange-500/10 dark:text-orange-400',
     icon: AlertCircle,
   },
@@ -54,6 +48,9 @@ interface OrderItemsListProps {
 export function OrderItemsList({ items, orderId }: OrderItemsListProps) {
   const updateItemStatusMutation = useUpdateOrderItemStatusMutation()
   const { formatPrice, formatTime } = useFormat()
+  const t = useTranslations('orders')
+
+  const getItemStatusLabel = (status: string) => t(`itemStatus.${status}` as any) || status
 
   const handleMarkServed = (itemId: string) => {
     updateItemStatusMutation.mutate({
@@ -66,15 +63,19 @@ export function OrderItemsList({ items, orderId }: OrderItemsListProps) {
   if (!items || items.length === 0) {
     return (
       <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
-        <h2 className="mb-4 text-lg font-semibold text-slate-900 dark:text-white">Danh sách món</h2>
-        <p className="text-sm text-slate-500 dark:text-slate-400">Chưa có món nào</p>
+        <h2 className="mb-4 text-lg font-semibold text-slate-900 dark:text-white">
+          {t('items.title')}
+        </h2>
+        <p className="text-sm text-slate-500 dark:text-slate-400">{t('items.empty')}</p>
       </div>
     )
   }
 
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
-      <h2 className="mb-4 text-lg font-semibold text-slate-900 dark:text-white">Danh sách món</h2>
+      <h2 className="mb-4 text-lg font-semibold text-slate-900 dark:text-white">
+        {t('items.title')}
+      </h2>
 
       <div className="space-y-4">
         {items.map((item) => {
@@ -125,15 +126,22 @@ export function OrderItemsList({ items, orderId }: OrderItemsListProps) {
                     </div>
                   )}
 
-                  {/* Timeline */}
                   <div className="ml-11 flex flex-wrap items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
                     {item.preparationStartedAt && (
-                      <span>Bắt đầu: {formatTime(item.preparationStartedAt)}</span>
+                      <span>
+                        {t('items.started')}: {formatTime(item.preparationStartedAt)}
+                      </span>
                     )}
                     {item.preparationCompletedAt && (
-                      <span>Xong: {formatTime(item.preparationCompletedAt)}</span>
+                      <span>
+                        {t('items.done')}: {formatTime(item.preparationCompletedAt)}
+                      </span>
                     )}
-                    {item.servedAt && <span>Phục vụ: {formatTime(item.servedAt)}</span>}
+                    {item.servedAt && (
+                      <span>
+                        {t('items.servedAt')}: {formatTime(item.servedAt)}
+                      </span>
+                    )}
                   </div>
                 </div>
 
@@ -157,7 +165,7 @@ export function OrderItemsList({ items, orderId }: OrderItemsListProps) {
                   {/* Status Badge */}
                   <Badge className={cn('gap-1 text-xs font-medium', statusConfig?.color)}>
                     {StatusIcon && <StatusIcon className="h-3 w-3" />}
-                    {statusConfig?.label || item.status}
+                    {getItemStatusLabel(item.status)}
                   </Badge>
 
                   {/* Actions - Only waiter can mark as served */}
@@ -173,7 +181,7 @@ export function OrderItemsList({ items, orderId }: OrderItemsListProps) {
                         {updateItemStatusMutation.isPending ? (
                           <Loader2 className="h-4 w-4 animate-spin" />
                         ) : (
-                          'Đã phục vụ'
+                          t('items.served')
                         )}
                       </Button>
                     )}
