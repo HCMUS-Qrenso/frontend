@@ -318,7 +318,7 @@ export function OrdersTable() {
     <div className="space-y-4">
       {/* Table */}
       <AdminTableContainer>
-        <Table>
+        <Table className="overflow-hidden">
           <TableHeader>
             <AdminTableHeaderRow>
               <AdminTableHead className="px-4">{t('orderId')}</AdminTableHead>

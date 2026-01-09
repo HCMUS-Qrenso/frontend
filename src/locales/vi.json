@@ -348,6 +348,7 @@
     "import": "Import",
     "exportData": "Export Data",
     "export": "Export",
+    "importExportLabel": "Nhập / Xuất",
     "modifierGroups": "Nhóm tuỳ chọn",
     "modifiersLabel": "Tuỳ chọn",
     "createGroup": "Tạo nhóm",

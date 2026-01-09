@@ -348,6 +348,7 @@
     "import": "导入",
     "exportData": "导出数据",
     "export": "导出",
+    "importExportLabel": "导入 / 导出",
     "modifierGroups": "加料组",
     "createGroup": "创建组",
     "editGroup": "编辑组",

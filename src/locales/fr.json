@@ -348,6 +348,7 @@
     "import": "Importer",
     "exportData": "Exporter les données",
     "export": "Exporter",
+    "importExportLabel": "Importer / Exporter",
     "modifierGroups": "Groupes de modificateurs",
     "createGroup": "Créer un Groupe",
     "editGroup": "Modifier le Groupe",

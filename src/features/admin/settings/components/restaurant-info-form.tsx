@@ -20,9 +20,10 @@ interface RestaurantInfoSettings {
 interface RestaurantInfoFormProps {
   settings: RestaurantInfoSettings
   onChange: (settings: Partial<RestaurantInfoSettings>) => void
+  onImageUpload?: (imageUrl: string) => void
 }
 
-export function RestaurantInfoForm({ settings, onChange }: RestaurantInfoFormProps) {
+export function RestaurantInfoForm({ settings, onChange, onImageUpload }: RestaurantInfoFormProps) {
   const t = useTranslations('settings.restaurantInfo')
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { uploadFiles, isUploading, progress: uploadProgress } = useUploadFiles()
@@ -56,9 +57,15 @@ export function RestaurantInfoForm({ settings, onChange }: RestaurantInfoFormPro
         setPreviewUrl(objectUrl)
 
         // Upload to S3
-        const results = await uploadFiles([file], { group: 'restaurant-images' })
+        const results = await uploadFiles([file], { group: 'tenant-images' })
         if (results.length > 0) {
-          onChange({ image: results[0].url })
+          const imageUrl = results[0].url
+          onChange({ image: imageUrl })
+          // Call the update API immediately
+          if (onImageUpload) {
+            const timestampedUrl = `${imageUrl}?t=${Date.now()}`
+            onImageUpload(timestampedUrl)
+          }
           toast.success(t('uploadSuccess'))
         }
 
@@ -80,11 +87,15 @@ export function RestaurantInfoForm({ settings, onChange }: RestaurantInfoFormPro
 
   const handleRemoveImage = useCallback(() => {
     onChange({ image: null })
+    // Call the update API immediately
+    if (onImageUpload) {
+      onImageUpload('')
+    }
     if (previewUrl) {
       URL.revokeObjectURL(previewUrl)
       setPreviewUrl(null)
     }
-  }, [onChange, previewUrl])
+  }, [onChange, onImageUpload, previewUrl])
 
   // Current image to display (preview takes priority)
   const displayImage = previewUrl || settings.image
@@ -96,8 +107,7 @@ export function RestaurantInfoForm({ settings, onChange }: RestaurantInfoFormPro
       description={t('description')}
       icon={Store}
     >
-      <div className="grid gap-6 lg:grid-cols-2">
-        {/* Left Column - Name & Address */}
+      <div className="grid gap-6">
         <div className="space-y-4">
           {/* Restaurant Name */}
           <div className="space-y-2">
@@ -124,7 +134,6 @@ export function RestaurantInfoForm({ settings, onChange }: RestaurantInfoFormPro
           </div>
         </div>
 
-        {/* Right Column - Image Upload */}
         <div className="space-y-2">
           <Label>{t('image')}</Label>
 

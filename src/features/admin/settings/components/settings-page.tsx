@@ -164,6 +164,14 @@ export function SettingsPage() {
     [],
   )
 
+  const handleImageUpload = useCallback(
+    (imageUrl: string) => {
+      // Call the update API immediately after image upload
+      updateMutation.mutate({ image: imageUrl })
+    },
+    [updateMutation],
+  )
+
   // Show skeleton while loading OR while formData is still null (initial render)
   if (isLoading || (!formData && !isError)) {
     return <SettingsPageSkeleton />
@@ -187,6 +195,7 @@ export function SettingsPage() {
           <RestaurantInfoForm
             settings={{ name: formData.name, address: formData.address, image: formData.image }}
             onChange={updateRestaurantInfo}
+            onImageUpload={handleImageUpload}
           />
         </div>
 

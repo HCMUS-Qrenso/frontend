@@ -44,9 +44,9 @@ export function StepRestaurant({ data, onChange }: StepRestaurantProps) {
         const objectUrl = URL.createObjectURL(file)
         setPreviewUrl(objectUrl)
 
-        const results = await uploadFiles([file], { group: 'restaurant-images' })
+        const results = await uploadFiles([file], { group: 'tenant-images' })
         if (results.length > 0) {
-          onChange({ ...data, image: results[0].url })
+          onChange({ ...data, image: `${results[0].url}?t=${Date.now()}` }) // Cache busting
           toast.success('Tải ảnh thành công')
         }
 

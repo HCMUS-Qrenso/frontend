@@ -65,11 +65,14 @@ export function NotificationSettingsForm({ settings, onChange }: NotificationSet
                 const soundInfo = getSoundInfo(soundId)
                 return (
                   <div key={soundId} className="flex items-center space-x-3">
-                    <RadioGroupItem value={String(soundId)} id={`sound-${soundId}`} />
+                    <RadioGroupItem
+                      value={String(soundId)}
+                      id={`sound-${soundId}`}
+                      onClick={() => playNotificationSound(tenantSettings, soundId, true)}
+                    />
                     <Label
                       htmlFor={`sound-${soundId}`}
                       className="flex-1 cursor-pointer font-normal"
-                      onClick={() => playNotificationSound(tenantSettings, soundId, true)}
                     >
                       <div className="flex flex-col">
                         <span className="font-medium">{soundInfo.name}</span>

@@ -138,7 +138,7 @@ export function MenuItemsFilterToolbar({ categories, onCreateClick }: MenuItemsF
           className="h-8 gap-1 rounded-lg bg-transparent px-3"
         >
           <Download className="h-3 w-3" />
-          <span className="hidden text-sm sm:inline">{t('importExport')}</span>
+          <span className="hidden text-sm sm:inline">{t('importExportLabel')}</span>
         </Button>
         <Button
           onClick={onCreateClick}
