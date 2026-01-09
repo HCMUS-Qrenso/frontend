@@ -26,8 +26,17 @@ export const authApi = {
   },
 
   logout: async (): Promise<MessageResponse> => {
-    const { data } = await apiClient.post<MessageResponse>('/auth/logout')
-    return data
+    try {
+      const { data } = await apiClient.post<MessageResponse>('/auth/logout')
+      return data
+    } catch (error: any) {
+      // If token is already invalid/expired, still allow logout
+      // The client will clear local state regardless
+      if (error?.response?.status === 401) {
+        return { success: true, message: 'Logged out' }
+      }
+      throw error
+    }
   },
 
   refresh: async (): Promise<AuthResponse> => {

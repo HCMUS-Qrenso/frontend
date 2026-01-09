@@ -1456,5 +1456,129 @@
     "passwordChangedSuccess": "Password changed successfully",
     "passwordChangeError": "Failed to change password",
     "incorrectCurrentPassword": "Current password is incorrect"
+  },
+  "onboarding": {
+    "welcome": "Welcome to Qrenso 🎉",
+    "welcomeDesc": "Let's set up some basic information to get started",
+    "step": "Step {current} / {total}",
+    "back": "Back",
+    "next": "Next",
+    "skip": "Skip",
+    "finishLater": "Finish Later",
+    "saving": "Saving...",
+    "optional": "Optional",
+    "required": "Required",
+    "completeRequired": "Please complete the required steps",
+    "fillRequired": "Please fill in all required fields",
+    "savedProgress": "Progress saved. You can continue later.",
+    "saveError": "Failed to save. Please try again.",
+    "completed": "Setup complete! Welcome to Qrenso",
+    "completeError": "An error occurred. Please try again.",
+    "steps": {
+      "restaurant": {
+        "title": "Restaurant Info",
+        "description": "Name, address and image",
+        "subtitle": "This information will be displayed when customers scan QR and on receipts"
+      },
+      "locale": {
+        "title": "Format & Language",
+        "description": "Currency, timezone, language",
+        "subtitle": "Configure currency, timezone and display language",
+        "quickSelect": "Quick select:"
+      },
+      "taxCharge": {
+        "title": "Tax & Service Charge",
+        "description": "Configure VAT and service charge",
+        "subtitle": "Configure VAT and service charge (can be skipped to use defaults)"
+      },
+      "hours": {
+        "title": "Operating Hours",
+        "description": "Opening hours by day",
+        "subtitle": "Configure opening hours for each day"
+      },
+      "orderRules": {
+        "title": "Order Rules",
+        "description": "Time, minimum value",
+        "subtitle": "Configure prep time, minimum value and other rules"
+      },
+      "review": {
+        "title": "Confirm",
+        "description": "Review and complete",
+        "subtitle": "Review your settings before completing"
+      }
+    },
+    "fields": {
+      "name": "Restaurant Name",
+      "namePlaceholder": "E.g: Pho Hanoi",
+      "address": "Address",
+      "addressPlaceholder": "E.g: 123 Main Street, City",
+      "image": "Restaurant Image",
+      "uploadImage": "Click to upload image",
+      "changeImage": "Change",
+      "removeImage": "Remove",
+      "uploadingImage": "Uploading...",
+      "imageHint": "JPG, PNG, GIF - Max 5MB",
+      "currency": "Currency",
+      "timezone": "Timezone",
+      "dateFormat": "Date Format",
+      "language": "Language",
+      "taxRate": "Tax Rate",
+      "taxLabel": "Tax Label",
+      "taxInclusive": "Price includes tax",
+      "serviceCharge": "Service Charge",
+      "serviceChargeRate": "Rate",
+      "serviceChargeMinParty": "Minimum party size",
+      "serviceChargeTaxable": "Service charge taxable",
+      "prepTime": "Prep Time (minutes)",
+      "minOrderValue": "Minimum Order Value",
+      "sessionTimeout": "Session Timeout (minutes)",
+      "specialInstructions": "Allow special instructions",
+      "requireGuestCount": "Require guest count"
+    },
+    "presets": {
+      "vietnam": "Vietnam",
+      "us": "US",
+      "china": "China",
+      "smallShop": "Small Shop",
+      "restaurant": "Restaurant",
+      "fineDining": "Fine Dining",
+      "standard": "Standard",
+      "allDay": "24/7",
+      "officeHours": "Office Hours",
+      "quickService": "Quick Service",
+      "fullService": "Full Service",
+      "takeaway": "Takeaway"
+    },
+    "preview": "Preview",
+    "previewBill": "Bill Preview",
+    "subtotal": "Subtotal",
+    "total": "Total",
+    "included": "included",
+    "days": {
+      "monday": "Monday",
+      "tuesday": "Tuesday",
+      "wednesday": "Wednesday",
+      "thursday": "Thursday",
+      "friday": "Friday",
+      "saturday": "Saturday",
+      "sunday": "Sunday"
+    },
+    "closed": "Closed",
+    "addSlot": "Add slot",
+    "copyToAll": "Copy to all days",
+    "edit": "Edit",
+    "complete": "Complete & Go to Dashboard",
+    "completing": "Processing...",
+    "canEditLater": "You can edit all these settings later in the Settings page.",
+    "completeRequiredSteps": "Please complete the required steps (Restaurant Info and Format) before finishing.",
+    "configured": "Configured",
+    "default": "Default",
+    "noLimit": "No limit",
+    "allTables": "All tables",
+    "helpWhatIs": "What is this?",
+    "helpWhereShown": "Shown in:",
+    "helpTip": "Tip:",
+    "helpCanSkip": "Can be skipped",
+    "helpRequired": "Required"
   }
 }

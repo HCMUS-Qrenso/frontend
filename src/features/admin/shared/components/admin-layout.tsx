@@ -28,6 +28,7 @@ import { AdminSidebar } from './admin-sidebar'
 import { getInitials } from '../utils'
 import { useTranslations } from 'next-intl'
 import { TenantSettingsProvider } from '@/src/contexts/tenant-settings-context'
+import { OnboardingGuard } from '@/src/features/admin/onboarding'
 import { useRouter } from '@/src/i18n/navigation'
 
 interface AdminLayoutProps {
@@ -201,6 +202,12 @@ export function AdminLayout({ children }: AdminLayoutProps) {
     await logout()
   }
 
+  // Check if on onboarding page - render full screen without sidebar/header
+  const isOnboardingPage = pathname.includes('/admin/onboarding')
+  if (isOnboardingPage) {
+    return <>{children}</>
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
       {/* Sidebar */}
@@ -354,7 +361,9 @@ export function AdminLayout({ children }: AdminLayoutProps) {
 
         {/* Page content */}
         <main className="p-4 lg:p-8">
-          <TenantSettingsProvider>{children}</TenantSettingsProvider>
+          <TenantSettingsProvider>
+            <OnboardingGuard>{children}</OnboardingGuard>
+          </TenantSettingsProvider>
         </main>
       </div>
     </div>
