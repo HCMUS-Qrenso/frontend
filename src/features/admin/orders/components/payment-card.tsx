@@ -157,9 +157,10 @@ export function PaymentCard({
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-slate-900 dark:text-white">{t('paymentCard.title')}</h2>
-        <Badge className={cn('text-xs font-medium', PAYMENT_STATUS_COLORS[paymentStatus])}
-        >
+        <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
+          {t('paymentCard.title')}
+        </h2>
+        <Badge className={cn('text-xs font-medium', PAYMENT_STATUS_COLORS[paymentStatus])}>
           {getPaymentStatusLabel(paymentStatus)}
         </Badge>
       </div>
@@ -193,7 +194,9 @@ export function PaymentCard({
 
         {hasPayment && payment.transactionId && (
           <div className="space-y-1">
-            <p className="text-sm text-slate-500 dark:text-slate-400">{t('paymentCard.transactionId')}</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400">
+              {t('paymentCard.transactionId')}
+            </p>
             <div className="flex items-center gap-2">
               <p className="flex-1 font-mono text-sm text-slate-900 dark:text-white">
                 {payment.transactionId}
@@ -224,7 +227,9 @@ export function PaymentCard({
           <>
             <div className="border-t border-slate-200 dark:border-slate-700" />
             <div className="rounded-lg bg-amber-50 p-3 dark:bg-amber-500/10">
-              <p className="text-sm font-medium text-amber-900 dark:text-amber-400">{t('paymentCard.refunded')}</p>
+              <p className="text-sm font-medium text-amber-900 dark:text-amber-400">
+                {t('paymentCard.refunded')}
+              </p>
               <p className="mt-1 text-sm text-amber-700 dark:text-amber-300">
                 {t('paymentCard.amount')}: {formatPrice(payment.refundAmount)}
               </p>
@@ -276,8 +281,10 @@ export function PaymentCard({
                 className="flex-1"
                 size="lg"
               >
-              <CheckCircle className="mr-2 h-4 w-4" />
-                {completePaymentMutation.isPending ? t('paymentCard.processing') : t('paymentCard.complete')}
+                <CheckCircle className="mr-2 h-4 w-4" />
+                {completePaymentMutation.isPending
+                  ? t('paymentCard.processing')
+                  : t('paymentCard.complete')}
               </Button>
               <Button
                 onClick={handleOpenCancelDialog}
@@ -347,9 +354,7 @@ export function PaymentCard({
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{t('dialog.cancelPaymentTitle')}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {t('dialog.cancelPaymentDesc')}
-            </AlertDialogDescription>
+            <AlertDialogDescription>{t('dialog.cancelPaymentDesc')}</AlertDialogDescription>
           </AlertDialogHeader>
           <div className="space-y-2 py-4">
             <Label htmlFor="cancel-reason">{t('dialog.cancelReason')}</Label>
@@ -362,13 +367,17 @@ export function PaymentCard({
             />
           </div>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={cancelPaymentMutation.isPending}>{t('dialog.no')}</AlertDialogCancel>
+            <AlertDialogCancel disabled={cancelPaymentMutation.isPending}>
+              {t('dialog.no')}
+            </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleCancelPayment}
               disabled={cancelPaymentMutation.isPending}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {cancelPaymentMutation.isPending ? t('paymentCard.processing') : t('paymentCard.cancelPayment')}
+              {cancelPaymentMutation.isPending
+                ? t('paymentCard.processing')
+                : t('paymentCard.cancelPayment')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

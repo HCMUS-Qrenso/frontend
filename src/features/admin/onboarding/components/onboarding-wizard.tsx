@@ -37,7 +37,7 @@ export function OnboardingWizard() {
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <Loader2 className="text-primary h-8 w-8 animate-spin" />
       </div>
     )
   }
@@ -52,12 +52,7 @@ export function OnboardingWizard() {
           />
         )
       case 2:
-        return (
-          <StepLocale
-            data={draft.locale}
-            onChange={(data) => updateDraft('locale', data)}
-          />
-        )
+        return <StepLocale data={draft.locale} onChange={(data) => updateDraft('locale', data)} />
       case 3:
         return (
           <StepTaxCharge
@@ -67,12 +62,7 @@ export function OnboardingWizard() {
           />
         )
       case 4:
-        return (
-          <StepHours
-            data={draft.hours}
-            onChange={(data) => updateDraft('hours', data)}
-          />
-        )
+        return <StepHours data={draft.hours} onChange={(data) => updateDraft('hours', data)} />
       case 5:
         return (
           <StepOrderRules
@@ -83,10 +73,7 @@ export function OnboardingWizard() {
         )
       case 6:
         return (
-          <StepPayment
-            data={draft.payment}
-            onChange={(data) => updateDraft('payment', data)}
-          />
+          <StepPayment data={draft.payment} onChange={(data) => updateDraft('payment', data)} />
         )
       case 7:
         return (
@@ -103,12 +90,12 @@ export function OnboardingWizard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-muted/30 flex items-center justify-center">
+    <div className="from-background to-muted/30 flex min-h-screen items-center justify-center bg-gradient-to-br">
       <div className="container max-w-4xl py-8">
         {/* Header */}
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-bold">Chào mừng đến với Qrenso 🎉</h1>
-          <p className="mt-2 text-muted-foreground">
+          <p className="text-muted-foreground mt-2">
             Hãy thiết lập một số thông tin cơ bản để bắt đầu
           </p>
         </div>
@@ -124,29 +111,19 @@ export function OnboardingWizard() {
 
         {/* Step Content */}
         <Card className="mb-6">
-          <CardContent className="p-6">
-            {renderStep()}
-          </CardContent>
+          <CardContent className="p-6">{renderStep()}</CardContent>
         </Card>
 
         {/* Navigation (hidden on review step) */}
         {currentStep < 7 && (
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                onClick={prevStep}
-                disabled={!canGoPrev}
-              >
+              <Button variant="ghost" onClick={prevStep} disabled={!canGoPrev}>
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 Quay lại
               </Button>
-              
-              <Button
-                variant="ghost"
-                onClick={finishLater}
-                disabled={isSaving}
-              >
+
+              <Button variant="ghost" onClick={finishLater} disabled={isSaving}>
                 <LogOut className="mr-2 h-4 w-4" />
                 Hoàn thành sau
               </Button>
@@ -154,20 +131,13 @@ export function OnboardingWizard() {
 
             <div className="flex items-center gap-2">
               {canSkip && (
-                <Button
-                  variant="outline"
-                  onClick={skipStep}
-                  disabled={isSaving}
-                >
+                <Button variant="outline" onClick={skipStep} disabled={isSaving}>
                   <SkipForward className="mr-2 h-4 w-4" />
                   Bỏ qua
                 </Button>
               )}
-              
-              <Button
-                onClick={nextStep}
-                disabled={!canGoNext || isSaving}
-              >
+
+              <Button onClick={nextStep} disabled={!canGoNext || isSaving}>
                 {isSaving ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -185,9 +155,7 @@ export function OnboardingWizard() {
         )}
 
         {/* Progress indicator */}
-        <div className="mt-6 text-center text-sm text-muted-foreground">
-          Bước {currentStep} / 7
-        </div>
+        <div className="text-muted-foreground mt-6 text-center text-sm">Bước {currentStep} / 7</div>
       </div>
     </div>
   )

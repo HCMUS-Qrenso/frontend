@@ -139,7 +139,7 @@ export function RestaurantInfoForm({ settings, onChange }: RestaurantInfoFormPro
 
           {displayImage ? (
             <div className="relative">
-              <div className="relative aspect-video w-full overflow-hidden rounded-lg border bg-muted">
+              <div className="bg-muted relative aspect-video w-full overflow-hidden rounded-lg border">
                 <Image
                   src={displayImage}
                   alt={settings.name || 'Restaurant'}
@@ -186,12 +186,14 @@ export function RestaurantInfoForm({ settings, onChange }: RestaurantInfoFormPro
               type="button"
               onClick={handleImageUpload}
               disabled={isUploading}
-              className="flex aspect-video w-full flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed border-muted-foreground/25 bg-muted/50 text-muted-foreground transition-all hover:border-primary hover:bg-muted hover:text-primary disabled:cursor-not-allowed disabled:opacity-50"
+              className="border-muted-foreground/25 bg-muted/50 text-muted-foreground hover:border-primary hover:bg-muted hover:text-primary flex aspect-video w-full flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed transition-all disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isUploading ? (
                 <>
                   <Loader2 className="h-10 w-10 animate-spin" />
-                  <span className="text-sm">{t('uploading')} {uploadProgress}%</span>
+                  <span className="text-sm">
+                    {t('uploading')} {uploadProgress}%
+                  </span>
                 </>
               ) : (
                 <>

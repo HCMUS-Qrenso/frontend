@@ -38,7 +38,7 @@ export function OnboardingGuard({ children }: OnboardingGuardProps) {
   if (!isOnboardingPage && isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <Loader2 className="text-primary h-8 w-8 animate-spin" />
       </div>
     )
   }
@@ -47,7 +47,7 @@ export function OnboardingGuard({ children }: OnboardingGuardProps) {
   if (!isOnboardingPage && data?.data && !data.data.completed) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <Loader2 className="text-primary h-8 w-8 animate-spin" />
       </div>
     )
   }

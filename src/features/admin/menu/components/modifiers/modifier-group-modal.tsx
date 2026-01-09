@@ -206,9 +206,7 @@ export function ModifierGroupModal({
           <Label htmlFor="is_required" className="text-sm font-medium">
             {t('isRequired')}
           </Label>
-          <p className="text-xs text-slate-500 dark:text-slate-400">
-            {t('isRequiredHint')}
-          </p>
+          <p className="text-xs text-slate-500 dark:text-slate-400">{t('isRequiredHint')}</p>
         </div>
         <Switch
           id="is_required"
@@ -256,4 +254,3 @@ export function ModifierGroupModal({
     </FormDialog>
   )
 }
-

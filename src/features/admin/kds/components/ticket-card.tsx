@@ -147,7 +147,10 @@ export function TicketCard({
         open={showConfirmComplete}
         onOpenChange={setShowConfirmComplete}
         title={t('confirmCompleteTitle')}
-        description={t('confirmCompleteDesc', { count: pendingItemsCount, orderNumber: order.orderNumber })}
+        description={t('confirmCompleteDesc', {
+          count: pendingItemsCount,
+          orderNumber: order.orderNumber,
+        })}
         variant="success"
         confirmText={t('confirm')}
         onConfirm={async () => {

@@ -219,7 +219,9 @@ export function createOrderStatusConfig(labels: OrderStatusLabels): Record<strin
   }
 }
 
-export function createMenuItemStatusConfig(labels: MenuItemStatusLabels): Record<string, StatusConfig> {
+export function createMenuItemStatusConfig(
+  labels: MenuItemStatusLabels,
+): Record<string, StatusConfig> {
   return {
     available: {
       label: labels.available,
@@ -239,7 +241,9 @@ export function createMenuItemStatusConfig(labels: MenuItemStatusLabels): Record
   }
 }
 
-export function createPaymentStatusConfig(labels: PaymentStatusLabels): Record<string, StatusConfig> {
+export function createPaymentStatusConfig(
+  labels: PaymentStatusLabels,
+): Record<string, StatusConfig> {
   return {
     unpaid: {
       label: labels.unpaid,
@@ -259,7 +263,9 @@ export function createPaymentStatusConfig(labels: PaymentStatusLabels): Record<s
   }
 }
 
-export function createCategoryActiveConfig(labels: CategoryActiveLabels): Record<string, StatusConfig> {
+export function createCategoryActiveConfig(
+  labels: CategoryActiveLabels,
+): Record<string, StatusConfig> {
   return {
     active: {
       label: labels.active,
@@ -429,4 +435,3 @@ export const ZONE_ACTIVE_CONFIG: Record<string, StatusConfig> = {
       'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-500/10 dark:text-slate-400 dark:border-slate-500/20',
   },
 }
-

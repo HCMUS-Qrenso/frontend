@@ -56,9 +56,7 @@ export function ModifierGroupDeleteDialog({
       <div className="flex gap-2">
         <AlertCircle className="h-5 w-5 shrink-0 text-amber-600 dark:text-amber-400" />
         <div className="space-y-1 text-sm">
-          <p className="font-medium text-amber-900 dark:text-amber-200">
-            {t('warning')}
-          </p>
+          <p className="font-medium text-amber-900 dark:text-amber-200">{t('warning')}</p>
           {usedByCount > 0 && (
             <p className="text-amber-700 dark:text-amber-300">
               {t('usedByWarning', { count: usedByCount })}
@@ -82,4 +80,3 @@ export function ModifierGroupDeleteDialog({
     />
   )
 }
-

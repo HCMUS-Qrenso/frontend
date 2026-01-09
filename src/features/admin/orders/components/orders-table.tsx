@@ -478,7 +478,9 @@ export function OrdersTable() {
                                         <CheckCircle className="h-3 w-3" />
                                       )}
                                       {!isProcessing && (
-                                        <span className="hidden md:inline">{t('paymentCard.complete')}</span>
+                                        <span className="hidden md:inline">
+                                          {t('paymentCard.complete')}
+                                        </span>
                                       )}
                                     </Button>
                                   )}
@@ -498,7 +500,11 @@ export function OrdersTable() {
                                   ) : (
                                     <X className="h-3 w-3" />
                                   )}
-                                  {!isProcessing && <span className="hidden md:inline">{t('paymentCard.cancel')}</span>}
+                                  {!isProcessing && (
+                                    <span className="hidden md:inline">
+                                      {t('paymentCard.cancel')}
+                                    </span>
+                                  )}
                                 </Button>
                               </>
                             )

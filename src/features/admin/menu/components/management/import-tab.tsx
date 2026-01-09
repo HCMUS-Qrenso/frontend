@@ -243,7 +243,9 @@ export function ImportTab() {
                 <Download className="h-5 w-5" />
               </div>
               <div className="flex-1">
-                <h3 className="font-medium text-slate-900 dark:text-white">{t('import.downloadTemplate')}</h3>
+                <h3 className="font-medium text-slate-900 dark:text-white">
+                  {t('import.downloadTemplate')}
+                </h3>
                 <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
                   {t('import.templateHint')}
                 </p>
@@ -292,7 +294,9 @@ export function ImportTab() {
                   <p className="text-2xl font-bold text-slate-900 dark:text-white">
                     {importResult.data.created}
                   </p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">{t('import.created')}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    {t('import.created')}
+                  </p>
                 </div>
               </div>
             </Card>
@@ -305,7 +309,9 @@ export function ImportTab() {
                   <p className="text-2xl font-bold text-slate-900 dark:text-white">
                     {importResult.data.updated}
                   </p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">{t('import.updated')}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    {t('import.updated')}
+                  </p>
                 </div>
               </div>
             </Card>
@@ -318,7 +324,9 @@ export function ImportTab() {
                   <p className="text-2xl font-bold text-slate-900 dark:text-white">
                     {importResult.data.skipped}
                   </p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">{t('import.skipped')}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    {t('import.skipped')}
+                  </p>
                 </div>
               </div>
             </Card>
@@ -405,4 +413,3 @@ export function ImportTab() {
     </div>
   )
 }
-

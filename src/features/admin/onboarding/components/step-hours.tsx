@@ -44,8 +44,13 @@ const PRESETS = [
     apply: () => {
       const allDay = { isOpen: true, slots: [{ open: '00:00', close: '23:59' }] }
       return {
-        monday: allDay, tuesday: allDay, wednesday: allDay, thursday: allDay,
-        friday: allDay, saturday: allDay, sunday: allDay,
+        monday: allDay,
+        tuesday: allDay,
+        wednesday: allDay,
+        thursday: allDay,
+        friday: allDay,
+        saturday: allDay,
+        sunday: allDay,
       }
     },
   },
@@ -53,11 +58,22 @@ const PRESETS = [
     label: '🏢 Giờ văn phòng',
     desc: 'T2-T6: 11-14h & 18-22h',
     apply: () => {
-      const weekday = { isOpen: true, slots: [{ open: '11:00', close: '14:00' }, { open: '18:00', close: '22:00' }] }
+      const weekday = {
+        isOpen: true,
+        slots: [
+          { open: '11:00', close: '14:00' },
+          { open: '18:00', close: '22:00' },
+        ],
+      }
       const weekend = { isOpen: false, slots: [] }
       return {
-        monday: weekday, tuesday: weekday, wednesday: weekday, thursday: weekday, friday: weekday,
-        saturday: weekend, sunday: weekend,
+        monday: weekday,
+        tuesday: weekday,
+        wednesday: weekday,
+        thursday: weekday,
+        friday: weekday,
+        saturday: weekend,
+        sunday: weekend,
       }
     },
   },
@@ -69,27 +85,27 @@ type RawDayData = DayHours | string | undefined
 // Helper to parse any format into DayHours
 const parseDayData = (raw: RawDayData): DayHours => {
   const defaultSlots = [{ open: '09:00', close: '22:00' }]
-  
+
   if (!raw) return { isOpen: true, slots: defaultSlots }
-  
+
   if (typeof raw === 'string') {
     const parts = raw.split('-')
     return { isOpen: true, slots: [{ open: parts[0] || '09:00', close: parts[1] || '22:00' }] }
   }
-  
+
   // It's an object
   const dayData = raw as DayHours
   if (!dayData.slots || !Array.isArray(dayData.slots) || dayData.slots.length === 0) {
     return { ...dayData, slots: defaultSlots }
   }
-  
+
   return dayData
 }
 
 export function StepHours({ data, onChange }: StepHoursProps) {
   const hours = (data.operating_hours || {}) as Record<string, RawDayData>
 
-  const applyPreset = (preset: typeof PRESETS[0]) => {
+  const applyPreset = (preset: (typeof PRESETS)[0]) => {
     onChange({ operating_hours: preset.apply() })
   }
 
@@ -107,7 +123,12 @@ export function StepHours({ data, onChange }: StepHoursProps) {
     updateDay(dayKey, { ...currentDay, isOpen })
   }
 
-  const updateSlot = (dayKey: string, slotIndex: number, field: 'open' | 'close', value: string) => {
+  const updateSlot = (
+    dayKey: string,
+    slotIndex: number,
+    field: 'open' | 'close',
+    value: string,
+  ) => {
     const currentDay = parseDayData(hours[dayKey])
     const newSlots = [...currentDay.slots]
     newSlots[slotIndex] = { ...newSlots[slotIndex], [field]: value }
@@ -125,8 +146,13 @@ export function StepHours({ data, onChange }: StepHoursProps) {
 
   const removeSlot = (dayKey: string, slotIndex: number) => {
     const currentDay = parseDayData(hours[dayKey])
-    const newSlots = currentDay.slots.filter((_: { open: string; close: string }, i: number) => i !== slotIndex)
-    updateDay(dayKey, { ...currentDay, slots: newSlots.length ? newSlots : [{ open: '09:00', close: '22:00' }] })
+    const newSlots = currentDay.slots.filter(
+      (_: { open: string; close: string }, i: number) => i !== slotIndex,
+    )
+    updateDay(dayKey, {
+      ...currentDay,
+      slots: newSlots.length ? newSlots : [{ open: '09:00', close: '22:00' }],
+    })
   }
 
   const copyToAll = (fromDayKey: string) => {
@@ -142,20 +168,18 @@ export function StepHours({ data, onChange }: StepHoursProps) {
     <div className="space-y-6">
       <div>
         <h2 className="text-xl font-semibold">Giờ hoạt động</h2>
-        <p className="text-sm text-muted-foreground">
-          Cấu hình giờ mở cửa theo từng ngày
-        </p>
+        <p className="text-muted-foreground text-sm">Cấu hình giờ mở cửa theo từng ngày</p>
       </div>
 
       {/* Quick presets */}
       <div className="flex flex-wrap items-center gap-2">
-        <span className="text-sm text-muted-foreground">Chọn nhanh:</span>
+        <span className="text-muted-foreground text-sm">Chọn nhanh:</span>
         {PRESETS.map((preset) => (
           <button
             key={preset.label}
             type="button"
             onClick={() => applyPreset(preset)}
-            className="rounded-full border px-3 py-1 text-sm hover:bg-muted transition-colors"
+            className="hover:bg-muted rounded-full border px-3 py-1 text-sm transition-colors"
             title={preset.desc}
           >
             {preset.label}
@@ -166,18 +190,18 @@ export function StepHours({ data, onChange }: StepHoursProps) {
       <div className="space-y-3">
         {DAYS.map((day) => {
           const dayData = parseDayData(hours[day.key])
-          
+
           return (
             <div key={day.key} className="rounded-lg border p-3">
-              <div className="flex items-center justify-between mb-2">
+              <div className="mb-2 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <Switch
                     checked={dayData.isOpen}
                     onCheckedChange={(checked) => toggleDay(day.key, checked)}
                   />
-                  <span className="font-medium w-20">{day.label}</span>
+                  <span className="w-20 font-medium">{day.label}</span>
                 </div>
-                
+
                 {dayData.isOpen && (
                   <Button
                     type="button"
@@ -190,9 +214,9 @@ export function StepHours({ data, onChange }: StepHoursProps) {
                   </Button>
                 )}
               </div>
-              
+
               {dayData.isOpen ? (
-                <div className="space-y-2 ml-14">
+                <div className="ml-14 space-y-2">
                   {dayData.slots.map((slot, slotIndex) => (
                     <div key={slotIndex} className="flex items-center gap-2">
                       <Input
@@ -214,7 +238,7 @@ export function StepHours({ data, onChange }: StepHoursProps) {
                           variant="ghost"
                           size="icon"
                           onClick={() => removeSlot(day.key, slotIndex)}
-                          className="h-8 w-8 text-destructive"
+                          className="text-destructive h-8 w-8"
                         >
                           <X className="h-4 w-4" />
                         </Button>
@@ -228,12 +252,12 @@ export function StepHours({ data, onChange }: StepHoursProps) {
                     onClick={() => addSlot(day.key)}
                     className="text-muted-foreground"
                   >
-                    <Plus className="h-4 w-4 mr-1" />
+                    <Plus className="mr-1 h-4 w-4" />
                     Thêm ca
                   </Button>
                 </div>
               ) : (
-                <span className="ml-14 text-sm text-muted-foreground">Đóng cửa</span>
+                <span className="text-muted-foreground ml-14 text-sm">Đóng cửa</span>
               )}
             </div>
           )

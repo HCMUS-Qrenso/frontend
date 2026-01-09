@@ -31,7 +31,10 @@ function ActionIcon({ iconName }: { iconName: 'check' | 'play' | 'checkCircle' }
 }
 
 // Action config for each status
-const ACTION_CONFIG: Record<OrderItemStatus, { labelKey: string; iconName: 'check' | 'play' | 'checkCircle' } | null> = {
+const ACTION_CONFIG: Record<
+  OrderItemStatus,
+  { labelKey: string; iconName: 'check' | 'play' | 'checkCircle' } | null
+> = {
   pending: null, // Waiter handles pending->accepted, not KDS
   accepted: { labelKey: 'action.start', iconName: 'play' },
   preparing: { labelKey: 'action.done', iconName: 'checkCircle' },
@@ -91,4 +94,3 @@ export function TicketItemRow({ item, orderId, onUpdateStatus }: TicketItemRowPr
     </div>
   )
 }
-

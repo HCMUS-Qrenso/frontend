@@ -157,7 +157,8 @@ export function PaymentDialog({
         <DialogHeader className="border-b border-slate-200 pb-2 dark:border-slate-800">
           <DialogTitle>{t('dialog.paymentTitle', { orderNumber: order.orderNumber })}</DialogTitle>
           <DialogDescription>
-            {t('header.table')} {order.table?.tableNumber} - {t('paymentCard.total')}: {order.totalAmount.toLocaleString('vi-VN')}₫
+            {t('header.table')} {order.table?.tableNumber} - {t('paymentCard.total')}:{' '}
+            {order.totalAmount.toLocaleString('vi-VN')}₫
           </DialogDescription>
         </DialogHeader>
 
@@ -188,8 +189,10 @@ export function PaymentDialog({
                     </p>
                     <p className="mt-1 text-xs text-blue-700 dark:text-blue-300">
                       {t('paymentCard.method')}:{' '}
-                      {t(`paymentMethod.${activePayment.paymentMethod}` as any) || activePayment.paymentMethod}{' '}
-                      - {t('dialog.currentStatus')}: {t(`paymentStatus.${activePayment.status}` as any) || activePayment.status}
+                      {t(`paymentMethod.${activePayment.paymentMethod}` as any) ||
+                        activePayment.paymentMethod}{' '}
+                      - {t('dialog.currentStatus')}:{' '}
+                      {t(`paymentStatus.${activePayment.status}` as any) || activePayment.status}
                     </p>
                     <p className="mt-1 text-xs text-blue-600 dark:text-blue-400">
                       {t('warning.cannotCreateNewPayment')}
@@ -297,9 +300,7 @@ export function PaymentDialog({
                         </div>
                         <div className="flex-1">
                           <div className="font-medium">{t('paymentMethod.qr')}</div>
-                          <div className="text-muted-foreground text-xs">
-                            {t('dialog.qrDesc')}
-                          </div>
+                          <div className="text-muted-foreground text-xs">{t('dialog.qrDesc')}</div>
                         </div>
                       </Label>
                     </div>

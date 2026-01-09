@@ -38,7 +38,9 @@ function getNextStatus(currentStatus: OrderItemStatus): OrderItemStatus | null {
 }
 
 // Get action button config key for a status
-function getActionConfigKey(status: OrderItemStatus): { labelKey: string; icon: React.ReactNode } | null {
+function getActionConfigKey(
+  status: OrderItemStatus,
+): { labelKey: string; icon: React.ReactNode } | null {
   switch (status) {
     case 'pending':
       return { labelKey: 'acceptOrder', icon: <CheckCircle2 className="mr-2 h-4 w-4" /> }
@@ -72,7 +74,9 @@ export function TicketDetailsDrawer({
         {/* Header */}
         <SheetHeader className="space-y-1 pb-4">
           <SheetTitle className="text-2xl">{t('orderDetails')}</SheetTitle>
-          <SheetDescription>{t('orderDetailsDesc', { orderNumber: order.orderNumber })}</SheetDescription>
+          <SheetDescription>
+            {t('orderDetailsDesc', { orderNumber: order.orderNumber })}
+          </SheetDescription>
         </SheetHeader>
 
         {/* Scrollable Content */}
@@ -241,4 +245,3 @@ export function TicketDetailsDrawer({
     </Sheet>
   )
 }
-

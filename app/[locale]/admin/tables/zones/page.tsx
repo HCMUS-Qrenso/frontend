@@ -68,4 +68,3 @@ export default function ZonesPage() {
     </Suspense>
   )
 }
-

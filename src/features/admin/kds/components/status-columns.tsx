@@ -19,11 +19,26 @@ const KDS_STATUSES: OrderItemStatus[] = ['accepted', 'preparing', 'ready']
 
 // Status display config with colors
 const STATUS_DISPLAY_CONFIG: Record<OrderItemStatus, { bgColor: string; color: string }> = {
-  pending: { bgColor: 'bg-slate-100 dark:bg-slate-800', color: 'text-slate-700 dark:text-slate-300' },
-  accepted: { bgColor: 'bg-blue-100 dark:bg-blue-500/10', color: 'text-blue-700 dark:text-blue-400' },
-  preparing: { bgColor: 'bg-amber-100 dark:bg-amber-500/10', color: 'text-amber-700 dark:text-amber-400' },
-  ready: { bgColor: 'bg-emerald-100 dark:bg-emerald-500/10', color: 'text-emerald-700 dark:text-emerald-400' },
-  served: { bgColor: 'bg-purple-100 dark:bg-purple-500/10', color: 'text-purple-700 dark:text-purple-400' },
+  pending: {
+    bgColor: 'bg-slate-100 dark:bg-slate-800',
+    color: 'text-slate-700 dark:text-slate-300',
+  },
+  accepted: {
+    bgColor: 'bg-blue-100 dark:bg-blue-500/10',
+    color: 'text-blue-700 dark:text-blue-400',
+  },
+  preparing: {
+    bgColor: 'bg-amber-100 dark:bg-amber-500/10',
+    color: 'text-amber-700 dark:text-amber-400',
+  },
+  ready: {
+    bgColor: 'bg-emerald-100 dark:bg-emerald-500/10',
+    color: 'text-emerald-700 dark:text-emerald-400',
+  },
+  served: {
+    bgColor: 'bg-purple-100 dark:bg-purple-500/10',
+    color: 'text-purple-700 dark:text-purple-400',
+  },
   cancelled: { bgColor: 'bg-red-100 dark:bg-red-500/10', color: 'text-red-700 dark:text-red-400' },
   returned: { bgColor: 'bg-red-100 dark:bg-red-500/10', color: 'text-red-700 dark:text-red-400' },
 }
@@ -50,9 +65,7 @@ export function StatusColumns({
         <div className="text-6xl">🍳</div>
         <div className="text-center">
           <h3 className="text-lg font-semibold text-slate-900 dark:text-white">{t('noOrders')}</h3>
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-            {t('waitingOrders')}
-          </p>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{t('waitingOrders')}</p>
         </div>
       </div>
     )
@@ -152,4 +165,3 @@ export function StatusColumns({
     </div>
   )
 }
-

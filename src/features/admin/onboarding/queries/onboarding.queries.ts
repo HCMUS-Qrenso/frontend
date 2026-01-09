@@ -18,7 +18,7 @@ export function useOnboardingQuery() {
 // Save onboarding draft
 export function useSaveOnboardingDraft() {
   const queryClient = useQueryClient()
-  
+
   return useMutation({
     mutationFn: async (draft: Partial<OnboardingDraft>) => {
       const response = await apiClient.patch('/tenants/onboarding', draft)
@@ -33,7 +33,7 @@ export function useSaveOnboardingDraft() {
 // Complete onboarding
 export function useCompleteOnboarding() {
   const queryClient = useQueryClient()
-  
+
   return useMutation({
     mutationFn: async () => {
       const response = await apiClient.post('/tenants/onboarding/complete')

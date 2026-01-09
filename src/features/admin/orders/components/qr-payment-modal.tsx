@@ -87,9 +87,7 @@ export function QrPaymentModal({
       <DialogContent className="flex max-h-[90vh] w-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl sm:max-w-md dark:border-slate-700 dark:bg-slate-900">
         <DialogHeader className="border-b border-slate-200 p-6 dark:border-slate-800">
           <DialogTitle>{t('dialog.qrPaymentTitle')}</DialogTitle>
-          <DialogDescription>
-            {t('dialog.qrPaymentDesc')}
-          </DialogDescription>
+          <DialogDescription>{t('dialog.qrPaymentDesc')}</DialogDescription>
         </DialogHeader>
         <div className="flex-1 space-y-6 overflow-y-auto p-6">
           <div className="flex flex-col items-center justify-center space-y-4">
@@ -112,7 +110,9 @@ export function QrPaymentModal({
             </div>
             <div className="text-center">
               <p className="text-lg font-semibold">{amount.toLocaleString('vi-VN')}₫</p>
-              <p className="text-muted-foreground text-sm">{t('header.orders')} {orderNumber}</p>
+              <p className="text-muted-foreground text-sm">
+                {t('header.orders')} {orderNumber}
+              </p>
             </div>
           </div>
         </div>

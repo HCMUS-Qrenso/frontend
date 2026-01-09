@@ -49,19 +49,43 @@ const LANGUAGES = [
 const PRESETS = [
   {
     label: '🇻🇳 Việt Nam',
-    values: { currency: 'VND', currency_symbol: '₫', timezone: 'Asia/Ho_Chi_Minh', date_format: 'DD/MM/YYYY', language: 'vi' },
+    values: {
+      currency: 'VND',
+      currency_symbol: '₫',
+      timezone: 'Asia/Ho_Chi_Minh',
+      date_format: 'DD/MM/YYYY',
+      language: 'vi',
+    },
   },
   {
     label: '🇺🇸 US',
-    values: { currency: 'USD', currency_symbol: '$', timezone: 'America/New_York', date_format: 'MM/DD/YYYY', language: 'en' },
+    values: {
+      currency: 'USD',
+      currency_symbol: '$',
+      timezone: 'America/New_York',
+      date_format: 'MM/DD/YYYY',
+      language: 'en',
+    },
   },
   {
     label: '🇨🇳 China',
-    values: { currency: 'CNY', currency_symbol: '¥', timezone: 'Asia/Shanghai', date_format: 'YYYY-MM-DD', language: 'zh' },
+    values: {
+      currency: 'CNY',
+      currency_symbol: '¥',
+      timezone: 'Asia/Shanghai',
+      date_format: 'YYYY-MM-DD',
+      language: 'zh',
+    },
   },
   {
     label: '🇫🇷 France',
-    values: { currency: 'EUR', currency_symbol: '€', timezone: 'Europe/Paris', date_format: 'DD/MM/YYYY', language: 'fr' },
+    values: {
+      currency: 'EUR',
+      currency_symbol: '€',
+      timezone: 'Europe/Paris',
+      date_format: 'DD/MM/YYYY',
+      language: 'fr',
+    },
   },
 ]
 
@@ -75,7 +99,7 @@ export function StepLocale({ data, onChange }: StepLocaleProps) {
     })
   }
 
-  const applyPreset = (preset: typeof PRESETS[0]) => {
+  const applyPreset = (preset: (typeof PRESETS)[0]) => {
     onChange({ ...data, ...preset.values })
   }
 
@@ -90,12 +114,16 @@ export function StepLocale({ data, onChange }: StepLocaleProps) {
     const day = String(now.getDate()).padStart(2, '0')
     const month = String(now.getMonth() + 1).padStart(2, '0')
     const year = now.getFullYear()
-    
+
     switch (data.date_format) {
-      case 'DD/MM/YYYY': return `${day}/${month}/${year}`
-      case 'MM/DD/YYYY': return `${month}/${day}/${year}`
-      case 'YYYY-MM-DD': return `${year}-${month}-${day}`
-      default: return `${day}/${month}/${year}`
+      case 'DD/MM/YYYY':
+        return `${day}/${month}/${year}`
+      case 'MM/DD/YYYY':
+        return `${month}/${day}/${year}`
+      case 'YYYY-MM-DD':
+        return `${year}-${month}-${day}`
+      default:
+        return `${day}/${month}/${year}`
     }
   }
 
@@ -103,20 +131,20 @@ export function StepLocale({ data, onChange }: StepLocaleProps) {
     <div className="space-y-6">
       <div>
         <h2 className="text-xl font-semibold">Định dạng & Ngôn ngữ</h2>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           Cấu hình tiền tệ, múi giờ và ngôn ngữ hiển thị
         </p>
       </div>
 
       {/* Quick presets */}
       <div className="flex flex-wrap items-center gap-2">
-        <span className="text-sm text-muted-foreground">Chọn nhanh:</span>
+        <span className="text-muted-foreground text-sm">Chọn nhanh:</span>
         {PRESETS.map((preset) => (
           <button
             key={preset.label}
             type="button"
             onClick={() => applyPreset(preset)}
-            className="rounded-full border px-3 py-1 text-sm hover:bg-muted transition-colors"
+            className="hover:bg-muted rounded-full border px-3 py-1 text-sm transition-colors"
           >
             {preset.label}
           </button>
@@ -187,7 +215,10 @@ export function StepLocale({ data, onChange }: StepLocaleProps) {
               example={formatDate()}
             />
           </div>
-          <Select value={data.date_format} onValueChange={(v) => onChange({ ...data, date_format: v })}>
+          <Select
+            value={data.date_format}
+            onValueChange={(v) => onChange({ ...data, date_format: v })}
+          >
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
@@ -228,8 +259,8 @@ export function StepLocale({ data, onChange }: StepLocaleProps) {
       </div>
 
       {/* Live Preview */}
-      <div className="rounded-lg border bg-muted/50 p-4">
-        <p className="text-sm font-medium mb-2">Preview</p>
+      <div className="bg-muted/50 rounded-lg border p-4">
+        <p className="mb-2 text-sm font-medium">Preview</p>
         <div className="grid grid-cols-3 gap-4 text-sm">
           <div>
             <span className="text-muted-foreground">Giá:</span>

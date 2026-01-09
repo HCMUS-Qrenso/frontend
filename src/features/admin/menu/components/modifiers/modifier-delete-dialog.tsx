@@ -54,4 +54,3 @@ export function ModifierDeleteDialog({ open, modifier, onOpenChange }: ModifierD
     />
   )
 }
-

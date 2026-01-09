@@ -9,4 +9,3 @@ export * from './notification-settings-form'
 export * from './receipt-settings-form'
 export * from './operating-hours-form'
 export * from './qr-payment-settings-form'
-

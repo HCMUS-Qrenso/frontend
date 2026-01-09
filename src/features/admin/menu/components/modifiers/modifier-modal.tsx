@@ -144,10 +144,7 @@ export function ModifierModal({
       </FormDialogField>
 
       {/* Điều chỉnh giá */}
-      <FormDialogField
-        label={t('priceAdjustment')}
-        hint={t('priceHint')}
-      >
+      <FormDialogField label={t('priceAdjustment')} hint={t('priceHint')}>
         <div className="relative">
           <Input
             id="price"
@@ -185,4 +182,3 @@ export function ModifierModal({
     </FormDialog>
   )
 }
-

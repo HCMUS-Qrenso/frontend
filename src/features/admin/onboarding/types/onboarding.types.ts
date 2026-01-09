@@ -3,14 +3,14 @@
 export interface OnboardingDraft {
   current_step: number
   completed_steps: number[]
-  
+
   // Step 1: Restaurant
   restaurant: {
     name: string
     address: string
     image: string | null
   }
-  
+
   // Step 2: Locale
   locale: {
     currency: string
@@ -19,7 +19,7 @@ export interface OnboardingDraft {
     date_format: string
     language: string
   }
-  
+
   // Step 3: Tax & Charges
   tax_charge: {
     tax_rate: number
@@ -30,15 +30,18 @@ export interface OnboardingDraft {
     service_charge_taxable: boolean
     service_charge_min_party: number | null
   }
-  
+
   // Step 4: Operating Hours
   hours: {
-    operating_hours: Record<string, {
-      isOpen: boolean
-      slots: Array<{ open: string; close: string }>
-    }>
+    operating_hours: Record<
+      string,
+      {
+        isOpen: boolean
+        slots: Array<{ open: string; close: string }>
+      }
+    >
   }
-  
+
   // Step 5: Order Rules
   order_rules: {
     min_value: number | null
@@ -47,7 +50,7 @@ export interface OnboardingDraft {
     session_timeout_minutes: number
     require_guest_count: boolean
   }
-  
+
   // Step 6: Payment (PayOS)
   payment: {
     payos_client_id: string | null

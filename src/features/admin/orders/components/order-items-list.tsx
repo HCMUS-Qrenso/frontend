@@ -63,7 +63,9 @@ export function OrderItemsList({ items, orderId }: OrderItemsListProps) {
   if (!items || items.length === 0) {
     return (
       <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
-        <h2 className="mb-4 text-lg font-semibold text-slate-900 dark:text-white">{t('items.title')}</h2>
+        <h2 className="mb-4 text-lg font-semibold text-slate-900 dark:text-white">
+          {t('items.title')}
+        </h2>
         <p className="text-sm text-slate-500 dark:text-slate-400">{t('items.empty')}</p>
       </div>
     )
@@ -71,7 +73,9 @@ export function OrderItemsList({ items, orderId }: OrderItemsListProps) {
 
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
-      <h2 className="mb-4 text-lg font-semibold text-slate-900 dark:text-white">{t('items.title')}</h2>
+      <h2 className="mb-4 text-lg font-semibold text-slate-900 dark:text-white">
+        {t('items.title')}
+      </h2>
 
       <div className="space-y-4">
         {items.map((item) => {
@@ -124,12 +128,20 @@ export function OrderItemsList({ items, orderId }: OrderItemsListProps) {
 
                   <div className="ml-11 flex flex-wrap items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
                     {item.preparationStartedAt && (
-                      <span>{t('items.started')}: {formatTime(item.preparationStartedAt)}</span>
+                      <span>
+                        {t('items.started')}: {formatTime(item.preparationStartedAt)}
+                      </span>
                     )}
                     {item.preparationCompletedAt && (
-                      <span>{t('items.done')}: {formatTime(item.preparationCompletedAt)}</span>
+                      <span>
+                        {t('items.done')}: {formatTime(item.preparationCompletedAt)}
+                      </span>
                     )}
-                    {item.servedAt && <span>{t('items.servedAt')}: {formatTime(item.servedAt)}</span>}
+                    {item.servedAt && (
+                      <span>
+                        {t('items.servedAt')}: {formatTime(item.servedAt)}
+                      </span>
+                    )}
                   </div>
                 </div>
 

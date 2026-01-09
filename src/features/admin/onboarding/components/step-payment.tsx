@@ -23,7 +23,7 @@ export function StepPayment({ data, onChange }: StepPaymentProps) {
     <div className="space-y-6">
       <div>
         <h2 className="text-xl font-semibold">Thanh toán QR (PayOS)</h2>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           Cấu hình PayOS API để nhận thanh toán QR từ khách hàng (có thể bỏ qua)
         </p>
       </div>
@@ -182,11 +182,11 @@ export function StepPayment({ data, onChange }: StepPaymentProps) {
       </div>
 
       {/* Info Box */}
-      <div className="rounded-lg border bg-muted/50 p-4 text-sm text-muted-foreground">
-        <p className="font-medium mb-2">💡 Chưa có tài khoản PayOS?</p>
+      <div className="bg-muted/50 text-muted-foreground rounded-lg border p-4 text-sm">
+        <p className="mb-2 font-medium">💡 Chưa có tài khoản PayOS?</p>
         <p>
-          Bạn có thể bỏ qua bước này và cấu hình sau trong Settings → Thanh toán QR. 
-          Tính năng thanh toán QR sẽ bị vô hiệu cho đến khi cấu hình đầy đủ.
+          Bạn có thể bỏ qua bước này và cấu hình sau trong Settings → Thanh toán QR. Tính năng thanh
+          toán QR sẽ bị vô hiệu cho đến khi cấu hình đầy đủ.
         </p>
       </div>
     </div>

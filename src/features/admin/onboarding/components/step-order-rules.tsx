@@ -17,22 +17,40 @@ const PRESETS = [
   {
     label: '🍜 Quick Service',
     desc: '10 phút, không tối thiểu',
-    values: { min_value: null, estimated_prep_time: 10, allow_special_instructions: true, session_timeout_minutes: 60, require_guest_count: false },
+    values: {
+      min_value: null,
+      estimated_prep_time: 10,
+      allow_special_instructions: true,
+      session_timeout_minutes: 60,
+      require_guest_count: false,
+    },
   },
   {
     label: '🍽️ Full Service',
     desc: '20 phút, 100k tối thiểu',
-    values: { min_value: 100000, estimated_prep_time: 20, allow_special_instructions: true, session_timeout_minutes: 180, require_guest_count: true },
+    values: {
+      min_value: 100000,
+      estimated_prep_time: 20,
+      allow_special_instructions: true,
+      session_timeout_minutes: 180,
+      require_guest_count: true,
+    },
   },
   {
     label: '🥡 Takeaway',
     desc: '15 phút, 50k tối thiểu',
-    values: { min_value: 50000, estimated_prep_time: 15, allow_special_instructions: true, session_timeout_minutes: 30, require_guest_count: false },
+    values: {
+      min_value: 50000,
+      estimated_prep_time: 15,
+      allow_special_instructions: true,
+      session_timeout_minutes: 30,
+      require_guest_count: false,
+    },
   },
 ]
 
 export function StepOrderRules({ data, onChange, currencySymbol }: StepOrderRulesProps) {
-  const applyPreset = (preset: typeof PRESETS[0]) => {
+  const applyPreset = (preset: (typeof PRESETS)[0]) => {
     onChange({ ...data, ...preset.values })
   }
 
@@ -40,20 +58,20 @@ export function StepOrderRules({ data, onChange, currencySymbol }: StepOrderRule
     <div className="space-y-6">
       <div>
         <h2 className="text-xl font-semibold">Quy tắc đặt hàng</h2>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           Cấu hình thời gian, giá trị tối thiểu và các quy tắc khác
         </p>
       </div>
 
       {/* Quick presets */}
       <div className="flex flex-wrap items-center gap-2">
-        <span className="text-sm text-muted-foreground">Chọn nhanh:</span>
+        <span className="text-muted-foreground text-sm">Chọn nhanh:</span>
         {PRESETS.map((preset) => (
           <button
             key={preset.label}
             type="button"
             onClick={() => applyPreset(preset)}
-            className="rounded-full border px-3 py-1 text-sm hover:bg-muted transition-colors"
+            className="hover:bg-muted rounded-full border px-3 py-1 text-sm transition-colors"
             title={preset.desc}
           >
             {preset.label}
@@ -101,7 +119,9 @@ export function StepOrderRules({ data, onChange, currencySymbol }: StepOrderRule
             type="number"
             min={0}
             value={data.min_value || ''}
-            onChange={(e) => onChange({ ...data, min_value: e.target.value ? Number(e.target.value) : null })}
+            onChange={(e) =>
+              onChange({ ...data, min_value: e.target.value ? Number(e.target.value) : null })
+            }
             placeholder="Không giới hạn"
           />
         </div>
@@ -143,7 +163,9 @@ export function StepOrderRules({ data, onChange, currencySymbol }: StepOrderRule
             <Switch
               id="special_instructions"
               checked={data.allow_special_instructions}
-              onCheckedChange={(checked) => onChange({ ...data, allow_special_instructions: checked })}
+              onCheckedChange={(checked) =>
+                onChange({ ...data, allow_special_instructions: checked })
+              }
             />
           </div>
 

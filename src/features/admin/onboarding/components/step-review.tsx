@@ -42,8 +42,16 @@ export function StepReview({ draft, onEdit, onComplete, isCompleting }: StepRevi
       step: 3,
       title: '💰 Thuế & Phí dịch vụ',
       items: [
-        { label: draft.tax_charge.tax_label, value: `${draft.tax_charge.tax_rate}% ${draft.tax_charge.tax_inclusive ? '(đã bao gồm)' : ''}` },
-        { label: 'Phí dịch vụ', value: draft.tax_charge.service_charge_enabled ? `${draft.tax_charge.service_charge_rate}%` : 'Không' },
+        {
+          label: draft.tax_charge.tax_label,
+          value: `${draft.tax_charge.tax_rate}% ${draft.tax_charge.tax_inclusive ? '(đã bao gồm)' : ''}`,
+        },
+        {
+          label: 'Phí dịch vụ',
+          value: draft.tax_charge.service_charge_enabled
+            ? `${draft.tax_charge.service_charge_rate}%`
+            : 'Không',
+        },
       ],
       isComplete: true,
     },
@@ -73,31 +81,21 @@ export function StepReview({ draft, onEdit, onComplete, isCompleting }: StepRevi
     <div className="space-y-6">
       <div>
         <h2 className="text-xl font-semibold">Xác nhận cài đặt</h2>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           Kiểm tra lại các thiết lập trước khi hoàn tất
         </p>
       </div>
 
       <div className="space-y-4">
         {sections.map((section) => (
-          <div
-            key={section.step}
-            className="rounded-lg border p-4"
-          >
-            <div className="flex items-center justify-between mb-3">
+          <div key={section.step} className="rounded-lg border p-4">
+            <div className="mb-3 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span className="font-medium">{section.title}</span>
-                {section.isComplete && (
-                  <Check className="h-4 w-4 text-green-600" />
-                )}
+                {section.isComplete && <Check className="h-4 w-4 text-green-600" />}
               </div>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => onEdit(section.step)}
-              >
-                <Edit className="h-4 w-4 mr-1" />
+              <Button type="button" variant="ghost" size="sm" onClick={() => onEdit(section.step)}>
+                <Edit className="mr-1 h-4 w-4" />
                 Sửa
               </Button>
             </div>
@@ -105,7 +103,7 @@ export function StepReview({ draft, onEdit, onComplete, isCompleting }: StepRevi
               {section.items.map((item, i) => (
                 <div key={i} className="flex justify-between">
                   <span className="text-muted-foreground">{item.label}:</span>
-                  <span className="font-medium truncate ml-2">{item.value}</span>
+                  <span className="ml-2 truncate font-medium">{item.value}</span>
                 </div>
               ))}
             </div>
@@ -115,11 +113,12 @@ export function StepReview({ draft, onEdit, onComplete, isCompleting }: StepRevi
 
       {!requiredComplete && (
         <div className="rounded-lg border border-orange-200 bg-orange-50 p-4 text-sm text-orange-800">
-          ⚠️ Vui lòng hoàn thành các bước bắt buộc (Thông tin nhà hàng và Định dạng) trước khi hoàn tất.
+          ⚠️ Vui lòng hoàn thành các bước bắt buộc (Thông tin nhà hàng và Định dạng) trước khi hoàn
+          tất.
         </div>
       )}
 
-      <div className="rounded-lg bg-muted p-4 text-sm text-muted-foreground">
+      <div className="bg-muted text-muted-foreground rounded-lg p-4 text-sm">
         💡 Bạn có thể chỉnh sửa tất cả cài đặt này sau trong trang <strong>Settings</strong>.
       </div>
 

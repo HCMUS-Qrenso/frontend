@@ -14,7 +14,11 @@ import {
 } from '@/src/components/ui/table'
 import { Avatar, AvatarFallback, AvatarImage } from '@/src/components/ui/avatar'
 import { Button } from '@/src/components/ui/button'
-import { StatusBadge, createUserStatusConfig, createUserRoleConfig } from '@/src/components/ui/status-badge'
+import {
+  StatusBadge,
+  createUserStatusConfig,
+  createUserRoleConfig,
+} from '@/src/components/ui/status-badge'
 import { StaffRowActions } from '@/src/features/admin/staff/components/staff-row-actions'
 import { LoadingState } from '@/src/components/ui/loading-state'
 import { EmptyState } from '@/src/components/ui/empty-state'

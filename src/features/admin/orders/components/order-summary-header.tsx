@@ -97,7 +97,9 @@ export function OrderSummaryHeader({ order }: OrderSummaryHeaderProps) {
               </div>
 
               <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
-                <span className="text-lg font-medium">{t('table')} {order.table?.tableNumber}</span>
+                <span className="text-lg font-medium">
+                  {t('table')} {order.table?.tableNumber}
+                </span>
                 {order.table?.zone?.name && (
                   <>
                     <span className="text-sm">•</span>
@@ -107,14 +109,11 @@ export function OrderSummaryHeader({ order }: OrderSummaryHeaderProps) {
               </div>
 
               <div className="flex flex-wrap items-center gap-2">
-                <Badge className={cn('text-xs font-medium', STATUS_COLORS[order.status])}
-                >
+                <Badge className={cn('text-xs font-medium', STATUS_COLORS[order.status])}>
                   {getStatusLabel(order.status)}
                 </Badge>
 
-                <Badge
-                  className={cn('text-xs font-medium', PRIORITY_COLORS[order.priority])}
-                >
+                <Badge className={cn('text-xs font-medium', PRIORITY_COLORS[order.priority])}>
                   {getPriorityLabel(order.priority)}
                 </Badge>
 

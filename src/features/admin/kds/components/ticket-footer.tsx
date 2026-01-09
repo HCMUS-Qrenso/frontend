@@ -39,4 +39,3 @@ export function TicketFooter({ isAllDone, onCompleteAll, onShowDetail }: TicketF
     </div>
   )
 }
-

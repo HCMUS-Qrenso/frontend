@@ -158,9 +158,7 @@ export function ExportDataTab() {
               <span className="text-sm font-medium text-slate-900 dark:text-white">
                 {t('includeHidden')}
               </span>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                {t('includeHiddenDesc')}
-              </p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">{t('includeHiddenDesc')}</p>
             </div>
           </label>
         </div>
@@ -208,9 +206,7 @@ export function ExportDataTab() {
         <div className="flex items-center justify-between">
           <div>
             <h3 className="font-semibold text-slate-900 dark:text-white">{t('readyToExport')}</h3>
-            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-              {t('autoDownload')}
-            </p>
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{t('autoDownload')}</p>
           </div>
           <Button
             onClick={handleExport}
@@ -234,4 +230,3 @@ export function ExportDataTab() {
     </div>
   )
 }
-

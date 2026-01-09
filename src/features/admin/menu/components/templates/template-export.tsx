@@ -1315,7 +1315,9 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
 
                 {/* Accent Color */}
                 <div className="space-y-2">
-                  <p className="text-xs font-medium text-slate-700 dark:text-slate-300">{t('accentColor')}</p>
+                  <p className="text-xs font-medium text-slate-700 dark:text-slate-300">
+                    {t('accentColor')}
+                  </p>
                   <div className="flex gap-2">
                     {['emerald', 'blue', 'amber', 'rose'].map((color) => (
                       <button
@@ -1338,7 +1340,9 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
 
                 {/* Options */}
                 <div className="space-y-2">
-                  <p className="text-xs font-medium text-slate-700 dark:text-slate-300">{t('display')}</p>
+                  <p className="text-xs font-medium text-slate-700 dark:text-slate-300">
+                    {t('display')}
+                  </p>
                   <div className="space-y-2 text-sm">
                     <label className="flex items-center gap-2">
                       <input
@@ -1363,7 +1367,9 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
                         }
                         className="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
                       />
-                      <span className="text-slate-700 dark:text-slate-300">{t('showDescriptions')}</span>
+                      <span className="text-slate-700 dark:text-slate-300">
+                        {t('showDescriptions')}
+                      </span>
                     </label>
                     <label className="flex items-center gap-2">
                       <input
@@ -1387,9 +1393,7 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
                 {/* Max Items Per Page */}
                 <div className="space-y-2">
                   <p className="text-xs font-medium text-slate-700 dark:text-slate-300">
-                    {selectedTemplate !== '4'
-                      ? t('maxItemsPerPage')
-                      : t('maxItemsPerCategory')}
+                    {selectedTemplate !== '4' ? t('maxItemsPerPage') : t('maxItemsPerCategory')}
                   </p>
                   <input
                     type="number"
@@ -1491,16 +1495,24 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline" size="sm">
                       Font:{' '}
-                      {fontSize === 'small' ? t('fontSmall') : fontSize === 'medium' ? t('fontMedium') : t('fontLarge')}{' '}
+                      {fontSize === 'small'
+                        ? t('fontSmall')
+                        : fontSize === 'medium'
+                          ? t('fontMedium')
+                          : t('fontLarge')}{' '}
                       <ChevronDown className="ml-1 h-3 w-3" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => setFontSize('small')}>{t('fontSmall')}</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setFontSize('small')}>
+                      {t('fontSmall')}
+                    </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => setFontSize('medium')}>
                       {t('fontMedium')}
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setFontSize('large')}>{t('fontLarge')}</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setFontSize('large')}>
+                      {t('fontLarge')}
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
 

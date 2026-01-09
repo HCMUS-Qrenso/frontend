@@ -80,9 +80,7 @@ export function OrderStatusTimeline({ history }: OrderStatusTimelineProps) {
           const isLast = idx === history.length - 1
 
           // Get localized status labels
-          const fromLabel = entry.fromStatus
-            ? getStatusLabel(entry.fromStatus)
-            : null
+          const fromLabel = entry.fromStatus ? getStatusLabel(entry.fromStatus) : null
           const toLabel = getStatusLabel(entry.toStatus)
           const localizedNotes = localizeNotes(entry.notes ?? null)
 

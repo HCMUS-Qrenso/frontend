@@ -1,12 +1,4 @@
-export default function OnboardingLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function OnboardingLayout({ children }: { children: React.ReactNode }) {
   // Simple layout without sidebar for onboarding flow
-  return (
-    <div className="min-h-screen bg-background">
-      {children}
-    </div>
-  )
+  return <div className="bg-background min-h-screen">{children}</div>
 }

@@ -188,7 +188,7 @@ export function FormPageSkeleton() {
     <div className="space-y-6">
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Full width card */}
-        <div className="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900 lg:col-span-2">
+        <div className="rounded-xl border border-slate-200 bg-white p-6 lg:col-span-2 dark:border-slate-800 dark:bg-slate-900">
           <Skeleton className="mb-4 h-6 w-40" />
           <div className="grid gap-4 sm:grid-cols-2">
             <Skeleton className="h-10 w-full" />
@@ -213,7 +213,7 @@ export function FormPageSkeleton() {
         ))}
 
         {/* Full width card */}
-        <div className="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900 lg:col-span-2">
+        <div className="rounded-xl border border-slate-200 bg-white p-6 lg:col-span-2 dark:border-slate-800 dark:bg-slate-900">
           <Skeleton className="mb-4 h-6 w-40" />
           <div className="space-y-4">
             <Skeleton className="h-10 w-full" />
@@ -349,4 +349,3 @@ export function FloorPlanSkeleton() {
     </div>
   )
 }
-

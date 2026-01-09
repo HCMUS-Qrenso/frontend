@@ -10,7 +10,7 @@ interface OrderNotesProps {
 
 export function OrderNotes({ specialInstructions, rejectionReason }: OrderNotesProps) {
   const t = useTranslations('orders')
-  
+
   if (!specialInstructions && !rejectionReason) {
     return null
   }
@@ -42,7 +42,9 @@ export function OrderNotes({ specialInstructions, rejectionReason }: OrderNotesP
               <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
             </div>
             <div className="flex-1">
-              <h3 className="mb-1 font-semibold text-red-900 dark:text-red-400">{t('notes.rejectionReason')}</h3>
+              <h3 className="mb-1 font-semibold text-red-900 dark:text-red-400">
+                {t('notes.rejectionReason')}
+              </h3>
               <p className="text-sm text-red-700 dark:text-red-300">{rejectionReason}</p>
             </div>
           </div>

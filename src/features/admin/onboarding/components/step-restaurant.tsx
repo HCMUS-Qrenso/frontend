@@ -78,7 +78,7 @@ export function StepRestaurant({ data, onChange }: StepRestaurantProps) {
     <div className="space-y-6">
       <div>
         <h2 className="text-xl font-semibold">Thông tin nhà hàng</h2>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           Thông tin này sẽ hiển thị khi khách quét QR và trên hóa đơn
         </p>
       </div>
@@ -148,7 +148,7 @@ export function StepRestaurant({ data, onChange }: StepRestaurantProps) {
 
           {displayImage ? (
             <div className="relative">
-              <div className="relative aspect-video w-full overflow-hidden rounded-lg border bg-muted">
+              <div className="bg-muted relative aspect-video w-full overflow-hidden rounded-lg border">
                 <Image
                   src={displayImage}
                   alt={data.name || 'Restaurant'}
@@ -194,7 +194,7 @@ export function StepRestaurant({ data, onChange }: StepRestaurantProps) {
               type="button"
               onClick={handleImageUpload}
               disabled={isUploading}
-              className="flex aspect-video w-full flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed border-muted-foreground/25 bg-muted/50 text-muted-foreground transition-all hover:border-primary hover:bg-muted hover:text-primary disabled:cursor-not-allowed disabled:opacity-50"
+              className="border-muted-foreground/25 bg-muted/50 text-muted-foreground hover:border-primary hover:bg-muted hover:text-primary flex aspect-video w-full flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed transition-all disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isUploading ? (
                 <>

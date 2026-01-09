@@ -17,33 +17,57 @@ const PRESETS = [
   {
     label: '🏪 Quán ăn nhỏ',
     desc: 'VAT 10%, không phí phục vụ',
-    values: { tax_rate: 10, tax_inclusive: true, tax_label: 'VAT', service_charge_enabled: false, service_charge_rate: 5, service_charge_taxable: false, service_charge_min_party: null },
+    values: {
+      tax_rate: 10,
+      tax_inclusive: true,
+      tax_label: 'VAT',
+      service_charge_enabled: false,
+      service_charge_rate: 5,
+      service_charge_taxable: false,
+      service_charge_min_party: null,
+    },
   },
   {
     label: '🍽️ Nhà hàng',
     desc: 'VAT 10%, 5% phí phục vụ',
-    values: { tax_rate: 10, tax_inclusive: true, tax_label: 'VAT', service_charge_enabled: true, service_charge_rate: 5, service_charge_taxable: false, service_charge_min_party: null },
+    values: {
+      tax_rate: 10,
+      tax_inclusive: true,
+      tax_label: 'VAT',
+      service_charge_enabled: true,
+      service_charge_rate: 5,
+      service_charge_taxable: false,
+      service_charge_min_party: null,
+    },
   },
   {
     label: '🏨 Fine Dining',
     desc: 'VAT 10%, 10% phí cho bàn 6+',
-    values: { tax_rate: 10, tax_inclusive: true, tax_label: 'VAT', service_charge_enabled: true, service_charge_rate: 10, service_charge_taxable: false, service_charge_min_party: 6 },
+    values: {
+      tax_rate: 10,
+      tax_inclusive: true,
+      tax_label: 'VAT',
+      service_charge_enabled: true,
+      service_charge_rate: 10,
+      service_charge_taxable: false,
+      service_charge_min_party: 6,
+    },
   },
 ]
 
 export function StepTaxCharge({ data, onChange, currencySymbol }: StepTaxChargeProps) {
-  const applyPreset = (preset: typeof PRESETS[0]) => {
+  const applyPreset = (preset: (typeof PRESETS)[0]) => {
     onChange({ ...data, ...preset.values })
   }
 
   // Live preview calculation
   const subtotal = 450000
-  const serviceAmount = data.service_charge_enabled ? subtotal * (data.service_charge_rate / 100) : 0
+  const serviceAmount = data.service_charge_enabled
+    ? subtotal * (data.service_charge_rate / 100)
+    : 0
   const taxableAmount = subtotal + (data.service_charge_taxable ? serviceAmount : 0)
   const taxAmount = taxableAmount * (data.tax_rate / 100)
-  const total = data.tax_inclusive 
-    ? subtotal + serviceAmount 
-    : subtotal + serviceAmount + taxAmount
+  const total = data.tax_inclusive ? subtotal + serviceAmount : subtotal + serviceAmount + taxAmount
 
   const formatPrice = (amount: number) => {
     return new Intl.NumberFormat('vi-VN').format(Math.round(amount)) + ' ' + currencySymbol
@@ -53,20 +77,20 @@ export function StepTaxCharge({ data, onChange, currencySymbol }: StepTaxChargeP
     <div className="space-y-6">
       <div>
         <h2 className="text-xl font-semibold">Thuế & Phí dịch vụ</h2>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           Cấu hình VAT và phí phục vụ (có thể bỏ qua và dùng mặc định)
         </p>
       </div>
 
       {/* Quick presets */}
       <div className="flex flex-wrap items-center gap-2">
-        <span className="text-sm text-muted-foreground">Chọn nhanh:</span>
+        <span className="text-muted-foreground text-sm">Chọn nhanh:</span>
         {PRESETS.map((preset) => (
           <button
             key={preset.label}
             type="button"
             onClick={() => applyPreset(preset)}
-            className="rounded-full border px-3 py-1 text-sm hover:bg-muted transition-colors"
+            className="hover:bg-muted rounded-full border px-3 py-1 text-sm transition-colors"
             title={preset.desc}
           >
             {preset.label}
@@ -78,7 +102,7 @@ export function StepTaxCharge({ data, onChange, currencySymbol }: StepTaxChargeP
         {/* Tax Settings */}
         <div className="space-y-4 rounded-lg border p-4">
           <h3 className="font-medium">Thuế VAT</h3>
-          
+
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <Label htmlFor="tax_rate">Thuế suất (%)</Label>
@@ -165,7 +189,9 @@ export function StepTaxCharge({ data, onChange, currencySymbol }: StepTaxChargeP
                   min={0}
                   max={100}
                   value={data.service_charge_rate}
-                  onChange={(e) => onChange({ ...data, service_charge_rate: Number(e.target.value) })}
+                  onChange={(e) =>
+                    onChange({ ...data, service_charge_rate: Number(e.target.value) })
+                  }
                 />
               </div>
 
@@ -185,7 +211,12 @@ export function StepTaxCharge({ data, onChange, currencySymbol }: StepTaxChargeP
                   type="number"
                   min={0}
                   value={data.service_charge_min_party || ''}
-                  onChange={(e) => onChange({ ...data, service_charge_min_party: e.target.value ? Number(e.target.value) : null })}
+                  onChange={(e) =>
+                    onChange({
+                      ...data,
+                      service_charge_min_party: e.target.value ? Number(e.target.value) : null,
+                    })
+                  }
                   placeholder="Tất cả bàn"
                 />
               </div>
@@ -203,7 +234,9 @@ export function StepTaxCharge({ data, onChange, currencySymbol }: StepTaxChargeP
                 <Switch
                   id="sc_taxable"
                   checked={data.service_charge_taxable}
-                  onCheckedChange={(checked) => onChange({ ...data, service_charge_taxable: checked })}
+                  onCheckedChange={(checked) =>
+                    onChange({ ...data, service_charge_taxable: checked })
+                  }
                 />
               </div>
             </>
@@ -212,8 +245,8 @@ export function StepTaxCharge({ data, onChange, currencySymbol }: StepTaxChargeP
       </div>
 
       {/* Live Preview */}
-      <div className="rounded-lg border bg-muted/50 p-4">
-        <p className="text-sm font-medium mb-3">Preview hóa đơn</p>
+      <div className="bg-muted/50 rounded-lg border p-4">
+        <p className="mb-3 text-sm font-medium">Preview hóa đơn</p>
         <div className="space-y-2 text-sm">
           <div className="flex justify-between">
             <span className="text-muted-foreground">Tạm tính:</span>
@@ -221,7 +254,9 @@ export function StepTaxCharge({ data, onChange, currencySymbol }: StepTaxChargeP
           </div>
           {data.service_charge_enabled && (
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Phí dịch vụ ({data.service_charge_rate}%):</span>
+              <span className="text-muted-foreground">
+                Phí dịch vụ ({data.service_charge_rate}%):
+              </span>
               <span>{formatPrice(serviceAmount)}</span>
             </div>
           )}
@@ -229,7 +264,9 @@ export function StepTaxCharge({ data, onChange, currencySymbol }: StepTaxChargeP
             <span className="text-muted-foreground">
               {data.tax_label} ({data.tax_rate}%){data.tax_inclusive && ' (đã bao gồm)'}:
             </span>
-            <span>{data.tax_inclusive ? `(${formatPrice(taxAmount)})` : formatPrice(taxAmount)}</span>
+            <span>
+              {data.tax_inclusive ? `(${formatPrice(taxAmount)})` : formatPrice(taxAmount)}
+            </span>
           </div>
           <div className="flex justify-between border-t pt-2 font-medium">
             <span>Tổng cộng:</span>

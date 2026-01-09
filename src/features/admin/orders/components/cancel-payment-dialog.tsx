@@ -59,9 +59,7 @@ export function CancelPaymentDialog({
       <AlertDialogContent className="flex max-h-[90vh] max-w-lg flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-700 dark:bg-slate-900">
         <AlertDialogHeader className="border-b border-slate-200 pb-2 dark:border-slate-800">
           <AlertDialogTitle>{t('dialog.cancelPaymentTitle')}</AlertDialogTitle>
-          <AlertDialogDescription>
-            {t('dialog.cancelPaymentDesc')}
-          </AlertDialogDescription>
+          <AlertDialogDescription>{t('dialog.cancelPaymentDesc')}</AlertDialogDescription>
         </AlertDialogHeader>
         <div className="flex-1 space-y-6 overflow-y-auto">
           <div className="space-y-2">
@@ -76,13 +74,17 @@ export function CancelPaymentDialog({
           </div>
         </div>
         <AlertDialogFooter className="border-t border-slate-200 pt-4 dark:border-slate-800">
-          <AlertDialogCancel disabled={cancelPaymentMutation.isPending}>{t('dialog.no')}</AlertDialogCancel>
+          <AlertDialogCancel disabled={cancelPaymentMutation.isPending}>
+            {t('dialog.no')}
+          </AlertDialogCancel>
           <AlertDialogAction
             onClick={handleCancelPayment}
             disabled={cancelPaymentMutation.isPending || !cancelReason.trim()}
             className="bg-amber-600 hover:bg-amber-700"
           >
-            {cancelPaymentMutation.isPending ? t('paymentCard.processing') : t('paymentCard.cancelPayment')}
+            {cancelPaymentMutation.isPending
+              ? t('paymentCard.processing')
+              : t('paymentCard.cancelPayment')}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

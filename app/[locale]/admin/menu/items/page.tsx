@@ -75,4 +75,3 @@ export default function MenuItemsPage() {
     </Suspense>
   )
 }
-
