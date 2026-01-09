@@ -204,21 +204,23 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
       {/* Sidebar */}
-      <AdminSidebar
-        isModalOpen={isModalOpen}
-        userProfile={userProfile}
-        logout={handleLogout}
-        logoutPending={logoutPending}
-        sidebarOpen={sidebarOpen}
-        onSidebarToggle={setSidebarOpen}
-        logoutDialogOpen={logoutDialogOpen}
-        onLogoutDialogOpenChange={setLogoutDialogOpen}
-      />
+      <div className="kds-fullscreen:hidden">
+        <AdminSidebar
+          isModalOpen={isModalOpen}
+          userProfile={userProfile}
+          logout={handleLogout}
+          logoutPending={logoutPending}
+          sidebarOpen={sidebarOpen}
+          onSidebarToggle={setSidebarOpen}
+          logoutDialogOpen={logoutDialogOpen}
+          onLogoutDialogOpenChange={setLogoutDialogOpen}
+        />
+      </div>
 
       {/* Main content */}
-      <div className="lg:pl-64">
+      <div className="kds-fullscreen:!pl-0 lg:pl-64">
         {/* Top bar */}
-        <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/80 backdrop-blur-xl dark:border-slate-800 dark:bg-slate-900/80">
+        <header className="kds-fullscreen:hidden sticky top-0 z-30 border-b border-slate-200 bg-white/80 backdrop-blur-xl dark:border-slate-800 dark:bg-slate-900/80">
           <div className="flex items-center justify-between px-4 py-4 lg:px-8">
             <div className="flex items-center gap-4">
               <Button

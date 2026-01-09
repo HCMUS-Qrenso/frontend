@@ -9,6 +9,9 @@ import { useQueryClient, QueryClient } from '@tanstack/react-query'
 import { ordersQueryKeys } from '../queries/orders.keys'
 import { useAuthStore } from '@/src/store/auth-store'
 import { notifyFromSocket, notifySocketError } from '@/src/lib/socket'
+import { playNotificationSound } from '../../shared/utils'
+import { useTenantSettings } from '@/src/contexts/tenant-settings-context'
+import { pl } from 'date-fns/locale'
 
 const WS_URL = process.env.NEXT_PUBLIC_WS_URL || 'http://localhost:3000'
 const WS_NAMESPACE = '/orders'
@@ -71,6 +74,7 @@ export function useOrdersSocket(options: UseOrdersSocketOptions = {}): UseOrders
   const [isConnected, setIsConnected] = useState(false)
   const queryClient = useQueryClient()
   const accessToken = useAuthStore((state) => state.accessToken)
+  const { settings: tenantSettings } = useTenantSettings()
 
   // Use refs and keep callbacks stable to avoid dependency changes causing reconnect loops
   const queryClientRef = useRef<QueryClient>(queryClient)
@@ -126,6 +130,9 @@ export function useOrdersSocket(options: UseOrdersSocketOptions = {}): UseOrders
       console.log('[AdminSocket] Order created:', event.data.orderNumber)
       queryClientRef.current.invalidateQueries({ queryKey: ordersQueryKeys.lists() })
       queryClientRef.current.invalidateQueries({ queryKey: ordersQueryKeys.stats() })
+
+      // Play notification sound
+      playNotificationSound(tenantSettings)
 
       if (showNotificationsRef.current) {
         notifyFromSocket('order:created', event.data)
@@ -184,6 +191,27 @@ export function useOrdersSocket(options: UseOrdersSocketOptions = {}): UseOrders
       // Show toast notification
       if (showNotificationsRef.current && event.data.status === 'paid') {
         notifyFromSocket('payment:updated', event.data)
+      }
+    })
+
+    // Bill requested by customer
+    socket.on('bill:requested', (event: any) => {
+      console.log(
+        '[AdminSocket] Bill requested:',
+        event.data.orderNumber,
+        'Table:',
+        event.data.tableNumber,
+      )
+
+      // Invalidate queries to refresh order status
+      queryClientRef.current.invalidateQueries({ queryKey: ordersQueryKeys.lists() })
+
+      // Play notification sound
+      playNotificationSound(tenantSettings)
+
+      // Show toast notification with bill request details
+      if (showNotificationsRef.current) {
+        notifyFromSocket('bill:requested', event.data)
       }
     })
 

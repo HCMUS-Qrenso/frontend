@@ -443,7 +443,8 @@
     "paid": "已支付",
     "partialPaid": "部分支付",
     "refunded": "已退款",
-    "itemLabel": "个订单"
+    "itemLabel": "个订单",
+    "paymentRequested": "客户请求付款"
   },
   "tables": {
     "title": "桌台管理",
@@ -1296,6 +1297,29 @@
       "description": "配置声音和邮件通知",
       "soundEnabled": "声音通知",
       "soundDescription": "新订单到达时播放声音",
+      "soundType": "通知声音",
+      "sounds": {
+        "bell": {
+          "name": "铃声",
+          "description": "经典铃声通知"
+        },
+        "chime": {
+          "name": "风铃声",
+          "description": "轻柔的风铃声"
+        },
+        "ding": {
+          "name": "叮声",
+          "description": "快速的叮声通知"
+        },
+        "pop": {
+          "name": "弹出声",
+          "description": "现代的弹出声"
+        },
+        "ping": {
+          "name": "乒声",
+          "description": "尖锐的乒声警报"
+        }
+      },
       "emailEnabled": "邮件通知",
       "emailDescription": "新订单到达时发送邮件",
       "email": "通知邮箱",

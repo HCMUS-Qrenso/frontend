@@ -91,6 +91,8 @@ export interface Order {
   status: OrderStatus
   priority: OrderPriority
   paymentStatus: PaymentStatus
+  paymentRequestedAt?: string | null
+  paymentMethod?: 'cash' | 'qr' | null
   table: OrderTable
   waiter?: OrderWaiter
   customer?: OrderCustomer
@@ -209,6 +211,8 @@ export interface OrderDetail {
   status: OrderStatus
   priority: OrderPriority
   paymentStatus: PaymentStatus
+  paymentRequestedAt?: string | null
+  paymentMethod?: 'cash' | 'qr' | null
   table: OrderTable
   tableSession?: {
     id: string

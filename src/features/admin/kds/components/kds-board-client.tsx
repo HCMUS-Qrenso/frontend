@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { KdsTopBar } from './kds-top-bar'
 import { KdsFilters } from './kds-filters'
 import { StatusColumns } from './status-columns'
@@ -33,6 +33,22 @@ export function KdsBoardClient() {
 
   // Single tick timer for all ticket cards (1 second interval)
   const now = useNow(1000)
+
+  // Listen for fullscreen changes (e.g., when user presses ESC)
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      if (!document.fullscreenElement) {
+        document.body.classList.remove('kds-fullscreen')
+        setIsFullscreen(false)
+      }
+    }
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange)
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange)
+      document.body.classList.remove('kds-fullscreen')
+    }
+  }, [])
 
   // Queries
   const { data, isLoading, error, dataUpdatedAt } = useKdsOrdersQuery({
@@ -83,9 +99,11 @@ export function KdsBoardClient() {
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen()
+      document.body.classList.add('kds-fullscreen')
       setIsFullscreen(true)
     } else {
       document.exitFullscreen()
+      document.body.classList.remove('kds-fullscreen')
       setIsFullscreen(false)
     }
   }

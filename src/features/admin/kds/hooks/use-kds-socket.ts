@@ -10,6 +10,8 @@ import { kdsQueryKeys } from '../queries/kds.keys'
 import { useAuthStore } from '@/src/store/auth-store'
 import { notifyFromSocket, notifySocketError } from '@/src/lib/socket'
 import type { KdsOrdersResponse, OrderItemStatus } from '../types/kds.types'
+import { useTenantSettings } from '@/src/contexts/tenant-settings-context'
+import { playNotificationSound } from '../../shared/utils'
 
 const WS_URL = process.env.NEXT_PUBLIC_WS_URL || 'http://localhost:3000'
 const WS_NAMESPACE = '/orders'
@@ -70,6 +72,8 @@ export function useKdsSocket(options: UseKdsSocketOptions = {}): UseKdsSocketRet
   const [isConnected, setIsConnected] = useState(false)
   const queryClient = useQueryClient()
   const accessToken = useAuthStore((state) => state.accessToken)
+
+  const { tenantSettings } = useTenantSettings()
 
   // Use refs to avoid dependency changes causing reconnect loops
   const queryClientRef = useRef<QueryClient>(queryClient)
@@ -156,6 +160,8 @@ export function useKdsSocket(options: UseKdsSocketOptions = {}): UseKdsSocketRet
       queryClientRef.current.invalidateQueries({ queryKey: kdsQueryKeys.all })
 
       if (showNotificationsRef.current) {
+        // play notification sound
+        playNotificationSound(tenantSettings)
         notifyFromSocket('order:created', event.data)
       }
     })
@@ -166,6 +172,8 @@ export function useKdsSocket(options: UseKdsSocketOptions = {}): UseKdsSocketRet
       queryClientRef.current.invalidateQueries({ queryKey: kdsQueryKeys.all })
 
       if (showNotificationsRef.current) {
+        // play notification sound
+        playNotificationSound(tenantSettings)
         notifyFromSocket('order:items:added', event.data)
       }
     })
@@ -177,6 +185,8 @@ export function useKdsSocket(options: UseKdsSocketOptions = {}): UseKdsSocketRet
 
       // Show toast for item status changes (except pending - no need to notify)
       if (showNotificationsRef.current && event.data.status !== 'pending') {
+        // play notification sound
+        playNotificationSound(tenantSettings)
         notifyFromSocket('item:status', event.data)
       }
     })
@@ -186,7 +196,12 @@ export function useKdsSocket(options: UseKdsSocketOptions = {}): UseKdsSocketRet
       console.log('[KdsSocket] Order updated:', event.data.orderNumber)
       queryClientRef.current.invalidateQueries({ queryKey: kdsQueryKeys.all })
 
+      // play notification sound
+      playNotificationSound(tenantSettings)
+
       if (showNotificationsRef.current) {
+        // play notification sound
+        playNotificationSound(tenantSettings)
         notifyFromSocket('order:updated', event.data)
       }
     })

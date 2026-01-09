@@ -29,60 +29,60 @@ export function useFormat() {
   const urlLocale = useLocale() // From next-intl (URL-based locale)
 
   // Determine locale: URL locale takes precedence, then settings, then default
-  const effectiveLocale = languageToLocale(urlLocale || settings.language)
+  const effectiveLocale = languageToLocale(urlLocale || settings.general.language)
 
   const formatPrice = useCallback(
     (price: string | number, options?: PriceFormatOptions) => {
       return baseFormatPrice(price, {
-        currency: settings.currency,
+        currency: settings.general.currency,
         symbol: settings.currencySymbol,
         locale: effectiveLocale,
         ...options, // Allow overrides
       })
     },
-    [settings.currency, settings.currencySymbol, effectiveLocale],
+    [settings.general.currency, settings.currencySymbol, effectiveLocale],
   )
 
   const formatDateTime = useCallback(
     (dateString: string | null, options?: DateFormatOptions) => {
       return baseFormatDateTime(dateString, {
         locale: effectiveLocale,
-        timezone: settings.timezone,
+        timezone: settings.general.timezone,
         dateFormat: settings.dateFormat as 'DD/MM/YYYY' | 'MM/DD/YYYY' | 'YYYY-MM-DD',
         ...options, // Allow overrides
       })
     },
-    [effectiveLocale, settings.timezone, settings.dateFormat],
+    [effectiveLocale, settings.general.timezone, settings.dateFormat],
   )
 
   const formatShortDate = useCallback(
     (dateString: string, options?: DateFormatOptions) => {
       return baseFormatShortDate(dateString, {
         locale: effectiveLocale,
-        timezone: settings.timezone,
+        timezone: settings.general.timezone,
         dateFormat: settings.dateFormat as 'DD/MM/YYYY' | 'MM/DD/YYYY' | 'YYYY-MM-DD',
         ...options,
       })
     },
-    [effectiveLocale, settings.timezone, settings.dateFormat],
+    [effectiveLocale, settings.general.timezone, settings.dateFormat],
   )
 
   const formatTime = useCallback(
     (dateString: string, options?: DateFormatOptions) => {
       return baseFormatTime(dateString, {
         locale: effectiveLocale,
-        timezone: settings.timezone,
+        timezone: settings.general.timezone,
         ...options,
       })
     },
-    [effectiveLocale, settings.timezone],
+    [effectiveLocale, settings.general.timezone],
   )
 
   const formatRelativeDate = useCallback(
     (dateString: string) => {
-      return baseFormatRelativeDate(dateString, urlLocale || settings.language)
+      return baseFormatRelativeDate(dateString, urlLocale || settings.general.language)
     },
-    [urlLocale, settings.language],
+    [urlLocale, settings.general.language],
   )
 
   return {

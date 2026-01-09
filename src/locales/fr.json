@@ -443,7 +443,8 @@
     "paid": "Payé",
     "partialPaid": "Partiel",
     "refunded": "Remboursé",
-    "itemLabel": "commandes"
+    "itemLabel": "commandes",
+    "paymentRequested": "Demande de paiement client"
   },
   "tables": {
     "title": "Gestion des Tables",
@@ -1328,6 +1329,29 @@
       "description": "Configurer les notifications sonores et par email",
       "soundEnabled": "Notifications sonores",
       "soundDescription": "Jouer un son à l'arrivée d'une nouvelle commande",
+      "soundType": "Son de notification",
+      "sounds": {
+        "bell": {
+          "name": "Cloche",
+          "description": "Notification classique avec cloche"
+        },
+        "chime": {
+          "name": "Carillon",
+          "description": "Son de carillon doux"
+        },
+        "ding": {
+          "name": "Ding",
+          "description": "Notification ding rapide"
+        },
+        "pop": {
+          "name": "Pop",
+          "description": "Son pop moderne"
+        },
+        "ping": {
+          "name": "Ping",
+          "description": "Alerte ping perçant"
+        }
+      },
       "emailEnabled": "Notifications par email",
       "emailDescription": "Envoyer un email à l'arrivée d'une nouvelle commande",
       "email": "Email de notification",
