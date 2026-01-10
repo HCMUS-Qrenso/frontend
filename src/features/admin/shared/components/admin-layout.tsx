@@ -191,6 +191,10 @@ export function AdminLayout({ children }: AdminLayoutProps) {
     if (path === '/admin/settings' || path.startsWith('/admin/settings/')) {
       return { title: t('settingsTitle'), description: t('settingsDesc') }
     }
+    // Vouchers
+    if (path === '/admin/vouchers' || path.startsWith('/admin/vouchers/')) {
+      return { title: t('vouchers.title'), description: t('vouchers.description') }
+    }
     // Fallback
     return { title: t('dashboardTitle'), description: t('dashboardDesc') }
   }

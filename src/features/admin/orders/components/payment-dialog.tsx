@@ -14,13 +14,14 @@ import { Label } from '@/src/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/src/components/ui/radio-group'
 import { Textarea } from '@/src/components/ui/textarea'
 import { Separator } from '@/src/components/ui/separator'
-import { Banknote, QrCode, Printer, Loader2 } from 'lucide-react'
+import { Banknote, QrCode, Printer, Loader2, Ticket } from 'lucide-react'
 import { cn } from '@/src/lib/utils'
 import { useCreatePaymentMutation } from '../queries'
 import { printBill } from '../utils/print-bill'
 import { toast } from 'sonner'
 import type { Order, OrderDetail } from '../types/orders'
 import { QrPaymentModal } from './qr-payment-modal'
+import { StaffVoucherSelector } from './staff-voucher-selector'
 import { useTranslations } from 'next-intl'
 
 interface PaymentDialogProps {
@@ -323,16 +324,18 @@ export function PaymentDialog({
               </>
             )}
 
-            {/* Order Summary */}
+            {/* Order Summary with Price Breakdown */}
             <div className="bg-muted/50 rounded-lg border p-4">
               <div className="mb-3 text-sm font-semibold">{t('dialog.orderSummary')}</div>
+              
+              {/* Items list */}
               <div className="space-y-2 text-sm">
                 {order.items.slice(0, 3).map((item, idx) => (
                   <div key={idx} className="flex justify-between">
                     <span className="text-muted-foreground">
                       {item.quantity}x {(item as any).name || (item as any).menuItem?.name}
                     </span>
-                    <span className="font-medium">{item.subtotal.toLocaleString('vi-VN')}₫</span>
+                    <span>{item.subtotal.toLocaleString('vi-VN')}₫</span>
                   </div>
                 ))}
                 {order.items.length > 3 && (
@@ -340,13 +343,75 @@ export function PaymentDialog({
                     +{order.items.length - 3} {t('dialog.moreItems')}
                   </div>
                 )}
-                <Separator />
-                <div className="flex justify-between text-base font-bold">
-                  <span>{t('dialog.total')}:</span>
-                  <span>{order.totalAmount.toLocaleString('vi-VN')}₫</span>
+              </div>
+
+              <Separator className="my-3" />
+
+              {/* Price Breakdown */}
+              <div className="space-y-2 text-sm">
+                {/* Subtotal */}
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">{t('paymentCard.subtotal')}</span>
+                  <span>{order.subtotal.toLocaleString('vi-VN')}₫</span>
+                </div>
+
+                {/* Discount - only if exists */}
+                {order.discountAmount > 0 && (
+                  <div className="flex justify-between text-emerald-600 dark:text-emerald-400">
+                    <span className="flex items-center gap-1">
+                      <Ticket className="h-3 w-3" />
+                      {t('paymentCard.discount')}
+                      {(order as any).voucherCode && (
+                        <span className="text-xs">({(order as any).voucherCode})</span>
+                      )}
+                    </span>
+                    <span>-{order.discountAmount.toLocaleString('vi-VN')}₫</span>
+                  </div>
+                )}
+
+                {/* Tax/VAT */}
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">{t('paymentCard.tax')}</span>
+                  <span>{order.taxAmount.toLocaleString('vi-VN')}₫</span>
                 </div>
               </div>
+
+              <Separator className="my-3" />
+
+              {/* Total */}
+              <div className="flex justify-between text-base font-bold">
+                <span>{t('dialog.total')}:</span>
+                <span>{order.totalAmount.toLocaleString('vi-VN')}₫</span>
+              </div>
             </div>
+
+            {/* Staff Voucher Selector - only before payment is created */}
+            {order.status === 'completed' && !order.payments?.some(p => 
+              !['cancelled', 'failed'].includes(p.status)
+            ) && (
+              <div className="space-y-2">
+                <Label className="text-sm font-medium flex items-center gap-2">
+                  <Ticket className="h-4 w-4" />
+                  {t('dialog.applyVoucher')}
+                </Label>
+                <StaffVoucherSelector
+                  orderId={order.id}
+                  orderSubtotal={order.subtotal}
+                  appliedVoucher={order.discountAmount > 0 ? {
+                    redemptionId: '',
+                    code: (order as any).voucherCode || '',
+                    name: (order as any).voucherCode || 'Voucher',
+                    discountAmount: order.discountAmount,
+                  } : null}
+                  onVoucherApplied={(discount) => {
+                    // Order will be refreshed via query invalidation
+                  }}
+                  onVoucherRemoved={() => {
+                    // Order will be refreshed via query invalidation
+                  }}
+                />
+              </div>
+            )}
           </div>
         </div>
 

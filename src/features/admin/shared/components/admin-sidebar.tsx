@@ -26,6 +26,7 @@ import {
   MapPin,
   Construction,
   ShipIcon,
+  CircleDollarSignIcon,
 } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/src/components/ui/avatar'
 import {
@@ -101,6 +102,7 @@ export function AdminSidebar({
           { icon: MapPin, labelKey: 'menuZones', href: '/admin/tables/zones' },
         ],
       },
+      { icon: CircleDollarSignIcon, labelKey: 'menuVouchers', href: '/admin/vouchers' },
       { icon: Users, labelKey: 'menuStaff', href: '/admin/staff' },
       { icon: BarChart3, labelKey: 'menuReports', href: '/admin/reports', wip: true },
       { icon: Settings, labelKey: 'menuSettings', href: '/admin/settings' },

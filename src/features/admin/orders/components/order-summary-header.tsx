@@ -17,6 +17,18 @@ import {
   TooltipTrigger,
 } from '@/src/components/ui/tooltip'
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/src/components/ui/alert-dialog'
+import { Textarea } from '@/src/components/ui/textarea'
+import { Label } from '@/src/components/ui/label'
+import {
   ArrowLeft,
   Copy,
   Printer,
@@ -27,6 +39,7 @@ import {
   QrCode,
   Bell,
   DollarSign,
+  X,
 } from 'lucide-react'
 import { cn } from '@/src/lib/utils'
 import { OverrideStatusModal } from './override-status-modal'
@@ -34,6 +47,8 @@ import { PaymentDialog } from './payment-dialog'
 import type { OrderDetail } from '../types/orders'
 import { useFormat } from '@/src/hooks/use-format'
 import { useTranslations } from 'next-intl'
+import { useUpdateOrderStatusMutation } from '../queries'
+import { toast } from 'sonner'
 
 const STATUS_COLORS: Record<string, string> = {
   pending: 'bg-slate-100 text-slate-700 dark:bg-slate-500/10 dark:text-slate-400',
@@ -65,13 +80,34 @@ export function OrderSummaryHeader({ order }: OrderSummaryHeaderProps) {
   const [overrideModalOpen, setOverrideModalOpen] = useState(false)
   const { formatRelativeDate } = useFormat()
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false)
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false)
+  const [cancelReason, setCancelReason] = useState('')
   const t = useTranslations('orders')
+  const updateStatusMutation = useUpdateOrderStatusMutation()
 
   const handleCopy = () => {
     navigator.clipboard.writeText(order.orderNumber)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
+
+  const handleCancelOrder = async () => {
+    try {
+      await updateStatusMutation.mutateAsync({
+        id: order.id,
+        payload: {
+          status: 'cancelled',
+          notes: cancelReason || t('header.cancelledByAdmin'),
+        },
+      })
+      toast.success(t('toast.orderCancelled'))
+      setCancelDialogOpen(false)
+      setCancelReason('')
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || t('toast.errorCancelOrder'))
+    }
+  }
+
 
   // Get localized labels
   const getStatusLabel = (status: string) => t(`status.${status}` as any) || status
@@ -210,8 +246,16 @@ export function OrderSummaryHeader({ order }: OrderSummaryHeaderProps) {
                     <DropdownMenuItem disabled={hasPaymentInProcess}>
                       {t('header.changePriority')}
                     </DropdownMenuItem>
-                    <DropdownMenuItem disabled={hasPaymentInProcess} className="text-red-600">
-                      {t('header.cancel')}
+                    <DropdownMenuItem
+                      onClick={() => setCancelDialogOpen(true)}
+                      disabled={
+                        hasPaymentInProcess ||
+                        ['cancelled', 'completed', 'rejected', 'abandoned'].includes(order.status)
+                      }
+                      className="text-red-600 dark:text-red-400"
+                    >
+                      <X className="mr-2 h-4 w-4" />
+                      {t('header.cancelOrder')}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -231,6 +275,40 @@ export function OrderSummaryHeader({ order }: OrderSummaryHeaderProps) {
 
       {/* Payment Dialog */}
       <PaymentDialog open={paymentDialogOpen} onOpenChange={setPaymentDialogOpen} order={order} />
+
+      {/* Cancel Order Dialog */}
+      <AlertDialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('dialog.cancelOrderTitle')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('dialog.cancelOrderDesc', { orderNumber: order.orderNumber })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="space-y-2 py-4">
+            <Label htmlFor="cancel-order-reason">{t('dialog.cancelReason')}</Label>
+            <Textarea
+              id="cancel-order-reason"
+              placeholder={t('dialog.cancelOrderReasonPlaceholder')}
+              value={cancelReason}
+              onChange={(e) => setCancelReason(e.target.value)}
+              rows={3}
+            />
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={updateStatusMutation.isPending}>
+              {t('dialog.no')}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleCancelOrder}
+              disabled={updateStatusMutation.isPending}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              {updateStatusMutation.isPending ? t('dialog.processing') : t('dialog.confirmCancel')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   )
 }

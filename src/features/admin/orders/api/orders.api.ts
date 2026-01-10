@@ -124,4 +124,48 @@ export const ordersApi = {
     const { data } = await apiClient.get<PaymentResponse>(`/payments/check/${transactionId}`)
     return data
   },
+
+  // ============================================
+  // Voucher Operations
+  // ============================================
+
+  /**
+   * Apply voucher to order (staff/waiter)
+   */
+  applyVoucher: async (
+    orderId: string,
+    voucherId: string,
+    notes?: string,
+  ): Promise<ApplyVoucherResponse> => {
+    const { data } = await apiClient.post<ApplyVoucherResponse>(`/orders/${orderId}/vouchers/apply`, {
+      voucherId,
+      notes,
+    })
+    return data
+  },
+
+  /**
+   * Revoke voucher from order (staff/waiter)
+   */
+  revokeVoucher: async (
+    orderId: string,
+    redemptionId: string,
+    reason: string,
+  ): Promise<{ success: boolean; message: string }> => {
+    const { data } = await apiClient.delete<{ success: boolean; message: string }>(
+      `/orders/${orderId}/vouchers/${redemptionId}`,
+      { data: { reason } },
+    )
+    return data
+  },
+}
+
+export interface ApplyVoucherResponse {
+  success: boolean
+  data: {
+    redemptionId: string
+    voucherCode: string
+    voucherName: string
+    discountAmount: number
+  }
 }

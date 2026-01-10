@@ -149,7 +149,51 @@
     "loadingUser": "Loading...",
     "logoutConfirmTitle": "Confirm Logout",
     "logoutConfirmDesc": "Are you sure you want to log out? You will need to log in again to continue.",
-    "loggingOut": "Logging out..."
+    "loggingOut": "Logging out...",
+    "vouchers": {
+      "title": "Voucher Management",
+      "description": "Create and manage discount codes for your restaurant",
+      "status": {
+        "draft": "Draft",
+        "active": "Active",
+        "paused": "Paused",
+        "archived": "Archived"
+      },
+      "kind": {
+        "automatic": "Auto Apply",
+        "staffOnly": "Staff Only",
+        "code": "Enter Code"
+      },
+      "discountType": {
+        "percent": "Percentage (%)",
+        "fixedAmount": "Fixed Amount"
+      },
+      "source": {
+        "auto": "Auto",
+        "waiter": "Staff",
+        "customerCode": "Customer Code",
+        "admin": "Admin"
+      },
+      "actions": {
+        "create": "Create voucher",
+        "view": "View details",
+        "edit": "Edit",
+        "archive": "Archive",
+        "applyVoucher": "Apply voucher"
+      },
+      "staffSelector": {
+        "title": "Apply Voucher",
+        "subtitle": "Select a voucher for this order",
+        "searchPlaceholder": "Search voucher...",
+        "noVouchers": "No vouchers available",
+        "orEnterCode": "Or enter voucher code:"
+      },
+      "applySuccess": "Voucher applied successfully",
+      "applyError": "Could not apply voucher",
+      "revokeSuccess": "Voucher removed",
+      "revokeError": "Could not remove voucher",
+      "invalidCode": "Invalid voucher code"
+    }
   },
   "dashboard": {
     "title": "Dashboard",
@@ -927,6 +971,8 @@
       "payment": "Checkout",
       "initiatePayment": "Checkout",
       "cancel": "Cancel Order",
+      "cancelOrder": "Cancel Order",
+      "cancelledByAdmin": "Cancelled by admin",
       "assignStaff": "Assign to Staff",
       "changePriority": "Change Priority"
     },
@@ -955,6 +1001,9 @@
     "paymentCard": {
       "title": "Payment",
       "method": "Method",
+      "subtotal": "Subtotal",
+      "discount": "Discount",
+      "tax": "VAT",
       "total": "Total",
       "transactionId": "Transaction ID",
       "paidAt": "Paid At",
@@ -1015,7 +1064,13 @@
       "qrPaymentTitle": "QR Code Payment",
       "qrPaymentDesc": "Scan the QR code below to pay",
       "noQrCode": "No QR code available",
-      "createAndPrint": "Create Payment & Print"
+      "createAndPrint": "Create Payment & Print",
+      "cancelOrderTitle": "Confirm Cancel Order",
+      "cancelOrderDesc": "Are you sure you want to cancel order #{orderNumber}? This action cannot be undone.",
+      "cancelOrderReasonPlaceholder": "Enter cancellation reason...",
+      "confirmCancel": "Confirm Cancel",
+      "processing": "Processing...",
+      "applyVoucher": "Apply voucher"
     },
     "toast": {
       "paymentCompleted": "Payment completed",
@@ -1041,7 +1096,9 @@
       "errorNoTransactionId": "No transaction ID",
       "errorOnlyCompleted": "Can only pay for completed orders",
       "errorActivePayment": "Order has an active payment. Please complete or cancel the current payment first.",
-      "selectStatusAndReason": "Please select a new status and enter a reason"
+      "selectStatusAndReason": "Please select a new status and enter a reason",
+      "orderCancelled": "Order cancelled",
+      "errorCancelOrder": "Cannot cancel order"
     },
     "warning": {
       "orderNotCompleted": "Order Not Completed",

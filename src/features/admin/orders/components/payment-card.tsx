@@ -184,12 +184,52 @@ export function PaymentCard({
         {/* Divider */}
         <div className="border-t border-slate-200 dark:border-slate-700" />
 
-        {/* Amount */}
-        <div className="flex items-center justify-between">
-          <p className="text-sm text-slate-500 dark:text-slate-400">{t('paymentCard.total')}</p>
-          <p className="text-xl font-bold text-slate-900 dark:text-white">
-            {formatPrice(totalAmount)}
-          </p>
+        {/* Price Breakdown */}
+        <div className="space-y-2">
+          {/* Subtotal */}
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-slate-500 dark:text-slate-400">{t('paymentCard.subtotal')}</p>
+            <p className="text-sm text-slate-900 dark:text-white">
+              {formatPrice(order?.subtotal || 0)}
+            </p>
+          </div>
+
+          {/* Discount - only show if exists */}
+          {order?.discountAmount > 0 && (
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-slate-500 dark:text-slate-400">
+                {t('paymentCard.discount')}
+                {order?.voucherCode && (
+                  <span className="ml-1 text-xs text-emerald-600 dark:text-emerald-400">
+                    ({order.voucherCode})
+                  </span>
+                )}
+              </p>
+              <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400">
+                -{formatPrice(order.discountAmount)}
+              </p>
+            </div>
+          )}
+
+          {/* Tax/VAT */}
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-slate-500 dark:text-slate-400">{t('paymentCard.tax')}</p>
+            <p className="text-sm text-slate-900 dark:text-white">
+              {formatPrice(order?.taxAmount || 0)}
+            </p>
+          </div>
+
+          <div className="border-t border-slate-200 dark:border-slate-700 pt-2" />
+
+          {/* Total */}
+          <div className="flex items-center justify-between">
+            <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
+              {t('paymentCard.total')}
+            </p>
+            <p className="text-xl font-bold text-slate-900 dark:text-white">
+              {formatPrice(totalAmount)}
+            </p>
+          </div>
         </div>
 
         {hasPayment && payment.transactionId && (
