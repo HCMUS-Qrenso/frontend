@@ -55,7 +55,7 @@ export function StaffVoucherSelector({
   onVoucherRemoved,
   disabled = false,
 }: StaffVoucherSelectorProps) {
-  const t = useTranslations('admin.vouchers');
+  const t = useTranslations('vouchers');
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [applyingId, setApplyingId] = useState<string | null>(null);

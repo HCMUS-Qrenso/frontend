@@ -1,0 +1,44 @@
+{
+  "table": {
+    "available": "Trống",
+    "occupied": "Đang sử dụng",
+    "reserved": "Đã đặt trước",
+    "maintenance": "Bảo trì"
+  },
+  "user": {
+    "active": "Hoạt động",
+    "inactive": "Không hoạt động",
+    "suspended": "Đình chỉ"
+  },
+  "role": {
+    "waiter": "Phục vụ",
+    "kitchen_staff": "Bếp"
+  },
+  "zone": {
+    "active": "Hoạt động",
+    "inactive": "Tạm ẩn"
+  },
+  "order": {
+    "new": "Mới",
+    "accepted": "Đã nhận",
+    "preparing": "Chuẩn bị",
+    "ready": "Sẵn sàng",
+    "served": "Đã phục vụ",
+    "completed": "Hoàn tất",
+    "cancelled": "Đã hủy"
+  },
+  "menuItem": {
+    "available": "Đang bán",
+    "sold_out": "Hết hàng",
+    "unavailable": "Tạm ẩn"
+  },
+  "payment": {
+    "unpaid": "Chưa TT",
+    "paid": "Đã TT",
+    "partial": "TT một phần"
+  },
+  "category": {
+    "active": "Hoạt động",
+    "hidden": "Đang ẩn"
+  }
+}

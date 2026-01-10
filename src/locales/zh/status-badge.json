@@ -1,0 +1,44 @@
+{
+  "table": {
+    "available": "空闲",
+    "occupied": "使用中",
+    "reserved": "已预订",
+    "maintenance": "维护中"
+  },
+  "user": {
+    "active": "活跃",
+    "inactive": "未激活",
+    "suspended": "已停用"
+  },
+  "role": {
+    "waiter": "服务员",
+    "kitchen_staff": "厨房"
+  },
+  "zone": {
+    "active": "活跃",
+    "inactive": "已隐藏"
+  },
+  "order": {
+    "new": "新订单",
+    "accepted": "已接受",
+    "preparing": "制作中",
+    "ready": "已就绪",
+    "served": "已上菜",
+    "completed": "已完成",
+    "cancelled": "已取消"
+  },
+  "menuItem": {
+    "available": "在售",
+    "sold_out": "售罄",
+    "unavailable": "已隐藏"
+  },
+  "payment": {
+    "unpaid": "未付款",
+    "paid": "已付款",
+    "partial": "部分付款"
+  },
+  "category": {
+    "active": "活跃",
+    "hidden": "已隐藏"
+  }
+}

@@ -28,7 +28,7 @@ export function VouchersFilterToolbar({
   onKindChange,
   onCreate,
 }: VouchersFilterToolbarProps) {
-  const t = useTranslations('admin.vouchers')
+  const t = useTranslations('vouchers')
   const [localSearch, setLocalSearch] = useState(search)
 
   // Debounce search

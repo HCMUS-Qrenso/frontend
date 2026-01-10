@@ -47,7 +47,7 @@ interface VoucherDetailPageProps {
 }
 
 export function VoucherDetailPage({ id }: VoucherDetailPageProps) {
-  const t = useTranslations('admin.vouchers');
+  const t = useTranslations('vouchers');
   const router = useRouter();
   const { settings } = useTenantSettings();
 

@@ -5,6 +5,7 @@ import * as DialogPrimitive from '@radix-ui/react-dialog'
 import { X, Loader2 } from 'lucide-react'
 import { cn } from '@/src/lib/utils'
 import { Button } from '@/src/components/ui/button'
+import { useTranslations } from 'next-intl'
 
 /**
  * FormDialog - Shared dialog component for upsert forms
@@ -66,9 +67,9 @@ export function FormDialog({
   description,
   onSubmit,
   isSubmitting = false,
-  submitText = 'Save',
-  cancelText = 'Cancel',
-  loadingText = 'Saving...',
+  submitText,
+  cancelText,
+  loadingText,
   size = 'lg',
   scrollable = false,
   children,
@@ -76,6 +77,13 @@ export function FormDialog({
   submitVariant = 'primary',
   submitDisabled = false,
 }: FormDialogProps) {
+  const t = useTranslations('common')
+  
+  // Use translations as fallbacks for button text
+  const resolvedCancelText = cancelText ?? t('cancel')
+  const resolvedSubmitText = submitText ?? t('save')
+  const resolvedLoadingText = loadingText ?? t('saving')
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     await onSubmit(e)
@@ -158,7 +166,7 @@ export function FormDialog({
                 disabled={isSubmitting}
                 className="rounded-lg"
               >
-                {cancelText}
+                {resolvedCancelText}
               </Button>
               <Button
                 type="submit"
@@ -172,10 +180,10 @@ export function FormDialog({
                 {isSubmitting ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    {loadingText}
+                    {resolvedLoadingText}
                   </>
                 ) : (
-                  submitText
+                  resolvedSubmitText
                 )}
               </Button>
             </div>

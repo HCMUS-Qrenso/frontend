@@ -1,0 +1,23 @@
+{
+  "required": "Trường này là bắt buộc",
+  "invalidEmail": "Email không hợp lệ",
+  "minLength": "Tối thiểu {min} ký tự",
+  "maxLength": "Tối đa {max} ký tự",
+  "networkError": "Lỗi kết nối mạng",
+  "serverError": "Lỗi máy chủ",
+  "unauthorized": "Không có quyền truy cập",
+  "notFound": "Không tìm thấy",
+  "somethingWentWrong": "Đã xảy ra lỗi",
+  "errorTitle": "Đã xảy ra lỗi",
+  "errorMessage": "Xin lỗi, đã có lỗi xảy ra khi tải trang này. Vui lòng thử lại hoặc quay về trang chủ.",
+  "tryAgain": "Thử lại",
+  "goHome": "Về trang chủ",
+  "goBack": "Quay lại",
+  "errorDetails": "Chi tiết lỗi (Development)",
+  "notFoundTitle": "Trang không tìm thấy",
+  "notFoundMessage": "Xin lỗi, trang bạn đang tìm kiếm không tồn tại hoặc đã bị di chuyển. Vui lòng kiểm tra lại đường dẫn hoặc quay về trang chủ.",
+  "adminErrorTitle": "Không thể tải trang",
+  "adminErrorMessage": "Đã xảy ra lỗi khi tải trang quản trị. Vui lòng thử lại hoặc quay về trang tổng quan.",
+  "goDashboard": "Về tổng quan",
+  "loading": "Đang tải..."
+}

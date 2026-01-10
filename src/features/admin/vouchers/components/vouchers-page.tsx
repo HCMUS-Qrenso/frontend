@@ -46,7 +46,7 @@ import type { Voucher, VoucherStatus, VoucherKind } from '../types';
 import { useTenantSettings } from '@/src/contexts/tenant-settings-context';
 
 export function VouchersPage() {
-  const t = useTranslations('admin.vouchers');
+  const t = useTranslations('vouchers');
   const router = useRouter();
   const { settings } = useTenantSettings();
 

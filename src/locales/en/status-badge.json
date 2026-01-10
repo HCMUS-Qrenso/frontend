@@ -1,0 +1,44 @@
+{
+  "table": {
+    "available": "Available",
+    "occupied": "Occupied",
+    "reserved": "Reserved",
+    "maintenance": "Maintenance"
+  },
+  "user": {
+    "active": "Active",
+    "inactive": "Inactive",
+    "suspended": "Suspended"
+  },
+  "role": {
+    "waiter": "Waiter",
+    "kitchen_staff": "Kitchen"
+  },
+  "zone": {
+    "active": "Active",
+    "inactive": "Hidden"
+  },
+  "order": {
+    "new": "New",
+    "accepted": "Accepted",
+    "preparing": "Preparing",
+    "ready": "Ready",
+    "served": "Served",
+    "completed": "Completed",
+    "cancelled": "Cancelled"
+  },
+  "menuItem": {
+    "available": "Available",
+    "sold_out": "Sold out",
+    "unavailable": "Hidden"
+  },
+  "payment": {
+    "unpaid": "Unpaid",
+    "paid": "Paid",
+    "partial": "Partial"
+  },
+  "category": {
+    "active": "Active",
+    "hidden": "Hidden"
+  }
+}

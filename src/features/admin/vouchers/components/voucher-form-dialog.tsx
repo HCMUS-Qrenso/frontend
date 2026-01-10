@@ -53,7 +53,7 @@ const initialFormData = {
 };
 
 export function VoucherFormDialog({ open, onOpenChange, voucher }: VoucherFormDialogProps) {
-  const t = useTranslations('admin.vouchers');
+  const t = useTranslations('vouchers');
   const isEditing = !!voucher;
   const { handleError } = useErrorHandler();
 

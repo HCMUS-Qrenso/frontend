@@ -1,0 +1,375 @@
+{
+  "nav": {
+    "features": "Tính năng",
+    "howItWorks": "Cách hoạt động",
+    "pricing": "Bảng giá",
+    "faq": "FAQ",
+    "contact": "Liên hệ"
+  },
+  "auth": {
+    "login": "Đăng nhập"
+  },
+  "cta": {
+    "bookDemo": "Đặt lịch demo",
+    "bookDemoFree": "Đặt lịch demo miễn phí",
+    "getStarted": "Bắt đầu ngay",
+    "learnMore": "Tìm hiểu thêm",
+    "viewProduct": "Xem sản phẩm",
+    "contactUs": "Liên hệ tư vấn",
+    "startTrial": "Bắt đầu dùng thử",
+    "contactConsult": "Liên hệ tư vấn"
+  },
+  "hero": {
+    "headline1": "Tăng tốc phục vụ, giảm sai sót với",
+    "headline2": "QR Ordering",
+    "headline3": "và quản lý realtime",
+    "subheadline": "Hệ thống hoàn chỉnh cho nhà hàng: Khách order qua QR, bếp nhận đơn tức thì, dashboard quản lý toàn diện, thanh toán linh hoạt.",
+    "socialProof": "Được tin dùng bởi các nhà hàng hàng đầu",
+    "logo": "Logo",
+    "stats": {
+      "orderTime": "Thời gian xử lý order",
+      "orderErrors": "Sai sót đơn hàng",
+      "tableSpeed": "Tốc độ phục vụ bàn"
+    }
+  },
+  "productShowcase": {
+    "title": "Một nền tảng, đầy đủ tính năng",
+    "subtitle": "Từ order đến thanh toán, mọi thứ đều được kết nối",
+    "tabs": {
+      "dashboard": {
+        "label": "Dashboard",
+        "description": "Theo dõi toàn bộ hoạt động nhà hàng realtime"
+      },
+      "kds": {
+        "label": "KDS Bếp",
+        "description": "Màn hình bếp nhận order tức thì, không bỏ sót"
+      },
+      "customer": {
+        "label": "Customer Order",
+        "description": "Khách scan QR và order trực tiếp trên điện thoại"
+      },
+      "tables": {
+        "label": "Tables & QR",
+        "description": "Quản lý bàn, tạo QR code, sơ đồ mặt bằng"
+      }
+    },
+    "images": {
+      "tableList": "Danh sách bàn",
+      "tableCanvas": "Sơ đồ mặt bằng",
+      "tableQR": "Quản lý QR",
+      "dashboardOverview": "Dashboard Overview",
+      "dashboardAnalytics": "Dashboard Analytics"
+    },
+    "placeholder": "Screenshot sẽ được thay thế sau"
+  },
+  "features": {
+    "title": "Tính năng hoàn chỉnh cho nhà hàng hiện đại",
+    "subtitle": "Từ đặt món đến thanh toán, từ bếp đến quản lý",
+    "items": {
+      "dashboard": {
+        "title": "Dashboard vận hành",
+        "description": "Theo dõi orders, doanh thu, bàn trống realtime. Analytics chi tiết theo ngày/tuần/tháng."
+      },
+      "tables": {
+        "title": "Tables & QR Manager",
+        "description": "Tạo QR cho từng bàn, quản lý sơ đồ mặt bằng, theo dõi trạng thái bàn trực quan."
+      },
+      "kds": {
+        "title": "KDS Realtime",
+        "description": "Màn hình bếp nhận order tức thì, sắp xếp ưu tiên, không bỏ sót món."
+      },
+      "customerOrdering": {
+        "title": "Customer Ordering",
+        "description": "Khách scan QR và order ngay trên điện thoại, xem menu đầy đủ, gọi món dễ dàng."
+      },
+      "payment": {
+        "title": "Payment linh hoạt",
+        "description": "Tích hợp VNPay, MoMo, ZaloPay, Stripe. Thanh toán sau bữa ăn hoặc online."
+      },
+      "analytics": {
+        "title": "Analytics & Reports",
+        "description": "Báo cáo doanh thu, món bán chạy, hiệu suất phục vụ. Export Excel/PDF."
+      },
+      "roles": {
+        "title": "Roles & Permissions",
+        "description": "Phân quyền chi tiết: Admin, Thu ngân, Waiter, Bếp. Bảo mật đa cấp."
+      },
+      "multiLang": {
+        "title": "Multi-language & Branch",
+        "description": "Hỗ trợ đa ngôn ngữ, quản lý nhiều chi nhánh trên một tài khoản."
+      }
+    }
+  },
+  "howItWorks": {
+    "title": "Cách hoạt động đơn giản",
+    "subtitle": "4 bước để số hoá nhà hàng của bạn",
+    "steps": {
+      "step1": {
+        "title": "Setup menu & bàn",
+        "description": "Tạo menu món ăn, categories, giá. Thiết lập bàn và tạo QR code."
+      },
+      "step2": {
+        "title": "Khách scan QR",
+        "description": "Khách quét QR trên bàn, xem menu và order trực tiếp trên điện thoại."
+      },
+      "step3": {
+        "title": "Bếp & Waiter nhận realtime",
+        "description": "Order hiển thị ngay trên KDS bếp và dashboard waiter. Xử lý tức thì."
+      },
+      "step4": {
+        "title": "Phục vụ & Thanh toán",
+        "description": "Phục vụ món ăn theo thứ tự. Khách thanh toán sau bữa ăn, linh hoạt."
+      }
+    }
+  },
+  "builtForRoles": {
+    "title": "Được thiết kế cho từng vai trò",
+    "subtitle": "Giải quyết đúng vấn đề của từng người trong nhà hàng",
+    "painPointsTitle": "Vấn đề thường gặp",
+    "solutionsTitle": "Qrenso giải quyết",
+    "roles": {
+      "owner": {
+        "label": "Chủ nhà hàng",
+        "painPoints": [
+          "Khó theo dõi doanh thu realtime",
+          "Sai sót order gây phàn nàn",
+          "Khó quản lý nhiều bàn cùng lúc"
+        ],
+        "solutions": [
+          "Dashboard tổng quan toàn diện",
+          "Analytics chi tiết theo thời gian",
+          "Báo cáo tự động, export dễ dàng"
+        ]
+      },
+      "cashier": {
+        "label": "Thu ngân",
+        "painPoints": [
+          "Order viết tay dễ sai sót",
+          "Tính tiền lâu, khách chờ lâu",
+          "Khó đối chiếu cuối ca"
+        ],
+        "solutions": [
+          "Order tự động từ khách",
+          "Tính tiền tức thì, chính xác",
+          "Report cuối ca tự động"
+        ]
+      },
+      "waiter": {
+        "label": "Phục vụ",
+        "painPoints": [
+          "Chạy qua lại ghi order",
+          "Khách gọi nhiều, không kịp",
+          "Quên order, bàn nào order gì"
+        ],
+        "solutions": [
+          "Khách tự order qua QR",
+          "Nhận thông báo order mới realtime",
+          "Xem lịch sử order từng bàn"
+        ]
+      },
+      "chef": {
+        "label": "Bếp",
+        "painPoints": [
+          "Order viết tay khó đọc",
+          "Không biết ưu tiên món nào",
+          "Bỏ sót order khi quá tải"
+        ],
+        "solutions": [
+          "KDS hiển thị rõ ràng",
+          "Sắp xếp ưu tiên tự động",
+          "Countdown thời gian chế biến"
+        ]
+      }
+    }
+  },
+  "testimonials": {
+    "title": "Khách hàng nói gì về Qrenso",
+    "subtitle": "Hàng trăm nhà hàng đã tin dùng và hài lòng",
+    "items": [
+      {
+        "name": "Nguyễn Minh Tuấn",
+        "role": "Chủ nhà hàng",
+        "restaurant": "Nhà hàng Phố Cổ",
+        "quote": "Sau khi dùng Qrenso, doanh thu tăng 30% do phục vụ nhanh hơn. Sai sót order giảm gần như về 0. Rất hài lòng!"
+      },
+      {
+        "name": "Trần Thị Hương",
+        "role": "Quản lý",
+        "restaurant": "Quán Ăn Ngon",
+        "quote": "KDS giúp bếp không bỏ sót món nào. Dashboard realtime giúp tôi theo dõi mọi thứ từ xa. Tiện lợi vô cùng!"
+      },
+      {
+        "name": "Lê Hoàng Nam",
+        "role": "Chủ chuỗi nhà hàng",
+        "restaurant": "Food Chain Co.",
+        "quote": "Quản lý 5 chi nhánh trên một tài khoản. Báo cáo tổng hợp giúp tôi ra quyết định nhanh. Đáng đầu tư!"
+      }
+    ]
+  },
+  "pricing": {
+    "title": "Bảng giá minh bạch",
+    "subtitle": "Chọn gói phù hợp với quy mô nhà hàng của bạn",
+    "perMonth": "tháng",
+    "trialNote": "Tất cả gói đều có 14 ngày dùng thử miễn phí. Không yêu cầu thẻ tín dụng.",
+    "plans": {
+      "starter": {
+        "name": "Starter",
+        "price": "1.990.000",
+        "description": "Phù hợp cho quán nhỏ, mới bắt đầu",
+        "cta": "Bắt đầu dùng thử",
+        "features": [
+          "1 chi nhánh",
+          "Tối đa 20 bàn",
+          "QR Ordering cơ bản",
+          "Dashboard & KDS",
+          "Báo cáo cơ bản",
+          "Hỗ trợ email"
+        ]
+      },
+      "pro": {
+        "name": "Pro",
+        "price": "3.990.000",
+        "description": "Cho nhà hàng vừa & lớn",
+        "cta": "Đặt lịch demo",
+        "features": [
+          "Tối đa 3 chi nhánh",
+          "Không giới hạn bàn",
+          "QR Ordering đầy đủ",
+          "Dashboard & KDS realtime",
+          "Analytics nâng cao",
+          "Payment gateway",
+          "Multi-language",
+          "Hỗ trợ ưu tiên 24/7"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "price": "Liên hệ",
+        "description": "Giải pháp cho chuỗi nhà hàng",
+        "cta": "Liên hệ tư vấn",
+        "features": [
+          "Không giới hạn chi nhánh",
+          "Không giới hạn bàn",
+          "Tất cả tính năng Pro",
+          "Tùy chỉnh theo yêu cầu",
+          "API riêng",
+          "Đào tạo on-site",
+          "Account manager riêng"
+        ]
+      }
+    }
+  },
+  "faq": {
+    "title": "Câu hỏi thường gặp",
+    "subtitle": "Giải đáp các thắc mắc phổ biến về Qrenso",
+    "items": [
+      {
+        "question": "Setup QR ordering mất bao lâu?",
+        "answer": "Trung bình 2-3 giờ. Bạn chỉ cần thêm menu, tạo bàn và QR code. Chúng tôi có hướng dẫn chi tiết và video tutorial."
+      },
+      {
+        "question": "Có phí giao dịch thanh toán không?",
+        "answer": "Phí gateway do đối tác thanh toán (VNPay, MoMo, ZaloPay) quy định, thường 1-3%. Qrenso không thu thêm phí."
+      },
+      {
+        "question": "Chạy trên thiết bị nào?",
+        "answer": "Qrenso là web app, chạy trên mọi thiết bị có trình duyệt: laptop, tablet, điện thoại. KDS nên dùng tablet hoặc màn hình lớn."
+      },
+      {
+        "question": "Có hỗ trợ nhiều chi nhánh không?",
+        "answer": "Có. Gói Pro hỗ trợ tối đa 3 chi nhánh, gói Enterprise không giới hạn. Mỗi chi nhánh có dashboard riêng."
+      },
+      {
+        "question": "Làm sao import menu nhanh?",
+        "answer": "Bạn có thể import từ file Excel theo template có sẵn. Hoặc nhập thủ công nhanh qua form đơn giản."
+      },
+      {
+        "question": "Dữ liệu có an toàn không?",
+        "answer": "Dữ liệu được mã hoá và backup tự động hàng ngày. Chúng tôi tuân thủ chuẩn bảo mật quốc tế ISO 27001."
+      },
+      {
+        "question": "Có hỗ trợ khi gặp sự cố không?",
+        "answer": "Gói Starter có hỗ trợ email, gói Pro có hỗ trợ 24/7 qua chat/phone. Enterprise có account manager riêng."
+      },
+      {
+        "question": "Có thể hủy bất cứ lúc nào không?",
+        "answer": "Có. Không cam kết dài hạn. Bạn có thể hủy bất cứ lúc nào, dữ liệu được giữ 30 ngày để export."
+      }
+    ]
+  },
+  "finalCta": {
+    "title": "Sẵn sàng số hoá nhà hàng của bạn?",
+    "subtitle": "Hơn 500+ nhà hàng đã tăng tốc phục vụ và giảm sai sót với Qrenso. Bắt đầu ngay hôm nay!",
+    "trustBadge": "Dùng thử 14 ngày miễn phí • Không yêu cầu thẻ tín dụng • Hỗ trợ 24/7"
+  },
+  "footer": {
+    "tagline": "Giải pháp QR Ordering & quản lý nhà hàng toàn diện",
+    "product": {
+      "title": "Sản phẩm",
+      "features": "Tính năng",
+      "pricing": "Bảng giá",
+      "caseStudies": "Case studies",
+      "roadmap": "Roadmap"
+    },
+    "company": {
+      "title": "Công ty",
+      "about": "Về chúng tôi",
+      "blog": "Blog",
+      "careers": "Careers",
+      "contact": "Liên hệ"
+    },
+    "legal": {
+      "title": "Pháp lý",
+      "terms": "Điều khoản sử dụng",
+      "privacy": "Chính sách bảo mật",
+      "refund": "Chính sách hoàn tiền"
+    },
+    "copyright": "© 2025 Qrenso. All rights reserved."
+  },
+  "contact": {
+    "pageTitle": "Liên hệ với Qrenso",
+    "pageSubtitle": "Để lại thông tin để đội ngũ Qrenso tư vấn giải pháp phù hợp nhất cho nhà hàng của bạn",
+    "whatYouGet": "Bạn sẽ nhận được gì?",
+    "benefit1": "Demo trực tiếp hệ thống trong 15 phút",
+    "benefit2": "Tư vấn miễn phí về quy trình vận hành",
+    "benefit3": "Báo giá chi tiết cho nhà hàng của bạn",
+    "benefit4": "Hỗ trợ triển khai và đào tạo nhân viên",
+    "contactInfo": "Thông tin liên hệ",
+    "hotline": "Hotline",
+    "email": "Email",
+    "office": "Văn phòng",
+    "workingHours": "Giờ làm việc",
+    "workingHoursValue": "T2 - T6: 8h30 - 18h00",
+    "sendRequest": "Gửi yêu cầu",
+    "fullName": "Họ và tên",
+    "workEmail": "Email công việc",
+    "phone": "Số điện thoại",
+    "restaurantName": "Tên nhà hàng",
+    "city": "Khu vực / Thành phố",
+    "branches": "Số chi nhánh / Số bàn",
+    "needs": "Nhu cầu",
+    "selectNeeds": "Chọn nhu cầu của bạn",
+    "trial": "Dùng thử",
+    "demo": "Đặt lịch demo",
+    "consultation": "Tư vấn triển khai",
+    "other": "Khác",
+    "notes": "Ghi chú",
+    "notesPlaceholder": "Bạn có câu hỏi hoặc yêu cầu đặc biệt nào không?",
+    "optional": "Tùy chọn",
+    "required": "*",
+    "submitting": "Đang gửi...",
+    "submit": "Gửi yêu cầu",
+    "privacyNote": "Chúng tôi chỉ sử dụng thông tin của bạn để liên hệ tư vấn và không chia sẻ cho bên thứ ba.",
+    "successTitle": "Cảm ơn bạn đã liên hệ!",
+    "successMessage": "Đội ngũ Qrenso sẽ liên hệ với bạn trong vòng 24 giờ làm việc.",
+    "backToHome": "Quay về trang chủ",
+    "enterFullName": "Vui lòng nhập họ và tên",
+    "fullNameMinLength": "Họ tên phải có ít nhất 2 ký tự",
+    "enterEmail": "Vui lòng nhập email",
+    "invalidEmailFormat": "Email không hợp lệ",
+    "enterPhone": "Vui lòng nhập số điện thoại",
+    "invalidPhoneFormat": "Số điện thoại không hợp lệ",
+    "enterRestaurantName": "Vui lòng nhập tên nhà hàng",
+    "errorOccurred": "Có lỗi xảy ra. Vui lòng thử lại sau."
+  }
+}

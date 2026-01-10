@@ -1,0 +1,167 @@
+{
+  "title": "设置",
+  "subtitle": "管理 {name} 的设置",
+  "saveChanges": "保存",
+  "saving": "保存中...",
+  "saveSuccess": "设置更新成功",
+  "saveError": "无法更新设置",
+  "loadError": "无法加载设置。请重试。",
+  "general": {
+    "title": "常规设置",
+    "description": "基本信息和显示格式",
+    "currency": "货币",
+    "currencyPlaceholder": "选择货币",
+    "timezone": "时区",
+    "timezonePlaceholder": "选择时区",
+    "language": "语言",
+    "languagePlaceholder": "选择语言",
+    "dateFormat": "日期格式",
+    "dateFormatPlaceholder": "选择格式",
+    "phone": "联系电话",
+    "phonePlaceholder": "+86 138 0000 0000",
+    "contactEmail": "联系邮箱",
+    "contactEmailPlaceholder": "contact@restaurant.com"
+  },
+  "tax": {
+    "title": "税率设置",
+    "description": "配置增值税和价格显示",
+    "rate": "税率 (%)",
+    "label": "税标签",
+    "labelPlaceholder": "增值税",
+    "inclusive": "含税价格",
+    "inclusiveDescription": "如果启用，菜单价格已包含税。否则，税将额外添加。"
+  },
+  "serviceCharge": {
+    "title": "服务费",
+    "description": "配置自动服务费",
+    "enabled": "启用服务费",
+    "enabledDescription": "自动将服务费添加到账单",
+    "rate": "费率 (%)",
+    "minParty": "最小用餐人数",
+    "minPartyPlaceholder": "适用于所有桌台",
+    "minPartyHint": "留空则适用于所有桌台",
+    "taxable": "服务费需征税",
+    "taxableDescription": "对服务费征税"
+  },
+  "order": {
+    "title": "订单设置",
+    "description": "自定义订单流程和会话",
+    "minValue": "最小订单金额",
+    "minValuePlaceholder": "无最低要求",
+    "minValueHint": "如无要求请留空",
+    "prepTime": "准备时间（分钟）",
+    "prepTimeHint": "用于没有自定义准备时间的菜品",
+    "sessionTimeout": "会话超时（分钟）",
+    "sessionTimeoutHint": "桌台会话将在此时间后过期",
+    "allowSpecialInstructions": "允许特殊要求",
+    "allowSpecialInstructionsDescription": "顾客可以为每个菜品添加备注",
+    "requireGuestCount": "要求用餐人数",
+    "requireGuestCountDescription": "在会话开始时要求输入用餐人数"
+  },
+  "notifications": {
+    "title": "通知",
+    "description": "配置声音和邮件通知",
+    "soundEnabled": "声音通知",
+    "soundDescription": "新订单时播放声音",
+    "soundType": "通知声音",
+    "sounds": {
+      "bell": {
+        "name": "铃声",
+        "description": "经典铃声通知"
+      },
+      "chime": {
+        "name": "和弦",
+        "description": "柔和的和弦声"
+      },
+      "ding": {
+        "name": "叮",
+        "description": "快速叮声"
+      },
+      "pop": {
+        "name": "弹出",
+        "description": "现代弹出声"
+      },
+      "ping": {
+        "name": "叮当",
+        "description": "清脆的叮当声"
+      }
+    },
+    "emailEnabled": "邮件通知",
+    "emailDescription": "新订单时发送邮件",
+    "email": "通知邮箱",
+    "emailPlaceholder": "orders@restaurant.com"
+  },
+  "receipt": {
+    "title": "发票与收据",
+    "description": "自定义发票显示内容",
+    "invoicePrefix": "发票前缀",
+    "invoicePrefixPlaceholder": "QR-",
+    "invoicePrefixHint": "示例：QR-001, INV-001",
+    "header": "收据头部文字",
+    "headerPlaceholder": "感谢光临！",
+    "footer": "收据底部文字",
+    "footerPlaceholder": "欢迎再次光临！",
+    "showLogo": "显示标志",
+    "showLogoDescription": "在收据上打印餐厅标志"
+  },
+  "operatingHours": {
+    "title": "营业时间",
+    "description": "配置每天的营业时间",
+    "monday": "周一",
+    "tuesday": "周二",
+    "wednesday": "周三",
+    "thursday": "周四",
+    "friday": "周五",
+    "saturday": "周六",
+    "sunday": "周日",
+    "closed": "休息",
+    "addSlot": "添加时段",
+    "copyTo": "复制",
+    "copyToAll": "复制到所有天",
+    "copyToWeekdays": "复制到工作日",
+    "copyToWeekend": "复制到周末"
+  },
+  "qrPayment": {
+    "title": "二维码支付设置",
+    "description": "配置 PayOS 集成用于二维码支付",
+    "warningMessage": "需要配置二维码支付才能为顾客启用二维码支付",
+    "downloadInstructions": "下载配置说明",
+    "clientId": "PayOS Client ID",
+    "clientIdPlaceholder": "输入您的 PayOS Client ID",
+    "clientIdDescription": "用于 API 认证的 PayOS 客户端标识符",
+    "apiKey": "PayOS API Key",
+    "apiKeyPlaceholder": "输入您的 PayOS API Key",
+    "apiKeyDescription": "用于安全支付处理的 PayOS API 密钥",
+    "checksumKey": "PayOS Checksum Key",
+    "checksumKeyPlaceholder": "输入您的 PayOS Checksum Key",
+    "checksumKeyDescription": "用于支付验证的 PayOS 校验密钥"
+  },
+  "restaurantInfo": {
+    "title": "餐厅信息",
+    "description": "更新您餐厅的名称、地址和图片",
+    "name": "餐厅名称",
+    "namePlaceholder": "输入餐厅名称",
+    "address": "地址",
+    "addressPlaceholder": "输入餐厅地址",
+    "image": "餐厅图片",
+    "clickToUpload": "点击上传图片",
+    "imageHint": "JPG, PNG, GIF - 最大 5MB",
+    "changeImage": "更换图片",
+    "removeImage": "删除图片",
+    "uploading": "上传中...",
+    "uploadSuccess": "图片上传成功",
+    "uploadError": "图片上传失败",
+    "invalidFileType": "请选择有效的图片文件",
+    "fileTooLarge": "图片文件过大（最大 5MB）"
+  },
+  "sidebar": {
+    "general": "常规",
+    "tax": "税率",
+    "serviceCharge": "服务费",
+    "order": "订单",
+    "notifications": "通知",
+    "receipt": "发票",
+    "operatingHours": "营业时间",
+    "qrPayment": "二维码支付"
+  }
+}

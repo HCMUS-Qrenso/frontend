@@ -1,0 +1,27 @@
+{
+  "validation": {
+    "required": "Ce champ est obligatoire",
+    "email": "Veuillez entrer une adresse email valide",
+    "minLength": "Ce champ doit avoir au moins {min} caractères",
+    "maxLength": "Ce champ ne doit pas dépasser {max} caractères",
+    "passwordMatch": "Les mots de passe ne correspondent pas",
+    "phoneNumber": "Veuillez entrer un numéro de téléphone valide"
+  },
+  "network": {
+    "offline": "Vous êtes hors ligne",
+    "connectionError": "Erreur de connexion réseau",
+    "timeout": "La requête a expiré",
+    "serverError": "Erreur serveur, veuillez réessayer",
+    "unexpectedError": "Une erreur inattendue est survenue"
+  },
+  "auth": {
+    "sessionExpired": "Votre session a expiré, veuillez vous reconnecter",
+    "unauthorized": "Vous n'avez pas les permissions pour cette action",
+    "forbidden": "Accès refusé"
+  },
+  "notFound": {
+    "title": "Page non trouvée",
+    "message": "La page que vous recherchez n'existe pas ou a été déplacée",
+    "backToHome": "Retour à l'accueil"
+  }
+}
