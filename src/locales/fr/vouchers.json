@@ -51,7 +51,8 @@
     "view": "Voir les détails",
     "edit": "Modifier",
     "archive": "Archiver",
-    "applyVoucher": "Appliquer le bon"
+    "applyVoucher": "Appliquer le bon",
+    "addAnotherVoucher": "Ajouter un autre bon"
   },
   "pagination": {
     "previous": "Précédent",

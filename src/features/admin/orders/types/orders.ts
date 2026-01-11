@@ -237,6 +237,12 @@ export interface OrderDetail {
   completedAt?: string
   statusHistory: StatusHistoryEntry[]
   payments: PaymentRecord[]
+  appliedVouchers?: Array<{
+    redemptionId: string
+    voucherCode: string
+    voucherName: string
+    discountAmount: number
+  }>
   createdAt: string
   updatedAt: string
 }

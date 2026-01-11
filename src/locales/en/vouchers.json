@@ -51,7 +51,8 @@
     "view": "View details",
     "edit": "Edit",
     "archive": "Archive",
-    "applyVoucher": "Apply voucher"
+    "applyVoucher": "Apply voucher",
+    "addAnotherVoucher": "Add another voucher"
   },
   "pagination": {
     "previous": "Previous",

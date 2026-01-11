@@ -1,6 +1,9 @@
 /**
  * Socket Event Notification Configuration
  * Maps socket events to toast notifications with consistent styling
+ * 
+ * NOTE: This file now uses translation keys from socket.json
+ * The actual translation is handled by notify-from-socket-hook.ts
  */
 
 import type { ExternalToast } from 'sonner'
@@ -13,24 +16,14 @@ export type NotificationSeverity = 'success' | 'info' | 'warning' | 'error'
 
 export interface SocketNotificationConfig {
   severity: NotificationSeverity
-  title: (data: any) => string
-  description?: (data: any) => string | undefined
+  /** Translation key for title (from socket namespace) */
+  titleKey: string
+  /** Translation key for description (from socket namespace) */
+  descriptionKey?: string
+  /** Data key mappings for interpolation, e.g., { orderNumber: 'orderNumber' } */
+  titleParams?: (data: any) => Record<string, string | number | undefined>
+  descriptionParams?: (data: any) => Record<string, string | number | undefined>
   duration?: number
-  icon?: string
-}
-
-// ============================================
-// Item Status Labels
-// ============================================
-
-export const ITEM_STATUS_LABELS: Record<string, string> = {
-  pending: 'Chờ xử lý',
-  accepted: 'Đã nhận',
-  preparing: 'Đang làm',
-  ready: 'Sẵn sàng',
-  served: 'Đã phục vụ',
-  cancelled: 'Đã hủy',
-  returned: 'Trả lại',
 }
 
 // ============================================
@@ -41,98 +34,104 @@ export const SOCKET_EVENT_NOTIFICATIONS: Record<string, SocketNotificationConfig
   // ========== Order Events ==========
   'order:created': {
     severity: 'success',
-    title: (data) => `Đơn mới: ${data.orderNumber || 'N/A'}`,
-    description: (data) => (data.table?.tableNumber ? `Bàn ${data.table.tableNumber}` : undefined),
+    titleKey: 'order.new',
+    titleParams: (data) => ({ orderNumber: data.orderNumber || 'N/A' }),
+    descriptionKey: 'order.table',
+    descriptionParams: (data) => ({ tableNumber: data.table?.tableNumber }),
     duration: 5000,
   },
 
   'order:updated': {
     severity: 'info',
-    title: (data) => `Cập nhật: ${data.orderNumber || 'N/A'}`,
-    description: (data) => (data.status ? `Trạng thái: ${data.status}` : undefined),
+    titleKey: 'order.updated',
+    titleParams: (data) => ({ orderNumber: data.orderNumber || 'N/A' }),
+    descriptionKey: 'order.status',
+    descriptionParams: (data) => ({ status: data.status }),
     duration: 3000,
   },
 
   'order:items:added': {
     severity: 'info',
-    title: (data) => `Thêm món: ${data.orderNumber || 'N/A'}`,
-    description: (data) => (data.itemCount ? `${data.itemCount} món mới` : undefined),
+    titleKey: 'order.itemsAdded',
+    titleParams: (data) => ({ orderNumber: data.orderNumber || 'N/A' }),
+    descriptionKey: 'order.newItems',
+    descriptionParams: (data) => ({ count: data.itemCount }),
     duration: 3000,
   },
 
   // ========== Item Status Events ==========
   'item:status:accepted': {
     severity: 'info',
-    title: (data) => `Đã nhận: ${data.menuItemName || 'Món ăn'}`,
+    titleKey: 'item.accepted',
+    titleParams: (data) => ({ itemName: data.menuItemName }),
     duration: 3000,
   },
 
   'item:status:preparing': {
     severity: 'info',
-    title: (data) => `Đang làm: ${data.menuItemName || 'Món ăn'}`,
+    titleKey: 'item.preparing',
+    titleParams: (data) => ({ itemName: data.menuItemName }),
     duration: 3000,
   },
 
   'item:status:ready': {
     severity: 'success',
-    title: (data) => `Sẵn sàng: ${data.menuItemName || 'Món ăn'}`,
-    description: (data) => (data.table?.tableNumber ? `Bàn ${data.table.tableNumber}` : undefined),
+    titleKey: 'item.ready',
+    titleParams: (data) => ({ itemName: data.menuItemName }),
+    descriptionKey: 'order.table',
+    descriptionParams: (data) => ({ tableNumber: data.table?.tableNumber }),
     duration: 4000,
   },
 
   'item:status:served': {
     severity: 'success',
-    title: (data) => `Đã phục vụ: ${data.menuItemName || 'Món ăn'}`,
+    titleKey: 'item.served',
+    titleParams: (data) => ({ itemName: data.menuItemName }),
     duration: 3000,
   },
 
   'item:status:cancelled': {
     severity: 'warning',
-    title: (data) => `Đã hủy: ${data.menuItemName || 'Món ăn'}`,
+    titleKey: 'item.cancelled',
+    titleParams: (data) => ({ itemName: data.menuItemName }),
     duration: 4000,
   },
 
   // ========== Connection Events ==========
   'socket:connected': {
     severity: 'success',
-    title: () => 'Đã kết nối realtime',
+    titleKey: 'socket.connected',
     duration: 2000,
   },
 
   'socket:disconnected': {
     severity: 'warning',
-    title: () => 'Mất kết nối realtime',
-    description: () => 'Đang thử kết nối lại...',
+    titleKey: 'socket.disconnected',
+    descriptionKey: 'socket.reconnecting',
     duration: 4000,
   },
 
   'socket:error': {
     severity: 'error',
-    title: () => 'Lỗi kết nối',
-    description: (data) => data.message || 'Không thể kết nối đến server',
+    titleKey: 'socket.error',
+    descriptionKey: 'socket.errorMessage',
     duration: 5000,
   },
 
   // ========== Payment Events ==========
   'payment:updated': {
     severity: 'success',
-    title: (data) => 'Thanh toán thành công',
-    description: (data) => (data.orderId ? `Đơn hàng đã được thanh toán` : undefined),
+    titleKey: 'payment.updated',
+    descriptionKey: 'payment.orderPaid',
     duration: 5000,
   },
 
   // ========== Bill Request Events ==========
   'bill:requested': {
     severity: 'warning',
-    title: (data) => `🔔 Yêu cầu tính tiền - Bàn ${data.tableNumber || 'N/A'}`,
-    description: (data) => {
-      const parts = []
-      if (data.zoneName) parts.push(data.zoneName)
-      if (data.orderNumber) parts.push(`#${data.orderNumber}`)
-      if (data.notes) parts.push(data.notes)
-      return parts.length > 0 ? parts.join(' • ') : undefined
-    },
-    duration: 8000, // Longer duration for important notification
+    titleKey: 'bill.requested',
+    titleParams: (data) => ({ tableNumber: data.tableNumber || 'N/A' }),
+    duration: 8000,
   },
 }
 

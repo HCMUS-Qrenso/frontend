@@ -51,7 +51,8 @@
     "view": "Xem chi tiết",
     "edit": "Chỉnh sửa",
     "archive": "Lưu trữ",
-    "applyVoucher": "Áp dụng voucher"
+    "applyVoucher": "Áp dụng voucher",
+    "addAnotherVoucher": "Thêm voucher khác"
   },
   "pagination": {
     "previous": "Trước",

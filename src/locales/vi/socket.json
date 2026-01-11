@@ -1,0 +1,42 @@
+{
+  "socket": {
+    "connected": "Đã kết nối realtime",
+    "disconnected": "Mất kết nối realtime",
+    "reconnecting": "Đang thử kết nối lại...",
+    "error": "Lỗi kết nối",
+    "errorMessage": "Không thể kết nối đến server"
+  },
+  "order": {
+    "new": "Đơn mới: {orderNumber}",
+    "updated": "Cập nhật: {orderNumber}",
+    "itemsAdded": "Thêm món: {orderNumber}",
+    "newItems": "{count} món mới",
+    "table": "Bàn {tableNumber}",
+    "status": "Trạng thái: {status}"
+  },
+  "item": {
+    "accepted": "Đã nhận: {itemName}",
+    "preparing": "Đang làm: {itemName}",
+    "ready": "Sẵn sàng: {itemName}",
+    "served": "Đã phục vụ: {itemName}",
+    "cancelled": "Đã hủy: {itemName}",
+    "returned": "Trả lại: {itemName}",
+    "defaultName": "Món ăn"
+  },
+  "payment": {
+    "updated": "Thanh toán thành công",
+    "orderPaid": "Đơn hàng đã được thanh toán"
+  },
+  "bill": {
+    "requested": "🔔 Yêu cầu tính tiền - Bàn {tableNumber}"
+  },
+  "itemStatus": {
+    "pending": "Chờ xử lý",
+    "accepted": "Đã nhận",
+    "preparing": "Đang làm",
+    "ready": "Sẵn sàng",
+    "served": "Đã phục vụ",
+    "cancelled": "Đã hủy",
+    "returned": "Trả lại"
+  }
+}

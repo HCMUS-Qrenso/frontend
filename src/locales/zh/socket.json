@@ -1,0 +1,42 @@
+{
+  "socket": {
+    "connected": "实时连接已建立",
+    "disconnected": "实时连接已断开",
+    "reconnecting": "正在重新连接...",
+    "error": "连接错误",
+    "errorMessage": "无法连接到服务器"
+  },
+  "order": {
+    "new": "新订单: {orderNumber}",
+    "updated": "已更新: {orderNumber}",
+    "itemsAdded": "已添加菜品: {orderNumber}",
+    "newItems": "{count} 个新菜品",
+    "table": "桌号 {tableNumber}",
+    "status": "状态: {status}"
+  },
+  "item": {
+    "accepted": "已接单: {itemName}",
+    "preparing": "制作中: {itemName}",
+    "ready": "已完成: {itemName}",
+    "served": "已上菜: {itemName}",
+    "cancelled": "已取消: {itemName}",
+    "returned": "已退回: {itemName}",
+    "defaultName": "菜品"
+  },
+  "payment": {
+    "updated": "支付成功",
+    "orderPaid": "订单已支付"
+  },
+  "bill": {
+    "requested": "🔔 结账请求 - 桌号 {tableNumber}"
+  },
+  "itemStatus": {
+    "pending": "待处理",
+    "accepted": "已接单",
+    "preparing": "制作中",
+    "ready": "已完成",
+    "served": "已上菜",
+    "cancelled": "已取消",
+    "returned": "已退回"
+  }
+}

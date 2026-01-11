@@ -8,6 +8,7 @@ import { routing } from '@/src/i18n/routing'
 import { QueryProvider } from '@/src/providers/query-provider'
 import { ThemeProvider } from '@/src/components/theme-provider'
 import { Toaster } from '@/src/components/ui/sonner'
+import { LocaleSync } from '@/src/components/locale-sync'
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin', 'vietnamese'] })
@@ -39,6 +40,7 @@ export default async function LocaleLayout({ children, params }: Props) {
           disableTransitionOnChange
         >
           <NextIntlClientProvider messages={messages} locale={locale}>
+            <LocaleSync />
             <QueryProvider>{children}</QueryProvider>
           </NextIntlClientProvider>
           <Toaster />

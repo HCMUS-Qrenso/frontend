@@ -15,6 +15,7 @@ import settings from './settings.json'
 import profile from './profile.json'
 import onboarding from './onboarding.json'
 import vouchers from './vouchers.json'
+import socket from './socket.json'
 
 export default {
   common,
@@ -34,5 +35,6 @@ export default {
   profile,
   onboarding,
   vouchers,
+  socket,
 }
 

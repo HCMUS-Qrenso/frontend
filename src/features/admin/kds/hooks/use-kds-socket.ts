@@ -8,7 +8,7 @@ import { io, Socket } from 'socket.io-client'
 import { useQueryClient, QueryClient } from '@tanstack/react-query'
 import { kdsQueryKeys } from '../queries/kds.keys'
 import { useAuthStore } from '@/src/store/auth-store'
-import { notifyFromSocket, notifySocketError } from '@/src/lib/socket'
+import { useSocketNotification } from '@/src/lib/socket'
 import type { KdsOrdersResponse, OrderItemStatus } from '../types/kds.types'
 import { useTenantSettings } from '@/src/contexts/tenant-settings-context'
 import { playNotificationSound } from '../../shared/utils'
@@ -75,14 +75,21 @@ export function useKdsSocket(options: UseKdsSocketOptions = {}): UseKdsSocketRet
 
   const { settings: tenantSettings } = useTenantSettings()
 
+  // Get localized notification functions
+  const { notifyFromSocket, notifySocketError } = useSocketNotification()
+
   // Use refs to avoid dependency changes causing reconnect loops
   const queryClientRef = useRef<QueryClient>(queryClient)
   const showNotificationsRef = useRef(showNotifications)
+  const notifyFromSocketRef = useRef(notifyFromSocket)
+  const notifySocketErrorRef = useRef(notifySocketError)
 
   useEffect(() => {
     queryClientRef.current = queryClient
     showNotificationsRef.current = showNotifications
-  }, [queryClient, showNotifications])
+    notifyFromSocketRef.current = notifyFromSocket
+    notifySocketErrorRef.current = notifySocketError
+  }, [queryClient, showNotifications, notifyFromSocket, notifySocketError])
 
   /**
    * Optimistically update item status in cache
@@ -150,7 +157,7 @@ export function useKdsSocket(options: UseKdsSocketOptions = {}): UseKdsSocketRet
     socket.on('connect_error', (error) => {
       console.error('[KdsSocket] Connection error:', error.message)
       if (showNotificationsRef.current) {
-        notifySocketError(error.message)
+        notifySocketErrorRef.current(error.message)
       }
     })
 
@@ -162,7 +169,7 @@ export function useKdsSocket(options: UseKdsSocketOptions = {}): UseKdsSocketRet
       if (showNotificationsRef.current) {
         // play notification sound
         playNotificationSound(tenantSettings)
-        notifyFromSocket('order:created', event.data)
+        notifyFromSocketRef.current('order:created', event.data)
       }
     })
 
@@ -174,7 +181,7 @@ export function useKdsSocket(options: UseKdsSocketOptions = {}): UseKdsSocketRet
       if (showNotificationsRef.current) {
         // play notification sound
         playNotificationSound(tenantSettings)
-        notifyFromSocket('order:items:added', event.data)
+        notifyFromSocketRef.current('order:items:added', event.data)
       }
     })
 
@@ -187,7 +194,7 @@ export function useKdsSocket(options: UseKdsSocketOptions = {}): UseKdsSocketRet
       if (showNotificationsRef.current && event.data.status !== 'pending') {
         // play notification sound
         playNotificationSound(tenantSettings)
-        notifyFromSocket('item:status', event.data)
+        notifyFromSocketRef.current('item:status', event.data)
       }
     })
 
@@ -202,7 +209,7 @@ export function useKdsSocket(options: UseKdsSocketOptions = {}): UseKdsSocketRet
       if (showNotificationsRef.current) {
         // play notification sound
         playNotificationSound(tenantSettings)
-        notifyFromSocket('order:updated', event.data)
+        notifyFromSocketRef.current('order:updated', event.data)
       }
     })
 

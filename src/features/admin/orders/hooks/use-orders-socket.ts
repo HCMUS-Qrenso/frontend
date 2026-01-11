@@ -8,10 +8,9 @@ import { io, Socket } from 'socket.io-client'
 import { useQueryClient, QueryClient } from '@tanstack/react-query'
 import { ordersQueryKeys } from '../queries/orders.keys'
 import { useAuthStore } from '@/src/store/auth-store'
-import { notifyFromSocket, notifySocketError } from '@/src/lib/socket'
+import { useSocketNotification } from '@/src/lib/socket'
 import { playNotificationSound } from '../../shared/utils'
 import { useTenantSettings } from '@/src/contexts/tenant-settings-context'
-import { pl } from 'date-fns/locale'
 
 const WS_URL = process.env.NEXT_PUBLIC_WS_URL || 'http://localhost:3000'
 const WS_NAMESPACE = '/orders'
@@ -75,16 +74,23 @@ export function useOrdersSocket(options: UseOrdersSocketOptions = {}): UseOrders
   const queryClient = useQueryClient()
   const accessToken = useAuthStore((state) => state.accessToken)
   const { settings: tenantSettings } = useTenantSettings()
+  
+  // Get localized notification functions
+  const { notifyFromSocket, notifySocketError } = useSocketNotification()
 
   // Use refs and keep callbacks stable to avoid dependency changes causing reconnect loops
   const queryClientRef = useRef<QueryClient>(queryClient)
   const showNotificationsRef = useRef(showNotifications)
+  const notifyFromSocketRef = useRef(notifyFromSocket)
+  const notifySocketErrorRef = useRef(notifySocketError)
 
   // Update refs when values change (without causing re-renders)
   useEffect(() => {
     queryClientRef.current = queryClient
     showNotificationsRef.current = showNotifications
-  }, [queryClient, showNotifications])
+    notifyFromSocketRef.current = notifyFromSocket
+    notifySocketErrorRef.current = notifySocketError
+  }, [queryClient, showNotifications, notifyFromSocket, notifySocketError])
 
   const connect = useCallback(() => {
     // Don't connect if disabled or no token
@@ -121,7 +127,7 @@ export function useOrdersSocket(options: UseOrdersSocketOptions = {}): UseOrders
     socket.on('connect_error', (error) => {
       console.error('[AdminSocket] Connection error:', error.message)
       if (showNotificationsRef.current) {
-        notifySocketError(error.message)
+        notifySocketErrorRef.current(error.message)
       }
     })
 
@@ -135,7 +141,7 @@ export function useOrdersSocket(options: UseOrdersSocketOptions = {}): UseOrders
       playNotificationSound(tenantSettings)
 
       if (showNotificationsRef.current) {
-        notifyFromSocket('order:created', event.data)
+        notifyFromSocketRef.current('order:created', event.data)
       }
     })
 
@@ -148,7 +154,7 @@ export function useOrdersSocket(options: UseOrdersSocketOptions = {}): UseOrders
       })
 
       if (showNotificationsRef.current) {
-        notifyFromSocket('order:updated', event.data)
+        notifyFromSocketRef.current('order:updated', event.data)
       }
     })
 
@@ -161,7 +167,7 @@ export function useOrdersSocket(options: UseOrdersSocketOptions = {}): UseOrders
       })
 
       if (showNotificationsRef.current) {
-        notifyFromSocket('order:items:added', event.data)
+        notifyFromSocketRef.current('order:items:added', event.data)
       }
     })
 
@@ -176,7 +182,7 @@ export function useOrdersSocket(options: UseOrdersSocketOptions = {}): UseOrders
 
       // Show toast for item status changes
       if (showNotificationsRef.current) {
-        notifyFromSocket('item:status', event.data)
+        notifyFromSocketRef.current('item:status', event.data)
       }
     })
 
@@ -190,7 +196,7 @@ export function useOrdersSocket(options: UseOrdersSocketOptions = {}): UseOrders
 
       // Show toast notification
       if (showNotificationsRef.current && event.data.status === 'paid') {
-        notifyFromSocket('payment:updated', event.data)
+        notifyFromSocketRef.current('payment:updated', event.data)
       }
     })
 
@@ -211,7 +217,7 @@ export function useOrdersSocket(options: UseOrdersSocketOptions = {}): UseOrders
 
       // Show toast notification with bill request details
       if (showNotificationsRef.current) {
-        notifyFromSocket('bill:requested', event.data)
+        notifyFromSocketRef.current('bill:requested', event.data)
       }
     })
 

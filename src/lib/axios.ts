@@ -4,12 +4,14 @@ import axios, {
   type AxiosRequestHeaders,
   type InternalAxiosRequestConfig,
 } from 'axios'
+import { locales, defaultLocale, type Locale } from '@/src/i18n/config'
 
 const baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
 
 let accessToken: string | null = null
 let tenantId: string | null = null
 let userRole: string | null = null // 'owner' | 'admin' | 'waiter' | 'chef' | null
+let currentLocale: Locale = defaultLocale // For Accept-Language header
 let refreshPromise: Promise<string | null> | null = null
 let failedRequestsQueue: Array<{
   resolve: (value?: any) => void
@@ -27,6 +29,32 @@ export const setTenantId = (tenant: string | null) => {
 
 export const setUserRole = (role: string | null) => {
   userRole = role
+}
+
+/**
+ * Set the current locale for API requests
+ * This should be called from a React component using useLocale() hook
+ */
+export const setCurrentLocale = (locale: Locale) => {
+  currentLocale = locale
+}
+
+/**
+ * Get current locale from URL path (for client-side detection)
+ * Falls back to default locale if not in URL or invalid
+ */
+export const getLocaleFromUrl = (): Locale => {
+  if (typeof window === 'undefined') return defaultLocale
+  
+  const pathSegments = window.location.pathname.split('/')
+  // URL format: /{locale}/admin/... or /admin/... (default locale)
+  const firstSegment = pathSegments[1]
+  
+  if (firstSegment && locales.includes(firstSegment as Locale)) {
+    return firstSegment as Locale
+  }
+  
+  return defaultLocale
 }
 
 const rawClient: AxiosInstance = axios.create({
@@ -66,6 +94,11 @@ apiClient.interceptors.request.use((config: TenantAwareRequestConfig) => {
   if (!skipTenantHeader && isOwner && tenantId && !('x-tenant-id' in config.headers)) {
     ;(config.headers as Record<string, string>)['x-tenant-id'] = tenantId
   }
+
+  // Add Accept-Language header for localized API responses
+  // Use currentLocale if set, otherwise detect from URL
+  const locale = currentLocale || getLocaleFromUrl()
+  ;(config.headers as Record<string, string>)['Accept-Language'] = locale
 
   return config
 })
