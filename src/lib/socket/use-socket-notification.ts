@@ -64,22 +64,30 @@ export function useSocketNotification() {
     // Get title from translations
     let title = options.title
     if (!title) {
-      const params = config.titleParams?.(data) || {}
+      const rawParams = config.titleParams?.(data) || {}
       // Use item.defaultName as fallback for itemName
-      if (params.itemName === undefined && config.titleKey.startsWith('item.')) {
-        params.itemName = t('item.defaultName')
+      if (rawParams.itemName === undefined && config.titleKey.startsWith('item.')) {
+        rawParams.itemName = t('item.defaultName')
       }
+      // Filter out undefined values (next-intl doesn't accept undefined)
+      const params = Object.fromEntries(
+        Object.entries(rawParams).filter(([, v]) => v !== undefined)
+      ) as Record<string, string | number>
       title = t(config.titleKey, params)
     }
 
     // Get description from translations (if available)
     let description = options.description
     if (!description && config.descriptionKey) {
-      const params = config.descriptionParams?.(data) || {}
+      const rawDescParams = config.descriptionParams?.(data) || {}
       // Only show description if all params are defined
-      const hasAllParams = Object.values(params).every(v => v !== undefined && v !== null)
-      if (hasAllParams || Object.keys(params).length === 0) {
-        description = t(config.descriptionKey, params)
+      const hasAllParams = Object.values(rawDescParams).every(v => v !== undefined && v !== null)
+      if (hasAllParams || Object.keys(rawDescParams).length === 0) {
+        // Filter out undefined values (next-intl doesn't accept undefined)
+        const descParams = Object.fromEntries(
+          Object.entries(rawDescParams).filter(([, v]) => v !== undefined)
+        ) as Record<string, string | number>
+        description = t(config.descriptionKey, descParams)
       }
     }
 
