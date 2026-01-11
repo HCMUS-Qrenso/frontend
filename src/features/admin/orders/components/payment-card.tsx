@@ -194,8 +194,24 @@ export function PaymentCard({
             </p>
           </div>
 
-          {/* Discount - only show if exists */}
-          {order?.discountAmount > 0 && (
+          {/* Discount - show each applied voucher */}
+          {order?.appliedVouchers && order.appliedVouchers.length > 0 ? (
+            // Show individual voucher discounts
+            order.appliedVouchers.map((voucher: any) => (
+              <div key={voucher.redemptionId} className="flex items-center justify-between">
+                <p className="text-sm text-slate-500 dark:text-slate-400">
+                  {t('paymentCard.discount')}
+                  <span className="ml-1 text-xs text-emerald-600 dark:text-emerald-400">
+                    ({voucher.voucherCode})
+                  </span>
+                </p>
+                <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400">
+                  -{formatPrice(voucher.discountAmount)}
+                </p>
+              </div>
+            ))
+          ) : order?.discountAmount > 0 && (
+            // Fallback: single discount line
             <div className="flex items-center justify-between">
               <p className="text-sm text-slate-500 dark:text-slate-400">
                 {t('paymentCard.discount')}

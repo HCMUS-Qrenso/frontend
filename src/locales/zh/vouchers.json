@@ -51,7 +51,8 @@
     "view": "查看详情",
     "edit": "编辑",
     "archive": "归档",
-    "applyVoucher": "应用优惠券"
+    "applyVoucher": "应用优惠券",
+    "addAnotherVoucher": "添加另一个优惠券"
   },
   "pagination": {
     "previous": "上一页",

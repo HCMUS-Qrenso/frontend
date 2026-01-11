@@ -33,12 +33,12 @@ import { toast } from 'sonner';
 interface StaffVoucherSelectorProps {
   orderId: string;
   orderSubtotal: number;
-  appliedVoucher?: {
+  appliedVouchers?: Array<{
     redemptionId: string;
     code: string;
     name: string;
     discountAmount: number;
-  } | null;
+  }>;
   onVoucherApplied?: (discountAmount: number) => void;
   onVoucherRemoved?: () => void;
   disabled?: boolean;
@@ -46,11 +46,12 @@ interface StaffVoucherSelectorProps {
 
 /**
  * Staff voucher selector component for waiter/admin to apply vouchers on orders
+ * Supports multiple vouchers per order
  */
 export function StaffVoucherSelector({
   orderId,
   orderSubtotal,
-  appliedVoucher,
+  appliedVouchers = [],
   onVoucherApplied,
   onVoucherRemoved,
   disabled = false,
@@ -149,13 +150,11 @@ export function StaffVoucherSelector({
     }
   };
 
-  // Remove applied voucher
-  const handleRemoveVoucher = async () => {
-    if (!appliedVoucher) return;
-    
+  // Remove applied voucher by redemptionId
+  const handleRemoveVoucher = async (redemptionId: string) => {
     setRemoving(true);
     try {
-      await ordersApi.revokeVoucher(orderId, appliedVoucher.redemptionId, 'Removed by staff');
+      await ordersApi.revokeVoucher(orderId, redemptionId, 'Removed by staff');
       toast.success(t('revokeSuccess'));
       // Invalidate order queries to refresh data
       queryClient.invalidateQueries({ queryKey: ordersQueryKeys.detail(orderId) });
@@ -168,51 +167,55 @@ export function StaffVoucherSelector({
     }
   };
 
-  // If voucher is already applied, show badge
-  if (appliedVoucher) {
-    return (
-      <div className="flex items-center gap-2 p-2 bg-green-50 dark:bg-green-900/20 rounded-lg">
-        <div className="flex items-center gap-2 flex-1">
-          <Ticket className="h-4 w-4 text-green-600" />
-          <div>
-            <p className="text-sm font-medium text-green-800 dark:text-green-200">
-              {appliedVoucher.name}
-            </p>
-            <p className="text-xs text-green-600 dark:text-green-400">
-              {appliedVoucher.code} • -{formatCurrency(appliedVoucher.discountAmount)}
-            </p>
-          </div>
-        </div>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={handleRemoveVoucher}
-          disabled={disabled || removing}
-          className="text-green-700 hover:text-red-600 hover:bg-red-50"
-        >
-          {removing ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <X className="h-4 w-4" />
-          )}
-        </Button>
-      </div>
-    );
-  }
-
   return (
-    <Popover open={isOpen} onOpenChange={setIsOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          size="sm"
-          disabled={disabled}
-          className="gap-2"
-        >
-          <Tag className="h-4 w-4" />
-          {t('actions.applyVoucher')}
-        </Button>
-      </PopoverTrigger>
+    <div className="space-y-2">
+      {/* Show all applied vouchers */}
+      {appliedVouchers.length > 0 && (
+        <div className="space-y-2">
+          {appliedVouchers.map((voucher) => (
+            <div key={voucher.redemptionId} className="flex items-center gap-2 p-2 bg-green-50 dark:bg-green-900/20 rounded-lg">
+              <div className="flex items-center gap-2 flex-1">
+                <Ticket className="h-4 w-4 text-green-600" />
+                <div>
+                  <p className="text-sm font-medium text-green-800 dark:text-green-200">
+                    {voucher.name}
+                  </p>
+                  <p className="text-xs text-green-600 dark:text-green-400">
+                    {voucher.code} • -{formatCurrency(voucher.discountAmount)}
+                  </p>
+                </div>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleRemoveVoucher(voucher.redemptionId)}
+                disabled={disabled || removing}
+                className="text-green-700 hover:text-red-600 hover:bg-red-50"
+              >
+                {removing ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <X className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Add voucher button */}
+      <Popover open={isOpen} onOpenChange={setIsOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={disabled}
+            className="gap-2"
+          >
+            <Tag className="h-4 w-4" />
+            {appliedVouchers.length > 0 ? t('actions.addAnotherVoucher') : t('actions.applyVoucher')}
+          </Button>
+        </PopoverTrigger>
       <PopoverContent className="w-80 p-0" align="end">
         <div className="p-3 border-b">
           <h4 className="font-medium text-sm">{t('staffSelector.title')}</h4>
@@ -338,5 +341,6 @@ export function StaffVoucherSelector({
         </div>
       </PopoverContent>
     </Popover>
+    </div>
   );
 }
