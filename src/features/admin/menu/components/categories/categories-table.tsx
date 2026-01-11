@@ -40,7 +40,7 @@ import type { CategorySortBy, CategorySortOrder, Category } from '@/src/features
 import { toast } from 'sonner'
 import { SkeletonTableRows } from '@/src/components/loading'
 import { TablePagination } from '@/src/components/ui/table-pagination'
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
 
 interface CategoriesTableProps {
   reorderMode: boolean
@@ -57,6 +57,7 @@ function SortableCategoryRow({
   onToggleActive,
   onViewItems,
   t,
+  locale,
 }: {
   category: Category
   reorderMode: boolean
@@ -65,6 +66,7 @@ function SortableCategoryRow({
   onToggleActive: (id: string) => void
   onViewItems: (id: string) => void
   t: (key: string) => string
+  locale: string
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: category.id,
@@ -134,7 +136,7 @@ function SortableCategoryRow({
         {category.item_count}
       </TableCell>
       <TableCell className="px-6 py-4 text-slate-600 dark:text-slate-400">
-        {formatRelativeDate(category.updated_at)}
+        {formatRelativeDate(category.updated_at, locale)}
       </TableCell>
       <TableCell className="px-6 py-4 text-right">
         <div className="flex items-center justify-end">
@@ -206,6 +208,7 @@ export function CategoriesTable({
   const searchParams = useSearchParams()
   const { handleErrorWithStatus } = useErrorHandler()
   const t = useTranslations('menu')
+  const locale = useLocale()
 
   const CATEGORY_ACTIVE_CONFIG: Record<string, StatusConfig> = {
     active: {
@@ -419,6 +422,7 @@ export function CategoriesTable({
                 onToggleActive={handleToggleActive}
                 onViewItems={handleViewItems}
                 t={t}
+                locale={locale}
               />
             ))}
           </TableBody>
@@ -457,7 +461,7 @@ export function CategoriesTable({
                 {category.item_count}
               </TableCell>
               <TableCell className="px-6 py-4 text-slate-600 dark:text-slate-400">
-                {formatRelativeDate(category.updated_at)}
+                {formatRelativeDate(category.updated_at, locale)}
               </TableCell>
               <TableCell className="px-6 py-4 text-right">
                 <div className="flex items-center justify-end">

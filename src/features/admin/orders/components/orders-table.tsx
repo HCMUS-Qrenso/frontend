@@ -51,7 +51,7 @@ import { StatusBadge, type StatusConfig } from '@/src/components/ui/status-badge
 import { EmptyState } from '@/src/components/ui/empty-state'
 import { SkeletonTableRows } from '@/src/components/loading'
 import { formatDistanceToNow } from 'date-fns'
-import { vi, enUS } from 'date-fns/locale'
+import { vi, enUS, zhCN, fr } from 'date-fns/locale'
 import { TablePagination } from '@/src/components/ui/table-pagination'
 import {
   useOrdersQuery,
@@ -267,7 +267,13 @@ export function OrdersTable() {
     return getAgingMinutes(createdAt) > 20
   }
 
-  const dateLocale = locale === 'vi' ? vi : enUS
+  const dateLocaleMap: Record<string, typeof vi> = {
+    vi: vi,
+    en: enUS,
+    zh: zhCN,
+    fr: fr,
+  }
+  const dateLocale = dateLocaleMap[locale] || enUS
 
   // Loading state - skeleton rows to avoid layout shift
   if (isLoading) {

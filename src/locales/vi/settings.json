@@ -1,0 +1,167 @@
+{
+  "title": "Cài đặt",
+  "subtitle": "Quản lý cài đặt cho {name}",
+  "saveChanges": "Lưu thay đổi",
+  "saving": "Đang lưu...",
+  "saveSuccess": "Cài đặt đã được cập nhật thành công",
+  "saveError": "Không thể cập nhật cài đặt",
+  "loadError": "Không thể tải cài đặt. Vui lòng thử lại sau.",
+  "general": {
+    "title": "Cài đặt chung",
+    "description": "Thông tin cơ bản và định dạng hiển thị",
+    "currency": "Đơn vị tiền tệ",
+    "currencyPlaceholder": "Chọn đơn vị tiền tệ",
+    "timezone": "Múi giờ",
+    "timezonePlaceholder": "Chọn múi giờ",
+    "language": "Ngôn ngữ",
+    "languagePlaceholder": "Chọn ngôn ngữ",
+    "dateFormat": "Định dạng ngày",
+    "dateFormatPlaceholder": "Chọn định dạng ngày",
+    "phone": "Số điện thoại liên hệ",
+    "phonePlaceholder": "+84 123 456 789",
+    "contactEmail": "Email liên hệ",
+    "contactEmailPlaceholder": "contact@restaurant.com"
+  },
+  "tax": {
+    "title": "Cài đặt thuế",
+    "description": "Cấu hình thuế VAT và cách hiển thị giá",
+    "rate": "Thuế suất (%)",
+    "label": "Nhãn thuế",
+    "labelPlaceholder": "VAT",
+    "inclusive": "Giá đã bao gồm thuế",
+    "inclusiveDescription": "Khi bật, giá menu sẽ đã bao gồm thuế. Khi tắt, thuế sẽ được tính thêm."
+  },
+  "serviceCharge": {
+    "title": "Phí phục vụ",
+    "description": "Cấu hình phí phục vụ (service charge) tự động",
+    "enabled": "Bật phí phục vụ",
+    "enabledDescription": "Tự động thêm phí phục vụ vào hóa đơn",
+    "rate": "Tỷ lệ phí (%)",
+    "minParty": "Áp dụng từ (số khách)",
+    "minPartyPlaceholder": "Áp dụng cho mọi bàn",
+    "minPartyHint": "Để trống để áp dụng cho tất cả",
+    "taxable": "Phí phục vụ chịu thuế",
+    "taxableDescription": "Tính thuế trên phí phục vụ"
+  },
+  "order": {
+    "title": "Cài đặt đơn hàng",
+    "description": "Tùy chỉnh quy trình đặt món và phiên làm việc",
+    "minValue": "Giá trị đơn tối thiểu",
+    "minValuePlaceholder": "Không giới hạn",
+    "minValueHint": "Để trống nếu không yêu cầu",
+    "prepTime": "Thời gian chuẩn bị (phút)",
+    "prepTimeHint": "Áp dụng cho món ăn không có thời gian chuẩn bị riêng",
+    "sessionTimeout": "Thời gian hết hạn phiên (phút)",
+    "sessionTimeoutHint": "Phiên bàn sẽ hết hạn sau khoảng thời gian này",
+    "allowSpecialInstructions": "Cho phép ghi chú đặc biệt",
+    "allowSpecialInstructionsDescription": "Khách hàng có thể thêm ghi chú cho từng món",
+    "requireGuestCount": "Yêu cầu nhập số khách",
+    "requireGuestCountDescription": "Bắt buộc nhập số khách khi bắt đầu phiên"
+  },
+  "notifications": {
+    "title": "Thông báo",
+    "description": "Cấu hình âm thanh và email thông báo",
+    "soundEnabled": "Âm thanh thông báo",
+    "soundDescription": "Phát âm thanh khi có đơn hàng mới",
+    "soundType": "Loại âm thanh",
+    "sounds": {
+      "bell": {
+        "name": "Chuông",
+        "description": "Chuông cổ điển"
+      },
+      "chime": {
+        "name": "Tiếng leng keng",
+        "description": "Tiếng leng keng nhẹ nhàng"
+      },
+      "ding": {
+        "name": "Tiếng ding",
+        "description": "Tiếng ding nhanh"
+      },
+      "pop": {
+        "name": "Tiếng pop",
+        "description": "Tiếng pop hiện đại"
+      },
+      "ping": {
+        "name": "Tiếng ping",
+        "description": "Tiếng ping sắc nét"
+      }
+    },
+    "emailEnabled": "Thông báo email",
+    "emailDescription": "Gửi email khi có đơn hàng mới",
+    "email": "Email nhận thông báo",
+    "emailPlaceholder": "orders@restaurant.com"
+  },
+  "receipt": {
+    "title": "Hóa đơn & Biên lai",
+    "description": "Tùy chỉnh nội dung hiển thị trên hóa đơn",
+    "invoicePrefix": "Tiền tố hóa đơn",
+    "invoicePrefixPlaceholder": "QR-",
+    "invoicePrefixHint": "Ví dụ: QR-001, INV-001",
+    "header": "Văn bản đầu hóa đơn",
+    "headerPlaceholder": "Cảm ơn quý khách đã ghé thăm!",
+    "footer": "Văn bản cuối hóa đơn",
+    "footerPlaceholder": "Hẹn gặp lại quý khách!",
+    "showLogo": "Hiển thị logo",
+    "showLogoDescription": "In logo nhà hàng trên hóa đơn"
+  },
+  "sidebar": {
+    "general": "Cài đặt chung",
+    "tax": "Thuế",
+    "serviceCharge": "Phí phục vụ",
+    "order": "Đơn hàng",
+    "notifications": "Thông báo",
+    "receipt": "Hóa đơn",
+    "operatingHours": "Giờ hoạt động",
+    "qrPayment": "Thanh toán QR"
+  },
+  "restaurantInfo": {
+    "title": "Thông tin nhà hàng",
+    "description": "Cập nhật tên, địa chỉ và hình ảnh của nhà hàng",
+    "name": "Tên nhà hàng",
+    "namePlaceholder": "Nhập tên nhà hàng",
+    "address": "Địa chỉ",
+    "addressPlaceholder": "Nhập địa chỉ nhà hàng",
+    "image": "Hình ảnh nhà hàng",
+    "clickToUpload": "Nhấn để tải lên hình ảnh",
+    "imageHint": "JPG, PNG, GIF - Tối đa 5MB",
+    "changeImage": "Đổi hình ảnh",
+    "removeImage": "Xóa hình ảnh",
+    "uploading": "Đang tải lên...",
+    "uploadSuccess": "Tải lên hình ảnh thành công",
+    "uploadError": "Có lỗi khi tải lên hình ảnh",
+    "invalidFileType": "Vui lòng chọn tệp hình ảnh hợp lệ",
+    "fileTooLarge": "Tệp hình ảnh quá lớn (tối đa 5MB)"
+  },
+  "operatingHours": {
+    "title": "Giờ hoạt động",
+    "description": "Cấu hình giờ mở cửa của cửa hàng theo từng ngày",
+    "monday": "Thứ Hai",
+    "tuesday": "Thứ Ba",
+    "wednesday": "Thứ Tư",
+    "thursday": "Thứ Năm",
+    "friday": "Thứ Sáu",
+    "saturday": "Thứ Bảy",
+    "sunday": "Chủ Nhật",
+    "closed": "Đóng cửa",
+    "addSlot": "Thêm ca",
+    "copyTo": "Sao chép",
+    "copyToAll": "Sao chép sang tất cả",
+    "copyToWeekdays": "Sao chép sang ngày trong tuần",
+    "copyToWeekend": "Sao chép sang cuối tuần"
+  },
+  "qrPayment": {
+    "title": "Cài đặt thanh toán QR",
+    "description": "Cấu hình tích hợp PayOS cho thanh toán mã QR",
+    "warningMessage": "Phải cấu hình thanh toán QR để kích hoạt thanh toán mã QR cho khách hàng",
+    "downloadInstructions": "Tải hướng dẫn thiết lập",
+    "clientId": "PayOS Client ID",
+    "clientIdPlaceholder": "Nhập PayOS Client ID của bạn",
+    "clientIdDescription": "Mã định danh khách hàng PayOS để xác thực API",
+    "apiKey": "PayOS API Key",
+    "apiKeyPlaceholder": "Nhập PayOS API Key của bạn",
+    "apiKeyDescription": "Khóa API PayOS để xử lý thanh toán an toàn",
+    "checksumKey": "PayOS Checksum Key",
+    "checksumKeyPlaceholder": "Nhập PayOS Checksum Key của bạn",
+    "checksumKeyDescription": "Khóa checksum PayOS để xác minh thanh toán"
+  }
+}

@@ -43,6 +43,10 @@ export function RecentOrders({ className }: { className?: string }) {
       label: t('completed'),
       className: 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400',
     },
+    cancelled: {
+      label: t('cancelled'),
+      className: 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400',
+    },
   }
 
   return (

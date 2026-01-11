@@ -1,0 +1,167 @@
+{
+  "title": "Paramètres",
+  "subtitle": "Gérer les paramètres de {name}",
+  "saveChanges": "Enregistrer",
+  "saving": "Enregistrement...",
+  "saveSuccess": "Paramètres mis à jour avec succès",
+  "saveError": "Impossible de mettre à jour les paramètres",
+  "loadError": "Impossible de charger les paramètres. Veuillez réessayer.",
+  "general": {
+    "title": "Paramètres généraux",
+    "description": "Informations de base et formats d'affichage",
+    "currency": "Devise",
+    "currencyPlaceholder": "Sélectionner une devise",
+    "timezone": "Fuseau horaire",
+    "timezonePlaceholder": "Sélectionner un fuseau horaire",
+    "language": "Langue",
+    "languagePlaceholder": "Sélectionner une langue",
+    "dateFormat": "Format de date",
+    "dateFormatPlaceholder": "Sélectionner un format",
+    "phone": "Téléphone de contact",
+    "phonePlaceholder": "+33 1 23 45 67 89",
+    "contactEmail": "Email de contact",
+    "contactEmailPlaceholder": "contact@restaurant.com"
+  },
+  "tax": {
+    "title": "Paramètres de taxes",
+    "description": "Configurer la TVA et l'affichage des prix",
+    "rate": "Taux de taxe (%)",
+    "label": "Libellé de la taxe",
+    "labelPlaceholder": "TVA",
+    "inclusive": "Prix TTC",
+    "inclusiveDescription": "Si activé, les prix du menu incluent la taxe. Sinon, la taxe sera ajoutée."
+  },
+  "serviceCharge": {
+    "title": "Frais de service",
+    "description": "Configurer les frais de service automatiques",
+    "enabled": "Activer les frais de service",
+    "enabledDescription": "Ajouter automatiquement les frais de service aux factures",
+    "rate": "Taux (%)",
+    "minParty": "Taille minimale du groupe",
+    "minPartyPlaceholder": "Appliquer à toutes les tables",
+    "minPartyHint": "Laisser vide pour appliquer à tous",
+    "taxable": "Frais de service taxables",
+    "taxableDescription": "Appliquer la taxe sur les frais de service"
+  },
+  "order": {
+    "title": "Paramètres de commande",
+    "description": "Personnaliser le processus de commande et les sessions",
+    "minValue": "Montant minimum de commande",
+    "minValuePlaceholder": "Pas de minimum",
+    "minValueHint": "Laisser vide si non requis",
+    "prepTime": "Temps de préparation (minutes)",
+    "prepTimeHint": "Utilisé pour les plats sans temps de préparation personnalisé",
+    "sessionTimeout": "Délai d'expiration de session (minutes)",
+    "sessionTimeoutHint": "La session de table expirera après cette durée",
+    "allowSpecialInstructions": "Autoriser les instructions spéciales",
+    "allowSpecialInstructionsDescription": "Les clients peuvent ajouter des notes à chaque article",
+    "requireGuestCount": "Exiger le nombre de convives",
+    "requireGuestCountDescription": "Exiger la saisie du nombre de convives au début de la session"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "description": "Configurer les notifications sonores et par email",
+    "soundEnabled": "Notifications sonores",
+    "soundDescription": "Jouer un son à l'arrivée d'une nouvelle commande",
+    "soundType": "Son de notification",
+    "sounds": {
+      "bell": {
+        "name": "Cloche",
+        "description": "Notification classique avec cloche"
+      },
+      "chime": {
+        "name": "Carillon",
+        "description": "Son de carillon doux"
+      },
+      "ding": {
+        "name": "Ding",
+        "description": "Notification ding rapide"
+      },
+      "pop": {
+        "name": "Pop",
+        "description": "Son pop moderne"
+      },
+      "ping": {
+        "name": "Ping",
+        "description": "Alerte ping perçant"
+      }
+    },
+    "emailEnabled": "Notifications par email",
+    "emailDescription": "Envoyer un email à l'arrivée d'une nouvelle commande",
+    "email": "Email de notification",
+    "emailPlaceholder": "commandes@restaurant.com"
+  },
+  "receipt": {
+    "title": "Factures & Reçus",
+    "description": "Personnaliser le contenu affiché sur les factures",
+    "invoicePrefix": "Préfixe de facture",
+    "invoicePrefixPlaceholder": "QR-",
+    "invoicePrefixHint": "Exemple : QR-001, INV-001",
+    "header": "Texte d'en-tête du reçu",
+    "headerPlaceholder": "Merci de votre visite !",
+    "footer": "Texte de pied de page du reçu",
+    "footerPlaceholder": "À bientôt !",
+    "showLogo": "Afficher le logo",
+    "showLogoDescription": "Imprimer le logo du restaurant sur le reçu"
+  },
+  "operatingHours": {
+    "title": "Heures d'ouverture",
+    "description": "Configurer les heures d'ouverture du magasin par jour",
+    "monday": "Lundi",
+    "tuesday": "Mardi",
+    "wednesday": "Mercredi",
+    "thursday": "Jeudi",
+    "friday": "Vendredi",
+    "saturday": "Samedi",
+    "sunday": "Dimanche",
+    "closed": "Fermé",
+    "addSlot": "Ajouter un créneau",
+    "copyTo": "Copier",
+    "copyToAll": "Copier vers tous les jours",
+    "copyToWeekdays": "Copier vers les jours de semaine",
+    "copyToWeekend": "Copier vers le week-end"
+  },
+  "qrPayment": {
+    "title": "Paramètres de paiement QR",
+    "description": "Configurer l'intégration PayOS pour les paiements QR code",
+    "warningMessage": "Le paiement QR doit être configuré pour activer les paiements QR code pour les clients",
+    "downloadInstructions": "Télécharger les instructions de configuration",
+    "clientId": "PayOS Client ID",
+    "clientIdPlaceholder": "Entrez votre PayOS Client ID",
+    "clientIdDescription": "Votre identifiant client PayOS pour l'authentification API",
+    "apiKey": "PayOS API Key",
+    "apiKeyPlaceholder": "Entrez votre PayOS API Key",
+    "apiKeyDescription": "Votre clé API PayOS pour le traitement sécurisé des paiements",
+    "checksumKey": "PayOS Checksum Key",
+    "checksumKeyPlaceholder": "Entrez votre PayOS Checksum Key",
+    "checksumKeyDescription": "Votre clé checksum PayOS pour la vérification des paiements"
+  },
+  "restaurantInfo": {
+    "title": "Informations du restaurant",
+    "description": "Mettez à jour le nom, l'adresse et l'image de votre restaurant",
+    "name": "Nom du restaurant",
+    "namePlaceholder": "Entrez le nom du restaurant",
+    "address": "Adresse",
+    "addressPlaceholder": "Entrez l'adresse du restaurant",
+    "image": "Image du restaurant",
+    "clickToUpload": "Cliquez pour télécharger une image",
+    "imageHint": "JPG, PNG, GIF - Max 5 Mo",
+    "changeImage": "Changer l'image",
+    "removeImage": "Supprimer l'image",
+    "uploading": "Téléchargement...",
+    "uploadSuccess": "Image téléchargée avec succès",
+    "uploadError": "Échec du téléchargement de l'image",
+    "invalidFileType": "Veuillez sélectionner un fichier image valide",
+    "fileTooLarge": "Le fichier image est trop volumineux (max 5 Mo)"
+  },
+  "sidebar": {
+    "general": "Général",
+    "tax": "Taxes",
+    "serviceCharge": "Frais de service",
+    "order": "Commandes",
+    "notifications": "Notifications",
+    "receipt": "Factures",
+    "operatingHours": "Heures d'ouverture",
+    "qrPayment": "Paiement QR"
+  }
+}
