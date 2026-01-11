@@ -15,6 +15,7 @@ import settings from './settings.json';
 import profile from './profile.json';
 import onboarding from './onboarding.json';
 import vouchers from './vouchers.json';
+import socket from './socket.json';
 
 const fr = {
   common,
@@ -34,6 +35,7 @@ const fr = {
   profile,
   onboarding,
   vouchers,
+  socket,
 };
 
 export default fr;

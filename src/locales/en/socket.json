@@ -1,0 +1,42 @@
+{
+  "socket": {
+    "connected": "Realtime connected",
+    "disconnected": "Realtime disconnected",
+    "reconnecting": "Reconnecting...",
+    "error": "Connection error",
+    "errorMessage": "Cannot connect to server"
+  },
+  "order": {
+    "new": "New order: {orderNumber}",
+    "updated": "Updated: {orderNumber}",
+    "itemsAdded": "Items added: {orderNumber}",
+    "newItems": "{count} new items",
+    "table": "Table {tableNumber}",
+    "status": "Status: {status}"
+  },
+  "item": {
+    "accepted": "Accepted: {itemName}",
+    "preparing": "Preparing: {itemName}",
+    "ready": "Ready: {itemName}",
+    "served": "Served: {itemName}",
+    "cancelled": "Cancelled: {itemName}",
+    "returned": "Returned: {itemName}",
+    "defaultName": "Item"
+  },
+  "payment": {
+    "updated": "Payment successful",
+    "orderPaid": "Order has been paid"
+  },
+  "bill": {
+    "requested": "🔔 Bill request - Table {tableNumber}"
+  },
+  "itemStatus": {
+    "pending": "Pending",
+    "accepted": "Accepted",
+    "preparing": "Preparing",
+    "ready": "Ready",
+    "served": "Served",
+    "cancelled": "Cancelled",
+    "returned": "Returned"
+  }
+}
