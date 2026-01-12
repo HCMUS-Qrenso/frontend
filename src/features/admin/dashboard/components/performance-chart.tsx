@@ -141,10 +141,18 @@ export function PerformanceChart() {
               />
               <Tooltip
                 contentStyle={{
-                  backgroundColor: '#fff',
-                  border: '1px solid #e2e8f0',
+                  backgroundColor: 'var(--popover)',
+                  color: 'var(--popover-foreground)',
+                  border: '1px solid var(--border)',
                   borderRadius: '12px',
-                  boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+                  boxShadow:
+                    '0 4px 6px -1px color-mix(in srgb, var(--background) 10%, transparent), 0 2px 4px -2px color-mix(in srgb, var(--background) 10%, transparent)',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                }}
+                labelStyle={{
+                  color: 'var(--popover-foreground)',
+                  fontWeight: '600',
                 }}
                 formatter={(value: number) => [
                   dataType === 'revenue'
