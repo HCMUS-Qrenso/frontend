@@ -277,6 +277,12 @@ export function OrdersTable() {
     return getAgingMinutes(createdAt) > 20
   }
 
+  const handlePageChange = (page: number) => {
+    const params = new URLSearchParams(searchParams.toString())
+    params.set('page', page.toString())
+    router.push(`/admin/orders?${params.toString()}`)
+  }
+
   const dateLocaleMap: Record<string, typeof vi> = {
     vi: vi,
     en: enUS,
@@ -673,7 +679,7 @@ export function OrdersTable() {
           total={meta.total || 0}
           limit={meta.limit || 10}
           itemLabel={t('itemLabel')}
-          onPageChange={() => {}}
+          onPageChange={handlePageChange}
         />
       )}
 
