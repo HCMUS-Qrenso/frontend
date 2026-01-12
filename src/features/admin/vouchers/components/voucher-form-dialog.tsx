@@ -1,34 +1,34 @@
-'use client';
+'use client'
 
-import { useEffect, useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useEffect, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import {
   FormDialog,
   FormDialogField,
   FormDialogSection,
   FormDialogSectionGroup,
   FormDialogDivider,
-} from '@/src/components/ui/form-dialog';
-import { Input } from '@/src/components/ui/input';
-import { Textarea } from '@/src/components/ui/textarea';
+} from '@/src/components/ui/form-dialog'
+import { Input } from '@/src/components/ui/input'
+import { Textarea } from '@/src/components/ui/textarea'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/src/components/ui/select';
-import { Switch } from '@/src/components/ui/switch';
-import { Label } from '@/src/components/ui/label';
-import { useCreateVoucherMutation, useUpdateVoucherMutation } from '../queries';
-import { useErrorHandler } from '@/src/hooks/use-error-handler';
-import { toast } from 'sonner';
-import type { Voucher, VoucherKind, DiscountType, VoucherStatus } from '../types';
+} from '@/src/components/ui/select'
+import { Switch } from '@/src/components/ui/switch'
+import { Label } from '@/src/components/ui/label'
+import { useCreateVoucherMutation, useUpdateVoucherMutation } from '../queries'
+import { useErrorHandler } from '@/src/hooks/use-error-handler'
+import { toast } from 'sonner'
+import type { Voucher, VoucherKind, DiscountType, VoucherStatus } from '../types'
 
 interface VoucherFormDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  voucher: Voucher | null;
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  voucher: Voucher | null
 }
 
 const initialFormData = {
@@ -50,19 +50,19 @@ const initialFormData = {
   isPublic: false,
   priority: 0,
   status: 'draft' as VoucherStatus,
-};
+}
 
 export function VoucherFormDialog({ open, onOpenChange, voucher }: VoucherFormDialogProps) {
-  const t = useTranslations('vouchers');
-  const isEditing = !!voucher;
-  const { handleError } = useErrorHandler();
+  const t = useTranslations('vouchers')
+  const isEditing = !!voucher
+  const { handleError } = useErrorHandler()
 
-  const [formData, setFormData] = useState(initialFormData);
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [formData, setFormData] = useState(initialFormData)
+  const [errors, setErrors] = useState<Record<string, string>>({})
 
-  const createMutation = useCreateVoucherMutation();
-  const updateMutation = useUpdateVoucherMutation();
-  const isSubmitting = createMutation.isPending || updateMutation.isPending;
+  const createMutation = useCreateVoucherMutation()
+  const updateMutation = useUpdateVoucherMutation()
+  const isSubmitting = createMutation.isPending || updateMutation.isPending
 
   // Load data if editing
   useEffect(() => {
@@ -86,35 +86,41 @@ export function VoucherFormDialog({ open, onOpenChange, voucher }: VoucherFormDi
         isPublic: voucher.isPublic,
         priority: voucher.priority,
         status: voucher.status,
-      });
+      })
     } else {
-      setFormData(initialFormData);
+      setFormData(initialFormData)
     }
-    setErrors({});
-  }, [voucher, open]);
+    setErrors({})
+  }, [voucher, open])
 
   const validate = (): boolean => {
-    const newErrors: Record<string, string> = {};
+    const newErrors: Record<string, string> = {}
 
     if (!formData.code.trim()) {
-      newErrors.code = 'Mã voucher không được để trống';
+      newErrors.code = 'Mã voucher không được để trống'
     }
     if (!formData.name.trim()) {
-      newErrors.name = 'Tên voucher không được để trống';
+      newErrors.name = 'Tên voucher không được để trống'
     }
-    if (formData.discountType === 'percent' && (!formData.percentOff || formData.percentOff <= 0 || formData.percentOff > 100)) {
-      newErrors.percentOff = 'Phần trăm giảm phải từ 1 đến 100';
+    if (
+      formData.discountType === 'percent' &&
+      (!formData.percentOff || formData.percentOff <= 0 || formData.percentOff > 100)
+    ) {
+      newErrors.percentOff = 'Phần trăm giảm phải từ 1 đến 100'
     }
-    if (formData.discountType === 'fixed_amount' && (!formData.amountOff || formData.amountOff <= 0)) {
-      newErrors.amountOff = 'Số tiền giảm phải lớn hơn 0';
+    if (
+      formData.discountType === 'fixed_amount' &&
+      (!formData.amountOff || formData.amountOff <= 0)
+    ) {
+      newErrors.amountOff = 'Số tiền giảm phải lớn hơn 0'
     }
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
 
   const handleSubmit = async () => {
-    if (!validate()) return;
+    if (!validate()) return
 
     const payload = {
       code: formData.code.toUpperCase(),
@@ -135,25 +141,25 @@ export function VoucherFormDialog({ open, onOpenChange, voucher }: VoucherFormDi
       isPublic: formData.isPublic,
       priority: formData.priority,
       status: formData.status,
-    };
+    }
 
     try {
       if (isEditing) {
-        await updateMutation.mutateAsync({ id: voucher.id, payload });
-        toast.success('Cập nhật voucher thành công');
+        await updateMutation.mutateAsync({ id: voucher.id, payload })
+        toast.success('Cập nhật voucher thành công')
       } else {
-        await createMutation.mutateAsync(payload);
-        toast.success('Tạo voucher thành công');
+        await createMutation.mutateAsync(payload)
+        toast.success('Tạo voucher thành công')
       }
-      onOpenChange(false);
+      onOpenChange(false)
     } catch (error) {
-      handleError(error, isEditing ? 'Không thể cập nhật voucher' : 'Không thể tạo voucher');
+      handleError(error, isEditing ? 'Không thể cập nhật voucher' : 'Không thể tạo voucher')
     }
-  };
+  }
 
   const updateField = <K extends keyof typeof formData>(field: K, value: (typeof formData)[K]) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-  };
+    setFormData((prev) => ({ ...prev, [field]: value }))
+  }
 
   return (
     <FormDialog
@@ -262,18 +268,28 @@ export function VoucherFormDialog({ open, onOpenChange, voucher }: VoucherFormDi
               <Input
                 type="number"
                 value={formData.percentOff || ''}
-                onChange={(e) => updateField('percentOff', e.target.value ? Number(e.target.value) : 0)}
+                onChange={(e) =>
+                  updateField('percentOff', e.target.value ? Number(e.target.value) : 0)
+                }
                 min={0}
                 max={100}
                 disabled={isSubmitting}
               />
             </FormDialogField>
 
-            <FormDialogField label={t('form.maxDiscountAmount')} hint={t('form.maxDiscountAmountHint')}>
+            <FormDialogField
+              label={t('form.maxDiscountAmount')}
+              hint={t('form.maxDiscountAmountHint')}
+            >
               <Input
                 type="number"
                 value={formData.maxDiscountAmount || ''}
-                onChange={(e) => updateField('maxDiscountAmount', e.target.value ? Number(e.target.value) : undefined)}
+                onChange={(e) =>
+                  updateField(
+                    'maxDiscountAmount',
+                    e.target.value ? Number(e.target.value) : undefined,
+                  )
+                }
                 min={0}
                 disabled={isSubmitting}
               />
@@ -284,7 +300,9 @@ export function VoucherFormDialog({ open, onOpenChange, voucher }: VoucherFormDi
             <Input
               type="number"
               value={formData.amountOff || ''}
-              onChange={(e) => updateField('amountOff', e.target.value ? Number(e.target.value) : 0)}
+              onChange={(e) =>
+                updateField('amountOff', e.target.value ? Number(e.target.value) : 0)
+              }
               min={0}
               disabled={isSubmitting}
             />
@@ -295,7 +313,9 @@ export function VoucherFormDialog({ open, onOpenChange, voucher }: VoucherFormDi
           <Input
             type="number"
             value={formData.minSubtotal || ''}
-            onChange={(e) => updateField('minSubtotal', e.target.value ? Number(e.target.value) : undefined)}
+            onChange={(e) =>
+              updateField('minSubtotal', e.target.value ? Number(e.target.value) : undefined)
+            }
             min={0}
             disabled={isSubmitting}
           />
@@ -327,11 +347,19 @@ export function VoucherFormDialog({ open, onOpenChange, voucher }: VoucherFormDi
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
-          <FormDialogField label={t('form.maxRedemptionsTotal')} hint={t('form.maxRedemptionsTotalHint')}>
+          <FormDialogField
+            label={t('form.maxRedemptionsTotal')}
+            hint={t('form.maxRedemptionsTotalHint')}
+          >
             <Input
               type="number"
               value={formData.maxRedemptionsTotal || ''}
-              onChange={(e) => updateField('maxRedemptionsTotal', e.target.value ? Number(e.target.value) : undefined)}
+              onChange={(e) =>
+                updateField(
+                  'maxRedemptionsTotal',
+                  e.target.value ? Number(e.target.value) : undefined,
+                )
+              }
               min={1}
               disabled={isSubmitting}
             />
@@ -341,7 +369,12 @@ export function VoucherFormDialog({ open, onOpenChange, voucher }: VoucherFormDi
             <Input
               type="number"
               value={formData.maxRedemptionsPerCustomer || ''}
-              onChange={(e) => updateField('maxRedemptionsPerCustomer', e.target.value ? Number(e.target.value) : undefined)}
+              onChange={(e) =>
+                updateField(
+                  'maxRedemptionsPerCustomer',
+                  e.target.value ? Number(e.target.value) : undefined,
+                )
+              }
               min={1}
               disabled={isSubmitting}
             />
@@ -352,7 +385,9 @@ export function VoucherFormDialog({ open, onOpenChange, voucher }: VoucherFormDi
           <Input
             type="number"
             value={formData.minParty || ''}
-            onChange={(e) => updateField('minParty', e.target.value ? Number(e.target.value) : undefined)}
+            onChange={(e) =>
+              updateField('minParty', e.target.value ? Number(e.target.value) : undefined)
+            }
             min={1}
             disabled={isSubmitting}
           />
@@ -377,7 +412,9 @@ export function VoucherFormDialog({ open, onOpenChange, voucher }: VoucherFormDi
           <FormDialogSection>
             <div className="space-y-0.5">
               <Label className="text-base">{t('form.autoApply')}</Label>
-              <p className="text-sm text-slate-500 dark:text-slate-400">{t('form.autoApplyHint')}</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400">
+                {t('form.autoApplyHint')}
+              </p>
             </div>
             <Switch
               checked={formData.autoApply}
@@ -400,5 +437,5 @@ export function VoucherFormDialog({ open, onOpenChange, voucher }: VoucherFormDi
         </FormDialogSectionGroup>
       )}
     </FormDialog>
-  );
+  )
 }

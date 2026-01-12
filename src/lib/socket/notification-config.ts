@@ -1,7 +1,7 @@
 /**
  * Socket Event Notification Configuration
  * Maps socket events to toast notifications with consistent styling
- * 
+ *
  * NOTE: This file now uses translation keys from socket.json
  * The actual translation is handled by notify-from-socket-hook.ts
  */

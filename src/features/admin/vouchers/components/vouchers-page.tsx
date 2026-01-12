@@ -1,8 +1,8 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
-import { useTranslations } from 'next-intl';
-import { useRouter } from '@/src/i18n/navigation';
+import { useState } from 'react'
+import { useTranslations } from 'next-intl'
+import { useRouter } from '@/src/i18n/navigation'
 import {
   MoreVertical,
   Pencil,
@@ -14,8 +14,8 @@ import {
   Users,
   Zap,
   Ticket,
-} from 'lucide-react';
-import { Button } from '@/src/components/ui/button';
+} from 'lucide-react'
+import { Button } from '@/src/components/ui/button'
 import {
   Table,
   TableBody,
@@ -26,68 +26,72 @@ import {
   AdminTableHeaderRow,
   AdminTableHead,
   AdminTableRow,
-} from '@/src/components/ui/table';
+} from '@/src/components/ui/table'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/src/components/ui/dropdown-menu';
-import { StatusBadge, type StatusConfig } from '@/src/components/ui/status-badge';
-import { EmptyState } from '@/src/components/ui/empty-state';
-import { ContainerErrorState } from '@/src/components/ui/loading-state';
-import { SkeletonTableRows } from '@/src/components/loading';
-import { TablePagination } from '@/src/components/ui/table-pagination';
-import { useVouchersQuery, useArchiveVoucherMutation } from '../queries';
-import { VoucherFormDialog } from './voucher-form-dialog';
-import { VouchersFilterToolbar } from './vouchers-filter-toolbar';
-import { ConfirmDeleteDialog } from '@/src/components/ui/confirm-delete-dialog';
-import type { Voucher, VoucherStatus, VoucherKind } from '../types';
-import { useTenantSettings } from '@/src/contexts/tenant-settings-context';
+} from '@/src/components/ui/dropdown-menu'
+import { StatusBadge, type StatusConfig } from '@/src/components/ui/status-badge'
+import { EmptyState } from '@/src/components/ui/empty-state'
+import { ContainerErrorState } from '@/src/components/ui/loading-state'
+import { SkeletonTableRows } from '@/src/components/loading'
+import { TablePagination } from '@/src/components/ui/table-pagination'
+import { useVouchersQuery, useArchiveVoucherMutation } from '../queries'
+import { VoucherFormDialog } from './voucher-form-dialog'
+import { VouchersFilterToolbar } from './vouchers-filter-toolbar'
+import { ConfirmDeleteDialog } from '@/src/components/ui/confirm-delete-dialog'
+import type { Voucher, VoucherStatus, VoucherKind } from '../types'
+import { useTenantSettings } from '@/src/contexts/tenant-settings-context'
 
 export function VouchersPage() {
-  const t = useTranslations('vouchers');
-  const router = useRouter();
-  const { settings } = useTenantSettings();
+  const t = useTranslations('vouchers')
+  const router = useRouter()
+  const { settings } = useTenantSettings()
 
   // Helper to format currency
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('vi-VN', {
       style: 'currency',
       currency: settings.general.currency || 'VND',
-    }).format(value);
-  };
+    }).format(value)
+  }
 
   // Create status config for StatusBadge
   const voucherStatusConfig: Record<string, StatusConfig> = {
     active: {
       label: t('status.active'),
-      className: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20',
+      className:
+        'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20',
     },
     draft: {
       label: t('status.draft'),
-      className: 'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-500/10 dark:text-slate-400 dark:border-slate-500/20',
+      className:
+        'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-500/10 dark:text-slate-400 dark:border-slate-500/20',
     },
     paused: {
       label: t('status.paused'),
-      className: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20',
+      className:
+        'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20',
     },
     archived: {
       label: t('status.archived'),
-      className: 'bg-red-50 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20',
+      className:
+        'bg-red-50 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20',
     },
-  };
+  }
 
   // State
-  const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState<VoucherStatus | 'all'>('all');
-  const [kindFilter, setKindFilter] = useState<VoucherKind | 'all'>('all');
-  const [page, setPage] = useState(1);
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [editingVoucher, setEditingVoucher] = useState<Voucher | null>(null);
-  const [deletingVoucher, setDeletingVoucher] = useState<Voucher | null>(null);
+  const [search, setSearch] = useState('')
+  const [statusFilter, setStatusFilter] = useState<VoucherStatus | 'all'>('all')
+  const [kindFilter, setKindFilter] = useState<VoucherKind | 'all'>('all')
+  const [page, setPage] = useState(1)
+  const [isFormOpen, setIsFormOpen] = useState(false)
+  const [editingVoucher, setEditingVoucher] = useState<Voucher | null>(null)
+  const [deletingVoucher, setDeletingVoucher] = useState<Voucher | null>(null)
 
-  const limit = 10;
+  const limit = 10
 
   // Query
   const { data, isLoading, isError } = useVouchersQuery({
@@ -96,12 +100,12 @@ export function VouchersPage() {
     search: search || undefined,
     status: statusFilter !== 'all' ? statusFilter : undefined,
     kind: kindFilter !== 'all' ? kindFilter : undefined,
-  });
+  })
 
-  const vouchers = data?.data || [];
-  const meta = data?.meta;
+  const vouchers = data?.data || []
+  const meta = data?.meta
 
-  const archiveMutation = useArchiveVoucherMutation();
+  const archiveMutation = useArchiveVoucherMutation()
 
   // Helpers
   const getKindIcon = (kind: VoucherKind) => {
@@ -109,49 +113,49 @@ export function VouchersPage() {
       automatic: <Zap className="h-3 w-3" />,
       staff_only: <Users className="h-3 w-3" />,
       code: <Tag className="h-3 w-3" />,
-    };
-    return icons[kind];
-  };
+    }
+    return icons[kind]
+  }
 
   const getKindLabel = (kind: VoucherKind) => {
     const labels: Record<VoucherKind, string> = {
       automatic: t('kind.automatic'),
       staff_only: t('kind.staffOnly'),
       code: t('kind.code'),
-    };
-    return labels[kind];
-  };
+    }
+    return labels[kind]
+  }
 
   const formatDiscount = (voucher: Voucher) => {
     if (voucher.discountType === 'percent') {
-      return `${voucher.percentOff}%`;
+      return `${voucher.percentOff}%`
     }
-    return formatCurrency(voucher.amountOff || 0);
-  };
+    return formatCurrency(voucher.amountOff || 0)
+  }
 
   const handleEdit = (voucher: Voucher) => {
-    setEditingVoucher(voucher);
-    setIsFormOpen(true);
-  };
+    setEditingVoucher(voucher)
+    setIsFormOpen(true)
+  }
 
   const handleCreate = () => {
-    setEditingVoucher(null);
-    setIsFormOpen(true);
-  };
+    setEditingVoucher(null)
+    setIsFormOpen(true)
+  }
 
   const handleArchive = async () => {
     if (deletingVoucher) {
-      await archiveMutation.mutateAsync(deletingVoucher.id);
-      setDeletingVoucher(null);
+      await archiveMutation.mutateAsync(deletingVoucher.id)
+      setDeletingVoucher(null)
     }
-  };
+  }
 
   const handlePageChange = (newPage: number) => {
-    setPage(newPage);
-  };
+    setPage(newPage)
+  }
 
   if (isError) {
-    return <ContainerErrorState title={t('error.title')} description={t('error.loadFailed')} />;
+    return <ContainerErrorState title={t('error.title')} description={t('error.loadFailed')} />
   }
 
   return (
@@ -233,7 +237,7 @@ export function VouchersPage() {
                         {voucher.name}
                       </p>
                       {voucher.description && (
-                        <p className="truncate text-xs text-slate-500 dark:text-slate-400 max-w-[200px]">
+                        <p className="max-w-[200px] truncate text-xs text-slate-500 dark:text-slate-400">
                           {voucher.description}
                         </p>
                       )}
@@ -279,7 +283,9 @@ export function VouchersPage() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-48">
-                          <DropdownMenuItem onClick={() => router.push(`/admin/vouchers/${voucher.id}`)}>
+                          <DropdownMenuItem
+                            onClick={() => router.push(`/admin/vouchers/${voucher.id}`)}
+                          >
                             <Eye className="mr-2 h-4 w-4" />
                             {t('actions.view')}
                           </DropdownMenuItem>
@@ -318,11 +324,7 @@ export function VouchersPage() {
       )}
 
       {/* Dialogs */}
-      <VoucherFormDialog
-        open={isFormOpen}
-        onOpenChange={setIsFormOpen}
-        voucher={editingVoucher}
-      />
+      <VoucherFormDialog open={isFormOpen} onOpenChange={setIsFormOpen} voucher={editingVoucher} />
 
       <ConfirmDeleteDialog
         open={!!deletingVoucher}
@@ -333,5 +335,5 @@ export function VouchersPage() {
         isLoading={archiveMutation.isPending}
       />
     </div>
-  );
+  )
 }

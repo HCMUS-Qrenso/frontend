@@ -1,9 +1,9 @@
-'use client';
+'use client'
 
-import { useTranslations } from 'next-intl';
-import { format } from 'date-fns';
-import { vi } from 'date-fns/locale';
-import { useRouter } from '@/src/i18n/navigation';
+import { useTranslations } from 'next-intl'
+import { format } from 'date-fns'
+import { vi } from 'date-fns/locale'
+import { useRouter } from '@/src/i18n/navigation'
 import {
   ArrowLeft,
   Calendar,
@@ -16,9 +16,9 @@ import {
   Clock,
   TrendingUp,
   Archive,
-} from 'lucide-react';
-import { Button } from '@/src/components/ui/button';
-import { Badge } from '@/src/components/ui/badge';
+} from 'lucide-react'
+import { Button } from '@/src/components/ui/button'
+import { Badge } from '@/src/components/ui/badge'
 import {
   Table,
   TableBody,
@@ -29,82 +29,90 @@ import {
   AdminTableHeaderRow,
   AdminTableHead,
   AdminTableRow,
-} from '@/src/components/ui/table';
-import { StatusBadge, type StatusConfig } from '@/src/components/ui/status-badge';
-import { EmptyState } from '@/src/components/ui/empty-state';
-import { ContainerErrorState } from '@/src/components/ui/loading-state';
-import { Skeleton } from '@/src/components/ui/skeleton';
-import { useVoucherQuery, useVoucherRedemptionsQuery, useArchiveVoucherMutation } from '../queries';
-import { VoucherFormDialog } from './voucher-form-dialog';
-import { ConfirmDeleteDialog } from '@/src/components/ui/confirm-delete-dialog';
-import type { ApplySource, VoucherStatus } from '../types';
-import { useTenantSettings } from '@/src/contexts/tenant-settings-context';
-import { useState } from 'react';
-import { toast } from 'sonner';
+} from '@/src/components/ui/table'
+import { StatusBadge, type StatusConfig } from '@/src/components/ui/status-badge'
+import { EmptyState } from '@/src/components/ui/empty-state'
+import { ContainerErrorState } from '@/src/components/ui/loading-state'
+import { Skeleton } from '@/src/components/ui/skeleton'
+import { useVoucherQuery, useVoucherRedemptionsQuery, useArchiveVoucherMutation } from '../queries'
+import { VoucherFormDialog } from './voucher-form-dialog'
+import { ConfirmDeleteDialog } from '@/src/components/ui/confirm-delete-dialog'
+import type { ApplySource, VoucherStatus } from '../types'
+import { useTenantSettings } from '@/src/contexts/tenant-settings-context'
+import { useState } from 'react'
+import { toast } from 'sonner'
 
 interface VoucherDetailPageProps {
-  id: string;
+  id: string
 }
 
 export function VoucherDetailPage({ id }: VoucherDetailPageProps) {
-  const t = useTranslations('vouchers');
-  const router = useRouter();
-  const { settings } = useTenantSettings();
+  const t = useTranslations('vouchers')
+  const router = useRouter()
+  const { settings } = useTenantSettings()
 
-  const [isEditOpen, setIsEditOpen] = useState(false);
-  const [isArchiveOpen, setIsArchiveOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false)
+  const [isArchiveOpen, setIsArchiveOpen] = useState(false)
 
-  const { data: voucherData, isLoading, isError } = useVoucherQuery(id);
-  const { data: redemptionsData, isLoading: redemptionsLoading } = useVoucherRedemptionsQuery(id, 1, 20);
-  const archiveMutation = useArchiveVoucherMutation();
+  const { data: voucherData, isLoading, isError } = useVoucherQuery(id)
+  const { data: redemptionsData, isLoading: redemptionsLoading } = useVoucherRedemptionsQuery(
+    id,
+    1,
+    20,
+  )
+  const archiveMutation = useArchiveVoucherMutation()
 
-  const voucher = voucherData?.data;
+  const voucher = voucherData?.data
 
   // Helper to format currency
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('vi-VN', {
       style: 'currency',
       currency: settings.general.currency || 'VND',
-    }).format(value);
-  };
+    }).format(value)
+  }
 
   // Status config
   const voucherStatusConfig: Record<string, StatusConfig> = {
     active: {
       label: t('status.active'),
-      className: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20',
+      className:
+        'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20',
     },
     draft: {
       label: t('status.draft'),
-      className: 'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-500/10 dark:text-slate-400 dark:border-slate-500/20',
+      className:
+        'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-500/10 dark:text-slate-400 dark:border-slate-500/20',
     },
     paused: {
       label: t('status.paused'),
-      className: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20',
+      className:
+        'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20',
     },
     archived: {
       label: t('status.archived'),
-      className: 'bg-red-50 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20',
+      className:
+        'bg-red-50 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20',
     },
-  };
+  }
 
   const getKindIcon = (kind: string) => {
     const icons: Record<string, React.ReactNode> = {
       automatic: <Zap className="h-4 w-4" />,
       staff_only: <Users className="h-4 w-4" />,
       code: <Tag className="h-4 w-4" />,
-    };
-    return icons[kind];
-  };
+    }
+    return icons[kind]
+  }
 
   const getKindLabel = (kind: string) => {
     const labels: Record<string, string> = {
       automatic: t('kind.automatic'),
       staff_only: t('kind.staffOnly'),
       code: t('kind.code'),
-    };
-    return labels[kind];
-  };
+    }
+    return labels[kind]
+  }
 
   const getSourceLabel = (source: ApplySource) => {
     const labels: Record<ApplySource, string> = {
@@ -112,19 +120,19 @@ export function VoucherDetailPage({ id }: VoucherDetailPageProps) {
       waiter: t('source.waiter'),
       customer_code: t('source.customerCode'),
       admin: t('source.admin'),
-    };
-    return labels[source];
-  };
+    }
+    return labels[source]
+  }
 
   const handleArchive = async () => {
     try {
-      await archiveMutation.mutateAsync(id);
-      toast.success(t('archiveSuccess'));
-      router.push('/admin/vouchers');
+      await archiveMutation.mutateAsync(id)
+      toast.success(t('archiveSuccess'))
+      router.push('/admin/vouchers')
     } catch {
-      toast.error(t('archiveError'));
+      toast.error(t('archiveError'))
     }
-  };
+  }
 
   if (isLoading) {
     return (
@@ -143,11 +151,11 @@ export function VoucherDetailPage({ id }: VoucherDetailPageProps) {
         </div>
         <Skeleton className="h-64 rounded-xl" />
       </div>
-    );
+    )
   }
 
   if (isError || !voucher) {
-    return <ContainerErrorState title={t('error.title')} description={t('error.loadFailed')} />;
+    return <ContainerErrorState title={t('error.title')} description={t('error.loadFailed')} />
   }
 
   return (
@@ -165,7 +173,7 @@ export function VoucherDetailPage({ id }: VoucherDetailPageProps) {
           </Button>
           <div>
             <div className="flex items-center gap-3">
-              <h1 className="font-mono text-xl font-bold text-slate-900 dark:text-white sm:text-2xl">
+              <h1 className="font-mono text-xl font-bold text-slate-900 sm:text-2xl dark:text-white">
                 {voucher.code}
               </h1>
               <StatusBadge status={voucher.status} config={voucherStatusConfig} />
@@ -208,7 +216,9 @@ export function VoucherDetailPage({ id }: VoucherDetailPageProps) {
               )}
             </div>
             <div>
-              <p className="text-xs text-slate-500 dark:text-slate-400">{t('detail.discountValue')}</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                {t('detail.discountValue')}
+              </p>
               <p className="text-lg font-bold text-slate-900 dark:text-white">
                 {voucher.discountType === 'percent'
                   ? `${voucher.percentOff}%`
@@ -290,13 +300,17 @@ export function VoucherDetailPage({ id }: VoucherDetailPageProps) {
           <dl className="space-y-4">
             {voucher.description && (
               <div>
-                <dt className="text-sm text-slate-500 dark:text-slate-400">{t('form.description')}</dt>
+                <dt className="text-sm text-slate-500 dark:text-slate-400">
+                  {t('form.description')}
+                </dt>
                 <dd className="text-sm text-slate-900 dark:text-white">{voucher.description}</dd>
               </div>
             )}
             {voucher.minSubtotal && (
               <div>
-                <dt className="text-sm text-slate-500 dark:text-slate-400">{t('detail.minOrder')}</dt>
+                <dt className="text-sm text-slate-500 dark:text-slate-400">
+                  {t('detail.minOrder')}
+                </dt>
                 <dd className="text-sm font-medium text-slate-900 dark:text-white">
                   {formatCurrency(voucher.minSubtotal)}
                 </dd>
@@ -312,7 +326,9 @@ export function VoucherDetailPage({ id }: VoucherDetailPageProps) {
             )}
             <div>
               <dt className="text-sm text-slate-500 dark:text-slate-400">{t('form.priority')}</dt>
-              <dd className="text-sm font-medium text-slate-900 dark:text-white">{voucher.priority}</dd>
+              <dd className="text-sm font-medium text-slate-900 dark:text-white">
+                {voucher.priority}
+              </dd>
             </div>
             <div className="flex gap-4">
               {voucher.autoApply && (
@@ -339,7 +355,9 @@ export function VoucherDetailPage({ id }: VoucherDetailPageProps) {
             <div className="flex items-center gap-3">
               <Clock className="h-4 w-4 text-slate-400" />
               <div>
-                <dt className="text-sm text-slate-500 dark:text-slate-400">{t('detail.startsAt')}</dt>
+                <dt className="text-sm text-slate-500 dark:text-slate-400">
+                  {t('detail.startsAt')}
+                </dt>
                 <dd className="text-sm font-medium text-slate-900 dark:text-white">
                   {voucher.startsAt
                     ? format(new Date(voucher.startsAt), "dd/MM/yyyy 'lúc' HH:mm", { locale: vi })
@@ -393,10 +411,18 @@ export function VoucherDetailPage({ id }: VoucherDetailPageProps) {
               {redemptionsLoading ? (
                 Array.from({ length: 3 }).map((_, i) => (
                   <TableRow key={i}>
-                    <TableCell><Skeleton className="h-4 w-24" /></TableCell>
-                    <TableCell><Skeleton className="h-4 w-20" /></TableCell>
-                    <TableCell><Skeleton className="h-4 w-16" /></TableCell>
-                    <TableCell><Skeleton className="h-4 w-28" /></TableCell>
+                    <TableCell>
+                      <Skeleton className="h-4 w-24" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-4 w-20" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-4 w-16" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-4 w-28" />
+                    </TableCell>
                   </TableRow>
                 ))
               ) : redemptionsData?.data.length === 0 ? (
@@ -411,7 +437,10 @@ export function VoucherDetailPage({ id }: VoucherDetailPageProps) {
                 </TableRow>
               ) : (
                 redemptionsData?.data.map((redemption, index) => (
-                  <AdminTableRow key={redemption.id} isLast={index === redemptionsData.data.length - 1}>
+                  <AdminTableRow
+                    key={redemption.id}
+                    isLast={index === redemptionsData.data.length - 1}
+                  >
                     <TableCell className="px-6 py-4">
                       <span className="font-mono text-sm font-medium text-slate-900 dark:text-white">
                         {redemption.orderNumber}
@@ -429,7 +458,7 @@ export function VoucherDetailPage({ id }: VoucherDetailPageProps) {
                     </TableCell>
                     <TableCell className="px-6 py-4">
                       <span className="text-sm text-slate-500 dark:text-slate-400">
-                        {format(new Date(redemption.createdAt), "dd/MM/yyyy HH:mm", { locale: vi })}
+                        {format(new Date(redemption.createdAt), 'dd/MM/yyyy HH:mm', { locale: vi })}
                       </span>
                     </TableCell>
                   </AdminTableRow>
@@ -441,11 +470,7 @@ export function VoucherDetailPage({ id }: VoucherDetailPageProps) {
       </div>
 
       {/* Edit Dialog */}
-      <VoucherFormDialog
-        open={isEditOpen}
-        onOpenChange={setIsEditOpen}
-        voucher={voucher}
-      />
+      <VoucherFormDialog open={isEditOpen} onOpenChange={setIsEditOpen} voucher={voucher} />
 
       {/* Archive Dialog */}
       <ConfirmDeleteDialog
@@ -457,5 +482,5 @@ export function VoucherDetailPage({ id }: VoucherDetailPageProps) {
         isLoading={archiveMutation.isPending}
       />
     </div>
-  );
+  )
 }

@@ -29,6 +29,8 @@ import {
 import { toast } from 'sonner'
 import { printBill } from '../utils/print-bill'
 import { useTranslations } from 'next-intl'
+import { useTenantSettings } from '@/src/contexts/tenant-settings-context'
+import { useLocale } from 'next-intl'
 
 const PAYMENT_STATUS_COLORS: Record<string, string> = {
   pending: 'bg-slate-100 text-slate-700 dark:bg-slate-500/10 dark:text-slate-400',
@@ -62,6 +64,8 @@ export function PaymentCard({
   const cancelPaymentMutation = useCancelPaymentMutation()
   const checkPaymentStatusMutation = useCheckPaymentStatusMutation()
   const t = useTranslations('orders')
+  const locale = useLocale()
+  const { settings } = useTenantSettings()
 
   // Helper functions for translation
   const getPaymentStatusLabel = (status: string) => t(`paymentStatus.${status}` as any) || status
@@ -130,6 +134,11 @@ export function PaymentCard({
       paymentMethod: payment?.paymentMethod as 'cash' | 'qr',
       tenantName,
       tenantAddress,
+      locale,
+      receiptHeader: settings.receipt.header,
+      receiptFooter: settings.receipt.footer,
+      currencySymbol: settings.general.currency_symbol,
+      invoiceNum: payment?.invoiceNum,
     })
     toast.success(t('toast.printingBill'))
   }
@@ -188,44 +197,46 @@ export function PaymentCard({
         <div className="space-y-2">
           {/* Subtotal */}
           <div className="flex items-center justify-between">
-            <p className="text-sm text-slate-500 dark:text-slate-400">{t('paymentCard.subtotal')}</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400">
+              {t('paymentCard.subtotal')}
+            </p>
             <p className="text-sm text-slate-900 dark:text-white">
               {formatPrice(order?.subtotal || 0)}
             </p>
           </div>
 
           {/* Discount - show each applied voucher */}
-          {order?.appliedVouchers && order.appliedVouchers.length > 0 ? (
-            // Show individual voucher discounts
-            order.appliedVouchers.map((voucher: any) => (
-              <div key={voucher.redemptionId} className="flex items-center justify-between">
-                <p className="text-sm text-slate-500 dark:text-slate-400">
-                  {t('paymentCard.discount')}
-                  <span className="ml-1 text-xs text-emerald-600 dark:text-emerald-400">
-                    ({voucher.voucherCode})
-                  </span>
-                </p>
-                <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400">
-                  -{formatPrice(voucher.discountAmount)}
-                </p>
-              </div>
-            ))
-          ) : order?.discountAmount > 0 && (
-            // Fallback: single discount line
-            <div className="flex items-center justify-between">
-              <p className="text-sm text-slate-500 dark:text-slate-400">
-                {t('paymentCard.discount')}
-                {order?.voucherCode && (
-                  <span className="ml-1 text-xs text-emerald-600 dark:text-emerald-400">
-                    ({order.voucherCode})
-                  </span>
-                )}
-              </p>
-              <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400">
-                -{formatPrice(order.discountAmount)}
-              </p>
-            </div>
-          )}
+          {order?.appliedVouchers && order.appliedVouchers.length > 0
+            ? // Show individual voucher discounts
+              order.appliedVouchers.map((voucher: any) => (
+                <div key={voucher.redemptionId} className="flex items-center justify-between">
+                  <p className="text-sm text-slate-500 dark:text-slate-400">
+                    {t('paymentCard.discount')}
+                    <span className="ml-1 text-xs text-emerald-600 dark:text-emerald-400">
+                      ({voucher.voucherCode})
+                    </span>
+                  </p>
+                  <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400">
+                    -{formatPrice(voucher.discountAmount)}
+                  </p>
+                </div>
+              ))
+            : order?.discountAmount > 0 && (
+                // Fallback: single discount line
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-slate-500 dark:text-slate-400">
+                    {t('paymentCard.discount')}
+                    {order?.voucherCode && (
+                      <span className="ml-1 text-xs text-emerald-600 dark:text-emerald-400">
+                        ({order.voucherCode})
+                      </span>
+                    )}
+                  </p>
+                  <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400">
+                    -{formatPrice(order.discountAmount)}
+                  </p>
+                </div>
+              )}
 
           {/* Tax/VAT */}
           <div className="flex items-center justify-between">
@@ -235,7 +246,7 @@ export function PaymentCard({
             </p>
           </div>
 
-          <div className="border-t border-slate-200 dark:border-slate-700 pt-2" />
+          <div className="border-t border-slate-200 pt-2 dark:border-slate-700" />
 
           {/* Total */}
           <div className="flex items-center justify-between">

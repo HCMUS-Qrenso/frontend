@@ -69,9 +69,11 @@ export function useKdsSocket(options: UseKdsSocketOptions = {}): UseKdsSocketRet
   const { enabled = true, showNotifications = true } = options
 
   const socketRef = useRef<Socket | null>(null)
+  const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const [isConnected, setIsConnected] = useState(false)
   const queryClient = useQueryClient()
   const accessToken = useAuthStore((state) => state.accessToken)
+  const accessTokenRef = useRef(accessToken)
 
   const { settings: tenantSettings } = useTenantSettings()
 
@@ -217,6 +219,12 @@ export function useKdsSocket(options: UseKdsSocketOptions = {}): UseKdsSocketRet
   }, [enabled, accessToken, updateItemStatusInCache])
 
   const disconnect = useCallback(() => {
+    // Clear any pending reconnect timeout
+    if (reconnectTimeoutRef.current) {
+      clearTimeout(reconnectTimeoutRef.current)
+      reconnectTimeoutRef.current = null
+    }
+
     if (socketRef.current) {
       console.log('[KdsSocket] Disconnecting')
       socketRef.current.disconnect()
@@ -227,8 +235,22 @@ export function useKdsSocket(options: UseKdsSocketOptions = {}): UseKdsSocketRet
 
   const reconnect = useCallback(() => {
     disconnect()
-    setTimeout(connect, 100)
+    reconnectTimeoutRef.current = setTimeout(connect, 100)
   }, [disconnect, connect])
+
+  // Detect token changes and reconnect
+  useEffect(() => {
+    if (accessToken !== accessTokenRef.current) {
+      console.log('[KdsSocket] Access token changed, reconnecting...')
+      accessTokenRef.current = accessToken
+      // Force reconnect with new token
+      if (socketRef.current?.connected) {
+        disconnect()
+        // Wait a bit before reconnecting
+        reconnectTimeoutRef.current = setTimeout(connect, 200)
+      }
+    }
+  }, [accessToken, connect, disconnect])
 
   // Connect on mount, disconnect on unmount
   useEffect(() => {
@@ -236,7 +258,7 @@ export function useKdsSocket(options: UseKdsSocketOptions = {}): UseKdsSocketRet
     return () => {
       disconnect()
     }
-  }, [enabled, accessToken])
+  }, [connect, disconnect])
 
   return { isConnected, disconnect, reconnect }
 }

@@ -39,9 +39,15 @@ export function useCompleteOnboarding() {
       const response = await apiClient.post('/tenants/onboarding/complete')
       return response.data
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ONBOARDING_KEY })
-      queryClient.invalidateQueries({ queryKey: ['tenant'] })
+    onSuccess: async () => {
+      // Invalidate and refetch both onboarding and tenant queries
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ONBOARDING_KEY }),
+        queryClient.invalidateQueries({ queryKey: ['tenant'] }),
+      ])
+
+      // Also refetch the onboarding query to ensure it's updated
+      await queryClient.refetchQueries({ queryKey: ONBOARDING_KEY })
     },
   })
 }

@@ -78,12 +78,12 @@ export function FormDialog({
   submitDisabled = false,
 }: FormDialogProps) {
   const t = useTranslations('common')
-  
+
   // Use translations as fallbacks for button text
   const resolvedCancelText = cancelText ?? t('cancel')
   const resolvedSubmitText = submitText ?? t('save')
   const resolvedLoadingText = loadingText ?? t('saving')
-  
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     await onSubmit(e)

@@ -9,11 +9,28 @@ interface PrintBillOptions {
   qrCodeData?: string
   tenantName?: string | null
   tenantAddress?: string | null
+  locale?: string
+  receiptHeader?: string | null
+  receiptFooter?: string | null
+  currencySymbol?: string
+  invoiceNum?: string | null
 }
 
 export async function printBill(options: PrintBillOptions): Promise<void> {
-  const { order, billType, paymentMethod, description, qrCodeData, tenantName, tenantAddress } =
-    options
+  const {
+    order,
+    billType,
+    paymentMethod,
+    description,
+    qrCodeData,
+    tenantName,
+    tenantAddress,
+    locale = 'vi',
+    receiptHeader,
+    receiptFooter,
+    currencySymbol = '₫',
+    invoiceNum,
+  } = options
 
   // Generate QR code data URL if qrCodeData is provided
   let qrCodeDataUrl: string | undefined
@@ -32,7 +49,104 @@ export async function printBill(options: PrintBillOptions): Promise<void> {
     }
   }
 
-  const billTitle = billType === 'temporary' ? 'PHIẾU TẠM TÍNH' : 'HÓA ĐƠN THANH TOÁN'
+  // Localized strings
+  const translations: Record<
+    string,
+    {
+      billTitle: { temporary: string; final: string }
+      orderCode: string
+      invoiceNumber: string
+      table: string
+      time: string
+      item: string
+      qty: string
+      amount: string
+      subtotal: string
+      discount: string
+      tax: string
+      total: string
+      scanQr: string
+      scanQrDesc: string
+      thankYou: string
+      note: string
+    }
+  > = {
+    vi: {
+      billTitle: { temporary: 'PHIẾU TẠM TÍNH', final: 'HÓA ĐƠN THANH TOÁN' },
+      orderCode: 'Mã đơn',
+      invoiceNumber: 'Số hóa đơn',
+      table: 'Bàn',
+      time: 'Thời gian',
+      item: 'Món',
+      qty: 'SL',
+      amount: 'Thành tiền',
+      subtotal: 'Tạm tính',
+      discount: 'Giảm giá',
+      tax: 'Thuế',
+      total: 'TỔNG CỘNG',
+      scanQr: 'QUÉT MÃ ĐỂ THANH TOÁN',
+      scanQrDesc: 'Quét mã QR bằng ứng dụng ngân hàng',
+      thankYou: 'CẢM ƠN QUÝ KHÁCH!',
+      note: 'Ghi chú',
+    },
+    en: {
+      billTitle: { temporary: 'TEMPORARY BILL', final: 'INVOICE' },
+      orderCode: 'Order',
+      invoiceNumber: 'Invoice No.',
+      table: 'Table',
+      time: 'Time',
+      item: 'Item',
+      qty: 'Qty',
+      amount: 'Amount',
+      subtotal: 'Subtotal',
+      discount: 'Discount',
+      tax: 'Tax',
+      total: 'TOTAL',
+      scanQr: 'SCAN TO PAY',
+      scanQrDesc: 'Scan QR code with banking app',
+      thankYou: 'THANK YOU!',
+      note: 'Note',
+    },
+    zh: {
+      billTitle: { temporary: '临时账单', final: '发票' },
+      orderCode: '订单号',
+      invoiceNumber: '发票号',
+      table: '桌号',
+      time: '时间',
+      item: '项目',
+      qty: '数量',
+      amount: '金额',
+      subtotal: '小计',
+      discount: '折扣',
+      tax: '税',
+      total: '总计',
+      scanQr: '扫码支付',
+      scanQrDesc: '使用银行应用扫描二维码',
+      thankYou: '谢谢！',
+      note: '备注',
+    },
+    fr: {
+      billTitle: { temporary: 'FACTURE TEMPORAIRE', final: 'FACTURE' },
+      orderCode: 'Commande',
+      invoiceNumber: 'N° Facture',
+      table: 'Table',
+      time: 'Heure',
+      item: 'Article',
+      qty: 'Qté',
+      amount: 'Montant',
+      subtotal: 'Sous-total',
+      discount: 'Remise',
+      tax: 'Taxe',
+      total: 'TOTAL',
+      scanQr: 'SCANNER POUR PAYER',
+      scanQrDesc: "Scanner le code QR avec l'application bancaire",
+      thankYou: 'MERCI!',
+      note: 'Remarque',
+    },
+  }
+
+  const t = translations[locale] || translations.vi
+  const billTitle = billType === 'temporary' ? t.billTitle.temporary : t.billTitle.final
   const isPaid = billType === 'final'
 
   const htmlContent = generateBillHTML({
@@ -44,6 +158,11 @@ export async function printBill(options: PrintBillOptions): Promise<void> {
     qrCodeDataUrl,
     tenantName,
     tenantAddress,
+    t,
+    receiptHeader,
+    receiptFooter,
+    currencySymbol,
+    invoiceNum,
   })
 
   // Create hidden iframe for printing
@@ -87,6 +206,11 @@ interface GenerateBillHTMLOptions {
   qrCodeDataUrl?: string
   tenantName?: string | null
   tenantAddress?: string | null
+  t: any
+  receiptHeader?: string | null
+  receiptFooter?: string | null
+  currencySymbol: string
+  invoiceNum?: string | null
 }
 
 function generateBillHTML(options: GenerateBillHTMLOptions): string {
@@ -99,6 +223,11 @@ function generateBillHTML(options: GenerateBillHTMLOptions): string {
     qrCodeDataUrl,
     tenantName,
     tenantAddress,
+    t,
+    receiptHeader,
+    receiptFooter,
+    currencySymbol,
+    invoiceNum,
   } = options
   return `
     <!DOCTYPE html>
@@ -234,31 +363,42 @@ function generateBillHTML(options: GenerateBillHTMLOptions): string {
       </head>
       <body>
         <div class="header">
-          <div class="restaurant-name">${tenantName || 'NHÀ HÀNG'}</div>
+          <div class="restaurant-name">${tenantName || 'RESTAURANT'}</div>
           ${tenantAddress ? `<div class="restaurant-info">${tenantAddress}</div>` : ''}
+          ${receiptHeader ? `<div class="restaurant-info">${receiptHeader}</div>` : ''}
           <div class="bill-type">${billTitle}</div>
         </div>
 
         <div class="info-section">
+          ${
+            isPaid && invoiceNum
+              ? `
           <div class="info-row">
-            <span class="label">Mã đơn:</span>
+            <span class="label">${t.invoiceNumber}:</span>
+            <span>${invoiceNum}</span>
+          </div>
+          `
+              : ''
+          }
+          <div class="info-row">
+            <span class="label">${t.orderCode}:</span>
             <span>${order.orderNumber}</span>
           </div>
           <div class="info-row">
-            <span class="label">Bàn:</span>
-            <span>Bàn ${order.table?.tableNumber || 'N/A'} - ${order.table?.zone?.name || ''}</span>
+            <span class="label">${t.table}:</span>
+            <span>${t.table} ${order.table?.tableNumber || 'N/A'} - ${order.table?.zone?.name || ''}</span>
           </div>
           <div class="info-row">
-            <span class="label">Thời gian:</span>
-            <span>${new Date(order.createdAt).toLocaleString('vi-VN')}</span>
+            <span class="label">${t.time}:</span>
+            <span>${new Date(order.createdAt).toLocaleString()}</span>
           </div>
         </div>
 
         <div class="items-section">
           <div class="item" style="font-weight: bold; border-bottom: 1px solid #000; padding-bottom: 5px;">
-            <div class="item-name">Món</div>
-            <div class="item-qty">SL</div>
-            <div class="item-price">Thành tiền</div>
+            <div class="item-name">${t.item}</div>
+            <div class="item-qty">${t.qty}</div>
+            <div class="item-price">${t.amount}</div>
           </div>
           ${order.items
             .map(
@@ -266,7 +406,7 @@ function generateBillHTML(options: GenerateBillHTMLOptions): string {
             <div class="item">
               <div class="item-name">${(item as any).name || (item as any).menuItem?.name}</div>
               <div class="item-qty">x${item.quantity}</div>
-              <div class="item-price">${item.subtotal.toLocaleString('vi-VN')}₫</div>
+              <div class="item-price">${item.subtotal.toLocaleString()}${currencySymbol}</div>
             </div>
             ${
               item.modifiers && item.modifiers.length > 0
@@ -276,7 +416,7 @@ function generateBillHTML(options: GenerateBillHTMLOptions): string {
                         `<div class="item" style="font-size: 10px; padding-left: 10px;">
                       <div class="item-name">+ ${mod.name || mod.modifierName}</div>
                       <div class="item-qty"></div>
-                      <div class="item-price">${mod.priceAdjustment.toLocaleString('vi-VN')}₫</div>
+                      <div class="item-price">${mod.priceAdjustment.toLocaleString()}${currencySymbol}</div>
                     </div>`,
                     )
                     .join('')
@@ -284,7 +424,7 @@ function generateBillHTML(options: GenerateBillHTMLOptions): string {
             }
             ${
               item.specialInstructions
-                ? `<div style="font-size: 10px; padding-left: 10px; font-style: italic; color: #666;">Ghi chú: ${item.specialInstructions}</div>`
+                ? `<div style="font-size: 10px; padding-left: 10px; font-style: italic; color: #666;">${t.note}: ${item.specialInstructions}</div>`
                 : ''
             }
           `,
@@ -294,15 +434,15 @@ function generateBillHTML(options: GenerateBillHTMLOptions): string {
 
         <div class="total-section">
           <div class="total-row">
-            <span>Tạm tính:</span>
-            <span>${order.subtotal.toLocaleString('vi-VN')}₫</span>
+            <span>${t.subtotal}:</span>
+            <span>${order.subtotal.toLocaleString()}${currencySymbol}</span>
           </div>
           ${
             order.discountAmount > 0
               ? `
           <div class="total-row">
-            <span>Giảm giá:</span>
-            <span>-${order.discountAmount.toLocaleString('vi-VN')}₫</span>
+            <span>${t.discount}:</span>
+            <span>-${order.discountAmount.toLocaleString()}${currencySymbol}</span>
           </div>
           `
               : ''
@@ -311,15 +451,15 @@ function generateBillHTML(options: GenerateBillHTMLOptions): string {
             order.taxAmount > 0
               ? `
           <div class="total-row">
-            <span>Thuế:</span>
-            <span>${order.taxAmount.toLocaleString('vi-VN')}₫</span>
+            <span>${t.tax}:</span>
+            <span>${order.taxAmount.toLocaleString()}${currencySymbol}</span>
           </div>
           `
               : ''
           }
           <div class="total-row grand-total">
-            <span>TỔNG CỘNG:</span>
-            <span>${order.totalAmount.toLocaleString('vi-VN')}₫</span>
+            <span>${t.total}:</span>
+            <span>${order.totalAmount.toLocaleString()}${currencySymbol}</span>
           </div>
         </div>
 
@@ -327,17 +467,18 @@ function generateBillHTML(options: GenerateBillHTMLOptions): string {
           !isPaid && paymentMethod === 'qr' && qrCodeDataUrl
             ? `
         <div class="qr-section">
-          <div class="qr-instruction">QUÉT MÃ ĐỂ THANH TOÁN</div>
+          <div class="qr-instruction">${t.scanQr}</div>
           <img src="${qrCodeDataUrl}" alt="QR Code" class="qr-code" />
-          <div style="font-size: 11px; margin-top: 10px;">Quét mã QR bằng ứng dụng ngân hàng</div>
+          <div style="font-size: 11px; margin-top: 10px;">${t.scanQrDesc}</div>
         </div>
         `
             : ''
         }
 
         <div class="footer">
-          <div class="thank-you">CẢM ƠN QUÝ KHÁCH!</div>
-          <div style="font-size: 10px;">Một sản phẩm của Qrenso - qrenso.site</div>
+          ${receiptFooter ? `<div style="font-size: 11px; margin-bottom: 10px;">${receiptFooter}</div>` : ''}
+          <div class="thank-you">${t.thankYou}</div>
+          <div style="font-size: 10px;">Qrenso - qrenso.site</div>
         </div>
       </body>
     </html>

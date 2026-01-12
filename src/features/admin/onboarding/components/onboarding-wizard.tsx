@@ -90,7 +90,7 @@ export function OnboardingWizard() {
   }
 
   return (
-    <div className="from-background to-muted/30 flex min-h-screen items-center justify-center bg-gradient-to-br">
+    <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-slate-950">
       <div className="container max-w-4xl py-8">
         {/* Header */}
         <div className="mb-8 text-center">
@@ -110,8 +110,8 @@ export function OnboardingWizard() {
         </div>
 
         {/* Step Content */}
-        <Card className="mb-6">
-          <CardContent className="p-6">{renderStep()}</CardContent>
+        <Card className="mb-6 rounded-2xl border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+          <CardContent className="p-0">{renderStep()}</CardContent>
         </Card>
 
         {/* Navigation (hidden on review step) */}

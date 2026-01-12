@@ -20,6 +20,8 @@ import type { Order, OrderDetail } from '../types/orders'
 import { QrPaymentModal } from './qr-payment-modal'
 import { StaffVoucherSelector } from './staff-voucher-selector'
 import { useTranslations } from 'next-intl'
+import { useTenantSettings } from '@/src/contexts/tenant-settings-context'
+import { useLocale } from 'next-intl'
 
 interface PaymentDialogProps {
   open: boolean
@@ -48,12 +50,14 @@ export function PaymentDialog({
 
   // Fetch fresh order data to get applied vouchers
   const { data: orderData } = useOrderQuery(orderProp?.id || null, open && !!orderProp?.id)
-  
+
   // Use fresh data if available, fallback to prop
   const order = orderData?.data || orderProp
 
   const createPaymentMutation = useCreatePaymentMutation()
   const t = useTranslations('orders')
+  const locale = useLocale()
+  const { settings } = useTenantSettings()
 
   useEffect(() => {
     if (open) {
@@ -101,6 +105,10 @@ export function PaymentDialog({
           qrCodeData: result?.qrCodeData,
           tenantName,
           tenantAddress,
+          locale,
+          receiptHeader: settings.receipt.header,
+          receiptFooter: settings.receipt.footer,
+          currencySymbol: settings.general.currency_symbol,
         })
 
         if (paymentMethod === 'cash') {
@@ -216,22 +224,14 @@ export function PaymentDialog({
 
         {/* Action Selection */}
         <FormDialogSectionGroup title={t('dialog.action')}>
-          <RadioGroup
-            value={action}
-            onValueChange={(value) => setAction(value as DialogAction)}
-          >
+          <RadioGroup value={action} onValueChange={(value) => setAction(value as DialogAction)}>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="print" id="print" />
-              <Label
-                htmlFor="print"
-                className="flex cursor-pointer items-center gap-2 font-normal"
-              >
+              <Label htmlFor="print" className="flex cursor-pointer items-center gap-2 font-normal">
                 <Printer className="h-4 w-4" />
                 <div>
                   <div className="font-medium">{t('dialog.printBill')}</div>
-                  <div className="text-muted-foreground text-xs">
-                    {t('dialog.printBillDesc')}
-                  </div>
+                  <div className="text-muted-foreground text-xs">{t('dialog.printBillDesc')}</div>
                 </div>
               </Label>
             </div>
@@ -279,18 +279,13 @@ export function PaymentDialog({
                   )}
                 >
                   <RadioGroupItem value="cash" id="cash" />
-                  <Label
-                    htmlFor="cash"
-                    className="flex flex-1 cursor-pointer items-center gap-3"
-                  >
+                  <Label htmlFor="cash" className="flex flex-1 cursor-pointer items-center gap-3">
                     <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-500/10">
                       <Banknote className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
                     </div>
                     <div className="flex-1">
                       <div className="font-medium">{t('paymentMethod.cash')}</div>
-                      <div className="text-muted-foreground text-xs">
-                        {t('dialog.cashDesc')}
-                      </div>
+                      <div className="text-muted-foreground text-xs">{t('dialog.cashDesc')}</div>
                     </div>
                   </Label>
                 </div>
@@ -365,31 +360,34 @@ export function PaymentDialog({
               </div>
 
               {/* Discount - show each applied voucher */}
-              {(order as any).appliedVouchers && (order as any).appliedVouchers.length > 0 ? (
-                // Show individual voucher discounts
-                (order as any).appliedVouchers.map((voucher: any) => (
-                  <div key={voucher.redemptionId} className="flex justify-between text-emerald-600 dark:text-emerald-400">
-                    <span className="flex items-center gap-1">
-                      <Ticket className="h-3 w-3" />
-                      {t('paymentCard.discount')}
-                      <span className="text-xs">({voucher.voucherCode})</span>
-                    </span>
-                    <span>-{voucher.discountAmount.toLocaleString('vi-VN')}₫</span>
-                  </div>
-                ))
-              ) : order.discountAmount > 0 && (
-                // Fallback: single discount line
-                <div className="flex justify-between text-emerald-600 dark:text-emerald-400">
-                  <span className="flex items-center gap-1">
-                    <Ticket className="h-3 w-3" />
-                    {t('paymentCard.discount')}
-                    {(order as any).voucherCode && (
-                      <span className="text-xs">({(order as any).voucherCode})</span>
-                    )}
-                  </span>
-                  <span>-{order.discountAmount.toLocaleString('vi-VN')}₫</span>
-                </div>
-              )}
+              {(order as any).appliedVouchers && (order as any).appliedVouchers.length > 0
+                ? // Show individual voucher discounts
+                  (order as any).appliedVouchers.map((voucher: any) => (
+                    <div
+                      key={voucher.redemptionId}
+                      className="flex justify-between text-emerald-600 dark:text-emerald-400"
+                    >
+                      <span className="flex items-center gap-1">
+                        <Ticket className="h-3 w-3" />
+                        {t('paymentCard.discount')}
+                        <span className="text-xs">({voucher.voucherCode})</span>
+                      </span>
+                      <span>-{voucher.discountAmount.toLocaleString('vi-VN')}₫</span>
+                    </div>
+                  ))
+                : order.discountAmount > 0 && (
+                    // Fallback: single discount line
+                    <div className="flex justify-between text-emerald-600 dark:text-emerald-400">
+                      <span className="flex items-center gap-1">
+                        <Ticket className="h-3 w-3" />
+                        {t('paymentCard.discount')}
+                        {(order as any).voucherCode && (
+                          <span className="text-xs">({(order as any).voucherCode})</span>
+                        )}
+                      </span>
+                      <span>-{order.discountAmount.toLocaleString('vi-VN')}₫</span>
+                    </div>
+                  )}
 
               {/* Tax/VAT */}
               <div className="flex justify-between">
@@ -409,28 +407,27 @@ export function PaymentDialog({
         </FormDialogSectionGroup>
 
         {/* Staff Voucher Selector - only before payment is created */}
-        {order.status === 'completed' && !order.payments?.some(p => 
-          !['cancelled', 'failed'].includes(p.status)
-        ) && (
-          <FormDialogSectionGroup title={t('dialog.applyVoucher')}>
-            <StaffVoucherSelector
-              orderId={order.id}
-              orderSubtotal={order.subtotal}
-              appliedVouchers={((order as any).appliedVouchers || []).map((v: any) => ({
-                redemptionId: v.redemptionId,
-                code: v.voucherCode,
-                name: v.voucherName,
-                discountAmount: v.discountAmount,
-              }))}
-              onVoucherApplied={(discount) => {
-                // Order will be refreshed via query invalidation
-              }}
-              onVoucherRemoved={() => {
-                // Order will be refreshed via query invalidation
-              }}
-            />
-          </FormDialogSectionGroup>
-        )}
+        {order.status === 'completed' &&
+          !order.payments?.some((p) => !['cancelled', 'failed'].includes(p.status)) && (
+            <FormDialogSectionGroup title={t('dialog.applyVoucher')}>
+              <StaffVoucherSelector
+                orderId={order.id}
+                orderSubtotal={order.subtotal}
+                appliedVouchers={((order as any).appliedVouchers || []).map((v: any) => ({
+                  redemptionId: v.redemptionId,
+                  code: v.voucherCode,
+                  name: v.voucherName,
+                  discountAmount: v.discountAmount,
+                }))}
+                onVoucherApplied={(discount) => {
+                  // Order will be refreshed via query invalidation
+                }}
+                onVoucherRemoved={() => {
+                  // Order will be refreshed via query invalidation
+                }}
+              />
+            </FormDialogSectionGroup>
+          )}
       </FormDialog>
 
       {/* QR Code Display Modal for Counter Payments */}

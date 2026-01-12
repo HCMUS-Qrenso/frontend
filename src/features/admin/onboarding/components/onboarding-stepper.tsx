@@ -36,7 +36,7 @@ export function OnboardingStepper({
 }: OnboardingStepperProps) {
   return (
     <nav aria-label="Progress" className="w-full">
-      <ol className="flex items-center justify-between">
+      <ol className="flex items-start justify-between">
         {ONBOARDING_STEPS.map((step, index) => {
           const isComplete = completedSteps.includes(step.id)
           const isCurrent = currentStep === step.id
@@ -60,7 +60,7 @@ export function OnboardingStepper({
                 onClick={() => onStepClick?.(step.id)}
                 disabled={!isComplete && step.id > currentStep}
                 className={cn(
-                  'group relative flex flex-col items-center',
+                  'group relative flex w-full flex-col items-center',
                   'focus-visible:ring-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
                   !isComplete && step.id > currentStep && 'cursor-not-allowed',
                 )}
@@ -78,17 +78,17 @@ export function OnboardingStepper({
                 </div>
 
                 {/* Label */}
-                <div className="mt-2 flex flex-col items-center">
+                <div className="mt-2 flex min-h-[2.5rem] flex-col items-center justify-start">
                   <span
                     className={cn(
-                      'text-xs font-medium',
+                      'text-center text-xs leading-tight font-medium',
                       isComplete || isCurrent ? 'text-foreground' : 'text-muted-foreground',
                     )}
                   >
                     {step.title}
                   </span>
                   {!step.required && (
-                    <span className="text-muted-foreground text-[10px]">(Tùy chọn)</span>
+                    <span className="text-muted-foreground mt-0.5 text-[10px]">(Tùy chọn)</span>
                   )}
                 </div>
               </button>

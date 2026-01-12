@@ -3,7 +3,6 @@
 import { useTranslations } from 'next-intl'
 import { Input } from '@/src/components/ui/input'
 import { Label } from '@/src/components/ui/label'
-import { Switch } from '@/src/components/ui/switch'
 import { Textarea } from '@/src/components/ui/textarea'
 import { SettingsSection } from './settings-section'
 import { Receipt } from 'lucide-react'
@@ -18,15 +17,9 @@ export function ReceiptSettingsForm({ settings, onChange }: ReceiptSettingsFormP
   const t = useTranslations('settings.receipt')
 
   return (
-    <SettingsSection
-      id="receipt"
-      title={t('title')}
-      description={t('description')}
-      icon={Receipt}
-      comingSoon
-    >
+    <SettingsSection id="receipt" title={t('title')} description={t('description')} icon={Receipt}>
       <div className="space-y-6">
-        <div className="grid gap-6 sm:grid-cols-2">
+        <div className="grid gap-6">
           {/* Invoice Prefix */}
           <div className="space-y-2">
             <Label htmlFor="invoicePrefix">{t('invoicePrefix')}</Label>
@@ -36,7 +29,6 @@ export function ReceiptSettingsForm({ settings, onChange }: ReceiptSettingsFormP
               onChange={(e) => onChange({ invoice_prefix: e.target.value })}
               placeholder={t('invoicePrefixPlaceholder')}
               maxLength={10}
-              disabled
             />
             <p className="text-muted-foreground text-xs">{t('invoicePrefixHint')}</p>
           </div>
@@ -52,7 +44,6 @@ export function ReceiptSettingsForm({ settings, onChange }: ReceiptSettingsFormP
             placeholder={t('headerPlaceholder')}
             rows={2}
             maxLength={500}
-            disabled
           />
         </div>
 
@@ -66,20 +57,6 @@ export function ReceiptSettingsForm({ settings, onChange }: ReceiptSettingsFormP
             placeholder={t('footerPlaceholder')}
             rows={2}
             maxLength={500}
-            disabled
-          />
-        </div>
-
-        {/* Show Logo */}
-        <div className="flex items-center justify-between rounded-lg border p-4">
-          <div className="space-y-0.5">
-            <Label>{t('showLogo')}</Label>
-            <p className="text-muted-foreground text-sm">{t('showLogoDescription')}</p>
-          </div>
-          <Switch
-            checked={settings.show_logo}
-            onCheckedChange={(checked) => onChange({ show_logo: checked })}
-            disabled
           />
         </div>
       </div>

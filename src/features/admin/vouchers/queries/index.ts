@@ -1,1 +1,1 @@
-export * from './vouchers.queries';
+export * from './vouchers.queries'

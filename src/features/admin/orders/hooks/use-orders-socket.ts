@@ -70,11 +70,13 @@ export function useOrdersSocket(options: UseOrdersSocketOptions = {}): UseOrders
   const { enabled = true, showNotifications = true } = options
 
   const socketRef = useRef<Socket | null>(null)
+  const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const [isConnected, setIsConnected] = useState(false)
   const queryClient = useQueryClient()
   const accessToken = useAuthStore((state) => state.accessToken)
+  const accessTokenRef = useRef(accessToken)
   const { settings: tenantSettings } = useTenantSettings()
-  
+
   // Get localized notification functions
   const { notifyFromSocket, notifySocketError } = useSocketNotification()
 
@@ -225,6 +227,12 @@ export function useOrdersSocket(options: UseOrdersSocketOptions = {}): UseOrders
   }, [enabled, accessToken])
 
   const disconnect = useCallback(() => {
+    // Clear any pending reconnect timeout
+    if (reconnectTimeoutRef.current) {
+      clearTimeout(reconnectTimeoutRef.current)
+      reconnectTimeoutRef.current = null
+    }
+
     if (socketRef.current) {
       console.log('[AdminSocket] Disconnecting')
       socketRef.current.disconnect()
@@ -235,17 +243,31 @@ export function useOrdersSocket(options: UseOrdersSocketOptions = {}): UseOrders
 
   const reconnect = useCallback(() => {
     disconnect()
-    setTimeout(connect, 100)
+    reconnectTimeoutRef.current = setTimeout(connect, 100)
   }, [disconnect, connect])
 
+  // Detect token changes and reconnect
+  useEffect(() => {
+    if (accessToken !== accessTokenRef.current) {
+      console.log('[AdminSocket] Access token changed, reconnecting...')
+      accessTokenRef.current = accessToken
+      // Force reconnect with new token
+      if (socketRef.current?.connected) {
+        disconnect()
+        // Wait a bit before reconnecting
+        reconnectTimeoutRef.current = setTimeout(connect, 200)
+      }
+    }
+  }, [accessToken, connect, disconnect])
+
   // Connect on mount, disconnect on unmount
-  // Only re-run when enabled or accessToken changes
+  // Only re-run when connect or disconnect functions change
   useEffect(() => {
     connect()
     return () => {
       disconnect()
     }
-  }, [enabled, accessToken])
+  }, [connect, disconnect])
 
   return { isConnected, disconnect, reconnect }
 }

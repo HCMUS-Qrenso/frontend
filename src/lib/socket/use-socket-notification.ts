@@ -35,10 +35,10 @@ export interface NotifyOptions {
 
 /**
  * Hook that returns localized socket notification functions
- * 
+ *
  * @example
  * const { notifyFromSocket } = useSocketNotification()
- * 
+ *
  * // In socket handler:
  * socket.on('order:created', (event) => {
  *   notifyFromSocket('order:created', event.data)
@@ -47,75 +47,80 @@ export interface NotifyOptions {
 export function useSocketNotification() {
   const t = useTranslations('socket')
 
-  const notifyFromSocket = useCallback((eventType: string, data: any, options: NotifyOptions = {}): void => {
-    // For item:status events, get specific config based on status
-    let configKey = eventType
-    if (eventType === 'item:status' && data?.status) {
-      configKey = getItemStatusNotificationKey(data.status)
-    }
-
-    const config = SOCKET_EVENT_NOTIFICATIONS[configKey]
-
-    // If no config found, skip notification (not all events need toast)
-    if (!config) {
-      return
-    }
-
-    // Get title from translations
-    let title = options.title
-    if (!title) {
-      const rawParams = config.titleParams?.(data) || {}
-      // Use item.defaultName as fallback for itemName
-      if (rawParams.itemName === undefined && config.titleKey.startsWith('item.')) {
-        rawParams.itemName = t('item.defaultName')
+  const notifyFromSocket = useCallback(
+    (eventType: string, data: any, options: NotifyOptions = {}): void => {
+      // For item:status events, get specific config based on status
+      let configKey = eventType
+      if (eventType === 'item:status' && data?.status) {
+        configKey = getItemStatusNotificationKey(data.status)
       }
-      // Filter out undefined values (next-intl doesn't accept undefined)
-      const params = Object.fromEntries(
-        Object.entries(rawParams).filter(([, v]) => v !== undefined)
-      ) as Record<string, string | number>
-      title = t(config.titleKey, params)
-    }
 
-    // Get description from translations (if available)
-    let description = options.description
-    if (!description && config.descriptionKey) {
-      const rawDescParams = config.descriptionParams?.(data) || {}
-      // Only show description if all params are defined
-      const hasAllParams = Object.values(rawDescParams).every(v => v !== undefined && v !== null)
-      if (hasAllParams || Object.keys(rawDescParams).length === 0) {
+      const config = SOCKET_EVENT_NOTIFICATIONS[configKey]
+
+      // If no config found, skip notification (not all events need toast)
+      if (!config) {
+        return
+      }
+
+      // Get title from translations
+      let title = options.title
+      if (!title) {
+        const rawParams = config.titleParams?.(data) || {}
+        // Use item.defaultName as fallback for itemName
+        if (rawParams.itemName === undefined && config.titleKey.startsWith('item.')) {
+          rawParams.itemName = t('item.defaultName')
+        }
         // Filter out undefined values (next-intl doesn't accept undefined)
-        const descParams = Object.fromEntries(
-          Object.entries(rawDescParams).filter(([, v]) => v !== undefined)
+        const params = Object.fromEntries(
+          Object.entries(rawParams).filter(([, v]) => v !== undefined),
         ) as Record<string, string | number>
-        description = t(config.descriptionKey, descParams)
+        title = t(config.titleKey, params)
       }
-    }
 
-    const duration = options.duration || config.duration || 3000
-    const severity = options.severity || config.severity
+      // Get description from translations (if available)
+      let description = options.description
+      if (!description && config.descriptionKey) {
+        const rawDescParams = config.descriptionParams?.(data) || {}
+        // Only show description if all params are defined
+        const hasAllParams = Object.values(rawDescParams).every(
+          (v) => v !== undefined && v !== null,
+        )
+        if (hasAllParams || Object.keys(rawDescParams).length === 0) {
+          // Filter out undefined values (next-intl doesn't accept undefined)
+          const descParams = Object.fromEntries(
+            Object.entries(rawDescParams).filter(([, v]) => v !== undefined),
+          ) as Record<string, string | number>
+          description = t(config.descriptionKey, descParams)
+        }
+      }
 
-    // Call appropriate toast method based on severity
-    const toastOptions = {
-      description,
-      duration,
-    }
+      const duration = options.duration || config.duration || 3000
+      const severity = options.severity || config.severity
 
-    switch (severity) {
-      case 'success':
-        toast.success(title, toastOptions)
-        break
-      case 'warning':
-        toast.warning(title, toastOptions)
-        break
-      case 'error':
-        toast.error(title, toastOptions)
-        break
-      case 'info':
-      default:
-        toast.info(title, toastOptions)
-        break
-    }
-  }, [t])
+      // Call appropriate toast method based on severity
+      const toastOptions = {
+        description,
+        duration,
+      }
+
+      switch (severity) {
+        case 'success':
+          toast.success(title, toastOptions)
+          break
+        case 'warning':
+          toast.warning(title, toastOptions)
+          break
+        case 'error':
+          toast.error(title, toastOptions)
+          break
+        case 'info':
+        default:
+          toast.info(title, toastOptions)
+          break
+      }
+    },
+    [t],
+  )
 
   const notifySocketConnected = useCallback((): void => {
     notifyFromSocket('socket:connected', {})
@@ -125,9 +130,12 @@ export function useSocketNotification() {
     notifyFromSocket('socket:disconnected', {})
   }, [notifyFromSocket])
 
-  const notifySocketError = useCallback((message?: string): void => {
-    notifyFromSocket('socket:error', { message })
-  }, [notifyFromSocket])
+  const notifySocketError = useCallback(
+    (message?: string): void => {
+      notifyFromSocket('socket:error', { message })
+    },
+    [notifyFromSocket],
+  )
 
   return {
     notifyFromSocket,

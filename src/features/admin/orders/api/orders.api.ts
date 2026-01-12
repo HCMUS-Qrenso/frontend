@@ -137,10 +137,13 @@ export const ordersApi = {
     voucherId: string,
     notes?: string,
   ): Promise<ApplyVoucherResponse> => {
-    const { data } = await apiClient.post<ApplyVoucherResponse>(`/orders/${orderId}/vouchers/apply`, {
-      voucherId,
-      notes,
-    })
+    const { data } = await apiClient.post<ApplyVoucherResponse>(
+      `/orders/${orderId}/vouchers/apply`,
+      {
+        voucherId,
+        notes,
+      },
+    )
     return data
   },
 

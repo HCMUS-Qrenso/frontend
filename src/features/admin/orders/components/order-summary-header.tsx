@@ -108,7 +108,6 @@ export function OrderSummaryHeader({ order }: OrderSummaryHeaderProps) {
     }
   }
 
-
   // Get localized labels
   const getStatusLabel = (status: string) => t(`status.${status}` as any) || status
   const getPriorityLabel = (priority: string) => t(`priority.${priority}` as any) || priority
@@ -302,7 +301,7 @@ export function OrderSummaryHeader({ order }: OrderSummaryHeaderProps) {
             <AlertDialogAction
               onClick={handleCancelOrder}
               disabled={updateStatusMutation.isPending}
-              className="bg-red-600 hover:bg-red-700 text-white"
+              className="bg-red-600 text-white hover:bg-red-700"
             >
               {updateStatusMutation.isPending ? t('dialog.processing') : t('dialog.confirmCancel')}
             </AlertDialogAction>

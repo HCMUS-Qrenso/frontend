@@ -45,15 +45,15 @@ export const setCurrentLocale = (locale: Locale) => {
  */
 export const getLocaleFromUrl = (): Locale => {
   if (typeof window === 'undefined') return defaultLocale
-  
+
   const pathSegments = window.location.pathname.split('/')
   // URL format: /{locale}/admin/... or /admin/... (default locale)
   const firstSegment = pathSegments[1]
-  
+
   if (firstSegment && locales.includes(firstSegment as Locale)) {
     return firstSegment as Locale
   }
-  
+
   return defaultLocale
 }
 

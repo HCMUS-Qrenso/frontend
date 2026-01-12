@@ -66,7 +66,6 @@ export const DEFAULT_SETTINGS: ExtendedTenantSettings = {
   receipt: {
     header: null,
     footer: null,
-    show_logo: true,
     invoice_prefix: 'INV',
   },
   qr_payment: {

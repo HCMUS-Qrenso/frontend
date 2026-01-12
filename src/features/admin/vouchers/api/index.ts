@@ -1,1 +1,1 @@
-export * from './vouchers.api';
+export * from './vouchers.api'

@@ -86,7 +86,6 @@ export function SettingsPage() {
       // Receipt
       receiptHeader: formData.receipt.header || undefined,
       receiptFooter: formData.receipt.footer || undefined,
-      receiptShowLogo: formData.receipt.show_logo,
       invoicePrefix: formData.receipt.invoice_prefix,
       // QR Payment
       qrPayosClientId: formData.qr_payment.payos_client_id || undefined,

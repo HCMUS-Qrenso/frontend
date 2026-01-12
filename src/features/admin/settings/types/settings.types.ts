@@ -88,7 +88,6 @@ export interface NotificationSettings {
 export interface ReceiptSettings {
   header: string | null
   footer: string | null
-  show_logo: boolean
   invoice_prefix: string
 }
 

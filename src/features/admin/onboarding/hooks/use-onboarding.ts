@@ -159,7 +159,7 @@ export function useOnboarding(): UseOnboardingReturn {
     try {
       // Save final draft first
       await saveDraft()
-      // Then complete
+      // Then complete - this will wait for cache invalidation and refetch
       await completeMutation.mutateAsync()
       toast.success('Thiết lập hoàn tất! Chào mừng đến với Qrenso')
       router.push('/admin/dashboard')

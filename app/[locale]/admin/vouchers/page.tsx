@@ -1,5 +1,5 @@
-import { VouchersPage } from '@/src/features/admin/vouchers/components';
+import { VouchersPage } from '@/src/features/admin/vouchers/components'
 
 export default function AdminVouchersPage() {
-  return <VouchersPage />;
+  return <VouchersPage />
 }

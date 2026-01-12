@@ -88,7 +88,10 @@ export function StepReview({ draft, onEdit, onComplete, isCompleting }: StepRevi
 
       <div className="space-y-4">
         {sections.map((section) => (
-          <div key={section.step} className="rounded-lg border p-4">
+          <div
+            key={section.step}
+            className="bg-card text-card-foreground rounded-xl border p-6 shadow-sm"
+          >
             <div className="mb-3 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span className="font-medium">{section.title}</span>

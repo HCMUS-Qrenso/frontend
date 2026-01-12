@@ -61,6 +61,7 @@ import {
 } from '../queries'
 import type { Order, OrderItem, OrderStatus } from '../types/orders'
 import { useTranslations } from 'next-intl'
+import { useTenantSettings } from '@/src/contexts/tenant-settings-context'
 import { useLocale } from 'next-intl'
 import { PriceBreakdownTooltip } from './price-breakdown-tooltip'
 import { useFormat } from '@/src/hooks/use-format'
@@ -78,6 +79,7 @@ export function OrdersTable() {
   const searchParams = useSearchParams()
   const t = useTranslations('orders')
   const locale = useLocale()
+  const { settings } = useTenantSettings()
   const { formatPrice } = useFormat()
 
   // Build status config with translations
@@ -230,12 +232,20 @@ export function OrdersTable() {
   }
 
   const handlePrintBill = (order: Order) => {
+    // Find paid payment to get invoice number
+    const paidPayment = order.payments?.find((p: { status: string }) => p.status === 'paid')
+
     printBill({
       order,
       billType: 'final',
       paymentMethod: 'cash',
       tenantName: tenantData?.data?.name,
       tenantAddress: tenantData?.data?.address,
+      locale,
+      receiptHeader: settings.receipt.header,
+      receiptFooter: settings.receipt.footer,
+      currencySymbol: settings.general.currency_symbol,
+      invoiceNum: (paidPayment as any)?.invoiceNum,
     })
     toast.success(t('toast.printingBill'))
   }
