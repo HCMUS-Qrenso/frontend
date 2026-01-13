@@ -13,6 +13,7 @@ import { toast } from 'sonner'
 import { cn } from '@/src/lib/utils'
 import { AvatarCropDialog } from './avatar-crop-dialog'
 import { UserProfile } from '../types/profile.types'
+import { useRoleLabel } from '@/src/hooks/use-role-label'
 
 interface ProfileOverviewCardProps {
   profile: UserProfile
@@ -27,6 +28,7 @@ export function ProfileOverviewCard({ profile }: ProfileOverviewCardProps) {
   const [cropDialogOpen, setCropDialogOpen] = useState(false)
   const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null)
   const [selectedImageSrc, setSelectedImageSrc] = useState<string | null>(null)
+  const getRoleLabel = useRoleLabel()
 
   const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -172,7 +174,7 @@ export function ProfileOverviewCard({ profile }: ProfileOverviewCardProps) {
           <p className="text-muted-foreground">{profile.email}</p>
           <div className="mt-2 flex items-center justify-center gap-2">
             <Shield className="text-muted-foreground h-4 w-4" />
-            <span className="text-sm capitalize">{profile.role}</span>
+            <span className="text-sm capitalize">{getRoleLabel(profile.role)}</span>
           </div>
           {/* Hidden file input */}
           <input

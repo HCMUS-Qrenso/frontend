@@ -7,27 +7,7 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { cn } from '@/src/lib/utils'
 import { Button } from '@/src/components/ui/button'
-import {
-  LayoutDashboard,
-  ClipboardList,
-  UtensilsCrossed,
-  QrCode,
-  Users,
-  BarChart3,
-  Settings,
-  ChevronDown,
-  ChevronRight,
-  X,
-  LogOut,
-  Table,
-  LayoutGrid,
-  FolderOpen,
-  Upload,
-  MapPin,
-  Construction,
-  ShipIcon,
-  CircleDollarSignIcon,
-} from 'lucide-react'
+import { ChevronDown, ChevronRight, X, LogOut, Construction } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/src/components/ui/avatar'
 import {
   AlertDialog,
@@ -39,8 +19,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/src/components/ui/alert-dialog'
-import { getInitials, getRoleLabel } from '../utils'
+import { getInitials } from '../utils'
 import { useTranslations } from 'next-intl'
+import { NAVIGATION_CONFIG, filterNavigationByRole } from '../config/navigation.config'
+import { useRoleLabel } from '../../../../hooks/use-role-label'
 
 interface AdminSidebarProps {
   isModalOpen: boolean
@@ -72,43 +54,12 @@ export function AdminSidebar({
   const router = useRouter()
   const t = useTranslations('admin')
   const tCommon = useTranslations('common')
+  const getRoleLabel = useRoleLabel()
 
-  // Menu items with translation keys
-  const menuItems = useMemo(
-    () => [
-      { icon: LayoutDashboard, labelKey: 'menuOverview', href: '/admin/dashboard' },
-      { icon: ClipboardList, labelKey: 'menuOrders', href: '/admin/orders' },
-      { icon: ShipIcon, labelKey: 'menuKds', href: '/admin/kds' },
-      {
-        icon: UtensilsCrossed,
-        labelKey: 'menuLabel',
-        href: '/admin/menu',
-        subItems: [
-          { icon: FolderOpen, labelKey: 'menuCateg', href: '/admin/menu/categories' },
-          { icon: UtensilsCrossed, labelKey: 'menuItemsLabel', href: '/admin/menu/items' },
-          { icon: Settings, labelKey: 'menuModifiersLabel', href: '/admin/menu/modifiers' },
-          { icon: Upload, labelKey: 'menuImportLabel', href: '/admin/menu/import-export' },
-          { icon: LayoutGrid, labelKey: 'menuTemplatesLabel', href: '/admin/menu/templates' },
-        ],
-      },
-      {
-        icon: QrCode,
-        labelKey: 'menuTablesQr',
-        href: '/admin/tables/list',
-        subItems: [
-          { icon: Table, labelKey: 'menuTablesList', href: '/admin/tables/list' },
-          { icon: LayoutGrid, labelKey: 'menuLayout', href: '/admin/tables/layout' },
-          { icon: QrCode, labelKey: 'menuQrManager', href: '/admin/tables/qr' },
-          { icon: MapPin, labelKey: 'menuZones', href: '/admin/tables/zones' },
-        ],
-      },
-      { icon: CircleDollarSignIcon, labelKey: 'menuVouchers', href: '/admin/vouchers' },
-      { icon: Users, labelKey: 'menuStaff', href: '/admin/staff' },
-      // { icon: BarChart3, labelKey: 'menuReports', href: '/admin/reports', wip: true },
-      { icon: Settings, labelKey: 'menuSettings', href: '/admin/settings', wip: false },
-    ],
-    [],
-  )
+  // Filter menu items based on user role
+  const menuItems = useMemo(() => {
+    return filterNavigationByRole(NAVIGATION_CONFIG, userProfile?.role)
+  }, [userProfile?.role])
 
   // Use controlled state if provided, otherwise use internal state
   const logoutDialogOpen =
@@ -215,7 +166,7 @@ export function AdminSidebar({
           </div>
 
           {/* Menu */}
-          <nav className="flex-1 space-y-1 px-3 py-4">
+          <nav className="flex-1 space-y-1 overflow-auto px-3 py-4">
             {menuItems.map((item) => {
               const hasSubItems = item.subItems && item.subItems.length > 0
               const isActive =

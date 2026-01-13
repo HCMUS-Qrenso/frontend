@@ -4,6 +4,7 @@ import { type ReactNode, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Loader2 } from 'lucide-react'
 import { useAuth } from '@/src/features/auth/hooks'
+import { ROLES } from '@/src/types/roles'
 
 interface GuestRouteProps {
   children: ReactNode
@@ -16,11 +17,13 @@ interface GuestRouteProps {
  */
 export function GuestRoute({ children, redirectTo = '/admin/dashboard' }: GuestRouteProps) {
   const router = useRouter()
-  const { authStatus } = useAuth()
+  const { authStatus, user } = useAuth()
 
   useEffect(() => {
     if (authStatus === 'authenticated') {
-      router.replace(redirectTo)
+      if (user?.role === ROLES.KITCHEN) router.replace('/admin/kds')
+      else if (user?.role === ROLES.WAITER) router.replace('/admin/orders')
+      else router.replace(redirectTo)
     }
   }, [authStatus, redirectTo, router])
 

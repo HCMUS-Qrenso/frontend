@@ -9,19 +9,6 @@ export const getInitials = (fullName: string): string => {
   return (names[0].charAt(0) + names[names.length - 1].charAt(0)).toUpperCase()
 }
 
-// Helper function to map role to Vietnamese label
-export const getRoleLabel = (role: string): string => {
-  const roleMap: Record<string, string> = {
-    owner: 'Chủ nhà hàng',
-    admin: 'Quản trị viên',
-    manager: 'Quản lý',
-    waiter: 'Nhân viên phục vụ',
-    chef: 'Đầu bếp',
-    customer: 'Khách hàng',
-  }
-  return roleMap[role.toLowerCase()] || role
-}
-
 export const NOTIFICATION_SOUNDS = [
   { id: 1, name: 'Bell', description: 'Classic bell notification', file: 'bell.mp3' },
   { id: 2, name: 'Chime', description: 'Gentle chime sound', file: 'chime.mp3' },

@@ -648,8 +648,6 @@ export function OrdersTable() {
                               {t('printBill')}
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem>{t('changeStatus')}</DropdownMenuItem>
-                            <DropdownMenuItem>{t('exportPdf')}</DropdownMenuItem>
                             <DropdownMenuItem
                               disabled={
                                 order.status !== 'completed' || order.paymentStatus === 'paid'

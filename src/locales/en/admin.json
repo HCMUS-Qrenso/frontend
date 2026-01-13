@@ -70,5 +70,12 @@
   "vouchers": {
     "title": "Promotions",
     "description": "Manage vouchers and discount codes"
+  },
+  "roles": {
+    "owner": "Restaurant Owner",
+    "admin": "Administrator",
+    "waiter": "Waiter",
+    "kitchen_staff": "Kitchen Staff",
+    "super_admin": "System Administrator"
   }
 }
