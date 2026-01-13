@@ -2,7 +2,7 @@
 
 import type React from 'react'
 
-import { useEffect, useMemo, useState } from 'react'
+import { use, useEffect, useMemo, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/src/components/ui/button'
 import {
@@ -30,6 +30,7 @@ import { useTranslations } from 'next-intl'
 import { TenantSettingsProvider } from '@/src/contexts/tenant-settings-context'
 import { OnboardingGuard } from '@/src/features/admin/onboarding'
 import { useRouter } from '@/src/i18n/navigation'
+import { ROLES } from '@/src/types/roles'
 
 interface AdminLayoutProps {
   children: React.ReactNode
@@ -297,7 +298,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
               )}
 
               {/* Date Range */}
-              <DropdownMenu>
+              {/* <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" className="gap-2 rounded-full bg-transparent">
                     <span className="hidden sm:inline">{t('today')}</span>
@@ -311,7 +312,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                   <DropdownMenuSeparator />
                   <DropdownMenuItem>{t('custom')}</DropdownMenuItem>
                 </DropdownMenuContent>
-              </DropdownMenu>
+              </DropdownMenu> */}
 
               {/* Language Switcher */}
               <LanguageSwitcher />
@@ -341,15 +342,19 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                     <User className="mr-2 h-4 w-4" />
                     {t('profile')}
                   </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => {
-                      // Navigate to settings page
-                      router.push('/admin/settings')
-                    }}
-                  >
-                    <Settings className="mr-2 h-4 w-4" />
-                    {t('settings')}
-                  </DropdownMenuItem>
+                  {userProfile &&
+                    userProfile?.role !== ROLES.WAITER &&
+                    userProfile?.role !== ROLES.KITCHEN && (
+                      <DropdownMenuItem
+                        onClick={() => {
+                          // Navigate to settings page
+                          router.push('/admin/settings')
+                        }}
+                      >
+                        <Settings className="mr-2 h-4 w-4" />
+                        {t('settings')}
+                      </DropdownMenuItem>
+                    )}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     className="text-red-600"

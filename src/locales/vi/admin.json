@@ -70,5 +70,12 @@
   "vouchers": {
     "title": "Khuyến mãi",
     "description": "Quản lý voucher và mã giảm giá"
+  },
+  "roles": {
+    "owner": "Chủ nhà hàng",
+    "admin": "Quản lý",
+    "waiter": "Phục vụ",
+    "kitchen_staff": "Nhân viên bếp",
+    "super_admin": "Quản trị viên hệ thống"
   }
 }

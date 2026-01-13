@@ -38,6 +38,8 @@ import {
   AdminTableRow,
 } from '@/src/components/ui/table'
 import { useTranslations } from 'next-intl'
+import { useAuth } from '@/src/features/auth/hooks'
+import { ROLES } from '@/src/types/roles'
 
 interface TablesListTableProps {
   isTrashView?: boolean
@@ -54,6 +56,7 @@ export function TablesListTable({
   const searchParams = useSearchParams()
   const t = useTranslations('tables')
   const tStatus = useTranslations('statusBadge.table')
+  const { user } = useAuth()
 
   // Create localized status config
   const tableStatusConfig = createTableStatusConfig({
@@ -269,7 +272,12 @@ export function TablesListTable({
                       ) : (
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 rounded-full"
+                              disabled={user?.role === ROLES.WAITER}
+                            >
                               <MoreVertical className="h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>

@@ -14,11 +14,14 @@ import { useZonesSimpleQuery } from '@/src/features/admin/tables/queries/zones.q
 import { SimpleZone } from '@/src/features/admin/tables/types/zones'
 import { PageContentSkeleton } from '@/src/components/loading'
 import { useTranslations } from 'next-intl'
+import { ROLES } from '@/src/types/roles'
+import { useAuth } from '@/src/features/auth/hooks'
 
 function TablesListContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const t = useTranslations('tables')
+  const { user } = useAuth()
 
   // Get current tab from URL, default to 'active'
   const currentTab = searchParams.get('tab') || 'active'
@@ -51,30 +54,32 @@ function TablesListContent() {
       <TablesOverviewStats />
 
       {/* Toggle Buttons - Like Staff Page */}
-      <div className="flex gap-2">
-        <button
-          onClick={() => handleTabChange('active')}
-          className={cn(
-            'rounded-lg px-4 py-2 text-sm font-medium transition-colors',
-            currentTab === 'active'
-              ? 'bg-emerald-500 text-white dark:bg-emerald-600'
-              : 'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700',
-          )}
-        >
-          {t('tableList')}
-        </button>
-        <button
-          onClick={() => handleTabChange('trash')}
-          className={cn(
-            'rounded-lg px-4 py-2 text-sm font-medium transition-colors',
-            currentTab === 'trash'
-              ? 'bg-emerald-500 text-white dark:bg-emerald-600'
-              : 'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700',
-          )}
-        >
-          {t('deleteHistory')}
-        </button>
-      </div>
+      {user?.role !== ROLES.WAITER && (
+        <div className="flex gap-2">
+          <button
+            onClick={() => handleTabChange('active')}
+            className={cn(
+              'rounded-lg px-4 py-2 text-sm font-medium transition-colors',
+              currentTab === 'active'
+                ? 'bg-emerald-500 text-white dark:bg-emerald-600'
+                : 'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700',
+            )}
+          >
+            {t('tableList')}
+          </button>
+          <button
+            onClick={() => handleTabChange('trash')}
+            className={cn(
+              'rounded-lg px-4 py-2 text-sm font-medium transition-colors',
+              currentTab === 'trash'
+                ? 'bg-emerald-500 text-white dark:bg-emerald-600'
+                : 'bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700',
+            )}
+          >
+            {t('deleteHistory')}
+          </button>
+        </div>
+      )}
 
       {/* Filter Toolbar */}
       <TablesFilterToolbar

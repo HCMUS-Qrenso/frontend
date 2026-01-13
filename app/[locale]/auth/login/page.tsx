@@ -17,6 +17,7 @@ import { useAuth } from '@/src/features/auth/hooks'
 import { useTranslations } from 'next-intl'
 
 import { loginSchema } from '@/src/features/auth/schemas'
+import { ROLES } from '@/src/types/roles'
 
 const REMEMBER_ME_KEY = 'rememberMe'
 const REMEMBERED_EMAIL_KEY = 'rememberedEmail'
@@ -85,8 +86,17 @@ export default function LoginPage() {
       }
 
       // Truyền rememberMe vào login call
-      await login({ ...formData, rememberMe, accountType: 'staff' })
-      router.push('/admin/dashboard')
+      const loginResult = await login({ ...formData, rememberMe, accountType: 'staff' })
+
+      // Check roles for redirecting to appropriate dashboard could be added here
+      let redirectUrl = '/admin/dashboard'
+      if (loginResult.user.role === ROLES.KITCHEN) {
+        redirectUrl = '/admin/kds'
+      } else if (loginResult.user.role === ROLES.WAITER) {
+        redirectUrl = '/admin/orders'
+      }
+
+      router.push(redirectUrl)
     } catch (err) {
       setError(extractErrorMessage(err))
     }

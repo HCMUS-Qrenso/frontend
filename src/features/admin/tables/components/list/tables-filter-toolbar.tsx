@@ -10,6 +10,8 @@ import { AdminFilterToolbarWrapper } from '../../../shared/components/admin-filt
 import { useRouter, useSearchParams } from 'next/navigation'
 import type { SimpleZone } from '@/src/features/admin/tables/types'
 import { useTranslations } from 'next-intl'
+import { useAuth } from '@/src/features/auth/hooks'
+import { ROLES } from '@/src/types/roles'
 
 interface TablesFilterToolbarProps {
   isTrashView?: boolean
@@ -25,6 +27,7 @@ export function TablesFilterToolbar({
   const router = useRouter()
   const searchParams = useSearchParams()
   const t = useTranslations('tables')
+  const { user } = useAuth()
 
   const STATUS_OPTIONS: FilterOption[] = [
     { value: '', label: t('all') },
@@ -128,7 +131,7 @@ export function TablesFilterToolbar({
 
       {/* Right - Actions */}
       <div className="flex items-center justify-center gap-2 md:justify-start">
-        {!isTrashView && (
+        {!isTrashView && user?.role && user?.role !== ROLES.WAITER && (
           <>
             <Link href="/admin/tables/layout">
               <Button
