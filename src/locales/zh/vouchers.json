@@ -1,0 +1,149 @@
+{
+  "title": "优惠券管理",
+  "description": "为您的餐厅创建和管理折扣码",
+  "status": {
+    "draft": "草稿",
+    "active": "活跃",
+    "paused": "暂停",
+    "archived": "已归档"
+  },
+  "kind": {
+    "automatic": "自动应用",
+    "staffOnly": "仅员工",
+    "code": "输入代码"
+  },
+  "discountType": {
+    "percent": "百分比 (%)",
+    "fixedAmount": "固定金额"
+  },
+  "source": {
+    "auto": "自动",
+    "waiter": "员工",
+    "customerCode": "客户代码",
+    "admin": "管理员"
+  },
+  "filters": {
+    "searchPlaceholder": "按代码或名称搜索...",
+    "status": "状态",
+    "allStatus": "所有状态",
+    "kind": "优惠券类型",
+    "allKind": "所有类型"
+  },
+  "table": {
+    "code": "优惠券代码",
+    "name": "名称",
+    "discount": "折扣",
+    "kind": "类型",
+    "status": "状态",
+    "usage": "使用次数",
+    "actions": "操作",
+    "empty": "暂无优惠券。创建您的第一个优惠券开始吧。",
+    "emptyTitle": "暂无优惠券",
+    "emptyDescription": "创建您的第一个优惠券开始吧。",
+    "voucherLabel": "优惠券"
+  },
+  "error": {
+    "title": "错误",
+    "loadFailed": "无法加载优惠券"
+  },
+  "actions": {
+    "create": "创建优惠券",
+    "view": "查看详情",
+    "edit": "编辑",
+    "archive": "归档",
+    "applyVoucher": "应用优惠券",
+    "addAnotherVoucher": "添加另一个优惠券"
+  },
+  "pagination": {
+    "previous": "上一页",
+    "next": "下一页",
+    "page": "第 {current} / {total} 页"
+  },
+  "form": {
+    "createTitle": "创建新优惠券",
+    "createDescription": "为客户创建新的折扣码",
+    "editTitle": "编辑优惠券",
+    "editDescription": "更新优惠券信息",
+    "tabs": {
+      "basic": "基本信息",
+      "discount": "折扣",
+      "limits": "限制"
+    },
+    "code": "优惠券代码",
+    "name": "优惠券名称",
+    "namePlaceholder": "例如：开业折扣",
+    "description": "描述",
+    "descriptionPlaceholder": "优惠券的详细描述...",
+    "status": "状态",
+    "kind": "应用类型",
+    "kindDescription": {
+      "automatic": "优惠券将自动应用于符合条件的订单",
+      "staff_only": "只有员工可以应用此优惠券",
+      "code": "客户或员工输入代码应用"
+    },
+    "autoApply": "自动应用",
+    "autoApplyHint": "自动应用于符合条件的订单",
+    "isPublic": "公开显示",
+    "isPublicHint": "在应用中向客户显示优惠券",
+    "discountType": "折扣类型",
+    "percentOff": "折扣百分比 (%)",
+    "amountOff": "折扣金额",
+    "maxDiscountAmount": "最大折扣",
+    "maxDiscountAmountHint": "百分比优惠券的最大折扣金额",
+    "minSubtotal": "最低订单",
+    "minSubtotalHint": "应用优惠券的最低订单金额",
+    "startsAt": "开始时间",
+    "endsAt": "结束时间",
+    "maxRedemptionsTotal": "最大使用次数",
+    "maxRedemptionsTotalHint": "优惠券可使用的总次数",
+    "maxRedemptionsPerCustomer": "每位客户限制",
+    "minParty": "最少用餐人数",
+    "minPartyHint": "应用的最少用餐人数",
+    "priority": "优先级",
+    "priorityHint": "优先级高的优惠券先应用",
+    "cancel": "取消",
+    "save": "保存更改",
+    "create": "创建优惠券",
+    "saving": "保存中..."
+  },
+  "detail": {
+    "discountInfo": "折扣信息",
+    "discountValue": "折扣值",
+    "maxCap": "最高",
+    "minOrder": "最低订单",
+    "usageStats": "使用统计",
+    "timesUsed": "已使用次数",
+    "remaining": "剩余",
+    "priority": "优先级",
+    "validity": "有效期",
+    "startsAt": "开始",
+    "endsAt": "结束",
+    "noLimit": "无限制",
+    "recentRedemptions": "最近使用记录",
+    "noRedemptions": "暂无使用记录",
+    "noRedemptionsDescription": "此优惠券尚未被使用。",
+    "orderNumber": "订单号",
+    "discountAmount": "折扣金额",
+    "source": "来源",
+    "time": "时间",
+    "people": "人"
+  },
+  "archiveSuccess": "优惠券归档成功",
+  "archiveError": "无法归档优惠券",
+  "archiveDialog": {
+    "title": "归档优惠券？",
+    "description": "优惠券「{code}」将被归档，无法再使用。您可以稍后恢复。"
+  },
+  "staffSelector": {
+    "title": "应用优惠券",
+    "subtitle": "为此订单选择优惠券",
+    "searchPlaceholder": "搜索优惠券...",
+    "noVouchers": "没有可用的优惠券",
+    "orEnterCode": "或输入优惠券代码："
+  },
+  "applySuccess": "优惠券应用成功",
+  "applyError": "无法应用优惠券",
+  "revokeSuccess": "优惠券已移除",
+  "revokeError": "无法移除优惠券",
+  "invalidCode": "无效的优惠券代码"
+}

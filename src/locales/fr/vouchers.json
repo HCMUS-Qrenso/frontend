@@ -1,0 +1,149 @@
+{
+  "title": "Gestion des Bons",
+  "description": "Créez et gérez les codes de réduction pour votre restaurant",
+  "status": {
+    "draft": "Brouillon",
+    "active": "Actif",
+    "paused": "En pause",
+    "archived": "Archivé"
+  },
+  "kind": {
+    "automatic": "Application automatique",
+    "staffOnly": "Personnel uniquement",
+    "code": "Saisir le code"
+  },
+  "discountType": {
+    "percent": "Pourcentage (%)",
+    "fixedAmount": "Montant fixe"
+  },
+  "source": {
+    "auto": "Auto",
+    "waiter": "Personnel",
+    "customerCode": "Code client",
+    "admin": "Admin"
+  },
+  "filters": {
+    "searchPlaceholder": "Rechercher par code ou nom...",
+    "status": "Statut",
+    "allStatus": "Tous les statuts",
+    "kind": "Type de bon",
+    "allKind": "Tous les types"
+  },
+  "table": {
+    "code": "Code du bon",
+    "name": "Nom",
+    "discount": "Réduction",
+    "kind": "Type",
+    "status": "Statut",
+    "usage": "Utilisation",
+    "actions": "Actions",
+    "empty": "Aucun bon. Créez votre premier bon pour commencer.",
+    "emptyTitle": "Aucun bon",
+    "emptyDescription": "Créez votre premier bon pour commencer.",
+    "voucherLabel": "bon"
+  },
+  "error": {
+    "title": "Erreur",
+    "loadFailed": "Impossible de charger les bons"
+  },
+  "actions": {
+    "create": "Créer un bon",
+    "view": "Voir les détails",
+    "edit": "Modifier",
+    "archive": "Archiver",
+    "applyVoucher": "Appliquer le bon",
+    "addAnotherVoucher": "Ajouter un autre bon"
+  },
+  "pagination": {
+    "previous": "Précédent",
+    "next": "Suivant",
+    "page": "Page {current} / {total}"
+  },
+  "form": {
+    "createTitle": "Créer un nouveau bon",
+    "createDescription": "Créer un nouveau code de réduction pour les clients",
+    "editTitle": "Modifier le bon",
+    "editDescription": "Mettre à jour les informations du bon",
+    "tabs": {
+      "basic": "Informations",
+      "discount": "Réduction",
+      "limits": "Limites"
+    },
+    "code": "Code du bon",
+    "name": "Nom du bon",
+    "namePlaceholder": "Ex: Réduction ouverture",
+    "description": "Description",
+    "descriptionPlaceholder": "Description détaillée du bon...",
+    "status": "Statut",
+    "kind": "Type d'application",
+    "kindDescription": {
+      "automatic": "Le bon sera automatiquement appliqué aux commandes éligibles",
+      "staff_only": "Seul le personnel peut appliquer ce bon",
+      "code": "Le client ou le personnel saisit le code pour appliquer"
+    },
+    "autoApply": "Application automatique",
+    "autoApplyHint": "Appliquer automatiquement aux commandes éligibles",
+    "isPublic": "Affichage public",
+    "isPublicHint": "Afficher le bon aux clients dans l'application",
+    "discountType": "Type de réduction",
+    "percentOff": "Pourcentage de réduction (%)",
+    "amountOff": "Montant de réduction",
+    "maxDiscountAmount": "Réduction maximale",
+    "maxDiscountAmountHint": "Montant maximum de réduction pour les bons en pourcentage",
+    "minSubtotal": "Commande minimum",
+    "minSubtotalHint": "Valeur minimum de commande pour appliquer le bon",
+    "startsAt": "Commence le",
+    "endsAt": "Se termine le",
+    "maxRedemptionsTotal": "Utilisations max totales",
+    "maxRedemptionsTotalHint": "Nombre total de fois que le bon peut être utilisé",
+    "maxRedemptionsPerCustomer": "Limite par client",
+    "minParty": "Taille minimum du groupe",
+    "minPartyHint": "Nombre minimum de convives pour appliquer",
+    "priority": "Priorité",
+    "priorityHint": "Les bons de priorité supérieure sont appliqués en premier",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "create": "Créer le bon",
+    "saving": "Enregistrement..."
+  },
+  "detail": {
+    "discountInfo": "Informations de réduction",
+    "discountValue": "Valeur de réduction",
+    "maxCap": "max",
+    "minOrder": "Commande minimum",
+    "usageStats": "Statistiques d'utilisation",
+    "timesUsed": "Fois utilisé",
+    "remaining": "Restant",
+    "priority": "Priorité",
+    "validity": "Période de validité",
+    "startsAt": "Commence",
+    "endsAt": "Se termine",
+    "noLimit": "Sans limite",
+    "recentRedemptions": "Utilisations récentes",
+    "noRedemptions": "Aucune utilisation",
+    "noRedemptionsDescription": "Ce bon n'a pas encore été utilisé.",
+    "orderNumber": "N° commande",
+    "discountAmount": "Montant réduit",
+    "source": "Source",
+    "time": "Heure",
+    "people": "personnes"
+  },
+  "archiveSuccess": "Bon archivé avec succès",
+  "archiveError": "Impossible d'archiver le bon",
+  "archiveDialog": {
+    "title": "Archiver le bon ?",
+    "description": "Le bon \"{code}\" sera archivé et ne pourra plus être utilisé. Vous pourrez le restaurer ultérieurement."
+  },
+  "staffSelector": {
+    "title": "Appliquer un bon",
+    "subtitle": "Sélectionnez un bon pour cette commande",
+    "searchPlaceholder": "Rechercher un bon...",
+    "noVouchers": "Aucun bon disponible",
+    "orEnterCode": "Ou saisir le code du bon :"
+  },
+  "applySuccess": "Bon appliqué avec succès",
+  "applyError": "Impossible d'appliquer le bon",
+  "revokeSuccess": "Bon retiré",
+  "revokeError": "Impossible de retirer le bon",
+  "invalidCode": "Code de bon invalide"
+}

@@ -5,9 +5,12 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableHead,
   TableHeader,
   TableRow,
+  AdminTableContainer,
+  AdminTableHeaderRow,
+  AdminTableHead,
+  AdminTableRow,
 } from '@/src/components/ui/table'
 import { Button } from '@/src/components/ui/button'
 import {
@@ -19,18 +22,20 @@ import {
 } from '@/src/components/ui/dropdown-menu'
 import { Pencil, Trash2, Award, Clock, MoreVertical, UtensilsCrossed } from 'lucide-react'
 import { cn } from '@/src/lib/utils'
-import { formatRelativeDate, formatPrice } from '@/src/lib/helpers/format'
-import { StatusBadge, MENU_ITEM_STATUS_CONFIG } from '@/src/components/ui/status-badge'
+import { useFormat } from '@/src/hooks/use-format'
+import { StatusBadge, type StatusConfig } from '@/src/components/ui/status-badge'
 import { ContainerLoadingState, ContainerErrorState } from '@/src/components/ui/loading-state'
 import { EmptyState } from '@/src/components/ui/empty-state'
 import { SkeletonTableRows } from '@/src/components/loading'
 import Image from 'next/image'
 import { useMenuItemsQuery } from '@/src/features/admin/menu/queries'
+import { TablePagination } from '@/src/components/ui/table-pagination'
 import type {
   MenuItemSortBy,
   MenuItemSortOrder,
   MenuItemStatus,
 } from '@/src/features/admin/menu/types'
+import { useTranslations } from 'next-intl'
 
 interface MenuItemsTableProps {
   onEditClick: (item: any) => void
@@ -40,6 +45,26 @@ interface MenuItemsTableProps {
 export function MenuItemsTable({ onEditClick, onDeleteClick }: MenuItemsTableProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const t = useTranslations('menu')
+  const { formatPrice, formatRelativeDate } = useFormat()
+
+  const MENU_ITEM_STATUS_CONFIG: Record<string, StatusConfig> = {
+    available: {
+      label: t('available'),
+      className:
+        'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20',
+    },
+    sold_out: {
+      label: t('soldOut'),
+      className:
+        'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20',
+    },
+    unavailable: {
+      label: t('unavailable'),
+      className:
+        'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-500/10 dark:text-slate-400 dark:border-slate-500/20',
+    },
+  }
 
   // Get query params from URL
   const page = Number.parseInt(searchParams.get('page') || '1')
@@ -90,32 +115,30 @@ export function MenuItemsTable({ onEditClick, onDeleteClick }: MenuItemsTablePro
   if (isLoading) {
     return (
       <div className="space-y-4">
-        <div className="overflow-hidden rounded-2xl border border-slate-100 bg-white/80 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
+        <AdminTableContainer>
           <Table>
             <TableHeader>
-              <TableRow className="border-b border-slate-100 bg-slate-50/80 hover:bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900">
-                <TableHead className="min-w-50 px-2 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase md:px-4 dark:text-slate-400">
-                  Món ăn
-                </TableHead>
-                <TableHead className="w-24 px-2 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase md:w-32 md:px-4 dark:text-slate-400">
-                  Danh mục
-                </TableHead>
-                <TableHead className="w-20 px-2 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase md:w-28 md:px-4 dark:text-slate-400">
-                  Giá
-                </TableHead>
-                <TableHead className="w-24 px-2 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase md:w-28 md:px-4 dark:text-slate-400">
-                  Trạng thái
-                </TableHead>
-                <TableHead className="w-16 px-2 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase md:w-20 md:px-4 dark:text-slate-400">
-                  Phổ biến
-                </TableHead>
-                <TableHead className="w-20 px-2 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase md:w-24 md:px-4 dark:text-slate-400">
-                  Cập nhật
-                </TableHead>
-                <TableHead className="w-20 px-2 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase md:px-4 dark:text-slate-400">
-                  Thao tác
-                </TableHead>
-              </TableRow>
+              <AdminTableHeaderRow>
+                <AdminTableHead className="min-w-50 px-2 md:px-4">{t('menuItem')}</AdminTableHead>
+                <AdminTableHead className="w-24 px-2 md:w-32 md:px-4">
+                  {t('category')}
+                </AdminTableHead>
+                <AdminTableHead className="w-20 px-2 md:w-28 md:px-4" align="right">
+                  {t('price')}
+                </AdminTableHead>
+                <AdminTableHead className="w-24 px-2 md:w-28 md:px-4" align="center">
+                  {t('status')}
+                </AdminTableHead>
+                <AdminTableHead className="w-16 px-2 md:w-20 md:px-4" align="center">
+                  {t('popularityScore')}
+                </AdminTableHead>
+                <AdminTableHead className="w-20 px-2 md:w-24 md:px-4">
+                  {t('updatedAt')}
+                </AdminTableHead>
+                <AdminTableHead className="w-20 px-2 md:px-4" align="right">
+                  {t('actions')}
+                </AdminTableHead>
+              </AdminTableHeaderRow>
             </TableHeader>
             <TableBody>
               <SkeletonTableRows
@@ -132,49 +155,40 @@ export function MenuItemsTable({ onEditClick, onDeleteClick }: MenuItemsTablePro
               />
             </TableBody>
           </Table>
-        </div>
+        </AdminTableContainer>
       </div>
     )
   }
 
   // Error state
   if (error) {
-    return (
-      <ContainerErrorState
-        title="Không thể tải danh sách món ăn"
-        description="Vui lòng thử lại sau"
-      />
-    )
+    return <ContainerErrorState title={t('cannotLoadItems')} description={t('tryAgainLater')} />
   }
 
   return (
     <div className="space-y-4">
-      <div className="overflow-hidden rounded-2xl border border-slate-100 bg-white/80 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
+      <AdminTableContainer>
         <Table>
           <TableHeader>
-            <TableRow className="border-b border-slate-100 bg-slate-50/80 hover:bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900">
-              <TableHead className="min-w-50 px-2 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase md:px-4 dark:text-slate-400">
-                Món ăn
-              </TableHead>
-              <TableHead className="w-24 px-2 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase md:w-32 md:px-4 dark:text-slate-400">
-                Danh mục
-              </TableHead>
-              <TableHead className="w-20 px-2 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase md:w-28 md:px-4 dark:text-slate-400">
-                Giá
-              </TableHead>
-              <TableHead className="w-24 px-2 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase md:w-28 md:px-4 dark:text-slate-400">
-                Trạng thái
-              </TableHead>
-              <TableHead className="w-16 px-2 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase md:w-20 md:px-4 dark:text-slate-400">
-                Phổ biến
-              </TableHead>
-              <TableHead className="w-20 px-2 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase md:w-24 md:px-4 dark:text-slate-400">
-                Cập nhật
-              </TableHead>
-              <TableHead className="w-20 px-2 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase md:px-4 dark:text-slate-400">
-                Thao tác
-              </TableHead>
-            </TableRow>
+            <AdminTableHeaderRow>
+              <AdminTableHead className="min-w-50 px-2 md:px-4">{t('menuItem')}</AdminTableHead>
+              <AdminTableHead className="w-24 px-2 md:w-32 md:px-4">{t('category')}</AdminTableHead>
+              <AdminTableHead className="w-20 px-2 md:w-28 md:px-4" align="right">
+                {t('price')}
+              </AdminTableHead>
+              <AdminTableHead className="w-24 px-2 md:w-28 md:px-4" align="center">
+                {t('status')}
+              </AdminTableHead>
+              <AdminTableHead className="w-16 px-2 md:w-20 md:px-4" align="center">
+                {t('popularityScore')}
+              </AdminTableHead>
+              <AdminTableHead className="w-20 px-2 md:w-24 md:px-4">
+                {t('updatedAt')}
+              </AdminTableHead>
+              <AdminTableHead className="w-20 px-2 md:px-4" align="right">
+                {t('actions')}
+              </AdminTableHead>
+            </AdminTableHeaderRow>
           </TableHeader>
           <TableBody>
             {menuItems.length === 0 ? (
@@ -182,19 +196,17 @@ export function MenuItemsTable({ onEditClick, onDeleteClick }: MenuItemsTablePro
                 <TableCell colSpan={7} className="px-2 py-0 md:px-4">
                   <EmptyState
                     icon={UtensilsCrossed}
-                    title="Chưa có món ăn nào"
-                    description="Bắt đầu bằng cách thêm món đầu tiên"
+                    title={t('noItems')}
+                    description={t('noItemsHint')}
                   />
                 </TableCell>
               </TableRow>
             ) : (
               menuItems.map((item, index) => (
-                <TableRow
+                <AdminTableRow
                   key={item.id}
-                  className={cn(
-                    'cursor-pointer border-b border-slate-100 transition-colors hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800',
-                    index === menuItems.length - 1 && 'border-b-0',
-                  )}
+                  isLast={index === menuItems.length - 1}
+                  className="cursor-pointer"
                   onClick={() => onEditClick(item)}
                 >
                   <TableCell className="px-2 py-3 md:px-4">
@@ -224,21 +236,23 @@ export function MenuItemsTable({ onEditClick, onDeleteClick }: MenuItemsTablePro
                             {item.name}
                           </span>
                           {item.is_chef_recommendation && (
-                            <span title="Chef's recommendation">
+                            <span title={t('chefRecommendation')}>
                               <Award className="h-4 w-4 text-amber-500" />
                             </span>
                           )}
                         </div>
                         <div className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400">
                           <Clock className="h-3 w-3" />
-                          <span>{item.preparation_time} phút</span>
+                          <span>
+                            {item.preparation_time} {t('prepTime')}
+                          </span>
                         </div>
                       </div>
                     </div>
                   </TableCell>
                   <TableCell className="px-2 py-3 md:px-4">
                     <span className="text-xs wrap-break-word text-slate-600 md:text-sm dark:text-slate-400">
-                      {item.category?.name || 'Chưa phân loại'}
+                      {item.category?.name || t('uncategorized')}
                     </span>
                   </TableCell>
                   <TableCell className="px-2 py-3 text-right md:px-4">
@@ -283,7 +297,7 @@ export function MenuItemsTable({ onEditClick, onDeleteClick }: MenuItemsTablePro
                             }}
                           >
                             <Pencil className="mr-2 h-4 w-4" />
-                            Chỉnh sửa
+                            {t('edit')}
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem
@@ -294,62 +308,29 @@ export function MenuItemsTable({ onEditClick, onDeleteClick }: MenuItemsTablePro
                             className="text-red-600 focus:text-red-600 dark:text-red-400"
                           >
                             <Trash2 className="mr-2 h-4 w-4" />
-                            Xóa món ăn
+                            {t('deleteItem')}
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </div>
                   </TableCell>
-                </TableRow>
+                </AdminTableRow>
               ))
             )}
           </TableBody>
         </Table>
-      </div>
+      </AdminTableContainer>
 
       {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="flex items-center justify-between">
-          <p className="text-sm text-slate-500 dark:text-slate-400">
-            Hiển thị {startItem}-{endItem} trên {total} món
-          </p>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              className="rounded-full bg-transparent"
-              disabled={currentPage === 1}
-              onClick={() => handlePageChange(currentPage - 1)}
-            >
-              Trước
-            </Button>
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
-              <Button
-                key={pageNum}
-                variant="outline"
-                size="sm"
-                className={cn(
-                  'h-8 w-8 rounded-full',
-                  pageNum === currentPage
-                    ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10'
-                    : 'bg-transparent',
-                )}
-                onClick={() => handlePageChange(pageNum)}
-              >
-                {pageNum}
-              </Button>
-            ))}
-            <Button
-              variant="outline"
-              size="sm"
-              className="rounded-full bg-transparent"
-              disabled={currentPage === totalPages}
-              onClick={() => handlePageChange(currentPage + 1)}
-            >
-              Sau
-            </Button>
-          </div>
-        </div>
+      {pagination && (
+        <TablePagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          total={total}
+          limit={limit}
+          itemLabel={t('itemLabel')}
+          onPageChange={handlePageChange}
+        />
       )}
     </div>
   )

@@ -14,6 +14,7 @@ import { toast } from 'sonner'
 import type { Staff } from '@/src/features/admin/staff/types'
 import { useUpdateStaffMutation } from '@/src/features/admin/staff/queries'
 import { useErrorHandler } from '@/src/hooks/use-error-handler'
+import { useTranslations } from 'next-intl'
 
 type StaffStatus = Staff['status']
 
@@ -27,6 +28,7 @@ export function StaffEditDialog({ open, onOpenChange, staff }: StaffEditDialogPr
   const [fullName, setFullName] = useState(staff.fullName)
   const [phone, setPhone] = useState(staff.phone || '')
   const [status, setStatus] = useState<StaffStatus>(staff.status)
+  const t = useTranslations('staff')
 
   const updateMutation = useUpdateStaffMutation()
   const { handleError } = useErrorHandler()
@@ -42,7 +44,7 @@ export function StaffEditDialog({ open, onOpenChange, staff }: StaffEditDialogPr
 
   const handleSubmit = async () => {
     if (!fullName.trim()) {
-      toast.error('Vui lòng nhập họ và tên')
+      toast.error(t('enterFullName'))
       return
     }
 
@@ -55,27 +57,33 @@ export function StaffEditDialog({ open, onOpenChange, staff }: StaffEditDialogPr
           status,
         },
       })
-      toast.success('Đã cập nhật thông tin thành công')
+      toast.success(t('updateSuccess'))
       onOpenChange(false)
     } catch (error) {
-      handleError(error, 'Không thể cập nhật thông tin')
+      handleError(error, t('updateError'))
     }
+  }
+
+  const getRoleLabelText = (role: string) => {
+    if (role === 'waiter') return t('waiter')
+    if (role === 'admin') return t('admin')
+    return t('kitchenStaff')
   }
 
   return (
     <FormDialog
       open={open}
       onOpenChange={onOpenChange}
-      title="Chỉnh sửa nhân viên"
-      description="Cập nhật thông tin nhân viên. Email không thể thay đổi."
+      title={t('editTitle')}
+      description={t('editDesc')}
       onSubmit={handleSubmit}
       isSubmitting={updateMutation.isPending}
-      submitText="Lưu thay đổi"
-      loadingText="Đang lưu..."
+      submitText={t('saveChanges')}
+      loadingText={t('savingChanges')}
       size="md"
     >
       {/* Họ và tên */}
-      <FormDialogField label="Họ và tên" required>
+      <FormDialogField label={t('fullNameLabel')} required>
         <Input
           id="full_name"
           value={fullName}
@@ -85,39 +93,33 @@ export function StaffEditDialog({ open, onOpenChange, staff }: StaffEditDialogPr
       </FormDialogField>
 
       {/* Email (read-only) */}
-      <FormDialogField label="Email">
+      <FormDialogField label={t('email')}>
         <Input id="email" value={staff.email} disabled className="bg-slate-50 dark:bg-slate-900" />
       </FormDialogField>
 
       {/* Số điện thoại */}
-      <FormDialogField label="Số điện thoại">
+      <FormDialogField label={t('phone')}>
         <Input
           id="phone"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
-          placeholder="Nhập số điện thoại"
+          placeholder={t('phonePlaceholder')}
           disabled={updateMutation.isPending}
         />
       </FormDialogField>
 
       {/* Vai trò (read-only) */}
-      <FormDialogField label="Vai trò">
+      <FormDialogField label={t('role')}>
         <Input
           id="role"
-          value={
-            staff.role === 'waiter'
-              ? 'Phục vụ'
-              : staff.role === 'admin'
-                ? 'Quản trị viên'
-                : 'Nhân viên bếp'
-          }
+          value={getRoleLabelText(staff.role)}
           disabled
           className="bg-slate-50 dark:bg-slate-900"
         />
       </FormDialogField>
 
       {/* Trạng thái */}
-      <FormDialogField label="Trạng thái">
+      <FormDialogField label={t('status')}>
         <Select
           value={status}
           onValueChange={(value: StaffStatus) => setStatus(value)}
@@ -127,9 +129,9 @@ export function StaffEditDialog({ open, onOpenChange, staff }: StaffEditDialogPr
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="active">Hoạt động</SelectItem>
-            <SelectItem value="inactive">Không hoạt động</SelectItem>
-            <SelectItem value="suspended">Đình chỉ</SelectItem>
+            <SelectItem value="active">{t('activeStatus')}</SelectItem>
+            <SelectItem value="inactive">{t('inactiveStatus')}</SelectItem>
+            <SelectItem value="suspended">{t('suspendedStatus')}</SelectItem>
           </SelectContent>
         </Select>
       </FormDialogField>

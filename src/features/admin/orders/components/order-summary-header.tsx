@@ -11,112 +11,114 @@ import {
   DropdownMenuTrigger,
 } from '@/src/components/ui/dropdown-menu'
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/src/components/ui/tooltip'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/src/components/ui/alert-dialog'
+import { Textarea } from '@/src/components/ui/textarea'
+import { Label } from '@/src/components/ui/label'
+import {
   ArrowLeft,
   Copy,
   Printer,
-  FileDown,
   MoreVertical,
   AlertTriangle,
   Check,
+  Wallet,
+  QrCode,
+  Bell,
+  DollarSign,
+  X,
 } from 'lucide-react'
 import { cn } from '@/src/lib/utils'
-import { formatDistanceToNow } from 'date-fns'
-import { vi } from 'date-fns/locale'
 import { OverrideStatusModal } from './override-status-modal'
+import { PaymentDialog } from './payment-dialog'
+import type { OrderDetail } from '../types/orders'
+import { useFormat } from '@/src/hooks/use-format'
+import { useTranslations } from 'next-intl'
+import { useUpdateOrderStatusMutation } from '../queries'
+import { toast } from 'sonner'
 
-// Mock data
-const MOCK_ORDER = {
-  id: 'ORD-1024',
-  order_number: 'ORD-1024',
-  table_id: '5',
-  tableName: 'Bàn 5',
-  floor: 'Tầng 1',
-  status: 'preparing',
-  priority: 'normal',
-  created_at: new Date(Date.now() - 18 * 60 * 1000),
-  total_amount: 285000,
+const STATUS_COLORS: Record<string, string> = {
+  pending: 'bg-slate-100 text-slate-700 dark:bg-slate-500/10 dark:text-slate-400',
+  accepted: 'bg-purple-100 text-purple-700 dark:bg-purple-500/10 dark:text-purple-400',
+  in_progress: 'bg-blue-100 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400',
+  preparing: 'bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400',
+  ready: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400',
+  served: 'bg-teal-100 text-teal-700 dark:bg-teal-500/10 dark:text-teal-400',
+  completed: 'bg-slate-100 text-slate-700 dark:bg-slate-500/10 dark:text-slate-400',
+  rejected: 'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400',
+  cancelled: 'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400',
+  abandoned: 'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400',
 }
 
-const STATUS_CONFIG = {
-  pending: {
-    label: 'Chờ xử lý',
-    color: 'bg-slate-100 text-slate-700 dark:bg-slate-500/10 dark:text-slate-400',
-  },
-  accepted: {
-    label: 'Đã nhận',
-    color: 'bg-purple-100 text-purple-700 dark:bg-purple-500/10 dark:text-purple-400',
-  },
-  in_progress: {
-    label: 'Đang xử lý',
-    color: 'bg-blue-100 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400',
-  },
-  preparing: {
-    label: 'Đang chuẩn bị',
-    color: 'bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400',
-  },
-  ready: {
-    label: 'Sẵn sàng',
-    color: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400',
-  },
-  served: {
-    label: 'Đã phục vụ',
-    color: 'bg-teal-100 text-teal-700 dark:bg-teal-500/10 dark:text-teal-400',
-  },
-  completed: {
-    label: 'Hoàn thành',
-    color: 'bg-slate-100 text-slate-700 dark:bg-slate-500/10 dark:text-slate-400',
-  },
-  rejected: {
-    label: 'Từ chối',
-    color: 'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400',
-  },
-  cancelled: {
-    label: 'Đã hủy',
-    color: 'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400',
-  },
-}
-
-const PRIORITY_CONFIG = {
-  normal: {
-    label: 'Bình thường',
-    color: 'bg-slate-100 text-slate-600 dark:bg-slate-500/10 dark:text-slate-400',
-  },
-  high: {
-    label: 'Cao',
-    color: 'bg-orange-100 text-orange-700 dark:bg-orange-500/10 dark:text-orange-400',
-  },
-  urgent: { label: 'Gấp', color: 'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400' },
-  vip: {
-    label: 'VIP',
-    color: 'bg-purple-100 text-purple-700 dark:bg-purple-500/10 dark:text-purple-400',
-  },
+const PRIORITY_COLORS: Record<string, string> = {
+  normal: 'bg-slate-100 text-slate-600 dark:bg-slate-500/10 dark:text-slate-400',
+  high: 'bg-orange-100 text-orange-700 dark:bg-orange-500/10 dark:text-orange-400',
+  urgent: 'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-400',
+  vip: 'bg-purple-100 text-purple-700 dark:bg-purple-500/10 dark:text-purple-400',
 }
 
 interface OrderSummaryHeaderProps {
-  orderId: string
+  order: OrderDetail
 }
 
-export function OrderSummaryHeader({ orderId }: OrderSummaryHeaderProps) {
+export function OrderSummaryHeader({ order }: OrderSummaryHeaderProps) {
   const router = useRouter()
   const [copied, setCopied] = useState(false)
   const [overrideModalOpen, setOverrideModalOpen] = useState(false)
-
-  const order = MOCK_ORDER
+  const { formatRelativeDate } = useFormat()
+  const [paymentDialogOpen, setPaymentDialogOpen] = useState(false)
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false)
+  const [cancelReason, setCancelReason] = useState('')
+  const t = useTranslations('orders')
+  const updateStatusMutation = useUpdateOrderStatusMutation()
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(order.order_number)
+    navigator.clipboard.writeText(order.orderNumber)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
 
-  const handlePrint = () => {
-    window.open(`/admin/orders/${orderId}/print`, '_blank')
+  const handleCancelOrder = async () => {
+    try {
+      await updateStatusMutation.mutateAsync({
+        id: order.id,
+        payload: {
+          status: 'cancelled',
+          notes: cancelReason || t('header.cancelledByAdmin'),
+        },
+      })
+      toast.success(t('toast.orderCancelled'))
+      setCancelDialogOpen(false)
+      setCancelReason('')
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || t('toast.errorCancelOrder'))
+    }
   }
 
-  const handleExport = (format: 'json' | 'pdf') => {
-    console.log(`[v0] Exporting order ${orderId} as ${format}`)
-    // API call to generate export
-  }
+  // Get localized labels
+  const getStatusLabel = (status: string) => t(`status.${status}` as any) || status
+  const getPriorityLabel = (priority: string) => t(`priority.${priority}` as any) || priority
+
+  // Check if there are any payments in process
+  const hasPaymentInProcess = order.payments?.some(
+    (payment) => payment.status === 'pending' || payment.status === 'processing',
+  )
+
+  const canInitiatePayment =
+    order.status === 'completed' && order.paymentStatus === 'unpaid' && !hasPaymentInProcess
 
   return (
     <>
@@ -124,7 +126,7 @@ export function OrderSummaryHeader({ orderId }: OrderSummaryHeaderProps) {
         {/* Back Button */}
         <Button variant="ghost" onClick={() => router.push('/admin/orders')} className="gap-2">
           <ArrowLeft className="h-4 w-4" />
-          Đơn hàng
+          {t('header.orders')}
         </Button>
 
         {/* Header Card */}
@@ -135,7 +137,7 @@ export function OrderSummaryHeader({ orderId }: OrderSummaryHeaderProps) {
               {/* Title */}
               <div className="flex items-center gap-3">
                 <h1 className="font-mono text-2xl font-bold text-slate-900 dark:text-white">
-                  Đơn hàng #{order.order_number}
+                  {t('header.orders')} #{order.orderNumber}
                 </h1>
                 <Button variant="ghost" size="sm" onClick={handleCopy} className="gap-2">
                   {copied ? (
@@ -144,84 +146,119 @@ export function OrderSummaryHeader({ orderId }: OrderSummaryHeaderProps) {
                     <Copy className="h-4 w-4" />
                   )}
                 </Button>
+                {order.paymentRequestedAt && order.paymentStatus !== 'paid' && (
+                  <TooltipProvider>
+                    <div className="flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1.5 dark:bg-amber-900/30">
+                      <Bell className="h-4 w-4 animate-pulse text-amber-600 dark:text-amber-400" />
+                      <span className="text-xs font-medium text-amber-700 dark:text-amber-300">
+                        Yêu cầu thanh toán
+                      </span>
+                      {order.paymentMethod === 'qr' ? (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <QrCode className="h-4 w-4 cursor-help text-blue-600 dark:text-blue-400" />
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>QR Payment</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      ) : order.paymentMethod === 'cash' ? (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <DollarSign className="h-4 w-4 cursor-help text-emerald-600 dark:text-emerald-400" />
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Cash Payment</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      ) : null}
+                    </div>
+                  </TooltipProvider>
+                )}
               </div>
 
-              {/* Table Info */}
               <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
-                <span className="text-lg font-medium">{order.tableName}</span>
-                <span className="text-sm">•</span>
-                <span className="text-sm">{order.floor}</span>
+                <span className="text-lg font-medium">
+                  {t('table')} {order.table?.tableNumber}
+                </span>
+                {order.table?.zone?.name && (
+                  <>
+                    <span className="text-sm">•</span>
+                    <span className="text-sm">{order.table.zone.name}</span>
+                  </>
+                )}
               </div>
 
-              {/* Meta Chips */}
               <div className="flex flex-wrap items-center gap-2">
-                <Badge
-                  className={cn(
-                    'text-xs font-medium',
-                    STATUS_CONFIG[order.status as keyof typeof STATUS_CONFIG]?.color,
-                  )}
-                >
-                  {STATUS_CONFIG[order.status as keyof typeof STATUS_CONFIG]?.label}
+                <Badge className={cn('text-xs font-medium', STATUS_COLORS[order.status])}>
+                  {getStatusLabel(order.status)}
                 </Badge>
 
-                <Badge
-                  className={cn(
-                    'text-xs font-medium',
-                    PRIORITY_CONFIG[order.priority as keyof typeof PRIORITY_CONFIG]?.color,
-                  )}
-                >
-                  {PRIORITY_CONFIG[order.priority as keyof typeof PRIORITY_CONFIG]?.label}
+                <Badge className={cn('text-xs font-medium', PRIORITY_COLORS[order.priority])}>
+                  {getPriorityLabel(order.priority)}
                 </Badge>
 
                 <span className="text-sm text-slate-500 dark:text-slate-400">
-                  {formatDistanceToNow(order.created_at, { addSuffix: true, locale: vi })}
+                  {formatRelativeDate(order.createdAt)}
                 </span>
               </div>
             </div>
 
             {/* Right: Quick Actions */}
             <div className="flex flex-wrap items-center gap-2">
-              <Button variant="outline" onClick={handlePrint} className="gap-2 bg-transparent">
-                <Printer className="h-4 w-4" />
-                In bill
-              </Button>
-
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="gap-2 bg-transparent">
-                    <FileDown className="h-4 w-4" />
-                    Xuất
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => handleExport('json')}>
-                    Xuất JSON
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleExport('pdf')}>Xuất PDF</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              {canInitiatePayment && (
+                <Button
+                  variant="outline"
+                  onClick={() => setPaymentDialogOpen(true)}
+                  className="gap-2 bg-transparent"
+                >
+                  <Wallet className="h-4 w-4" />
+                  {t('header.payment')}
+                </Button>
+              )}
 
               <Button
                 variant="default"
+                disabled={
+                  order.paymentStatus === 'paid' ||
+                  order.status === 'abandoned' ||
+                  hasPaymentInProcess
+                }
                 onClick={() => setOverrideModalOpen(true)}
                 className="gap-2 bg-emerald-600 hover:bg-emerald-700"
               >
                 <AlertTriangle className="h-4 w-4" />
-                Thay đổi trạng thái
+                {t('header.changeStatus')}
               </Button>
 
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon">
-                    <MoreVertical className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem>Giao cho nhân viên</DropdownMenuItem>
-                  <DropdownMenuItem>Thay đổi ưu tiên</DropdownMenuItem>
-                  <DropdownMenuItem className="text-red-600">Hủy đơn</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              {order.paymentStatus !== 'paid' && order.status !== 'abandoned' && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" disabled={hasPaymentInProcess}>
+                      <MoreVertical className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem disabled={hasPaymentInProcess}>
+                      {t('header.assignStaff')}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem disabled={hasPaymentInProcess}>
+                      {t('header.changePriority')}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => setCancelDialogOpen(true)}
+                      disabled={
+                        hasPaymentInProcess ||
+                        ['cancelled', 'completed', 'rejected', 'abandoned'].includes(order.status)
+                      }
+                      className="text-red-600 dark:text-red-400"
+                    >
+                      <X className="mr-2 h-4 w-4" />
+                      {t('header.cancelOrder')}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
             </div>
           </div>
         </div>
@@ -229,11 +266,48 @@ export function OrderSummaryHeader({ orderId }: OrderSummaryHeaderProps) {
 
       {/* Override Status Modal */}
       <OverrideStatusModal
-        orderId={orderId}
+        orderId={order.id}
         currentStatus={order.status}
         open={overrideModalOpen}
         onOpenChange={setOverrideModalOpen}
       />
+
+      {/* Payment Dialog */}
+      <PaymentDialog open={paymentDialogOpen} onOpenChange={setPaymentDialogOpen} order={order} />
+
+      {/* Cancel Order Dialog */}
+      <AlertDialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('dialog.cancelOrderTitle')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('dialog.cancelOrderDesc', { orderNumber: order.orderNumber })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="space-y-2 py-4">
+            <Label htmlFor="cancel-order-reason">{t('dialog.cancelReason')}</Label>
+            <Textarea
+              id="cancel-order-reason"
+              placeholder={t('dialog.cancelOrderReasonPlaceholder')}
+              value={cancelReason}
+              onChange={(e) => setCancelReason(e.target.value)}
+              rows={3}
+            />
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={updateStatusMutation.isPending}>
+              {t('dialog.no')}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleCancelOrder}
+              disabled={updateStatusMutation.isPending}
+              className="bg-red-600 text-white hover:bg-red-700"
+            >
+              {updateStatusMutation.isPending ? t('dialog.processing') : t('dialog.confirmCancel')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   )
 }

@@ -8,6 +8,7 @@ import { usersQueryKeys } from '@/src/features/auth/hooks'
 import { tenantsQueryKeys } from '@/src/features/admin/tenants/queries/tenants.queries'
 import type {
   AuthResponse,
+  ChangePasswordPayload,
   ForgotPasswordPayload,
   LoginCredentials,
   MessageResponse,
@@ -145,5 +146,11 @@ export const useResetPasswordMutation = () => {
 export const useVerifyEmailMutation = () => {
   return useMutation<MessageResponse, unknown, VerifyEmailPayload>({
     mutationFn: (payload) => authApi.verifyEmail(payload),
+  })
+}
+
+export const useChangePasswordMutation = () => {
+  return useMutation<MessageResponse, unknown, ChangePasswordPayload>({
+    mutationFn: (payload) => authApi.changePassword(payload),
   })
 }

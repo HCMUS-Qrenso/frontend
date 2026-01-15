@@ -1,7 +1,12 @@
+'use client'
+
 import { Button } from '@/src/components/ui/button'
 import { ArrowRight, Play } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 export function Hero() {
+  const t = useTranslations('landing')
+
   return (
     <section className="relative overflow-hidden border-b border-slate-200 bg-linear-to-b from-slate-50 via-white to-slate-50 dark:border-slate-800/50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
       {/* Background decoration */}
@@ -11,17 +16,16 @@ export function Hero() {
         <div className="mx-auto max-w-4xl text-center">
           {/* Headline */}
           <h1 className="text-4xl leading-tight font-bold text-balance text-slate-900 md:text-5xl lg:text-6xl dark:text-white">
-            Tăng tốc phục vụ, giảm sai sót với{' '}
+            {t('hero.headline1')}{' '}
             <span className="bg-linear-to-r from-emerald-400 to-teal-500 bg-clip-text text-transparent">
-              QR Ordering
+              {t('hero.headline2')}
             </span>{' '}
-            và quản lý realtime
+            {t('hero.headline3')}
           </h1>
 
           {/* Subheadline */}
           <p className="mx-auto mt-6 max-w-2xl text-lg text-pretty text-slate-600 md:text-xl dark:text-slate-300">
-            Hệ thống hoàn chỉnh cho nhà hàng: Khách order qua QR, bếp nhận đơn tức thì, dashboard
-            quản lý toàn diện, thanh toán linh hoạt.
+            {t('hero.subheadline')}
           </p>
 
           {/* CTAs */}
@@ -30,7 +34,7 @@ export function Hero() {
               size="lg"
               className="h-12 gap-2 bg-emerald-600 px-8 text-base hover:bg-emerald-700"
             >
-              Đặt lịch demo
+              {t('cta.bookDemo')}
               <ArrowRight className="h-4 w-4" />
             </Button>
             <Button
@@ -39,22 +43,22 @@ export function Hero() {
               className="h-12 gap-2 border-slate-300 bg-transparent px-8 text-base text-slate-900 dark:border-slate-700 dark:text-white"
             >
               <Play className="h-4 w-4" />
-              Xem sản phẩm
+              {t('cta.viewProduct')}
             </Button>
           </div>
 
           {/* Social Proof */}
           <div className="mt-16">
-            <p className="text-sm text-slate-500 dark:text-slate-400">
-              Được tin dùng bởi các nhà hàng hàng đầu
-            </p>
+            <p className="text-sm text-slate-500 dark:text-slate-400">{t('hero.socialProof')}</p>
             <div className="mt-6 flex flex-wrap items-center justify-center gap-8 opacity-60 grayscale">
               {[1, 2, 3, 4].map((i) => (
                 <div
                   key={i}
                   className="flex h-12 w-32 items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800/50"
                 >
-                  <span className="text-sm text-slate-500 dark:text-slate-400">Logo {i}</span>
+                  <span className="text-sm text-slate-500 dark:text-slate-400">
+                    {t('hero.logo')} {i}
+                  </span>
                 </div>
               ))}
             </div>
@@ -65,19 +69,19 @@ export function Hero() {
             <div>
               <div className="text-3xl font-bold text-emerald-400">-40%</div>
               <div className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-                Thời gian xử lý order
+                {t('hero.stats.orderTime')}
               </div>
             </div>
             <div>
               <div className="text-3xl font-bold text-emerald-400">-85%</div>
               <div className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-                Sai sót đơn hàng
+                {t('hero.stats.orderErrors')}
               </div>
             </div>
             <div>
               <div className="text-3xl font-bold text-emerald-400">+60%</div>
               <div className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-                Tốc độ phục vụ bàn
+                {t('hero.stats.tableSpeed')}
               </div>
             </div>
           </div>

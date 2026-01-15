@@ -8,25 +8,7 @@ import { FilterDropdown, type FilterOption } from '@/src/components/ui/filter-dr
 import { Plus, Download, ArrowUpDown } from 'lucide-react'
 import { AdminFilterToolbarWrapper } from '../../../shared/components/admin-filter-toolbar-wrapper'
 import type { Category } from '@/src/features/admin/menu/types'
-
-const STATUS_OPTIONS: FilterOption[] = [
-  { value: 'all', label: 'Tất cả' },
-  { value: 'available', label: 'Đang bán' },
-  { value: 'sold_out', label: 'Hết hàng' },
-  { value: 'unavailable', label: 'Tạm ẩn' },
-]
-
-const SORT_BY_OPTIONS: FilterOption[] = [
-  { value: 'createdAt', label: 'Ngày tạo' },
-  { value: 'name', label: 'Tên món' },
-  { value: 'basePrice', label: 'Giá' },
-  { value: 'popularityScore', label: 'Độ phổ biến' },
-]
-
-const SORT_ORDER_OPTIONS: FilterOption[] = [
-  { value: 'asc', label: 'Tăng dần' },
-  { value: 'desc', label: 'Giảm dần' },
-]
+import { useTranslations } from 'next-intl'
 
 interface MenuItemsFilterToolbarProps {
   categories: Category[] | undefined
@@ -36,10 +18,30 @@ interface MenuItemsFilterToolbarProps {
 export function MenuItemsFilterToolbar({ categories, onCreateClick }: MenuItemsFilterToolbarProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const t = useTranslations('menu')
+
+  const STATUS_OPTIONS: FilterOption[] = [
+    { value: 'all', label: t('all') },
+    { value: 'available', label: t('available') },
+    { value: 'sold_out', label: t('soldOut') },
+    { value: 'unavailable', label: t('unavailable') },
+  ]
+
+  const SORT_BY_OPTIONS: FilterOption[] = [
+    { value: 'createdAt', label: t('createdAt') },
+    { value: 'name', label: t('nameSort') },
+    { value: 'basePrice', label: t('priceSort') },
+    { value: 'popularityScore', label: t('popularitySort') },
+  ]
+
+  const SORT_ORDER_OPTIONS: FilterOption[] = [
+    { value: 'asc', label: t('ascending') },
+    { value: 'desc', label: t('descending') },
+  ]
 
   // Build dynamic category options from API data
   const categoryOptions: FilterOption[] = [
-    { value: 'all', label: 'Tất cả danh mục' },
+    { value: 'all', label: t('allCategories') },
     ...(categories ? categories.map((c) => ({ value: c.id, label: c.name })) : []),
   ]
 
@@ -89,30 +91,30 @@ export function MenuItemsFilterToolbar({ categories, onCreateClick }: MenuItemsF
       {/* Left: Search and Filters */}
       <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
         <SearchInput
-          placeholder="Tìm theo tên món..."
+          placeholder={t('searchPlaceholder')}
           value={localSearchQuery}
           onChange={setLocalSearchQuery}
         />
 
         <FilterDropdown
-          label="Danh mục:"
+          label={`${t('category')}:`}
           value={selectedCategoryId}
           options={categoryOptions}
           onChange={(value) => updateFilter('category_id', value)}
           isLoading={!categories}
-          placeholder="Tất cả danh mục"
-          emptyMessage="Chưa có danh mục"
+          placeholder={t('allCategories')}
+          emptyMessage={t('noCategory')}
         />
 
         <FilterDropdown
-          label="Trạng thái:"
+          label={`${t('status')}:`}
           value={selectedStatus}
           options={STATUS_OPTIONS}
           onChange={(value) => updateFilter('status', value)}
         />
 
         <FilterDropdown
-          label="Sắp xếp:"
+          label={`${t('sortBy')}:`}
           value={sortBy}
           options={SORT_BY_OPTIONS}
           onChange={(value) => updateFilter('sort_by', value)}
@@ -136,14 +138,14 @@ export function MenuItemsFilterToolbar({ categories, onCreateClick }: MenuItemsF
           className="h-8 gap-1 rounded-lg bg-transparent px-3"
         >
           <Download className="h-3 w-3" />
-          <span className="hidden text-sm sm:inline">Import/Export</span>
+          <span className="hidden text-sm sm:inline">{t('importExportLabel')}</span>
         </Button>
         <Button
           onClick={onCreateClick}
           className="h-8 gap-1 rounded-lg bg-emerald-600 px-3 hover:bg-emerald-700"
         >
           <Plus className="h-3 w-3" />
-          <span className="hidden text-sm sm:inline">Thêm món</span>
+          <span className="hidden text-sm sm:inline">{t('addItem')}</span>
         </Button>
       </div>
     </AdminFilterToolbarWrapper>

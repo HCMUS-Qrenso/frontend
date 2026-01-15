@@ -7,25 +7,7 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { cn } from '@/src/lib/utils'
 import { Button } from '@/src/components/ui/button'
-import {
-  LayoutDashboard,
-  ClipboardList,
-  UtensilsCrossed,
-  QrCode,
-  Users,
-  BarChart3,
-  Settings,
-  ChevronDown,
-  ChevronRight,
-  X,
-  LogOut,
-  Table,
-  LayoutGrid,
-  FolderOpen,
-  Upload,
-  MapPin,
-  Construction,
-} from 'lucide-react'
+import { ChevronDown, ChevronRight, X, LogOut, Construction } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/src/components/ui/avatar'
 import {
   AlertDialog,
@@ -37,38 +19,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/src/components/ui/alert-dialog'
-import { getInitials, getRoleLabel } from '../utils'
-
-const menuItems = [
-  { icon: LayoutDashboard, label: 'Tổng quan', href: '/admin/dashboard', wip: true },
-  { icon: ClipboardList, label: 'Đơn hàng', href: '/admin/orders', wip: true },
-  {
-    icon: UtensilsCrossed,
-    label: 'Thực đơn',
-    href: '/admin/menu',
-    subItems: [
-      { icon: FolderOpen, label: 'Danh mục', href: '/admin/menu/categories' },
-      { icon: UtensilsCrossed, label: 'Món ăn', href: '/admin/menu/items' },
-      { icon: Settings, label: 'Tuỳ chọn', href: '/admin/menu/modifiers' },
-      { icon: Upload, label: 'Import/Export', href: '/admin/menu/import-export' },
-      { icon: LayoutGrid, label: 'Templates', href: '/admin/menu/templates' },
-    ],
-  },
-  {
-    icon: QrCode,
-    label: 'Bàn & QR',
-    href: '/admin/tables/list',
-    subItems: [
-      { icon: Table, label: 'Danh sách bàn', href: '/admin/tables/list' },
-      { icon: LayoutGrid, label: 'Sơ đồ', href: '/admin/tables/layout' },
-      { icon: QrCode, label: 'Quản lý QR', href: '/admin/tables/qr' },
-      { icon: MapPin, label: 'Khu vực', href: '/admin/tables/zones' },
-    ],
-  },
-  { icon: Users, label: 'Nhân viên', href: '/admin/staff' },
-  { icon: BarChart3, label: 'Báo cáo', href: '/admin/reports', wip: true },
-  { icon: Settings, label: 'Cài đặt', href: '/admin/settings', wip: true },
-]
+import { getInitials } from '../utils'
+import { useTranslations } from 'next-intl'
+import { NAVIGATION_CONFIG, filterNavigationByRole } from '../config/navigation.config'
+import { useRoleLabel } from '../../../../hooks/use-role-label'
 
 interface AdminSidebarProps {
   isModalOpen: boolean
@@ -98,6 +52,14 @@ export function AdminSidebar({
   const [internalLogoutDialogOpen, setInternalLogoutDialogOpen] = useState(false)
   const pathname = usePathname()
   const router = useRouter()
+  const t = useTranslations('admin')
+  const tCommon = useTranslations('common')
+  const getRoleLabel = useRoleLabel()
+
+  // Filter menu items based on user role
+  const menuItems = useMemo(() => {
+    return filterNavigationByRole(NAVIGATION_CONFIG, userProfile?.role)
+  }, [userProfile?.role])
 
   // Use controlled state if provided, otherwise use internal state
   const logoutDialogOpen =
@@ -113,12 +75,12 @@ export function AdminSidebar({
           (subItem) => pathname === subItem.href || pathname?.startsWith(subItem.href),
         )
         if (shouldBeOpen) {
-          initial.add(item.label)
+          initial.add(item.labelKey)
         }
       }
     })
     return initial
-  }, [pathname])
+  }, [pathname, menuItems])
 
   const [openSubmenus, setOpenSubmenus] = useState<Set<string>>(initialOpenSubmenus)
 
@@ -132,9 +94,9 @@ export function AdminSidebar({
         if (shouldBeOpen) {
           setOpenSubmenus((prev) => {
             // Only update if not already in set to avoid unnecessary re-renders
-            if (!prev.has(item.label)) {
+            if (!prev.has(item.labelKey)) {
               const newSet = new Set(prev)
-              newSet.add(item.label)
+              newSet.add(item.labelKey)
               return newSet
             }
             return prev
@@ -142,7 +104,7 @@ export function AdminSidebar({
         }
       }
     })
-  }, [pathname])
+  }, [pathname, menuItems])
 
   const handleLogout = async () => {
     try {
@@ -154,13 +116,13 @@ export function AdminSidebar({
     }
   }
 
-  const toggleSubmenu = (itemLabel: string) => {
+  const toggleSubmenu = (itemLabelKey: string) => {
     setOpenSubmenus((prev) => {
       const newSet = new Set(prev)
-      if (newSet.has(itemLabel)) {
-        newSet.delete(itemLabel)
+      if (newSet.has(itemLabelKey)) {
+        newSet.delete(itemLabelKey)
       } else {
-        newSet.add(itemLabel)
+        newSet.add(itemLabelKey)
       }
       return newSet
     })
@@ -191,7 +153,7 @@ export function AdminSidebar({
             </div>
             <div>
               <h1 className="font-semibold text-slate-900 dark:text-white">Qrenso</h1>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Bảng điều khiển quản trị</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">{t('sidebarSubtitle')}</p>
             </div>
             <Button
               variant="ghost"
@@ -204,7 +166,7 @@ export function AdminSidebar({
           </div>
 
           {/* Menu */}
-          <nav className="flex-1 space-y-1 px-3 py-4">
+          <nav className="flex-1 space-y-1 overflow-auto px-3 py-4">
             {menuItems.map((item) => {
               const hasSubItems = item.subItems && item.subItems.length > 0
               const isActive =
@@ -215,13 +177,14 @@ export function AdminSidebar({
                     (subItem) => pathname === subItem.href || pathname?.startsWith(subItem.href),
                   ))
 
-              const isSubmenuOpen = hasSubItems && openSubmenus.has(item.label)
+              const isSubmenuOpen = hasSubItems && openSubmenus.has(item.labelKey)
+              const label = t(item.labelKey)
 
               return (
-                <div key={item.label}>
+                <div key={item.labelKey}>
                   {hasSubItems ? (
                     <button
-                      onClick={() => toggleSubmenu(item.label)}
+                      onClick={() => toggleSubmenu(item.labelKey)}
                       className={cn(
                         'flex w-full items-center justify-between gap-3 rounded-xl px-4 py-3 text-left text-sm font-medium transition-colors',
                         isActive
@@ -231,7 +194,7 @@ export function AdminSidebar({
                     >
                       <div className="flex items-center gap-3">
                         <item.icon className="h-5 w-5" />
-                        {item.label}
+                        {label}
                       </div>
                       {isSubmenuOpen ? (
                         <ChevronDown className="h-4 w-4 transition-transform" />
@@ -250,9 +213,9 @@ export function AdminSidebar({
                       )}
                     >
                       <item.icon className="h-5 w-5" />
-                      {item.label}
+                      {label}
                       {item.wip && (
-                        <span title="Đang phát triển">
+                        <span title={t('wipHint')}>
                           <Construction className="ml-auto h-4 w-4 text-amber-500" />
                         </span>
                       )}
@@ -285,7 +248,7 @@ export function AdminSidebar({
                               )}
                             >
                               <subItem.icon className="h-4 w-4" />
-                              {subItem.label}
+                              {t(subItem.labelKey)}
                             </Link>
                           )
                         })}
@@ -299,22 +262,24 @@ export function AdminSidebar({
 
           {/* Bottom */}
           <div className="border-t border-slate-200 p-4 dark:border-slate-800">
-            <div className="flex items-center gap-3 rounded-xl bg-slate-50 px-4 py-3 dark:bg-slate-800">
-              <Avatar className="h-9 w-9">
-                <AvatarImage src={userProfile?.avatarUrl || undefined} />
-                <AvatarFallback>
-                  {userProfile ? getInitials(userProfile.fullName) : 'U'}
-                </AvatarFallback>
-              </Avatar>
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium text-slate-900 dark:text-white">
-                  {userProfile?.fullName || 'Người dùng'}
-                </p>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
-                  {userProfile ? getRoleLabel(userProfile.role) : 'Đang tải...'}
-                </p>
+            <Link href="/admin/profile" className="block">
+              <div className="flex items-center gap-3 rounded-xl bg-slate-50 px-4 py-3 transition-colors hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-700">
+                <Avatar className="h-9 w-9">
+                  <AvatarImage src={userProfile?.avatarUrl || undefined} />
+                  <AvatarFallback>
+                    {userProfile ? getInitials(userProfile.fullName) : 'U'}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium text-slate-900 dark:text-white">
+                    {userProfile?.fullName || t('defaultUser')}
+                  </p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    {userProfile ? getRoleLabel(userProfile.role) : t('loadingUser')}
+                  </p>
+                </div>
               </div>
-            </div>
+            </Link>
             <button
               onClick={() => setLogoutDialogOpen(true)}
               disabled={logoutPending}
@@ -325,7 +290,7 @@ export function AdminSidebar({
               )}
             >
               <LogOut className="h-5 w-5" />
-              Đăng xuất
+              {t('logout')}
             </button>
           </div>
         </div>
@@ -335,20 +300,17 @@ export function AdminSidebar({
       <AlertDialog open={logoutDialogOpen} onOpenChange={setLogoutDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Xác nhận đăng xuất</AlertDialogTitle>
-            <AlertDialogDescription>
-              Bạn có chắc chắn muốn đăng xuất khỏi hệ thống? Bạn sẽ cần đăng nhập lại để tiếp tục sử
-              dụng.
-            </AlertDialogDescription>
+            <AlertDialogTitle>{t('logoutConfirmTitle')}</AlertDialogTitle>
+            <AlertDialogDescription>{t('logoutConfirmDesc')}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={logoutPending}>Hủy</AlertDialogCancel>
+            <AlertDialogCancel disabled={logoutPending}>{tCommon('cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleLogout}
               disabled={logoutPending}
               className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
             >
-              {logoutPending ? 'Đang đăng xuất...' : 'Đăng xuất'}
+              {logoutPending ? t('loggingOut') : t('logout')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

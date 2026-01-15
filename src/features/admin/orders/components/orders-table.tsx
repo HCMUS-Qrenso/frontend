@@ -6,11 +6,13 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableHead,
   TableHeader,
   TableRow,
+  AdminTableContainer,
+  AdminTableHeaderRow,
+  AdminTableHead,
+  AdminTableRow,
 } from '@/src/components/ui/table'
-import { Badge } from '@/src/components/ui/badge'
 import { Button } from '@/src/components/ui/button'
 import {
   DropdownMenu,
@@ -19,221 +21,252 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/src/components/ui/dropdown-menu'
-import { Eye, MoreVertical, Printer, ChevronRight, AlertCircle, ClipboardList } from 'lucide-react'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/src/components/ui/tooltip'
+import {
+  Eye,
+  MoreVertical,
+  Printer,
+  ChevronRight,
+  AlertCircle,
+  ClipboardList,
+  Wallet,
+  CheckCircle,
+  X,
+  Loader2,
+  Bell,
+  DollarSign,
+  QrCode,
+} from 'lucide-react'
+import { PaymentDialog } from './payment-dialog'
+import { CancelPaymentDialog } from './cancel-payment-dialog'
+import { printBill } from '../utils/print-bill'
+import { toast } from 'sonner'
 import { cn } from '@/src/lib/utils'
 import { StatusBadge, type StatusConfig } from '@/src/components/ui/status-badge'
-import { ContainerLoadingState } from '@/src/components/ui/loading-state'
 import { EmptyState } from '@/src/components/ui/empty-state'
 import { SkeletonTableRows } from '@/src/components/loading'
 import { formatDistanceToNow } from 'date-fns'
-import { vi } from 'date-fns/locale'
+import { vi, enUS, zhCN, fr } from 'date-fns/locale'
+import { TablePagination } from '@/src/components/ui/table-pagination'
+import {
+  useOrdersQuery,
+  useUpdateOrderStatusMutation,
+  useCompletePaymentMutation,
+  useCancelPaymentMutation,
+} from '../queries'
+import type { Order, OrderItem, OrderStatus } from '../types/orders'
+import { useTranslations } from 'next-intl'
+import { useTenantSettings } from '@/src/contexts/tenant-settings-context'
+import { useLocale } from 'next-intl'
+import { PriceBreakdownTooltip } from './price-breakdown-tooltip'
+import { useFormat } from '@/src/hooks/use-format'
+import { useCurrentTenantQuery } from '../../tenants/queries/tenants.queries'
 
-// Mock data
-const MOCK_ORDERS = [
-  {
-    id: 'ORD-1024',
-    tableId: '5',
-    tableName: 'Bàn 5',
-    floor: 'Tầng 1',
-    items: [
-      { name: 'Phở bò', quantity: 2 },
-      { name: 'Bánh xèo', quantity: 1 },
-      { name: 'Cà phê sữa', quantity: 2 },
-    ],
-    status: 'new',
-    paymentStatus: 'unpaid',
-    total: 285000,
-    createdAt: new Date(Date.now() - 12 * 60 * 1000), // 12 minutes ago
-    customerName: 'Nguyễn Văn A',
-    note: 'Không hành',
-  },
-  {
-    id: 'ORD-1023',
-    tableId: '3',
-    tableName: 'Bàn 3',
-    floor: 'Tầng 1',
-    items: [
-      { name: 'Bún chả', quantity: 3 },
-      { name: 'Nem rán', quantity: 1 },
-    ],
-    status: 'preparing',
-    paymentStatus: 'unpaid',
-    total: 420000,
-    createdAt: new Date(Date.now() - 25 * 60 * 1000), // 25 minutes ago
-    customerName: 'Trần Thị B',
-    note: '',
-  },
-  {
-    id: 'ORD-1022',
-    tableId: '7',
-    tableName: 'Bàn 7',
-    floor: 'Tầng 2',
-    items: [
-      { name: 'Cơm gà', quantity: 2 },
-      { name: 'Canh chua', quantity: 1 },
-      { name: 'Trà đá', quantity: 2 },
-    ],
-    status: 'ready',
-    paymentStatus: 'unpaid',
-    total: 350000,
-    createdAt: new Date(Date.now() - 8 * 60 * 1000), // 8 minutes ago
-    customerName: 'Lê Văn C',
-    note: '',
-  },
-  {
-    id: 'ORD-1021',
-    tableId: '2',
-    tableName: 'Bàn 2',
-    floor: 'Tầng 1',
-    items: [
-      { name: 'Phở gà', quantity: 1 },
-      { name: 'Gỏi cuốn', quantity: 2 },
-    ],
-    status: 'served',
-    paymentStatus: 'unpaid',
-    total: 185000,
-    createdAt: new Date(Date.now() - 45 * 60 * 1000), // 45 minutes ago
-    customerName: 'Phạm Thị D',
-    note: '',
-  },
-  {
-    id: 'ORD-1020',
-    tableId: '12',
-    tableName: 'Bàn 12',
-    floor: 'Tầng 2',
-    items: [
-      { name: 'Lẩu thái', quantity: 1 },
-      { name: 'Rau củ', quantity: 1 },
-      { name: 'Nước ngọt', quantity: 4 },
-    ],
-    status: 'preparing',
-    paymentStatus: 'unpaid',
-    total: 580000,
-    createdAt: new Date(Date.now() - 18 * 60 * 1000), // 18 minutes ago
-    customerName: 'Hoàng Văn E',
-    note: 'Không cay',
-  },
-  {
-    id: 'ORD-1019',
-    tableId: '1',
-    tableName: 'Bàn 1',
-    floor: 'Tầng 1',
-    items: [
-      { name: 'Bún bò Huế', quantity: 2 },
-      { name: 'Chả giò', quantity: 1 },
-    ],
-    status: 'new',
-    paymentStatus: 'unpaid',
-    total: 260000,
-    createdAt: new Date(Date.now() - 5 * 60 * 1000), // 5 minutes ago
-    customerName: 'Đỗ Thị F',
-    note: '',
-  },
-  {
-    id: 'ORD-1018',
-    tableId: '5',
-    tableName: 'Bàn 5',
-    floor: 'Tầng 1',
-    items: [
-      { name: 'Cơm chiên dương châu', quantity: 1 },
-      { name: 'Canh chua cá', quantity: 1 },
-    ],
-    status: 'completed',
-    paymentStatus: 'paid',
-    total: 180000,
-    createdAt: new Date(Date.now() - 120 * 60 * 1000), // 2 hours ago
-    customerName: 'Vũ Văn G',
-    note: '',
-  },
-]
-
-const STATUS_CONFIG: Record<string, StatusConfig> = {
-  new: {
-    label: 'Mới',
-    className:
-      'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20',
-  },
-  accepted: {
-    label: 'Đã nhận',
-    className:
-      'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-500/10 dark:text-purple-400 dark:border-purple-500/20',
-  },
-  preparing: {
-    label: 'Đang chuẩn bị',
-    className:
-      'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20',
-  },
-  ready: {
-    label: 'Sẵn sàng',
-    className:
-      'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20',
-  },
-  served: {
-    label: 'Đã phục vụ',
-    className:
-      'bg-teal-50 text-teal-700 border-teal-200 dark:bg-teal-500/10 dark:text-teal-400 dark:border-teal-500/20',
-  },
-  completed: {
-    label: 'Hoàn thành',
-    className:
-      'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-500/10 dark:text-slate-400 dark:border-slate-500/20',
-  },
-  cancelled: {
-    label: 'Đã hủy',
-    className:
-      'bg-red-50 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20',
-  },
-}
-
-const PAYMENT_STATUS_CONFIG: Record<string, StatusConfig> = {
-  unpaid: {
-    label: 'Chưa TT',
-    className:
-      'bg-red-50 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20',
-  },
-  paid: {
-    label: 'Đã TT',
-    className:
-      'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20',
-  },
-  refunded: {
-    label: 'Hoàn tiền',
-    className:
-      'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-500/10 dark:text-slate-400 dark:border-slate-500/20',
-  },
-}
-
+// Waiter-only transitions - KDS handles accepted->in_progress->ready
 const NEXT_STATUS_MAP: Record<string, string> = {
-  new: 'accepted',
-  accepted: 'preparing',
-  preparing: 'ready',
-  ready: 'served',
-  served: 'completed',
+  pending: 'accepted', // Waiter accepts order
+  ready: 'served', // Waiter serves ready items
+  served: 'completed', // Waiter completes order
 }
 
 export function OrdersTable() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const [orders, setOrders] = useState(MOCK_ORDERS)
-  const [isLoading, setIsLoading] = useState(false)
+  const t = useTranslations('orders')
+  const locale = useLocale()
+  const { settings } = useTenantSettings()
+  const { formatPrice } = useFormat()
 
-  // Pagination state (mock)
-  const page = 1
-  const totalPages = 1
-  const total = orders.length
+  // Build status config with translations
+  const STATUS_CONFIG: Record<string, StatusConfig> = {
+    pending: {
+      label: t('pending'),
+      className:
+        'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20',
+    },
+    accepted: {
+      label: t('accepted'),
+      className:
+        'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-500/10 dark:text-purple-400 dark:border-purple-500/20',
+    },
+    in_progress: {
+      label: t('preparing'),
+      className:
+        'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20',
+    },
+    ready: {
+      label: t('ready'),
+      className:
+        'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20',
+    },
+    served: {
+      label: t('served'),
+      className:
+        'bg-teal-50 text-teal-700 border-teal-200 dark:bg-teal-500/10 dark:text-teal-400 dark:border-teal-500/20',
+    },
+    completed: {
+      label: t('completed'),
+      className:
+        'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-500/10 dark:text-slate-400 dark:border-slate-500/20',
+    },
+    rejected: {
+      label: t('rejected'),
+      className:
+        'bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-500/10 dark:text-orange-400 dark:border-orange-500/20',
+    },
+    cancelled: {
+      label: t('cancelled'),
+      className:
+        'bg-red-50 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20',
+    },
+    abandoned: {
+      label: t('abandoned'),
+      className:
+        'bg-gray-50 text-gray-700 border-gray-200 dark:bg-gray-500/10 dark:text-gray-400 dark:border-gray-500/20',
+    },
+  }
+
+  const PAYMENT_STATUS_CONFIG: Record<string, StatusConfig> = {
+    unpaid: {
+      label: t('unpaid'),
+      className:
+        'bg-red-50 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20',
+    },
+    paid: {
+      label: t('paid'),
+      className:
+        'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20',
+    },
+    refunded: {
+      label: t('refunded'),
+      className:
+        'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-500/10 dark:text-slate-400 dark:border-slate-500/20',
+    },
+  }
+  const [paymentDialogOpen, setPaymentDialogOpen] = useState(false)
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false)
+  const [orderToCancel, setOrderToCancel] = useState<Order | null>(null)
+  const completePaymentMutation = useCompletePaymentMutation()
+  const { data: tenantData } = useCurrentTenantQuery()
+
+  // Build query params from URL
+  const timeRange = searchParams.get('timeRange') || 'all'
+
+  // Calculate date_from and date_to based on timeRange
+  const getDateRange = (range: string) => {
+    const now = new Date()
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+
+    switch (range) {
+      case 'today':
+        return {
+          date_from: today.toISOString().split('T')[0],
+          date_to: today.toISOString().split('T')[0],
+        }
+      case 'last24h':
+        const last24h = new Date(now.getTime() - 24 * 60 * 60 * 1000)
+        return {
+          date_from: last24h.toISOString().split('T')[0],
+          date_to: today.toISOString().split('T')[0],
+        }
+      case 'last7d':
+        const last7d = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000)
+        return {
+          date_from: last7d.toISOString().split('T')[0],
+          date_to: today.toISOString().split('T')[0],
+        }
+      default:
+        return {}
+    }
+  }
+
+  const dateRange = getDateRange(timeRange)
+
+  const queryParams = {
+    page: Number(searchParams.get('page')) || 1,
+    limit: 10,
+    status:
+      searchParams.get('status') !== 'all'
+        ? (searchParams.get('status') as OrderStatus)
+        : undefined,
+    search: searchParams.get('q') || undefined,
+    zone_id: searchParams.get('zoneId') || undefined,
+    table_id: searchParams.get('tableId') || undefined,
+    ...dateRange,
+  }
+
+  // Fetch orders from API
+  const { data, isLoading, error } = useOrdersQuery(queryParams)
+  const orders = data?.data || []
+  const meta = data?.meta
+
+  // Update status mutation
+  const updateStatusMutation = useUpdateOrderStatusMutation()
 
   const handleBumpStatus = (orderId: string) => {
-    setOrders((prev) =>
-      prev.map((order) =>
-        order.id === orderId
-          ? { ...order, status: NEXT_STATUS_MAP[order.status] || order.status }
-          : order,
-      ),
-    )
+    const order = orders.find((o: Order) => o.id === orderId)
+    if (!order) return
+
+    const nextStatus = NEXT_STATUS_MAP[order.status]
+    if (!nextStatus) return
+
+    updateStatusMutation.mutate({
+      id: orderId,
+      payload: { status: nextStatus as OrderStatus },
+    })
   }
 
   const handleViewOrder = (orderId: string) => {
     router.push(`/admin/orders/${orderId}`)
+  }
+
+  const handleOpenPaymentDialog = (order: Order) => {
+    setSelectedOrder(order)
+    setPaymentDialogOpen(true)
+  }
+
+  const handlePrintBill = (order: Order) => {
+    // Find paid payment to get invoice number
+    const paidPayment = order.payments?.find((p: { status: string }) => p.status === 'paid')
+
+    printBill({
+      order,
+      billType: 'final',
+      paymentMethod: 'cash',
+      tenantName: tenantData?.data?.name,
+      tenantAddress: tenantData?.data?.address,
+      locale,
+      receiptHeader: settings.receipt.header,
+      receiptFooter: settings.receipt.footer,
+      currencySymbol: settings.general.currency_symbol,
+      invoiceNum: (paidPayment as any)?.invoiceNum,
+    })
+    toast.success(t('toast.printingBill'))
+  }
+
+  const handleCompletePayment = async (order: Order) => {
+    const activePayment = order.payments?.find(
+      (p: { status: string }) => !['cancelled', 'failed', 'paid'].includes(p.status),
+    )
+    if (!activePayment) return
+
+    try {
+      await completePaymentMutation.mutateAsync(activePayment.id)
+      toast.success(t('toast.paymentCompleted'))
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || t('toast.errorCompletePayment'))
+    }
+  }
+
+  const handleOpenCancelDialog = (order: Order) => {
+    setOrderToCancel(order)
+    setCancelDialogOpen(true)
   }
 
   const getAgingMinutes = (createdAt: Date) => {
@@ -244,39 +277,43 @@ export function OrdersTable() {
     return getAgingMinutes(createdAt) > 20
   }
 
+  const handlePageChange = (page: number) => {
+    const params = new URLSearchParams(searchParams.toString())
+    params.set('page', page.toString())
+    router.push(`/admin/orders?${params.toString()}`)
+  }
+
+  const dateLocaleMap: Record<string, typeof vi> = {
+    vi: vi,
+    en: enUS,
+    zh: zhCN,
+    fr: fr,
+  }
+  const dateLocale = dateLocaleMap[locale] || enUS
+
   // Loading state - skeleton rows to avoid layout shift
   if (isLoading) {
     return (
       <div className="space-y-4">
-        <div className="overflow-x-auto rounded-2xl border border-slate-100 bg-white/80 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
+        <AdminTableContainer>
           <Table>
             <TableHeader>
-              <TableRow className="border-b border-slate-100 bg-slate-50/80 hover:bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900">
-                <TableHead className="px-4 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                  Mã đơn
-                </TableHead>
-                <TableHead className="px-4 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                  Bàn
-                </TableHead>
-                <TableHead className="px-4 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                  Món
-                </TableHead>
-                <TableHead className="px-4 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                  Trạng thái
-                </TableHead>
-                <TableHead className="px-4 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                  Thanh toán
-                </TableHead>
-                <TableHead className="px-4 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                  Tổng tiền
-                </TableHead>
-                <TableHead className="px-4 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                  Thời gian
-                </TableHead>
-                <TableHead className="px-4 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                  Thao tác
-                </TableHead>
-              </TableRow>
+              <AdminTableHeaderRow>
+                <AdminTableHead className="px-4">{t('orderId')}</AdminTableHead>
+                <AdminTableHead className="px-4">{t('tableHeader')}</AdminTableHead>
+                <AdminTableHead className="px-4">{t('itemsCount')}</AdminTableHead>
+                <AdminTableHead className="px-4">{t('statusLabel')}</AdminTableHead>
+                <AdminTableHead className="px-4">{t('payment')}</AdminTableHead>
+                <AdminTableHead className="px-4" align="right">
+                  {t('totalAmount')}
+                </AdminTableHead>
+                <AdminTableHead className="px-4" align="center">
+                  {t('time')}
+                </AdminTableHead>
+                <AdminTableHead className="px-4" align="right">
+                  {t('actions')}
+                </AdminTableHead>
+              </AdminTableHeaderRow>
             </TableHeader>
             <TableBody>
               <SkeletonTableRows
@@ -294,7 +331,7 @@ export function OrdersTable() {
               />
             </TableBody>
           </Table>
-        </div>
+        </AdminTableContainer>
       </div>
     )
   }
@@ -302,35 +339,25 @@ export function OrdersTable() {
   return (
     <div className="space-y-4">
       {/* Table */}
-      <div className="overflow-x-auto rounded-2xl border border-slate-100 bg-white/80 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
-        <Table>
+      <AdminTableContainer>
+        <Table className="overflow-hidden">
           <TableHeader>
-            <TableRow className="border-b border-slate-100 bg-slate-50/80 hover:bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900">
-              <TableHead className="px-4 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Mã đơn
-              </TableHead>
-              <TableHead className="px-4 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Bàn
-              </TableHead>
-              <TableHead className="px-4 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Món
-              </TableHead>
-              <TableHead className="px-4 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Trạng thái
-              </TableHead>
-              <TableHead className="px-4 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Thanh toán
-              </TableHead>
-              <TableHead className="px-4 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Tổng tiền
-              </TableHead>
-              <TableHead className="px-4 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Thời gian
-              </TableHead>
-              <TableHead className="px-4 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Thao tác
-              </TableHead>
-            </TableRow>
+            <AdminTableHeaderRow>
+              <AdminTableHead className="px-4">{t('orderId')}</AdminTableHead>
+              <AdminTableHead className="px-4">{t('tableHeader')}</AdminTableHead>
+              <AdminTableHead className="px-4">{t('itemsCount')}</AdminTableHead>
+              <AdminTableHead className="px-4">{t('statusLabel')}</AdminTableHead>
+              <AdminTableHead className="px-4">{t('payment')}</AdminTableHead>
+              <AdminTableHead className="px-4" align="right">
+                {t('totalAmount')}
+              </AdminTableHead>
+              <AdminTableHead className="px-4" align="center">
+                {t('time')}
+              </AdminTableHead>
+              <AdminTableHead className="px-4" align="right">
+                {t('actions')}
+              </AdminTableHead>
+            </AdminTableHeaderRow>
           </TableHeader>
           <TableBody>
             {orders.length === 0 ? (
@@ -338,62 +365,100 @@ export function OrdersTable() {
                 <TableCell colSpan={8} className="px-4 py-0">
                   <EmptyState
                     icon={ClipboardList}
-                    title="Chưa có đơn nào"
-                    description="Thử Reset filter hoặc chọn khoảng thời gian khác"
+                    title={t('noOrders')}
+                    description={t('noOrdersHint')}
                   />
                 </TableCell>
               </TableRow>
             ) : (
-              orders.map((order, index) => {
-                const aging = getAgingMinutes(order.createdAt)
-                const isOverdue = isAging(order.createdAt)
+              orders.map((order: Order, index: number) => {
+                const aging = getAgingMinutes(new Date(order.createdAt))
+                const isOverdue = isAging(new Date(order.createdAt))
 
                 return (
-                  <TableRow
+                  <AdminTableRow
                     key={order.id}
-                    className={cn(
-                      'cursor-pointer border-b border-slate-100 transition-colors hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800',
-                      index === orders.length - 1 && 'border-b-0',
-                    )}
+                    isLast={index === orders.length - 1}
+                    className="cursor-pointer"
                     onClick={() => handleViewOrder(order.id)}
                   >
                     <TableCell className="px-4 py-4">
-                      <div>
-                        <p className="font-mono text-sm font-semibold text-slate-900 dark:text-white">
-                          {order.id}
-                        </p>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">
-                          {formatDistanceToNow(order.createdAt, { addSuffix: true, locale: vi })}
-                        </p>
+                      <div className="flex items-center gap-2">
+                        <div>
+                          <p className="font-mono text-sm font-semibold text-slate-900 dark:text-white">
+                            {order.orderNumber}
+                          </p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400">
+                            {formatDistanceToNow(new Date(order.createdAt), {
+                              addSuffix: true,
+                              locale: dateLocale,
+                            })}
+                          </p>
+                        </div>
+                        {order.paymentRequestedAt && order.paymentStatus !== 'paid' && (
+                          <TooltipProvider>
+                            <div className="flex shrink-0 items-center gap-1">
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Bell className="h-4 w-4 animate-pulse cursor-help text-amber-500" />
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>{t('paymentRequested')}</p>
+                                </TooltipContent>
+                              </Tooltip>
+                              {order.paymentMethod === 'qr' ? (
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <QrCode className="h-4 w-4 cursor-help text-blue-600 dark:text-blue-400" />
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>QR Payment</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              ) : order.paymentMethod === 'cash' ? (
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <DollarSign className="h-4 w-4 cursor-help text-emerald-600 dark:text-emerald-400" />
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>Cash Payment</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              ) : null}
+                            </div>
+                          </TooltipProvider>
+                        )}
                       </div>
                     </TableCell>
                     <TableCell className="px-4 py-4">
                       <div>
                         <p className="text-sm font-medium text-slate-900 dark:text-white">
-                          {order.tableName}
+                          {t('tableHeader')} {order.table?.tableNumber || 'N/A'}
                         </p>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">{order.floor}</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">
+                          {order.table?.zone?.name || ''}
+                        </p>
                       </div>
                     </TableCell>
                     <TableCell className="px-4 py-4">
                       <div className="group relative">
                         <p className="text-sm text-slate-700 dark:text-slate-300">
-                          {order.items.length} món
+                          {order.items.length} {t('itemsCount').toLowerCase()}
                         </p>
-                        {/* Tooltip */}
-                        <div className="invisible absolute bottom-full left-0 z-10 mb-2 w-64 rounded-lg border border-slate-200 bg-white p-3 opacity-0 shadow-lg transition-all group-hover:visible group-hover:opacity-100 dark:border-slate-700 dark:bg-slate-800">
+                        {/* Tooltip - position below to avoid overflow clipping */}
+                        <div className="invisible absolute top-full left-0 z-50 mt-2 w-64 rounded-lg border border-slate-200 bg-white p-3 opacity-0 shadow-lg transition-all group-hover:visible group-hover:opacity-100 dark:border-slate-700 dark:bg-slate-800">
                           <p className="mb-2 text-xs font-semibold text-slate-900 dark:text-white">
-                            Chi tiết món:
+                            {t('itemDetails')}
                           </p>
                           <ul className="space-y-1">
-                            {order.items.slice(0, 3).map((item, idx) => (
+                            {order.items.slice(0, 3).map((item: OrderItem, idx: number) => (
                               <li key={idx} className="text-xs text-slate-600 dark:text-slate-400">
                                 {item.quantity}x {item.name}
                               </li>
                             ))}
                             {order.items.length > 3 && (
                               <li className="text-xs text-slate-500 dark:text-slate-500">
-                                +{order.items.length - 3} món khác
+                                {t('moreItems', { count: order.items.length - 3 })}
                               </li>
                             )}
                           </ul>
@@ -407,9 +472,18 @@ export function OrdersTable() {
                       <StatusBadge status={order.paymentStatus} config={PAYMENT_STATUS_CONFIG} />
                     </TableCell>
                     <TableCell className="px-4 py-4 text-right">
-                      <p className="font-semibold text-slate-900 dark:text-white">
-                        {order.total.toLocaleString('vi-VN')}₫
-                      </p>
+                      <PriceBreakdownTooltip
+                        price={{
+                          subtotal: order.subtotal,
+                          taxAmount: order.taxAmount,
+                          discountAmount: order.discountAmount,
+                          totalAmount: order.totalAmount,
+                        }}
+                      >
+                        <p className="cursor-help font-semibold text-slate-900 dark:text-white">
+                          {formatPrice(order.totalAmount)}
+                        </p>
+                      </PriceBreakdownTooltip>
                     </TableCell>
                     <TableCell className="px-4 py-4">
                       <div className="flex items-center justify-center gap-1">
@@ -431,6 +505,97 @@ export function OrdersTable() {
                       onClick={(e) => e.stopPropagation()}
                     >
                       <div className="flex items-center justify-end gap-1">
+                        {/* Payment Processing Indicator */}
+                        {(() => {
+                          const activePayment = order.payments?.find(
+                            (p: { status: string; paymentMethod?: string }) =>
+                              !['cancelled', 'failed', 'paid'].includes(p.status),
+                          )
+
+                          // Show Complete/Cancel buttons for active payments
+                          if (activePayment && order.status === 'completed') {
+                            const isProcessing = completePaymentMutation.isPending
+
+                            return (
+                              <>
+                                {/* Processing indicator */}
+                                <div className="relative mr-1">
+                                  <div className="flex h-2 w-2 items-center justify-center">
+                                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-blue-400 opacity-75"></span>
+                                    <span className="relative inline-flex h-2 w-2 rounded-full bg-blue-500"></span>
+                                  </div>
+                                </div>
+
+                                {/* Complete button - only for pending cash */}
+                                {activePayment.status === 'pending' &&
+                                  activePayment.paymentMethod === 'cash' && (
+                                    <Button
+                                      variant="default"
+                                      className="h-7 gap-1 rounded-full px-2 text-xs md:h-8 md:px-3"
+                                      disabled={isProcessing}
+                                      onClick={(e) => {
+                                        e.stopPropagation()
+                                        handleCompletePayment(order)
+                                      }}
+                                    >
+                                      {isProcessing ? (
+                                        <Loader2 className="h-3 w-3 animate-spin" />
+                                      ) : (
+                                        <CheckCircle className="h-3 w-3" />
+                                      )}
+                                      {!isProcessing && (
+                                        <span className="hidden md:inline">
+                                          {t('paymentCard.complete')}
+                                        </span>
+                                      )}
+                                    </Button>
+                                  )}
+
+                                {/* Cancel button */}
+                                <Button
+                                  variant="outline"
+                                  className="h-7 gap-1 rounded-full px-2 text-xs md:h-8 md:px-3"
+                                  disabled={isProcessing}
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    handleOpenCancelDialog(order)
+                                  }}
+                                >
+                                  {isProcessing ? (
+                                    <Loader2 className="h-3 w-3 animate-spin" />
+                                  ) : (
+                                    <X className="h-3 w-3" />
+                                  )}
+                                  {!isProcessing && (
+                                    <span className="hidden md:inline">
+                                      {t('paymentCard.cancel')}
+                                    </span>
+                                  )}
+                                </Button>
+                              </>
+                            )
+                          }
+
+                          // Show Tính tiền button for completed unpaid orders without active payment
+                          if (order.status === 'completed' && order.paymentStatus !== 'paid') {
+                            return (
+                              <Button
+                                variant="default"
+                                className="h-7 gap-1 rounded-full px-2 text-xs md:h-8 md:px-3"
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  handleOpenPaymentDialog(order)
+                                }}
+                              >
+                                <Wallet className="h-3 w-3" />
+                                {t('header.initiatePayment')}
+                              </Button>
+                            )
+                          }
+
+                          return null
+                        })()}
+
                         {/* Bump/Next Status */}
                         {NEXT_STATUS_MAP[order.status] && (
                           <Button
@@ -441,7 +606,7 @@ export function OrdersTable() {
                               handleBumpStatus(order.id)
                             }}
                           >
-                            Tiếp
+                            {t('next')}
                             <ChevronRight className="h-3 w-3" />
                           </Button>
                         )}
@@ -473,68 +638,64 @@ export function OrdersTable() {
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem onClick={() => handleViewOrder(order.id)}>
                               <Eye className="mr-2 h-4 w-4" />
-                              Xem chi tiết
+                              {t('viewDetails')}
                             </DropdownMenuItem>
-                            <DropdownMenuItem>
+                            <DropdownMenuItem
+                              disabled={order.paymentStatus !== 'paid'}
+                              onClick={() => handlePrintBill(order)}
+                            >
                               <Printer className="mr-2 h-4 w-4" />
-                              In bill
+                              {t('printBill')}
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem>Thay đổi trạng thái...</DropdownMenuItem>
-                            <DropdownMenuItem>Xuất PDF</DropdownMenuItem>
+                            <DropdownMenuItem
+                              disabled={
+                                order.status !== 'completed' || order.paymentStatus === 'paid'
+                              }
+                              onClick={() => handleOpenPaymentDialog(order)}
+                            >
+                              <Wallet className="mr-2 h-4 w-4" />
+                              {t('header.initiatePayment')}
+                            </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </div>
                     </TableCell>
-                  </TableRow>
+                  </AdminTableRow>
                 )
               })
             )}
           </TableBody>
         </Table>
-      </div>
+      </AdminTableContainer>
 
       {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="flex items-center justify-between">
-          <p className="text-sm text-slate-500 dark:text-slate-400">
-            Hiển thị 1-{total} trên {total} đơn
-          </p>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              className="rounded-full bg-transparent"
-              disabled={page === 1}
-            >
-              Trước
-            </Button>
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
-              <Button
-                key={pageNum}
-                variant="outline"
-                size="sm"
-                className={cn(
-                  'h-8 w-8 rounded-full',
-                  pageNum === page
-                    ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10'
-                    : 'bg-transparent',
-                )}
-              >
-                {pageNum}
-              </Button>
-            ))}
-            <Button
-              variant="outline"
-              size="sm"
-              className="rounded-full bg-transparent"
-              disabled={page === totalPages}
-            >
-              Sau
-            </Button>
-          </div>
-        </div>
+      {meta && (
+        <TablePagination
+          currentPage={meta.page || 1}
+          totalPages={meta.totalPages || 1}
+          total={meta.total || 0}
+          limit={meta.limit || 10}
+          itemLabel={t('itemLabel')}
+          onPageChange={handlePageChange}
+        />
       )}
+
+      {/* Payment Dialog */}
+      <PaymentDialog
+        open={paymentDialogOpen}
+        onOpenChange={setPaymentDialogOpen}
+        order={selectedOrder}
+        tenantAddress={tenantData?.data?.address}
+        tenantName={tenantData?.data?.name}
+      />
+
+      {/* Cancel Payment Confirmation Dialog */}
+      <CancelPaymentDialog
+        open={cancelDialogOpen}
+        onOpenChange={setCancelDialogOpen}
+        orderToCancel={orderToCancel}
+      />
     </div>
   )
 }

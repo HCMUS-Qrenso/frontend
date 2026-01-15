@@ -17,6 +17,7 @@ import { useCreateStaffMutation } from '@/src/features/admin/staff/queries'
 import { useErrorHandler } from '@/src/hooks/use-error-handler'
 import { useAuth } from '@/src/features/auth/hooks'
 import { inviteStaffSchema } from '@/src/features/admin/staff/schemas'
+import { useTranslations } from 'next-intl'
 
 type StaffRole = 'admin' | 'waiter' | 'kitchen_staff'
 
@@ -31,6 +32,7 @@ export function InviteStaffModal({ open, onOpenChange, defaultRole }: InviteStaf
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
   const [role, setRole] = useState<StaffRole>(defaultRole)
+  const t = useTranslations('staff')
 
   const { user } = useAuth()
   const createMutation = useCreateStaffMutation()
@@ -65,7 +67,7 @@ export function InviteStaffModal({ open, onOpenChange, defaultRole }: InviteStaf
 
     if (!result.success) {
       const firstError = result.error.issues[0]
-      toast.error(firstError?.message || 'Dữ liệu không hợp lệ')
+      toast.error(firstError?.message || t('invalidData'))
       return
     }
 
@@ -77,12 +79,10 @@ export function InviteStaffModal({ open, onOpenChange, defaultRole }: InviteStaf
         role,
       })
 
-      toast.success(
-        'Đã gửi lời mời thành công! Nhân viên sẽ nhận được email để thiết lập mật khẩu.',
-      )
+      toast.success(t('inviteSuccess'))
       onOpenChange(false)
     } catch (error) {
-      handleError(error, 'Không thể gửi lời mời')
+      handleError(error, t('inviteError'))
     }
   }
 
@@ -90,58 +90,58 @@ export function InviteStaffModal({ open, onOpenChange, defaultRole }: InviteStaf
     <FormDialog
       open={open}
       onOpenChange={onOpenChange}
-      title="Mời nhân viên mới"
-      description="Tạo tài khoản và gửi email mời cho nhân viên. Họ sẽ nhận được link để thiết lập mật khẩu."
+      title={t('inviteTitle')}
+      description={t('inviteDesc')}
       onSubmit={handleSubmit}
       isSubmitting={createMutation.isPending}
-      submitText="Gửi lời mời"
-      loadingText="Đang gửi..."
+      submitText={t('sendInvite')}
+      loadingText={t('sendingInvite')}
       size="md"
     >
       {/* Họ và tên */}
-      <FormDialogField label="Họ và tên" required>
+      <FormDialogField label={t('fullNameLabel')} required>
         <Input
           id="full_name"
           value={fullName}
           onChange={(e) => setFullName(e.target.value)}
-          placeholder="Nguyễn Văn A"
+          placeholder={t('fullNamePlaceholder')}
           disabled={createMutation.isPending}
         />
       </FormDialogField>
 
       {/* Email */}
-      <FormDialogField label="Email" required>
+      <FormDialogField label={t('email')} required>
         <Input
           id="email"
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="email@restaurant.com"
+          placeholder={t('emailPlaceholder')}
           disabled={createMutation.isPending}
         />
       </FormDialogField>
 
       {/* Số điện thoại */}
-      <FormDialogField label="Số điện thoại">
+      <FormDialogField label={t('phone')}>
         <Input
           id="phone"
           type="tel"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
-          placeholder="Nhập số điện thoại"
+          placeholder={t('phonePlaceholder')}
           disabled={createMutation.isPending}
         />
       </FormDialogField>
 
       {/* Vai trò */}
-      <FormDialogField label="Vai trò">
+      <FormDialogField label={t('role')}>
         <Select
           value={role}
           onValueChange={(value) => setRole(value as StaffRole)}
           disabled={createMutation.isPending}
         >
           <SelectTrigger id="role">
-            <SelectValue placeholder="Chọn vai trò" />
+            <SelectValue placeholder={t('selectRole')} />
           </SelectTrigger>
           <SelectContent>
             {/* Admin option - Only visible for Owner */}
@@ -149,24 +149,24 @@ export function InviteStaffModal({ open, onOpenChange, defaultRole }: InviteStaf
               <SelectItem value="admin">
                 <span className="flex items-center gap-2">
                   <span className="h-2 w-2 rounded-full bg-violet-500" />
-                  Quản trị viên
+                  {t('admin')}
                 </span>
               </SelectItem>
             )}
-            <SelectItem value="waiter">Phục vụ</SelectItem>
-            <SelectItem value="kitchen_staff">Nhân viên bếp</SelectItem>
+            <SelectItem value="waiter">{t('waiter')}</SelectItem>
+            <SelectItem value="kitchen_staff">{t('kitchenStaff')}</SelectItem>
           </SelectContent>
         </Select>
       </FormDialogField>
 
       {/* Trạng thái ban đầu */}
       <div className="space-y-2">
-        <Label>Trạng thái ban đầu</Label>
+        <Label>{t('initialStatus')}</Label>
         <div className="flex items-center gap-2">
           <Badge className="bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400">
-            Hoạt động
+            {t('active')}
           </Badge>
-          <span className="text-xs text-slate-500">(Mặc định)</span>
+          <span className="text-xs text-slate-500">{t('defaultActive')}</span>
         </div>
       </div>
     </FormDialog>

@@ -11,38 +11,11 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
-import { TrendingUp } from 'lucide-react'
-
-const dailyData = [
-  { date: '01/12', revenue: 12500000, orders: 45 },
-  { date: '02/12', revenue: 15800000, orders: 58 },
-  { date: '03/12', revenue: 14200000, orders: 52 },
-  { date: '04/12', revenue: 18900000, orders: 72 },
-  { date: '05/12', revenue: 16500000, orders: 61 },
-  { date: '06/12', revenue: 21200000, orders: 85 },
-  { date: '07/12', revenue: 19800000, orders: 78 },
-  { date: '08/12', revenue: 17400000, orders: 65 },
-  { date: '09/12', revenue: 22100000, orders: 88 },
-  { date: '10/12', revenue: 20500000, orders: 82 },
-  { date: '11/12', revenue: 18500000, orders: 70 },
-]
-
-const weeklyData = [
-  { date: 'Tuần 45', revenue: 98500000, orders: 385 },
-  { date: 'Tuần 46', revenue: 112800000, orders: 428 },
-  { date: 'Tuần 47', revenue: 125200000, orders: 492 },
-  { date: 'Tuần 48', revenue: 118900000, orders: 456 },
-  { date: 'Tuần 49', revenue: 132500000, orders: 521 },
-]
-
-const monthlyData = [
-  { date: 'Tháng 7', revenue: 420000000, orders: 1580 },
-  { date: 'Tháng 8', revenue: 485000000, orders: 1820 },
-  { date: 'Tháng 9', revenue: 512000000, orders: 1950 },
-  { date: 'Tháng 10', revenue: 498000000, orders: 1890 },
-  { date: 'Tháng 11', revenue: 545000000, orders: 2100 },
-  { date: 'Tháng 12', revenue: 380000000, orders: 1450 },
-]
+import { TrendingUp, TrendingDown } from 'lucide-react'
+import { usePerformanceQuery } from '../queries'
+import { Skeleton } from '@/src/components/ui/skeleton'
+import { useTranslations } from 'next-intl'
+import { useFormat } from '@/src/hooks/use-format'
 
 type TimeRange = 'day' | 'week' | 'month'
 type DataType = 'revenue' | 'orders'
@@ -57,12 +30,24 @@ function formatCurrency(value: number) {
 export function PerformanceChart() {
   const [timeRange, setTimeRange] = useState<TimeRange>('day')
   const [dataType, setDataType] = useState<DataType>('revenue')
+  const t = useTranslations('dashboard')
+  const { formatPrice } = useFormat()
 
-  const data = timeRange === 'day' ? dailyData : timeRange === 'week' ? weeklyData : monthlyData
+  const { data: performanceData, isLoading } = usePerformanceQuery(timeRange, 11)
 
-  const totalRevenue = data.reduce((sum, d) => sum + d.revenue, 0)
-  const totalOrders = data.reduce((sum, d) => sum + d.orders, 0)
-  const avgOrdersPerDay = Math.round(totalOrders / data.length)
+  const chartData = performanceData?.data || []
+  const summary = performanceData?.summary
+
+  const timeRangeLabels: Record<TimeRange, string> = {
+    day: t('day'),
+    week: t('week'),
+    month: t('month'),
+  }
+
+  const dataTypeLabels: Record<DataType, string> = {
+    revenue: t('revenue'),
+    orders: t('orders'),
+  }
 
   return (
     <div className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
@@ -70,11 +55,9 @@ export function PerformanceChart() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
-            Hiệu suất theo thời gian
+            {t('performanceOverTime')}
           </h3>
-          <p className="text-sm text-slate-500 dark:text-slate-400">
-            Theo dõi doanh thu và số order
-          </p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">{t('trackRevenueOrders')}</p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
@@ -91,7 +74,7 @@ export function PerformanceChart() {
                     : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white',
                 )}
               >
-                {range === 'day' ? 'Ngày' : range === 'week' ? 'Tuần' : 'Tháng'}
+                {timeRangeLabels[range]}
               </button>
             ))}
           </div>
@@ -109,7 +92,7 @@ export function PerformanceChart() {
                     : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white',
                 )}
               >
-                {type === 'revenue' ? 'Doanh thu' : 'Orders'}
+                {dataTypeLabels[type]}
               </button>
             ))}
           </div>
@@ -118,88 +101,121 @@ export function PerformanceChart() {
 
       {/* Chart */}
       <div className="mt-6 h-72">
-        <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-            <defs>
-              <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
-              </linearGradient>
-              <linearGradient id="colorOrders" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
-              </linearGradient>
-            </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
-            <XAxis
-              dataKey="date"
-              axisLine={false}
-              tickLine={false}
-              tick={{ fill: '#94a3b8', fontSize: 12 }}
-              dy={10}
-            />
-            <YAxis
-              axisLine={false}
-              tickLine={false}
-              tick={{ fill: '#94a3b8', fontSize: 12 }}
-              tickFormatter={(value) =>
-                dataType === 'revenue' ? formatCurrency(value) : value.toString()
-              }
-              dx={-10}
-            />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: '#fff',
-                border: '1px solid #e2e8f0',
-                borderRadius: '12px',
-                boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
-              }}
-              formatter={(value: number) => [
-                dataType === 'revenue'
-                  ? new Intl.NumberFormat('vi-VN', {
-                      style: 'currency',
-                      currency: 'VND',
-                    }).format(value)
-                  : `${value} orders`,
-                dataType === 'revenue' ? 'Doanh thu' : 'Orders',
-              ]}
-            />
-            <Area
-              type="monotone"
-              dataKey={dataType}
-              stroke={dataType === 'revenue' ? '#10b981' : '#6366f1'}
-              strokeWidth={2}
-              fill={dataType === 'revenue' ? 'url(#colorRevenue)' : 'url(#colorOrders)'}
-              animationDuration={500}
-            />
-          </AreaChart>
-        </ResponsiveContainer>
+        {isLoading ? (
+          <div className="flex h-full items-center justify-center">
+            <Skeleton className="h-full w-full" />
+          </div>
+        ) : chartData.length === 0 ? (
+          <div className="flex h-full items-center justify-center text-slate-500">
+            {t('noData')}
+          </div>
+        ) : (
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+              <defs>
+                <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                </linearGradient>
+                <linearGradient id="colorOrders" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
+              <XAxis
+                dataKey="date"
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: '#94a3b8', fontSize: 12 }}
+                dy={10}
+              />
+              <YAxis
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: '#94a3b8', fontSize: 12 }}
+                tickFormatter={(value) =>
+                  dataType === 'revenue' ? formatCurrency(value) : value.toString()
+                }
+                dx={-10}
+              />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: 'var(--popover)',
+                  color: 'var(--popover-foreground)',
+                  border: '1px solid var(--border)',
+                  borderRadius: '12px',
+                  boxShadow:
+                    '0 4px 6px -1px color-mix(in srgb, var(--background) 10%, transparent), 0 2px 4px -2px color-mix(in srgb, var(--background) 10%, transparent)',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                }}
+                labelStyle={{
+                  color: 'var(--popover-foreground)',
+                  fontWeight: '600',
+                }}
+                formatter={(value: number) => [
+                  dataType === 'revenue'
+                    ? formatPrice(value)
+                    : `${value} ${t('orders').toLowerCase()}`,
+                  dataTypeLabels[dataType],
+                ]}
+              />
+              <Area
+                type="monotone"
+                dataKey={dataType}
+                stroke={dataType === 'revenue' ? '#10b981' : '#6366f1'}
+                strokeWidth={2}
+                fill={dataType === 'revenue' ? 'url(#colorRevenue)' : 'url(#colorOrders)'}
+                animationDuration={500}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        )}
       </div>
 
       {/* Stats */}
       <div className="mt-6 grid gap-4 border-t border-slate-100 pt-6 sm:grid-cols-3 dark:border-slate-800">
         <div>
-          <p className="text-sm text-slate-500 dark:text-slate-400">Tổng doanh thu</p>
-          <p className="mt-1 text-xl font-semibold text-slate-900 dark:text-white">
-            {new Intl.NumberFormat('vi-VN', {
-              style: 'currency',
-              currency: 'VND',
-              maximumFractionDigits: 0,
-            }).format(totalRevenue)}
-          </p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">{t('totalRevenue')}</p>
+          {isLoading ? (
+            <Skeleton className="mt-1 h-7 w-32" />
+          ) : (
+            <p className="mt-1 text-xl font-semibold text-slate-900 dark:text-white">
+              {formatPrice(summary?.total_revenue || 0)}
+            </p>
+          )}
         </div>
         <div>
-          <p className="text-sm text-slate-500 dark:text-slate-400">Tăng trưởng</p>
-          <p className="mt-1 flex items-center gap-1 text-xl font-semibold text-emerald-600">
-            <TrendingUp className="h-5 w-5" />
-            +15.3%
-          </p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">{t('growth')}</p>
+          {isLoading ? (
+            <Skeleton className="mt-1 h-7 w-20" />
+          ) : (
+            <p
+              className={cn(
+                'mt-1 flex items-center gap-1 text-xl font-semibold',
+                (summary?.growth_percentage || 0) >= 0 ? 'text-emerald-600' : 'text-red-500',
+              )}
+            >
+              {(summary?.growth_percentage || 0) >= 0 ? (
+                <TrendingUp className="h-5 w-5" />
+              ) : (
+                <TrendingDown className="h-5 w-5" />
+              )}
+              {(summary?.growth_percentage ?? 0) >= 0 ? '+' : ''}
+              {summary?.growth_percentage ?? 0}%
+            </p>
+          )}
         </div>
         <div>
-          <p className="text-sm text-slate-500 dark:text-slate-400">Orders TB/ngày</p>
-          <p className="mt-1 text-xl font-semibold text-slate-900 dark:text-white">
-            {avgOrdersPerDay}
-          </p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">{t('avgOrdersPerDay')}</p>
+          {isLoading ? (
+            <Skeleton className="mt-1 h-7 w-16" />
+          ) : (
+            <p className="mt-1 text-xl font-semibold text-slate-900 dark:text-white">
+              {summary?.avg_orders_per_period || 0}
+            </p>
+          )}
         </div>
       </div>
     </div>

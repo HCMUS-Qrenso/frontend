@@ -18,6 +18,7 @@ import {
   useResendInviteMutation,
 } from '@/src/features/admin/staff/queries'
 import { useErrorHandler } from '@/src/hooks/use-error-handler'
+import { useTranslations } from 'next-intl'
 
 interface StaffPasswordDialogProps {
   open: boolean
@@ -35,6 +36,7 @@ export function StaffPasswordDialog({
   const resetPasswordMutation = useResetPasswordMutation()
   const resendInviteMutation = useResendInviteMutation()
   const { handleError } = useErrorHandler()
+  const t = useTranslations('staff')
 
   const isReset = action === 'reset'
   const mutation = isReset ? resetPasswordMutation : resendInviteMutation
@@ -43,17 +45,14 @@ export function StaffPasswordDialog({
     try {
       if (isReset) {
         await resetPasswordMutation.mutateAsync(staff.id)
-        toast.success('Đã gửi email reset mật khẩu')
+        toast.success(t('resetPasswordSuccess'))
       } else {
         await resendInviteMutation.mutateAsync(staff.id)
-        toast.success('Đã gửi lại email mời thành công')
+        toast.success(t('resendInviteSuccess'))
       }
       onOpenChange(false)
     } catch (error) {
-      handleError(
-        error,
-        isReset ? 'Không thể gửi email reset mật khẩu' : 'Không thể gửi lại email mời',
-      )
+      handleError(error, isReset ? t('resetPasswordError') : t('resendInviteError'))
     }
   }
 
@@ -61,30 +60,30 @@ export function StaffPasswordDialog({
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>{isReset ? 'Reset mật khẩu?' : 'Gửi lại lời mời?'}</AlertDialogTitle>
+          <AlertDialogTitle>
+            {isReset ? t('resetPasswordTitle') : t('resendInviteTitle')}
+          </AlertDialogTitle>
           <AlertDialogDescription>
-            {isReset ? (
-              <>
-                Gửi email reset mật khẩu đến <strong>{staff.email}</strong>? Nhân viên sẽ nhận được
-                link để tạo mật khẩu mới.
-              </>
-            ) : (
-              <>
-                Gửi lại email mời đến <strong>{staff.email}</strong>? Nhân viên sẽ nhận được link
-                mới để thiết lập mật khẩu.
-              </>
-            )}
+            {isReset
+              ? t.rich('resetPasswordDesc', {
+                  email: staff.email,
+                  strong: (chunks) => <strong className="font-semibold">{chunks}</strong>,
+                })
+              : t.rich('resendInviteDesc', {
+                  email: staff.email,
+                  strong: (chunks) => <strong className="font-semibold">{chunks}</strong>,
+                })}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={mutation.isPending}>Hủy</AlertDialogCancel>
+          <AlertDialogCancel disabled={mutation.isPending}>{t('cancel')}</AlertDialogCancel>
           <AlertDialogAction
             onClick={handleConfirm}
             className="bg-emerald-600 hover:bg-emerald-700"
             disabled={mutation.isPending}
           >
             {mutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {isReset ? 'Gửi email' : 'Gửi lại'}
+            {isReset ? t('sendEmail') : t('resendBtn')}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

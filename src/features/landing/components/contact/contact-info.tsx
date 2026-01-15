@@ -1,33 +1,33 @@
+'use client'
+
 import { Check, Clock, Mail, MapPin, Phone } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 export function ContactInfo() {
-  const benefits = [
-    'Demo trực tiếp hệ thống trong 15 phút',
-    'Tư vấn miễn phí về quy trình vận hành',
-    'Báo giá chi tiết cho nhà hàng của bạn',
-    'Hỗ trợ triển khai và đào tạo nhân viên',
-  ]
+  const t = useTranslations('landing.contact')
+
+  const benefits = [t('benefit1'), t('benefit2'), t('benefit3'), t('benefit4')]
 
   const contactMethods = [
     {
       icon: Phone,
-      label: 'Hotline',
+      label: t('hotline'),
       value: '1900 xxxx',
     },
     {
       icon: Mail,
-      label: 'Email',
+      label: t('email'),
       value: 'hello@qrenso.vn',
     },
     {
       icon: MapPin,
-      label: 'Văn phòng',
+      label: t('office'),
       value: 'TP. Hồ Chí Minh, Việt Nam',
     },
     {
       icon: Clock,
-      label: 'Giờ làm việc',
-      value: 'T2 - T6: 8h30 - 18h00',
+      label: t('workingHours'),
+      value: t('workingHoursValue'),
     },
   ]
 
@@ -35,7 +35,7 @@ export function ContactInfo() {
     <div className="space-y-8">
       {/* Benefits Section */}
       <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6 md:p-8 dark:border-slate-800 dark:bg-slate-900/50">
-        <h2 className="mb-6 text-2xl font-bold text-black dark:text-white">Bạn sẽ nhận được gì?</h2>
+        <h2 className="mb-6 text-2xl font-bold text-black dark:text-white">{t('whatYouGet')}</h2>
         <ul className="space-y-4">
           {benefits.map((benefit, index) => (
             <li key={index} className="flex items-start gap-3">
@@ -50,7 +50,7 @@ export function ContactInfo() {
 
       {/* Contact Methods */}
       <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6 md:p-8 dark:border-slate-800 dark:bg-slate-900/50">
-        <h2 className="mb-6 text-2xl font-bold text-black dark:text-white">Thông tin liên hệ</h2>
+        <h2 className="mb-6 text-2xl font-bold text-black dark:text-white">{t('contactInfo')}</h2>
         <div className="space-y-5">
           {contactMethods.map((method, index) => (
             <div key={index} className="flex items-start gap-4">

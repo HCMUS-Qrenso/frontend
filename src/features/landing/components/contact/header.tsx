@@ -2,19 +2,22 @@
 
 import { Button } from '@/src/components/ui/button'
 import { ThemeToggle } from '@/src/components/theme-toggle'
+import { LanguageSwitcher } from '@/src/components/language-switcher'
 import { Menu, X } from 'lucide-react'
 import { useState } from 'react'
-import Link from 'next/link'
+import { useTranslations } from 'next-intl'
+import { Link } from '@/src/i18n/navigation'
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const t = useTranslations('landing')
 
   const navItems = [
-    { label: 'Tính năng', href: '/#features' },
-    { label: 'Cách hoạt động', href: '/#how-it-works' },
-    { label: 'Bảng giá', href: '/#pricing' },
-    { label: 'FAQ', href: '/#faq' },
-    { label: 'Liên hệ', href: '/contact' },
+    { label: t('nav.features'), href: '/#features' },
+    { label: t('nav.howItWorks'), href: '/#how-it-works' },
+    { label: t('nav.pricing'), href: '/#pricing' },
+    { label: t('nav.faq'), href: '/#faq' },
+    { label: t('nav.contact'), href: '/contact' },
   ]
 
   const handleSmoothScroll = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
@@ -79,16 +82,17 @@ export function Header() {
 
         {/* CTA */}
         <div className="hidden items-center gap-3 md:flex">
+          <LanguageSwitcher />
           <ThemeToggle />
           <Button
             variant="outline"
             className="border-slate-300 bg-transparent text-slate-900 dark:border-slate-700 dark:text-white"
             asChild
           >
-            <Link href="/auth/login">Đăng nhập</Link>
+            <Link href="/auth/login">{t('auth.login')}</Link>
           </Button>
           <Button className="bg-emerald-600 text-white hover:bg-emerald-700" asChild>
-            <Link href="/contact">Đặt lịch demo</Link>
+            <Link href="/contact">{t('cta.bookDemo')}</Link>
           </Button>
         </div>
 
@@ -128,6 +132,7 @@ export function Header() {
               ),
             )}
             <div className="mt-4 flex items-center gap-3">
+              <LanguageSwitcher />
               <ThemeToggle />
             </div>
             <div className="flex flex-col gap-3">
@@ -136,10 +141,10 @@ export function Header() {
                 className="border-slate-300 bg-transparent text-slate-900 hover:bg-slate-100 dark:border-slate-700 dark:text-white dark:hover:bg-slate-800"
                 asChild
               >
-                <Link href="/auth/login">Đăng nhập</Link>
+                <Link href="/auth/login">{t('auth.login')}</Link>
               </Button>
               <Button className="bg-emerald-600 text-white hover:bg-emerald-700" asChild>
-                <Link href="/contact">Đặt lịch demo</Link>
+                <Link href="/contact">{t('cta.bookDemo')}</Link>
               </Button>
             </div>
           </nav>

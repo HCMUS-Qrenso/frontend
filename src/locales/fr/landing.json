@@ -1,0 +1,375 @@
+{
+  "nav": {
+    "features": "Fonctionnalités",
+    "howItWorks": "Fonctionnement",
+    "pricing": "Tarifs",
+    "faq": "FAQ",
+    "contact": "Contact"
+  },
+  "auth": {
+    "login": "Connexion"
+  },
+  "cta": {
+    "bookDemo": "Réserver une démo",
+    "bookDemoFree": "Démo gratuite",
+    "getStarted": "Commencer",
+    "learnMore": "En savoir plus",
+    "viewProduct": "Voir le produit",
+    "contactUs": "Nous contacter",
+    "startTrial": "Essai gratuit",
+    "contactConsult": "Demander conseil"
+  },
+  "hero": {
+    "headline1": "Accélérez le service, réduisez les erreurs avec",
+    "headline2": "la Commande QR",
+    "headline3": "et la gestion en temps réel",
+    "subheadline": "Système complet pour restaurant : Commande par QR, réception instantanée en cuisine, tableau de bord complet, paiements flexibles.",
+    "socialProof": "Utilisé par les meilleurs restaurants",
+    "logo": "Logo",
+    "stats": {
+      "orderTime": "Temps de traitement",
+      "orderErrors": "Erreurs de commande",
+      "tableSpeed": "Rotation des tables"
+    }
+  },
+  "productShowcase": {
+    "title": "Une plateforme, toutes les fonctionnalités",
+    "subtitle": "De la commande au paiement, tout est connecté",
+    "tabs": {
+      "dashboard": {
+        "label": "Tableau de Bord",
+        "description": "Surveillez toute l'activité en temps réel"
+      },
+      "kds": {
+        "label": "Écran Cuisine",
+        "description": "Réception instantanée des commandes en cuisine"
+      },
+      "customer": {
+        "label": "Commande Client",
+        "description": "Les clients scannent et commandent sur leur mobile"
+      },
+      "tables": {
+        "label": "Tables & QR",
+        "description": "Gestion des tables, codes QR et plan de salle"
+      }
+    },
+    "images": {
+      "tableList": "Liste des tables",
+      "tableCanvas": "Plan de salle",
+      "tableQR": "Gestion des QR",
+      "dashboardOverview": "Aperçu général",
+      "dashboardAnalytics": "Analyses"
+    },
+    "placeholder": "Captures d'écran bientôt disponibles"
+  },
+  "features": {
+    "title": "Fonctionnalités complètes pour restaurants modernes",
+    "subtitle": "De la commande au paiement, de la cuisine à la gestion",
+    "items": {
+      "dashboard": {
+        "title": "Tableau de Bord Opérationnel",
+        "description": "Suivez les commandes, revenus et tables en temps réel. Analyses détaillées par jour/semaine/mois."
+      },
+      "tables": {
+        "title": "Gestion des Tables & QR",
+        "description": "Créez des QR pour chaque table, gérez le plan de salle et suivez les statuts visuellement."
+      },
+      "kds": {
+        "title": "KDS Temps Réel",
+        "description": "L'écran cuisine reçoit les commandes instantanément avec tri automatique des priorités."
+      },
+      "customerOrdering": {
+        "title": "Commande Client",
+        "description": "Les clients scannent le QR et commandent sur leur mobile, accèdent au menu complet."
+      },
+      "payment": {
+        "title": "Paiement Flexible",
+        "description": "Intégration VNPay, MoMo, ZaloPay, Stripe. Paiement après repas ou en ligne."
+      },
+      "analytics": {
+        "title": "Analyses & Rapports",
+        "description": "Rapports de revenus, meilleures ventes, performance. Export Excel/PDF."
+      },
+      "roles": {
+        "title": "Rôles & Permissions",
+        "description": "Accès détaillés : Admin, Caissier, Serveur, Cuisine. Sécurité multi-niveaux."
+      },
+      "multiLang": {
+        "title": "Multilingue & Multi-succursale",
+        "description": "Support multilingue, gérez plusieurs établissements sur un seul compte."
+      }
+    }
+  },
+  "howItWorks": {
+    "title": "Fonctionnement simple",
+    "subtitle": "4 étapes pour numériser votre restaurant",
+    "steps": {
+      "step1": {
+        "title": "Configuration menu & tables",
+        "description": "Créez vos articles, catégories et prix. Configurez vos tables et générez les QR codes."
+      },
+      "step2": {
+        "title": "Le client scanne le QR",
+        "description": "Le client scanne le code sur la table, consulte le menu et commande directement."
+      },
+      "step3": {
+        "title": "Cuisine & Serveurs notifiés",
+        "description": "Les commandes apparaissent immédiatement sur l'écran cuisine et le tableau de bord serveur."
+      },
+      "step4": {
+        "title": "Service & Paiement",
+        "description": "Servez les plats dans l'ordre. Les clients paient après le repas, options flexibles."
+      }
+    }
+  },
+  "builtForRoles": {
+    "title": "Conçu pour chaque rôle",
+    "subtitle": "Résoudre les vrais problèmes de chacun dans le restaurant",
+    "painPointsTitle": "Problèmes Courants",
+    "solutionsTitle": "Solutions Qrenso",
+    "roles": {
+      "owner": {
+        "label": "Propriétaire de Restaurant",
+        "painPoints": [
+          "Difficile de suivre les revenus en temps réel",
+          "Erreurs de commande causant des plaintes",
+          "Difficile de gérer de nombreuses tables"
+        ],
+        "solutions": [
+          "Tableau de bord panoramique complet",
+          "Analyses détaillées dans le temps",
+          "Rapports automatiques, export facile"
+        ]
+      },
+      "cashier": {
+        "label": "Caissier",
+        "painPoints": [
+          "Commandes manuscrites sources d'erreurs",
+          "Facturation lente, attente client prolongée",
+          "Difficile de faire la caisse en fin de service"
+        ],
+        "solutions": [
+          "Commandes automatiques des clients",
+          "Facturation instantanée et précise",
+          "Rapports de fin de service automatiques"
+        ]
+      },
+      "waiter": {
+        "label": "Serveur",
+        "painPoints": [
+          "Allers-retours incessants pour les commandes",
+          "Trop de clients à gérer simultanément",
+          "Oubli de commandes ou confusion de tables"
+        ],
+        "solutions": [
+          "Les clients commandent eux-mêmes via QR",
+          "Notifications de commandes en temps réel",
+          "Historique des commandes par table"
+        ]
+      },
+      "chef": {
+        "label": "Cuisine",
+        "painPoints": [
+          "Commandes manuscrites illisibles",
+          "Difficulté à prioriser les plats",
+          "Oublis de commandes en période de rush"
+        ],
+        "solutions": [
+          "Affichage KDS clair et lisible",
+          "Tri automatique par priorité",
+          "Compte à rebours de temps de cuisson"
+        ]
+      }
+    }
+  },
+  "testimonials": {
+    "title": "Ce que nos clients disent",
+    "subtitle": "Des centaines de restaurants satisfaits",
+    "items": [
+      {
+        "name": "Nguyen Minh Tuan",
+        "role": "Propriétaire",
+        "restaurant": "Pho Co Restaurant",
+        "quote": "Depuis que nous utilisons Qrenso, nos revenus ont augmenté de 30% grâce à un service plus rapide. Les erreurs ont quasiment disparu. Très satisfait !"
+      },
+      {
+        "name": "Tran Thi Huong",
+        "role": "Manager",
+        "restaurant": "Ngon Eatery",
+        "quote": "Le KDS assure que la cuisine ne manque aucun plat. Le tableau de bord temps réel me permet de tout gérer à distance. Très pratique !"
+      },
+      {
+        "name": "Le Hoang Nam",
+        "role": "Propriétaire de chaîne",
+        "restaurant": "Food Chain Co.",
+        "quote": "Je gère 5 établissements sur un seul compte. Les rapports de synthèse m'aident à prendre des décisions rapides. Un excellent investissement !"
+      }
+    ]
+  },
+  "pricing": {
+    "title": "Tarification Transparente",
+    "subtitle": "Choisissez le forfait adapté à votre établissement",
+    "perMonth": "mois",
+    "trialNote": "Tous les forfaits incluent 14 jours d'essai gratuit. Pas de carte requise.",
+    "plans": {
+      "starter": {
+        "name": "Starter",
+        "price": "1,990,000",
+        "description": "Parfait pour les petits restaurants qui débutent",
+        "cta": "Essai Gratuit",
+        "features": [
+          "1 succursale",
+          "Jusqu'à 20 tables",
+          "Commande QR basique",
+          "Tableau de Bord & KDS",
+          "Rapports basiques",
+          "Support par email"
+        ]
+      },
+      "pro": {
+        "name": "Pro",
+        "price": "3,990,000",
+        "description": "Pour les restaurants moyens et grands",
+        "cta": "Réserver Démo",
+        "features": [
+          "Jusqu'à 3 succursales",
+          "Tables illimitées",
+          "Commande QR complète",
+          "Tableau de bord temps réel",
+          "Analyses avancées",
+          "Passerelle de paiement",
+          "Multilingue",
+          "Support prioritaire 24/7"
+        ]
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "price": "Nous Contacter",
+        "description": "Solution pour chaînes de restaurants",
+        "cta": "Demander Conseil",
+        "features": [
+          "Succursales illimitées",
+          "Tables illimitées",
+          "Toutes les fonctions Pro",
+          "Développement sur mesure",
+          "API dédiée",
+          "Formation sur place",
+          "Gestionnaire de compte dédié"
+        ]
+      }
+    }
+  },
+  "faq": {
+    "title": "Foire Aux Questions",
+    "subtitle": "Réponses aux questions courantes sur Qrenso",
+    "items": [
+      {
+        "question": "Combien de temps prend la mise en place ?",
+        "answer": "En moyenne 2 à 3 heures. Il vous suffit d'ajouter votre menu, créer vos tables et codes QR. Nous fournissons des guides détaillés."
+      },
+      {
+        "question": "Y a-t-il des frais sur les transactions ?",
+        "answer": "Les frais de transaction sont fixés par les partenaires de paiement (1 à 3%). Qrenso ne facture aucun frais supplémentaire."
+      },
+      {
+        "question": "Sur quels appareils cela fonctionne-t-il ?",
+        "answer": "Logiciel en ligne accessible sur tout navigateur : ordinateur, tablette, mobile. L'écran cuisine fonctionne mieux sur tablette."
+      },
+      {
+        "question": "Le système supporte-t-il plusieurs succursales ?",
+        "answer": "Oui. Le forfait Pro supporte jusqu'à 3 succursales, et Enterprise est illimité. Chaque site a son propre tableau de bord."
+      },
+      {
+        "question": "Comment importer le menu rapidement ?",
+        "answer": "Vous pouvez importer votre menu via un fichier Excel (modèle fourni) ou le saisir manuellement via nos formulaires rapides."
+      },
+      {
+        "question": "Les données sont-elles sécurisées ?",
+        "answer": "Données chiffrées et sauvegardées quotidiennement. Nous respectons les normes de sécurité internationales."
+      },
+      {
+        "question": "Quel support en cas de problème ?",
+        "answer": "Support email pour Starter, support chat/tél 24/7 pour Pro, et gestionnaire dédié pour Enterprise."
+      },
+      {
+        "question": "Puis-je annuler à tout moment ?",
+        "answer": "Oui. Aucun engagement long-terme. Vos données sont conservées 30 jours après résiliation pour export."
+      }
+    ]
+  },
+  "finalCta": {
+    "title": "Prêt à numériser votre restaurant ?",
+    "subtitle": "Plus de 500 restaurants ont déjà boosté leur activité avec Qrenso. Commencez aujourd'hui !",
+    "trustBadge": "14 jours d'essai gratuit • Pas de carte requise • Support 24/7"
+  },
+  "footer": {
+    "tagline": "Solution complète de commande QR et gestion de restaurant",
+    "product": {
+      "title": "Produit",
+      "features": "Fonctionnalités",
+      "pricing": "Tarifs",
+      "caseStudies": "Études de cas",
+      "roadmap": "Feuille de route"
+    },
+    "company": {
+      "title": "Entreprise",
+      "about": "À propos",
+      "blog": "Blog",
+      "careers": "Carrières",
+      "contact": "Contact"
+    },
+    "legal": {
+      "title": "Légal",
+      "terms": "Conditions d'utilisation",
+      "privacy": "Confidentialité",
+      "refund": "Politique de remboursement"
+    },
+    "copyright": "© 2025 Qrenso. Tous droits réservés."
+  },
+  "contact": {
+    "pageTitle": "Contacter Qrenso",
+    "pageSubtitle": "Laissez-nous vos coordonnées pour obtenir la solution adaptée à votre restaurant",
+    "whatYouGet": "Ce que vous allez recevoir :",
+    "benefit1": "Démonstration live de 15 minutes",
+    "benefit2": "Conseils gratuits sur vos opérations",
+    "benefit3": "Tarification détaillée personnalisée",
+    "benefit4": "Aide au déploiement et formation",
+    "contactInfo": "Informations de Contact",
+    "hotline": "Hotline",
+    "email": "Email",
+    "office": "Bureau",
+    "workingHours": "Heures d'ouverture",
+    "workingHoursValue": "Lun - Ven : 8h30 - 18h00",
+    "sendRequest": "Envoyer une demande",
+    "fullName": "Nom Complet",
+    "workEmail": "Email Professionnel",
+    "phone": "Numéro de Téléphone",
+    "restaurantName": "Nom du Restaurant",
+    "city": "Ville / Région",
+    "branches": "Nombre de succursales / tables",
+    "needs": "Vos Besoins",
+    "selectNeeds": "Sélectionnez vos besoins",
+    "trial": "Essai Gratuit",
+    "demo": "Planifier une Démo",
+    "consultation": "Conseil en Implémentation",
+    "other": "Autre",
+    "notes": "Notes",
+    "notesPlaceholder": "Avez-vous des questions ou des demandes spéciales ?",
+    "optional": "Optionnel",
+    "required": "*",
+    "submitting": "Envoi en cours...",
+    "submit": "Soumettre la Demande",
+    "privacyNote": "Nous utilisons vos données uniquement pour vous conseiller.",
+    "successTitle": "Merci de nous avoir contactés !",
+    "successMessage": "L'équipe Qrenso vous recontactera sous 24 heures ouvrées.",
+    "backToHome": "Retour à l'accueil",
+    "enterFullName": "Veuillez entrer votre nom complet",
+    "fullNameMinLength": "Le nom doit faire au moins 2 caractères",
+    "enterEmail": "Veuillez entrer votre email",
+    "invalidEmailFormat": "Format d'email invalide",
+    "enterPhone": "Veuillez entrer votre numéro de téléphone",
+    "invalidPhoneFormat": "Numéro de téléphone invalide",
+    "enterRestaurantName": "Veuillez entrer le nom du restaurant",
+    "errorOccurred": "Une erreur est survenue. Veuillez réessayer plus tard."
+  }
+}

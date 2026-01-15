@@ -1,0 +1,42 @@
+{
+  "socket": {
+    "connected": "Connecté en temps réel",
+    "disconnected": "Déconnecté du temps réel",
+    "reconnecting": "Reconnexion en cours...",
+    "error": "Erreur de connexion",
+    "errorMessage": "Impossible de se connecter au serveur"
+  },
+  "order": {
+    "new": "Nouvelle commande: {orderNumber}",
+    "updated": "Mise à jour: {orderNumber}",
+    "itemsAdded": "Articles ajoutés: {orderNumber}",
+    "newItems": "{count} nouveaux articles",
+    "table": "Table {tableNumber}",
+    "status": "Statut: {status}"
+  },
+  "item": {
+    "accepted": "Accepté: {itemName}",
+    "preparing": "En préparation: {itemName}",
+    "ready": "Prêt: {itemName}",
+    "served": "Servi: {itemName}",
+    "cancelled": "Annulé: {itemName}",
+    "returned": "Retourné: {itemName}",
+    "defaultName": "Article"
+  },
+  "payment": {
+    "updated": "Paiement réussi",
+    "orderPaid": "La commande a été payée"
+  },
+  "bill": {
+    "requested": "🔔 Demande d'addition - Table {tableNumber}"
+  },
+  "itemStatus": {
+    "pending": "En attente",
+    "accepted": "Accepté",
+    "preparing": "En préparation",
+    "ready": "Prêt",
+    "served": "Servi",
+    "cancelled": "Annulé",
+    "returned": "Retourné"
+  }
+}

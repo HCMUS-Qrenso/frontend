@@ -3,47 +3,29 @@
 import { useState, useEffect, useRef } from 'react'
 import { cn } from '@/src/lib/utils'
 import { LayoutDashboard, ChefHat, Smartphone, QrCode } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
-const tabs = [
-  {
-    id: 'dashboard',
-    label: 'Dashboard',
-    description: 'Theo dõi toàn bộ hoạt động nhà hàng realtime',
-    icon: LayoutDashboard,
-  },
-  {
-    id: 'kds',
-    label: 'KDS Bếp',
-    description: 'Màn hình bếp nhận order tức thì, không bỏ sót',
-    icon: ChefHat,
-  },
-  {
-    id: 'customer',
-    label: 'Customer Order',
-    description: 'Khách scan QR và order trực tiếp trên điện thoại',
-    icon: Smartphone,
-  },
-  {
-    id: 'tables',
-    label: 'Tables & QR',
-    description: 'Quản lý bàn, tạo QR code, sơ đồ mặt bằng',
-    icon: QrCode,
-  },
+const tabConfigs = [
+  { id: 'dashboard', icon: LayoutDashboard },
+  { id: 'kds', icon: ChefHat },
+  { id: 'customer', icon: Smartphone },
+  { id: 'tables', icon: QrCode },
 ]
 
 const tableImages = [
-  { src: '/Table-List.png', label: 'Danh sách bàn' },
-  { src: '/Table-Canvas.png', label: 'Sơ đồ mặt bằng' },
-  { src: '/Table-QR.png', label: 'Quản lý QR' },
+  { src: '/Table-List.png', key: 'tableList' },
+  { src: '/Table-Canvas.png', key: 'tableCanvas' },
+  { src: '/Table-QR.png', key: 'tableQR' },
 ]
 
 const dashboardImages = [
-  { src: '/Dashboard-1.png', label: 'Dashboard Overview' },
-  { src: '/Dashboard-2.png', label: 'Dashboard Analytics' },
+  { src: '/Dashboard-1.png', key: 'dashboardOverview' },
+  { src: '/Dashboard-2.png', key: 'dashboardAnalytics' },
 ]
 
 export function ProductShowcase() {
   const [activeTab, setActiveTab] = useState('dashboard')
+  const t = useTranslations('landing.productShowcase')
 
   // Slideshow state for tables tab
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -161,16 +143,14 @@ export function ProductShowcase() {
           {/* Section Header */}
           <div className="mb-12 text-center">
             <h2 className="text-3xl font-bold text-slate-900 md:text-4xl dark:text-white">
-              Một nền tảng, đầy đủ tính năng
+              {t('title')}
             </h2>
-            <p className="mt-4 text-lg text-slate-500 dark:text-slate-400">
-              Từ order đến thanh toán, mọi thứ đều được kết nối
-            </p>
+            <p className="mt-4 text-lg text-slate-500 dark:text-slate-400">{t('subtitle')}</p>
           </div>
 
           {/* Tabs */}
           <div className="mb-8 flex flex-wrap justify-center gap-3">
-            {tabs.map((tab) => (
+            {tabConfigs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => handleTabChange(tab.id)}
@@ -181,7 +161,7 @@ export function ProductShowcase() {
                     : 'border-slate-300 bg-slate-50 text-slate-600 hover:border-slate-400 hover:text-slate-900 dark:border-slate-700 dark:bg-slate-900/50 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-slate-300',
                 )}
               >
-                {tab.label}
+                {t(`tabs.${tab.id}.label`)}
               </button>
             ))}
           </div>
@@ -189,7 +169,7 @@ export function ProductShowcase() {
           {/* Tab Description */}
           <div className="mb-8 text-center">
             <p className="text-slate-600 dark:text-slate-300">
-              {tabs.find((t) => t.id === activeTab)?.description}
+              {t(`tabs.${activeTab}.description`)}
             </p>
           </div>
 
@@ -211,7 +191,7 @@ export function ProductShowcase() {
                       >
                         <img
                           src={image.src}
-                          alt={image.label}
+                          alt={t(`images.${image.key}`)}
                           className="h-full w-full rounded-lg object-contain"
                           draggable={false}
                         />
@@ -253,7 +233,7 @@ export function ProductShowcase() {
                       >
                         <img
                           src={image.src}
-                          alt={image.label}
+                          alt={t(`images.${image.key}`)}
                           className="h-full w-full rounded-lg object-contain"
                           draggable={false}
                         />
@@ -282,16 +262,16 @@ export function ProductShowcase() {
             ) : (
               <div className="flex aspect-video items-center justify-center rounded-lg bg-gradient-to-br from-slate-100 via-slate-50 to-slate-100 dark:from-slate-800 dark:via-slate-800 dark:to-slate-900">
                 {(() => {
-                  const activeTabData = tabs.find((t) => t.id === activeTab)
+                  const activeTabData = tabConfigs.find((tab) => tab.id === activeTab)
                   const Icon = activeTabData?.icon || LayoutDashboard
                   return (
                     <div className="text-center">
                       <Icon className="mx-auto mb-4 h-16 w-16 text-emerald-500/50" />
                       <p className="text-sm text-slate-500 dark:text-slate-500">
-                        {activeTabData?.label} Screenshot
+                        {t(`tabs.${activeTab}.label`)} Screenshot
                       </p>
                       <p className="mt-2 text-xs text-slate-600 dark:text-slate-600">
-                        Screenshot sẽ được thay thế sau
+                        {t('placeholder')}
                       </p>
                     </div>
                   )

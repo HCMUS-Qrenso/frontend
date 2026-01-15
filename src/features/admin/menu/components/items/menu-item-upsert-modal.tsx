@@ -32,6 +32,7 @@ import { toast } from 'sonner'
 import { ModifierGroupSelector } from './menu-item-modifier-groups-selector'
 import type { MenuItem, Category } from '@/src/features/admin/menu/types'
 import { menuItemFormSchema } from '@/src/features/admin/menu/schemas'
+import { useTranslations } from 'next-intl'
 
 interface MenuItemUpsertModalProps {
   open: boolean
@@ -49,6 +50,7 @@ export function MenuItemUpsertModal({
   mode,
 }: MenuItemUpsertModalProps) {
   const { handleErrorWithStatus } = useErrorHandler()
+  const t = useTranslations('menu.items.upsert')
 
   // Mutations
   const createMutation = useCreateMenuItemMutation()
@@ -280,7 +282,7 @@ export function MenuItemUpsertModal({
           primary_image_index: selectedPrimaryIndex,
         }
         await createMutation.mutateAsync(payload)
-        toast.success('Đã tạo món ăn thành công')
+        toast.success(t('createSuccess'))
       } else if (mode === 'edit' && item) {
         const payload = buildUpdatePayload()
 
@@ -296,7 +298,7 @@ export function MenuItemUpsertModal({
 
         // If no changes (including images), don't send request
         if (Object.keys(payload).length === 0) {
-          toast.info('Không có thay đổi nào để cập nhật')
+          toast.info(t('noChanges'))
           onOpenChange(false)
           return
         }
@@ -305,13 +307,13 @@ export function MenuItemUpsertModal({
           id: item.id,
           payload,
         })
-        toast.success('Đã cập nhật món ăn thành công')
+        toast.success(t('updateSuccess'))
       }
 
       // Success - close modal
       onOpenChange(false)
     } catch (error) {
-      handleErrorWithStatus(error, undefined, 'Không thể lưu món ăn')
+      handleErrorWithStatus(error, undefined, t('saveError'))
     }
   }
 
@@ -336,7 +338,7 @@ export function MenuItemUpsertModal({
 
     // Validate number of files
     if (images.length + files.length > maxFiles) {
-      toast.error(`Tối đa ${maxFiles} ảnh`)
+      toast.error(t('toast.maxImages', { count: maxFiles }))
       return
     }
 
@@ -348,13 +350,13 @@ export function MenuItemUpsertModal({
 
       // Check file type
       if (!file.type.startsWith('image/')) {
-        toast.error(`${file.name} không phải là file ảnh`)
+        toast.error(t('toast.notImage', { fileName: file.name }))
         continue
       }
 
       // Check file size
       if (file.size > maxSize) {
-        toast.error(`${file.name} vượt quá 5MB`)
+        toast.error(t('toast.fileTooLarge', { fileName: file.name }))
         continue
       }
 
@@ -371,7 +373,7 @@ export function MenuItemUpsertModal({
     }))
 
     setImages([...images, ...(newImages as any)])
-    toast.success(`Đã thêm ${validFiles.length} ảnh`)
+    toast.success(t('toast.imagesAdded', { count: validFiles.length }))
   }
 
   const handleRemoveImage = (index: number) => {
@@ -395,29 +397,29 @@ export function MenuItemUpsertModal({
     <FormDialog
       open={open}
       onOpenChange={onOpenChange}
-      title={mode === 'create' ? 'Thêm món mới' : 'Chỉnh sửa món'}
-      description={mode === 'create' ? 'Tạo món ăn mới cho menu' : 'Cập nhật thông tin món ăn'}
+      title={mode === 'create' ? t('createTitle') : t('editTitle')}
+      description={mode === 'create' ? t('createDesc') : t('editDesc')}
       onSubmit={handleSubmit}
       isSubmitting={isSubmitting}
-      submitText="Lưu"
-      loadingText={isUploading ? `Đang upload... ${uploadProgress}%` : 'Đang lưu...'}
+      submitText={t('save')}
+      loadingText={isUploading ? t('uploading', { progress: uploadProgress }) : t('saving')}
       size="3xl"
       scrollable
     >
       {/* Section 1: Thông tin cơ bản */}
-      <FormDialogSectionGroup title="Thông tin cơ bản">
+      <FormDialogSectionGroup title={t('sections.basicInfo')}>
         <div className="grid gap-4 sm:grid-cols-2">
-          <FormDialogField label="Tên món" required error={errors.name}>
+          <FormDialogField label={t('fields.name')} required error={errors.name}>
             <Input
               id="name"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              placeholder="Ví dụ: Phở Bò Tái"
+              placeholder={t('placeholders.name')}
               disabled={isSubmitting}
             />
           </FormDialogField>
 
-          <FormDialogField label="Danh mục">
+          <FormDialogField label={t('fields.category')}>
             <Select
               value={formData.category_id}
               onValueChange={(value) => {
@@ -427,7 +429,7 @@ export function MenuItemUpsertModal({
               disabled={isSubmitting}
             >
               <SelectTrigger id="category">
-                <SelectValue placeholder={'Chọn danh mục'} />
+                <SelectValue placeholder={t('placeholders.category')} />
               </SelectTrigger>
               <SelectContent>
                 {categories.map((category) => (
@@ -441,35 +443,35 @@ export function MenuItemUpsertModal({
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
-          <FormDialogField label="Giá (VND)" required error={errors.base_price}>
+          <FormDialogField label={t('fields.price')} required error={errors.base_price}>
             <Input
               id="price"
               type="number"
               value={formData.base_price}
               onChange={(e) => setFormData({ ...formData, base_price: e.target.value })}
-              placeholder="85000"
+              placeholder={t('placeholders.price')}
               disabled={isSubmitting}
             />
           </FormDialogField>
 
-          <FormDialogField label="Thời gian chuẩn bị (phút)">
+          <FormDialogField label={t('fields.prepTime')}>
             <Input
               id="prep_time"
               type="number"
               value={formData.preparation_time}
               onChange={(e) => setFormData({ ...formData, preparation_time: e.target.value })}
-              placeholder="15"
+              placeholder={t('placeholders.prepTime')}
               disabled={isSubmitting}
             />
           </FormDialogField>
         </div>
 
-        <FormDialogField label="Mô tả">
+        <FormDialogField label={t('fields.description')}>
           <Textarea
             id="description"
             value={formData.description}
             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-            placeholder="Mô tả ngắn về món ăn..."
+            placeholder={t('placeholders.description')}
             rows={3}
             disabled={isSubmitting}
           />
@@ -479,8 +481,8 @@ export function MenuItemUpsertModal({
       <FormDialogDivider />
 
       {/* Section 2: Vận hành */}
-      <FormDialogSectionGroup title="Vận hành">
-        <FormDialogField label="Trạng thái bán" required>
+      <FormDialogSectionGroup title={t('sections.operations')}>
+        <FormDialogField label={t('fields.status')} required>
           <Select
             value={formData.status}
             onValueChange={(value: any) => setFormData({ ...formData, status: value })}
@@ -489,9 +491,9 @@ export function MenuItemUpsertModal({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="available">Đang bán</SelectItem>
-              <SelectItem value="unavailable">Tạm ẩn</SelectItem>
-              <SelectItem value="sold_out">Hết hàng</SelectItem>
+              <SelectItem value="available">{t('status.available')}</SelectItem>
+              <SelectItem value="unavailable">{t('status.unavailable')}</SelectItem>
+              <SelectItem value="sold_out">{t('status.soldOut')}</SelectItem>
             </SelectContent>
           </Select>
         </FormDialogField>
@@ -499,10 +501,10 @@ export function MenuItemUpsertModal({
         <FormDialogSection>
           <div className="space-y-0.5">
             <Label htmlFor="chef_pick" className="text-base">
-              Chef's recommendation
+              {t('fields.chefRecommendation')}
             </Label>
             <p className="text-sm text-slate-500 dark:text-slate-400">
-              Đánh dấu là món đặc biệt của đầu bếp
+              {t('fields.chefRecommendationHint')}
             </p>
           </div>
           <Switch
@@ -519,7 +521,7 @@ export function MenuItemUpsertModal({
       <FormDialogDivider />
 
       {/* Section 3: Ảnh món */}
-      <FormDialogSectionGroup title="Ảnh món">
+      <FormDialogSectionGroup title={t('sections.images')}>
         <div className="flex flex-wrap gap-3">
           {images.map((image, index) => {
             const isPrimary = index === selectedPrimaryIndex
@@ -533,7 +535,7 @@ export function MenuItemUpsertModal({
                       ? 'border-emerald-500 ring-2 ring-emerald-500/20'
                       : 'border-slate-200 hover:border-emerald-400 dark:border-slate-800 dark:hover:border-emerald-400'
                   }`}
-                  title={isPrimary ? 'Ảnh chính (đã chọn)' : 'Nhấn để đặt làm ảnh chính'}
+                  title={isPrimary ? t('images.primarySelected') : t('images.setPrimary')}
                 >
                   <Image
                     src={image.url || '/placeholder.svg'}
@@ -553,7 +555,7 @@ export function MenuItemUpsertModal({
                 {isPrimary && (
                   <div className="absolute -bottom-1 left-1/2 -translate-x-1/2">
                     <span className="inline-flex items-center rounded-full bg-emerald-500 px-2 py-0.5 text-xs font-medium text-white">
-                      Chính
+                      {t('images.primary')}
                     </span>
                   </div>
                 )}
@@ -568,20 +570,17 @@ export function MenuItemUpsertModal({
             className="flex h-24 w-24 flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-slate-300 bg-slate-50 text-slate-400 transition-all hover:border-emerald-500 hover:bg-emerald-50 hover:text-emerald-600 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-800 dark:hover:border-emerald-500 dark:hover:bg-emerald-500/10"
           >
             <Upload className="h-5 w-5" />
-            <span className="text-xs">Tải ảnh</span>
+            <span className="text-xs">{t('images.upload')}</span>
           </button>
         </div>
 
-        <p className="text-xs text-slate-500 dark:text-slate-400">
-          Nhấn vào ảnh để đặt làm ảnh chính. Tải lên tối đa 10 ảnh (JPG, PNG, GIF). Kích thước
-          tối đa 5MB mỗi ảnh.
-        </p>
+        <p className="text-xs text-slate-500 dark:text-slate-400">{t('images.hint')}</p>
       </FormDialogSectionGroup>
 
       <FormDialogDivider />
 
       {/* Section 4: Modifier Groups */}
-      <FormDialogSectionGroup title="Tuỳ chọn món ăn (Modifiers)">
+      <FormDialogSectionGroup title={t('sections.modifiers')}>
         <ModifierGroupSelector
           selectedGroupIds={selectedModifierGroupIds}
           onChange={setSelectedModifierGroupIds}
@@ -592,56 +591,56 @@ export function MenuItemUpsertModal({
       <FormDialogDivider />
 
       {/* Section 5: Allergens & Dinh dưỡng */}
-      <FormDialogSectionGroup title="Allergens & Dinh dưỡng">
-        <FormDialogField label="Dị ứng">
+      <FormDialogSectionGroup title={t('sections.allergens')}>
+        <FormDialogField label={t('fields.allergen')}>
           <Textarea
             id="allergen"
             value={formData.allergen_info}
             onChange={(e) => setFormData({ ...formData, allergen_info: e.target.value })}
-            placeholder="Ví dụ: Không chứa gluten, không chứa sữa..."
+            placeholder={t('placeholders.allergen')}
             rows={2}
             disabled={isSubmitting}
           />
         </FormDialogField>
 
         <div className="grid gap-4 sm:grid-cols-2">
-          <FormDialogField label="Chất béo (g)">
+          <FormDialogField label={t('fields.fat')}>
             <Input
               id="fat"
               type="number"
               value={formData.fat}
               onChange={(e) => setFormData({ ...formData, fat: e.target.value })}
-              placeholder="0"
+              placeholder={t('placeholders.number')}
               disabled={isSubmitting}
             />
           </FormDialogField>
-          <FormDialogField label="Carbs (g)">
+          <FormDialogField label={t('fields.carbs')}>
             <Input
               id="carbs"
               type="number"
               value={formData.carbs}
               onChange={(e) => setFormData({ ...formData, carbs: e.target.value })}
-              placeholder="0"
+              placeholder={t('placeholders.number')}
               disabled={isSubmitting}
             />
           </FormDialogField>
-          <FormDialogField label="Protein (g)">
+          <FormDialogField label={t('fields.protein')}>
             <Input
               id="protein"
               type="number"
               value={formData.protein}
               onChange={(e) => setFormData({ ...formData, protein: e.target.value })}
-              placeholder="0"
+              placeholder={t('placeholders.number')}
               disabled={isSubmitting}
             />
           </FormDialogField>
-          <FormDialogField label="Calories">
+          <FormDialogField label={t('fields.calories')}>
             <Input
               id="calories"
               type="number"
               value={formData.calories}
               onChange={(e) => setFormData({ ...formData, calories: e.target.value })}
-              placeholder="0"
+              placeholder={t('placeholders.number')}
               disabled={isSubmitting}
             />
           </FormDialogField>

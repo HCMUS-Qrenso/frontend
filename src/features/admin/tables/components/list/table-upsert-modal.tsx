@@ -23,6 +23,7 @@ import type {
 import { toast } from 'sonner'
 import { useErrorHandler } from '@/src/hooks/use-error-handler'
 import { tableFormSchema } from '@/src/features/admin/tables/schemas'
+import { useTranslations } from 'next-intl'
 
 interface TableUpsertModalProps {
   open: boolean
@@ -64,6 +65,7 @@ export function TableUpsertModal({
   const [formData, setFormData] = useState<TableFormData>(initialFormData)
   const [errors, setErrors] = useState<Partial<Record<keyof TableFormData, string>>>({})
   const [isLoading, setIsLoading] = useState(false)
+  const t = useTranslations('tables')
 
   const createMutation = useCreateTableMutation()
   const updateMutation = useUpdateTableMutation()
@@ -134,13 +136,13 @@ export function TableUpsertModal({
 
       if (mode === 'create') {
         await createMutation.mutateAsync(payload)
-        toast.success('Bàn đã được tạo thành công')
+        toast.success(t('tableCreatedSuccess'))
       } else if (mode === 'edit' && table) {
         await updateMutation.mutateAsync({
           id: table.id,
           payload: { ...payload },
         })
-        toast.success('Bàn đã được cập nhật thành công')
+        toast.success(t('tableUpdatedSuccess'))
       }
 
       onOpenChange(false)
@@ -148,9 +150,9 @@ export function TableUpsertModal({
       console.error('Error saving table:', error)
 
       if (error?.response?.status === 409) {
-        const conflictMessage = getErrorMessage(error, 'Số bàn đã tồn tại')
+        const conflictMessage = getErrorMessage(error, t('tableNumberExists'))
         toast.error(conflictMessage)
-        setErrors({ table_number: 'Số bàn này đã tồn tại. Vui lòng chọn số khác.' })
+        setErrors({ table_number: t('tableNumberExistsHint') })
       } else if (error?.response?.status === 400) {
         const validationErrors = error?.response?.data?.message
         if (Array.isArray(validationErrors)) {
@@ -170,11 +172,11 @@ export function TableUpsertModal({
             }
           })
         } else {
-          const errorMessage = getErrorMessage(error, 'Dữ liệu không hợp lệ')
+          const errorMessage = getErrorMessage(error, t('invalidData'))
           toast.error(errorMessage)
         }
       } else {
-        const errorMessage = getErrorMessage(error, 'Có lỗi xảy ra khi lưu bàn')
+        const errorMessage = getErrorMessage(error, t('saveTableError'))
         toast.error(errorMessage)
       }
     } finally {
@@ -186,21 +188,17 @@ export function TableUpsertModal({
     <FormDialog
       open={open}
       onOpenChange={onOpenChange}
-      title={mode === 'create' ? 'Thêm bàn mới' : 'Chỉnh sửa bàn'}
-      description={
-        mode === 'create'
-          ? 'Điền đầy đủ thông tin để thêm bàn mới vào hệ thống'
-          : 'Cập nhật thông tin bàn trong form bên dưới'
-      }
+      title={mode === 'create' ? t('addNewTable') : t('editTableTitle')}
+      description={mode === 'create' ? t('addTableDesc') : t('editTableDesc')}
       onSubmit={handleSubmit}
       isSubmitting={isLoading}
-      submitText="Lưu bàn"
-      loadingText="Đang lưu..."
+      submitText={t('saveTable')}
+      loadingText={t('saving')}
       size="lg"
       scrollable
     >
       {/* Tên / Số bàn */}
-      <FormDialogField label="Tên / Số bàn" required error={errors.table_number}>
+      <FormDialogField label={t('tableNumberLabel')} required error={errors.table_number}>
         <Input
           id="table_number"
           value={formData.table_number}
@@ -210,13 +208,13 @@ export function TableUpsertModal({
               setErrors((prev) => ({ ...prev, table_number: undefined }))
             }
           }}
-          placeholder="Ví dụ: 1, A1, VIP01"
+          placeholder={t('tableNumberPlaceholder')}
           className={errors.table_number ? 'border-red-500' : ''}
         />
       </FormDialogField>
 
       {/* Khu vực / Tầng */}
-      <FormDialogField label="Khu vực / Tầng">
+      <FormDialogField label={t('zoneFloorLabel')}>
         <Select
           value={formData.zone_id}
           onValueChange={(value) => {
@@ -225,7 +223,7 @@ export function TableUpsertModal({
           }}
         >
           <SelectTrigger id="zone_id">
-            <SelectValue placeholder="Chọn khu vực" />
+            <SelectValue placeholder={t('selectZone')} />
           </SelectTrigger>
           <SelectContent>
             {zones?.map((zone: SimpleZone) => (
@@ -238,7 +236,7 @@ export function TableUpsertModal({
       </FormDialogField>
 
       {/* Số ghế */}
-      <FormDialogField label="Số ghế" required error={errors.capacity}>
+      <FormDialogField label={t('seatsLabel')} required error={errors.capacity}>
         <Input
           id="capacity"
           type="number"
@@ -251,7 +249,7 @@ export function TableUpsertModal({
       </FormDialogField>
 
       {/* Hình dạng */}
-      <FormDialogField label="Hình dạng">
+      <FormDialogField label={t('shapeLabel')}>
         <Select
           value={formData.shape}
           onValueChange={(value) => setFormData({ ...formData, shape: value as TableShape })}
@@ -260,18 +258,15 @@ export function TableUpsertModal({
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="circle">Tròn</SelectItem>
-            <SelectItem value="rectangle">Chữ nhật</SelectItem>
-            <SelectItem value="oval">Oval</SelectItem>
+            <SelectItem value="circle">{t('shapeCircle')}</SelectItem>
+            <SelectItem value="rectangle">{t('shapeRectangle')}</SelectItem>
+            <SelectItem value="oval">{t('shapeOval')}</SelectItem>
           </SelectContent>
         </Select>
       </FormDialogField>
 
       {/* Trạng thái */}
-      <FormDialogField
-        label="Trạng thái (vận hành)"
-        hint="Trạng thái vận hành của bàn (Trống, Đang sử dụng, Bảo trì)"
-      >
+      <FormDialogField label={t('operationStatus')} hint={t('operationStatusHint')}>
         <Select
           value={formData.status}
           onValueChange={(value) =>
@@ -282,10 +277,10 @@ export function TableUpsertModal({
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="available">Trống</SelectItem>
-            <SelectItem value="occupied">Đang sử dụng</SelectItem>
-            <SelectItem value="waiting_for_payment">Chờ thanh toán</SelectItem>
-            <SelectItem value="maintenance">Bảo trì</SelectItem>
+            <SelectItem value="available">{t('statusAvailable')}</SelectItem>
+            <SelectItem value="occupied">{t('statusOccupied')}</SelectItem>
+            <SelectItem value="waiting_for_payment">{t('statusWaitingPayment')}</SelectItem>
+            <SelectItem value="maintenance">{t('statusMaintenance')}</SelectItem>
           </SelectContent>
         </Select>
       </FormDialogField>
@@ -294,11 +289,9 @@ export function TableUpsertModal({
       <FormDialogSection>
         <div className="space-y-0.5">
           <Label htmlFor="is_active" className="cursor-pointer text-sm font-medium">
-            Kích hoạt bàn
+            {t('activateTable')}
           </Label>
-          <p className="text-xs text-slate-500 dark:text-slate-400">
-            Bàn có thể được sử dụng và hiển thị
-          </p>
+          <p className="text-xs text-slate-500 dark:text-slate-400">{t('activateTableHint')}</p>
         </div>
         <Switch
           id="is_active"
@@ -312,11 +305,9 @@ export function TableUpsertModal({
         <FormDialogSection>
           <div className="space-y-0.5">
             <Label htmlFor="autoGenerateQR" className="cursor-pointer text-sm font-medium">
-              Tự động tạo QR sau khi lưu
+              {t('autoGenerateQR')}
             </Label>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              Tạo mã QR ngay sau khi thêm bàn
-            </p>
+            <p className="text-xs text-slate-500 dark:text-slate-400">{t('autoGenerateQRHint')}</p>
           </div>
           <Switch
             id="autoGenerateQR"
@@ -329,7 +320,9 @@ export function TableUpsertModal({
       {/* ID bàn (read-only) - Chỉ hiển thị ở chế độ chỉnh sửa */}
       {mode === 'edit' && table && (
         <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-800/50">
-          <Label className="text-xs text-slate-500 dark:text-slate-400">ID bàn (read-only)</Label>
+          <Label className="text-xs text-slate-500 dark:text-slate-400">
+            {t('tableIdReadonly')}
+          </Label>
           <p className="mt-1 font-mono text-sm text-slate-700 dark:text-slate-300">{table.id}</p>
         </div>
       )}

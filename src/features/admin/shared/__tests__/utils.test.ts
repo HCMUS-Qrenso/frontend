@@ -4,7 +4,7 @@
  * Tests for admin shared utility functions.
  */
 
-import { getInitials, getRoleLabel } from '../utils'
+import { getInitials } from '../utils'
 
 describe('getInitials', () => {
   it('should return two initials for full name with two words', () => {
@@ -37,43 +37,5 @@ describe('getInitials', () => {
 
   it('should handle single character name', () => {
     expect(getInitials('A')).toBe('A')
-  })
-})
-
-describe('getRoleLabel', () => {
-  it('should return Vietnamese label for owner', () => {
-    expect(getRoleLabel('owner')).toBe('Chủ nhà hàng')
-  })
-
-  it('should return Vietnamese label for admin', () => {
-    expect(getRoleLabel('admin')).toBe('Quản trị viên')
-  })
-
-  it('should return Vietnamese label for manager', () => {
-    expect(getRoleLabel('manager')).toBe('Quản lý')
-  })
-
-  it('should return Vietnamese label for waiter', () => {
-    expect(getRoleLabel('waiter')).toBe('Nhân viên phục vụ')
-  })
-
-  it('should return Vietnamese label for chef', () => {
-    expect(getRoleLabel('chef')).toBe('Đầu bếp')
-  })
-
-  it('should return Vietnamese label for customer', () => {
-    expect(getRoleLabel('customer')).toBe('Khách hàng')
-  })
-
-  it('should handle uppercase role', () => {
-    expect(getRoleLabel('OWNER')).toBe('Chủ nhà hàng')
-  })
-
-  it('should handle mixed case role', () => {
-    expect(getRoleLabel('Waiter')).toBe('Nhân viên phục vụ')
-  })
-
-  it('should return original role for unknown role', () => {
-    expect(getRoleLabel('unknown_role')).toBe('unknown_role')
   })
 })

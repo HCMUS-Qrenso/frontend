@@ -1,7 +1,11 @@
+'use client'
+
 import { QrCode, CheckCircle2, AlertCircle, Clock } from 'lucide-react'
 import type { TableQR } from '@/src/features/admin/tables/types/tables'
 import { StatCard } from '../../../../../components/ui/stat-card'
 import { SkeletonStatCard } from '@/src/components/loading'
+import { useTranslations } from 'next-intl'
+import { useFormat } from '@/src/hooks/use-format'
 
 interface QRManagerStatsProps {
   total_active_tables?: number
@@ -18,56 +22,44 @@ export function QRManagerStats({
   latest_qr_update,
   isLoading = false,
 }: QRManagerStatsProps) {
+  const t = useTranslations('tables')
+  const { formatDateTime } = useFormat()
+
   if (isLoading) {
     return <SkeletonStatCard count={4} columns={4} />
   }
-  const latestQrUpdateFormatted = latest_qr_update
-    ? new Date(latest_qr_update).toLocaleDateString('vi-VN', {
-        day: '2-digit',
-        month: '2-digit',
-        year: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-      })
-    : '—'
-
-  console.log('QRManagerStats render with:', {
-    total_active_tables,
-    tables_with_qr,
-    tables_without_qr,
-    latest_qr_update,
-  })
+  const latestQrUpdateFormatted = latest_qr_update ? formatDateTime(latest_qr_update) : '—'
 
   const stats = [
     {
       icon: QrCode,
-      label: 'Tổng số bàn',
+      label: t('qrTotalTables'),
       value: total_active_tables?.toString() ?? '—',
-      subtext: 'Tổng cộng',
+      subtext: t('qrTotalSubtext'),
       color: 'text-slate-600 dark:text-slate-400',
       bgColor: 'bg-slate-50 dark:bg-slate-800',
     },
     {
       icon: CheckCircle2,
-      label: 'Bàn có QR',
+      label: t('qrWithCode'),
       value: tables_with_qr?.toString() ?? '—',
-      subtext: 'Đã có QR code',
+      subtext: t('qrWithCodeSubtext'),
       color: 'text-emerald-600 dark:text-emerald-400',
       bgColor: 'bg-emerald-50 dark:bg-emerald-500/10',
     },
     {
       icon: AlertCircle,
-      label: 'Thiếu QR',
+      label: t('qrMissingCode'),
       value: tables_without_qr?.toString() ?? '—',
-      subtext: 'Chưa có QR code',
+      subtext: t('qrMissingCodeSubtext'),
       color: 'text-rose-600 dark:text-rose-400',
       bgColor: 'bg-rose-50 dark:bg-rose-500/10',
     },
     {
       icon: Clock,
-      label: 'Lần tạo lại cuối',
+      label: t('qrLastUpdate'),
       value: latestQrUpdateFormatted,
-      subtext: 'Cập nhật gần nhất',
+      subtext: t('qrLastUpdateSubtext'),
       color: 'text-indigo-600 dark:text-indigo-400',
       bgColor: 'bg-indigo-50 dark:bg-indigo-500/10',
     },
@@ -84,7 +76,7 @@ export function QRManagerStats({
           icon={stat.icon}
           iconColor={stat.color}
           iconBgColor={stat.bgColor}
-          valueSz={stat.label === 'Lần tạo lại cuối' ? 'text-lg' : 'text-2xl'}
+          valueSz={stat.label === t('qrLastUpdate') ? 'text-lg' : 'text-2xl'}
         />
       ))}
     </div>

@@ -5,6 +5,7 @@ import { useDeleteZoneMutation } from '@/src/features/admin/tables/queries'
 import { useErrorHandler } from '@/src/hooks/use-error-handler'
 import { toast } from 'sonner'
 import type { Zone } from '@/src/features/admin/tables/types'
+import { useTranslations } from 'next-intl'
 
 interface ZoneDeleteModalProps {
   open: boolean
@@ -13,7 +14,8 @@ interface ZoneDeleteModalProps {
 }
 
 export function ZoneDeleteModal({ open, zone, onOpenChange }: ZoneDeleteModalProps) {
-  const zoneName = zone?.name || 'khu vực này'
+  const t = useTranslations('tables')
+  const zoneName = zone?.name || t('thisZone')
 
   const deleteMutation = useDeleteZoneMutation()
   const { handleErrorWithStatus } = useErrorHandler()
@@ -25,7 +27,7 @@ export function ZoneDeleteModal({ open, zone, onOpenChange }: ZoneDeleteModalPro
 
     try {
       await deleteMutation.mutateAsync(zone.id)
-      toast.success('Khu vực đã được xóa thành công')
+      toast.success(t('zoneDeletedSuccess'))
       onOpenChange(false)
     } catch (error: any) {
       const status = error?.response?.status
@@ -33,10 +35,10 @@ export function ZoneDeleteModal({ open, zone, onOpenChange }: ZoneDeleteModalPro
         const backendMessage = error?.response?.data?.message
         const message = Array.isArray(backendMessage)
           ? backendMessage.join(', ')
-          : backendMessage || 'Không thể xóa khu vực đang có bàn'
+          : backendMessage || t('cannotDeleteZoneWithTables')
         toast.error(message)
       } else {
-        handleErrorWithStatus(error, undefined, 'Không thể xóa khu vực. Vui lòng thử lại.')
+        handleErrorWithStatus(error, undefined, t('cannotDeleteZone'))
       }
     }
   }
@@ -45,12 +47,12 @@ export function ZoneDeleteModal({ open, zone, onOpenChange }: ZoneDeleteModalPro
     <ConfirmDeleteDialog
       open={open}
       onOpenChange={onOpenChange}
-      title="Xóa khu vực?"
-      description="Hành động này không thể hoàn tác. Lưu ý: Chỉ có thể xóa khu vực không có bàn nào."
-      itemName={zoneName !== 'khu vực này' ? zoneName : undefined}
+      title={t('deleteZoneTitle')}
+      description={t('deleteZoneDesc')}
+      itemName={zoneName !== t('thisZone') ? zoneName : undefined}
       onConfirm={handleConfirmDelete}
       isLoading={isDeleting}
-      confirmText="Xóa khu vực"
+      confirmText={t('confirmDeleteZone')}
     />
   )
 }

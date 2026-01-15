@@ -51,13 +51,13 @@ describe('formatPrice', () => {
   })
 
   it('should format price with different currency', () => {
-    const result = formatPrice(100, 'USD')
+    const result = formatPrice(100, { currency: 'USD', locale: 'en-US' })
     expect(result).toContain('100')
     expect(result).toContain('$')
   })
 
   it('should handle decimal prices', () => {
-    const result = formatPrice(99.99, 'USD')
+    const result = formatPrice(99.99, { currency: 'USD', locale: 'en-US' })
     expect(result).toContain('$')
   })
 })

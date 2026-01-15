@@ -8,6 +8,7 @@ import { useDeleteCategoryMutation } from '@/src/features/admin/menu/queries'
 import { useErrorHandler } from '@/src/hooks/use-error-handler'
 import { toast } from 'sonner'
 import type { Category } from '@/src/features/admin/menu/types'
+import { useTranslations } from 'next-intl'
 
 interface CategoryDeleteDialogProps {
   open: boolean
@@ -17,6 +18,7 @@ interface CategoryDeleteDialogProps {
 
 export function CategoryDeleteDialog({ open, category, onOpenChange }: CategoryDeleteDialogProps) {
   const { handleErrorWithStatus } = useErrorHandler()
+  const t = useTranslations('menu.deleteDialog')
   const [forceDelete, setForceDelete] = useState(false)
 
   // Check if category has items
@@ -39,10 +41,10 @@ export function CategoryDeleteDialog({ open, category, onOpenChange }: CategoryD
 
     try {
       await deleteMutation.mutateAsync({ id: category.id, force: forceDelete })
-      toast.success('Đã xóa danh mục thành công')
+      toast.success(t('success'))
       handleOpenChange(false)
     } catch (error) {
-      handleErrorWithStatus(error, undefined, 'Không thể xóa danh mục')
+      handleErrorWithStatus(error, undefined, t('error'))
     }
   }
 
@@ -56,8 +58,8 @@ export function CategoryDeleteDialog({ open, category, onOpenChange }: CategoryD
       <AlertTriangle className="h-4 w-4" />
       <AlertDescription>
         {forceDelete
-          ? `Danh mục đang chứa ${itemCount} món ăn. Xóa buộc sẽ xóa cả các món ăn này.`
-          : `Danh mục đang chứa ${itemCount} món ăn. Bạn cần chuyển các món sang danh mục khác trước khi xóa.`}
+          ? t('warningForceDelete', { count: itemCount })
+          : t('warningHasItems', { count: itemCount })}
       </AlertDescription>
     </Alert>
   ) : undefined
@@ -66,14 +68,16 @@ export function CategoryDeleteDialog({ open, category, onOpenChange }: CategoryD
     <ConfirmDeleteDialog
       open={open}
       onOpenChange={handleOpenChange}
-      title={`Xóa danh mục "${category?.name}"?`}
-      description="Hành động này không thể hoàn tác. Danh mục sẽ bị xóa vĩnh viễn khỏi hệ thống."
+      title={t('title', { name: category?.name || '' })}
+      description={t('description')}
       onConfirm={handleDelete}
       isLoading={deleteMutation.isPending}
-      confirmText="Xóa danh mục"
+      confirmText={t('confirmText')}
+      cancelText={t('cancelText')}
+      loadingText={t('loadingText')}
       warningContent={warningContent}
       confirmDisabled={hasItems && !forceDelete}
-      forceDeleteText="Xóa buộc"
+      forceDeleteText={t('forceDeleteText')}
       onForceDelete={hasItems ? handleForceDelete : undefined}
     />
   )

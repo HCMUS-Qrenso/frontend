@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 
 type Template = {
   id: string
@@ -21,15 +22,14 @@ interface TemplateGalleryProps {
 
 export function TemplateGallery({ templates, onSelectTemplate }: TemplateGalleryProps) {
   const router = useRouter()
+  const t = useTranslations('menu')
 
   return (
     <Card className="rounded-2xl border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h3 className="font-semibold text-slate-900 dark:text-white">Chọn template thiết kế</h3>
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-            Các mẫu menu đẹp, print-ready cho nhà hàng
-          </p>
+          <h3 className="font-semibold text-slate-900 dark:text-white">{t('selectTemplate')}</h3>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{t('templateGallery')}</p>
         </div>
       </div>
 
@@ -63,7 +63,7 @@ export function TemplateGallery({ templates, onSelectTemplate }: TemplateGallery
                 className="mt-4 w-full bg-emerald-600 hover:bg-emerald-700"
                 size="sm"
               >
-                Dùng template này
+                {t('selectTemplate')}
               </Button>
             </div>
           </div>

@@ -44,6 +44,23 @@ export interface TenantDetail extends TenantSummary {
     total_categories?: number
     total_menu_items?: number
   }
+  // Format settings
+  currency?: string
+  currencySymbol?: string
+  timezone?: string
+  dateFormat?: string
+  language?: string
+  phone?: string | null
+  contactEmail?: string | null
+  // Tax settings
+  taxRate?: number
+  taxInclusive?: boolean
+  taxLabel?: string
+  // Service charge settings
+  serviceChargeEnabled?: boolean
+  serviceChargeRate?: number
+  serviceChargeTaxable?: boolean
+  serviceChargeMinParty?: number | null
 }
 
 export interface TenantDetailResponse {

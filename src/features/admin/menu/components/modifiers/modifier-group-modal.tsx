@@ -13,6 +13,7 @@ import {
 } from '@/src/features/admin/menu/queries'
 import { useErrorHandler } from '@/src/hooks/use-error-handler'
 import { toast } from 'sonner'
+import { useTranslations } from 'next-intl'
 
 interface ModifierGroupModalProps {
   open: boolean
@@ -28,6 +29,7 @@ export function ModifierGroupModal({
   onOpenChange,
 }: ModifierGroupModalProps) {
   const { handleErrorWithStatus } = useErrorHandler()
+  const t = useTranslations('menu.modifiers.groupModal')
 
   // Mutations
   const createMutation = useCreateModifierGroupMutation()
@@ -92,17 +94,17 @@ export function ModifierGroupModal({
 
     // Validation
     if (!formData.name.trim()) {
-      setErrors({ name: 'Vui lòng nhập tên nhóm' })
+      setErrors({ name: t('nameRequired') })
       return
     }
 
     if (formData.name.length > 100) {
-      setErrors({ name: 'Tên nhóm không được vượt quá 100 ký tự' })
+      setErrors({ name: t('nameMaxLength') })
       return
     }
 
     if (formData.max_selections !== null && formData.min_selections > formData.max_selections) {
-      setErrors({ selections: 'Số lượng tối thiểu không được lớn hơn tối đa' })
+      setErrors({ selections: t('minMaxError') })
       return
     }
 
@@ -117,12 +119,12 @@ export function ModifierGroupModal({
     if (mode === 'create') {
       createMutation.mutate(payload, {
         onSuccess: () => {
-          toast.success('Đã tạo nhóm tuỳ chọn')
+          toast.success(t('createSuccess'))
           onOpenChange(false)
         },
         onError: (error) => {
           handleErrorWithStatus(error)
-          toast.error('Không thể tạo nhóm')
+          toast.error(t('createError'))
         },
       })
     } else if (mode === 'edit' && modifierGroup) {
@@ -130,12 +132,12 @@ export function ModifierGroupModal({
         { id: modifierGroup.id, payload },
         {
           onSuccess: () => {
-            toast.success('Đã cập nhật nhóm tuỳ chọn')
+            toast.success(t('updateSuccess'))
             onOpenChange(false)
           },
           onError: (error) => {
             handleErrorWithStatus(error)
-            toast.error('Không thể cập nhật nhóm')
+            toast.error(t('updateError'))
           },
         },
       )
@@ -146,25 +148,21 @@ export function ModifierGroupModal({
     <FormDialog
       open={open}
       onOpenChange={onOpenChange}
-      title={mode === 'create' ? 'Tạo nhóm tuỳ chọn mới' : 'Chỉnh sửa nhóm tuỳ chọn'}
-      description={
-        mode === 'create'
-          ? 'Tạo nhóm mới để phân loại các tuỳ chọn (Size, Topping, Độ chín...)'
-          : 'Cập nhật thông tin nhóm tuỳ chọn'
-      }
+      title={mode === 'create' ? t('createTitle') : t('editTitle')}
+      description={mode === 'create' ? t('createDesc') : t('editDesc')}
       onSubmit={handleSubmit}
       isSubmitting={isSubmitting}
-      submitText="Lưu"
-      loadingText="Đang lưu..."
+      submitText={t('save')}
+      loadingText={t('saving')}
       size="lg"
     >
       {/* Tên nhóm */}
-      <FormDialogField label="Tên nhóm" required error={errors.name}>
+      <FormDialogField label={t('nameLabel')} required error={errors.name}>
         <Input
           id="name"
           value={formData.name}
           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          placeholder="Ví dụ: Kích cỡ, Topping, Độ chín..."
+          placeholder={t('namePlaceholder')}
           disabled={isSubmitting}
         />
       </FormDialogField>
@@ -172,7 +170,7 @@ export function ModifierGroupModal({
       {/* Loại lựa chọn */}
       <div className="space-y-3">
         <Label>
-          Loại lựa chọn <span className="text-red-500">*</span>
+          {t('selectionType')} <span className="text-red-500">*</span>
         </Label>
         <RadioGroup
           value={formData.type}
@@ -184,18 +182,18 @@ export function ModifierGroupModal({
           <div className="flex items-center space-x-2 rounded-xl border border-slate-200 p-3 dark:border-slate-700">
             <RadioGroupItem value="single_choice" id="single" />
             <Label htmlFor="single" className="flex-1 cursor-pointer font-normal">
-              <div className="font-medium">Single Choice</div>
+              <div className="font-medium">{t('singleChoice')}</div>
               <div className="text-xs text-slate-500 dark:text-slate-400">
-                Chỉ chọn được 1 option (VD: Size)
+                {t('singleChoiceDesc')}
               </div>
             </Label>
           </div>
           <div className="flex items-center space-x-2 rounded-xl border border-slate-200 p-3 dark:border-slate-700">
             <RadioGroupItem value="multiple_choice" id="multiple" />
             <Label htmlFor="multiple" className="flex-1 cursor-pointer font-normal">
-              <div className="font-medium">Multiple Choice</div>
+              <div className="font-medium">{t('multipleChoice')}</div>
               <div className="text-xs text-slate-500 dark:text-slate-400">
-                Chọn được nhiều option (VD: Topping)
+                {t('multipleChoiceDesc')}
               </div>
             </Label>
           </div>
@@ -206,11 +204,9 @@ export function ModifierGroupModal({
       <FormDialogSection>
         <div className="space-y-0.5">
           <Label htmlFor="is_required" className="text-sm font-medium">
-            Bắt buộc chọn
+            {t('isRequired')}
           </Label>
-          <p className="text-xs text-slate-500 dark:text-slate-400">
-            Khách hàng phải chọn ít nhất 1 option
-          </p>
+          <p className="text-xs text-slate-500 dark:text-slate-400">{t('isRequiredHint')}</p>
         </div>
         <Switch
           id="is_required"
@@ -223,7 +219,7 @@ export function ModifierGroupModal({
       {/* Min/Max Selections - Only for multiple choice */}
       {formData.type === 'multiple_choice' && (
         <div className="grid grid-cols-2 gap-4">
-          <FormDialogField label="Số lượng tối thiểu">
+          <FormDialogField label={t('minSelections')}>
             <Input
               id="min"
               type="number"
@@ -238,7 +234,7 @@ export function ModifierGroupModal({
               disabled={isSubmitting}
             />
           </FormDialogField>
-          <FormDialogField label="Số lượng tối đa">
+          <FormDialogField label={t('maxSelections')}>
             <Input
               id="max"
               type="number"
@@ -248,7 +244,7 @@ export function ModifierGroupModal({
                 const val = e.target.value ? Number.parseInt(e.target.value) : null
                 setFormData({ ...formData, max_selections: val })
               }}
-              placeholder="Không giới hạn"
+              placeholder={t('maxPlaceholder')}
               disabled={isSubmitting}
             />
           </FormDialogField>

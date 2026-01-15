@@ -15,6 +15,7 @@ import { cn } from '@/src/lib/utils'
 import { useExportMenuMutation, useCategoriesQuery } from '@/src/features/admin/menu/queries'
 import { toast } from 'sonner'
 import { useErrorHandler } from '@/src/hooks/use-error-handler'
+import { useTranslations } from 'next-intl'
 
 type ExportScope = 'all' | 'category'
 type ExportFormat = 'csv' | 'xlsx'
@@ -31,10 +32,11 @@ export function ExportDataTab() {
   const exportMutation = useExportMenuMutation()
   const { data: categoriesData } = useCategoriesQuery({ limit: 100 })
   const categories = categoriesData?.data.categories || []
+  const t = useTranslations('menu.importExport.export')
 
   const handleExport = async () => {
     if (exportScope === 'category' && !selectedCategory) {
-      toast.error('Vui lòng chọn danh mục')
+      toast.error(t('categoryRequired'))
       return
     }
 
@@ -47,9 +49,9 @@ export function ExportDataTab() {
         includeModifiers,
         includeHidden,
       })
-      toast.success('Đã xuất file thành công')
+      toast.success(t('success'))
     } catch (error) {
-      handleErrorWithStatus(error, undefined, 'Không thể xuất file')
+      handleErrorWithStatus(error, undefined, t('error'))
     }
   }
 
@@ -57,18 +59,18 @@ export function ExportDataTab() {
     <div className="space-y-6">
       {/* Export Scope */}
       <Card className="rounded-2xl border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
-        <h3 className="mb-4 font-semibold text-slate-900 dark:text-white">Phạm vi xuất dữ liệu</h3>
+        <h3 className="mb-4 font-semibold text-slate-900 dark:text-white">{t('scopeTitle')}</h3>
         <div className="grid gap-3 sm:grid-cols-2">
           {[
             {
               value: 'all',
-              label: 'Tất cả',
-              description: 'Toàn bộ menu items',
+              label: t('scopeAll'),
+              description: t('scopeAllDesc'),
             },
             {
               value: 'category',
-              label: 'Theo danh mục',
-              description: 'Chọn một category cụ thể',
+              label: t('scopeCategory'),
+              description: t('scopeCategoryDesc'),
             },
           ].map((option) => (
             <button
@@ -93,11 +95,11 @@ export function ExportDataTab() {
         {exportScope === 'category' && (
           <div className="mt-4">
             <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
-              Chọn danh mục
+              {t('selectCategory')}
             </label>
             <Select value={selectedCategory} onValueChange={setSelectedCategory}>
               <SelectTrigger className="w-full max-w-xs">
-                <SelectValue placeholder="Chọn danh mục..." />
+                <SelectValue placeholder={t('selectCategoryPlaceholder')} />
               </SelectTrigger>
               <SelectContent>
                 {categories.map((cat) => (
@@ -113,7 +115,7 @@ export function ExportDataTab() {
 
       {/* Export Options */}
       <Card className="rounded-2xl border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
-        <h3 className="mb-4 font-semibold text-slate-900 dark:text-white">Tùy chọn xuất</h3>
+        <h3 className="mb-4 font-semibold text-slate-900 dark:text-white">{t('optionsTitle')}</h3>
         <div className="space-y-3">
           <label className="flex items-center gap-3">
             <input
@@ -124,9 +126,9 @@ export function ExportDataTab() {
             />
             <div>
               <span className="text-sm font-medium text-slate-900 dark:text-white">
-                Include images
+                {t('includeImages')}
               </span>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Xuất URLs ảnh món ăn</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">{t('includeImagesDesc')}</p>
             </div>
           </label>
           <label className="flex items-center gap-3">
@@ -138,10 +140,10 @@ export function ExportDataTab() {
             />
             <div>
               <span className="text-sm font-medium text-slate-900 dark:text-white">
-                Include modifiers
+                {t('includeModifiers')}
               </span>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Xuất modifier groups (JSON)
+                {t('includeModifiersDesc')}
               </p>
             </div>
           </label>
@@ -154,11 +156,9 @@ export function ExportDataTab() {
             />
             <div>
               <span className="text-sm font-medium text-slate-900 dark:text-white">
-                Include hidden items
+                {t('includeHidden')}
               </span>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Xuất cả items có status = unavailable
-              </p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">{t('includeHiddenDesc')}</p>
             </div>
           </label>
         </div>
@@ -166,7 +166,7 @@ export function ExportDataTab() {
 
       {/* Format Selection */}
       <Card className="rounded-2xl border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
-        <h3 className="mb-4 font-semibold text-slate-900 dark:text-white">Định dạng file</h3>
+        <h3 className="mb-4 font-semibold text-slate-900 dark:text-white">{t('formatTitle')}</h3>
         <div className="flex gap-3">
           <button
             onClick={() => setFormat('csv')}
@@ -180,7 +180,7 @@ export function ExportDataTab() {
             <FileSpreadsheet className="h-8 w-8 text-slate-400" />
             <div className="text-left">
               <p className="font-medium text-slate-900 dark:text-white">CSV</p>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Nhỏ gọn, dễ xử lý</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">{t('csvDesc')}</p>
             </div>
           </button>
           <button
@@ -195,7 +195,7 @@ export function ExportDataTab() {
             <FileSpreadsheet className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
             <div className="text-left">
               <p className="font-medium text-slate-900 dark:text-white">Excel (.xlsx)</p>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Format đẹp hơn</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">{t('xlsxDesc')}</p>
             </div>
           </button>
         </div>
@@ -205,10 +205,8 @@ export function ExportDataTab() {
       <Card className="rounded-2xl border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="font-semibold text-slate-900 dark:text-white">Sẵn sàng export</h3>
-            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-              File sẽ được tải xuống tự động
-            </p>
+            <h3 className="font-semibold text-slate-900 dark:text-white">{t('readyToExport')}</h3>
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{t('autoDownload')}</p>
           </div>
           <Button
             onClick={handleExport}
@@ -218,7 +216,7 @@ export function ExportDataTab() {
             {exportMutation.isPending ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Đang export...
+                {t('exporting')}
               </>
             ) : (
               <>

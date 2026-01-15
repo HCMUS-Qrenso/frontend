@@ -23,6 +23,7 @@ export interface UserProfile {
   tenantId: string | null
   createdAt: string
   lastLoginAt: string | null
+  updatedAt: string
 }
 
 export interface AuthResponse {
@@ -34,6 +35,7 @@ export interface LoginCredentials {
   email: string
   password: string
   rememberMe?: boolean
+  accountType: string
 }
 
 export interface SignupPayload {
@@ -46,11 +48,13 @@ export interface SignupPayload {
 
 export interface ForgotPasswordPayload {
   email: string
+  accountType: string
 }
 
 export interface ResetPasswordPayload {
   token: string
   newPassword: string
+  accountType: string
 }
 
 export interface VerifyEmailPayload {
@@ -62,4 +66,9 @@ export interface SetupPasswordPayload {
   email: string
   token: string
   password: string
+}
+
+export interface ChangePasswordPayload {
+  currentPassword: string
+  newPassword: string
 }

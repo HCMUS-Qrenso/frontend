@@ -1,0 +1,343 @@
+{
+  "nav": {
+    "features": "功能",
+    "howItWorks": "使用方法",
+    "pricing": "价格",
+    "faq": "常见问题",
+    "contact": "联系"
+  },
+  "auth": {
+    "login": "登录"
+  },
+  "cta": {
+    "bookDemo": "预约演示",
+    "bookDemoFree": "免费演示",
+    "getStarted": "开始使用",
+    "learnMore": "了解更多",
+    "viewProduct": "查看产品",
+    "contactUs": "联系我们",
+    "startTrial": "免费试用",
+    "contactConsult": "咨询顾问"
+  },
+  "hero": {
+    "headline1": "使用",
+    "headline2": "二维码点餐",
+    "headline3": "和实时管理加速服务，减少错误",
+    "subheadline": "完整的餐厅系统：二维码点餐、厨房即时接单、全面的仪表盘、灵活的支付方式。",
+    "socialProof": "被顶级餐厅使用",
+    "logo": "Logo",
+    "stats": {
+      "orderTime": "处理时间",
+      "orderErrors": "点餐错误",
+      "tableSpeed": "翻台速度"
+    }
+  },
+  "productShowcase": {
+    "title": "一个平台，所有功能",
+    "subtitle": "从点餐到支付，一切互联",
+    "tabs": {
+      "dashboard": {
+        "label": "仪表盘",
+        "description": "实时监控所有活动"
+      },
+      "kds": {
+        "label": "厨房显示",
+        "description": "厨房即时接收订单"
+      },
+      "customer": {
+        "label": "顾客点餐",
+        "description": "顾客扫码在手机上点餐"
+      },
+      "tables": {
+        "label": "桌台与二维码",
+        "description": "管理桌台、二维码与平面图"
+      }
+    },
+    "images": {
+      "tableList": "桌台列表",
+      "tableCanvas": "平面图",
+      "tableQR": "二维码管理",
+      "dashboardOverview": "全局概览",
+      "dashboardAnalytics": "数据分析"
+    },
+    "placeholder": "截图即将推出"
+  },
+  "features": {
+    "title": "现代餐厅的全面功能",
+    "subtitle": "从点餐到支付，从厨房到管理",
+    "items": {
+      "dashboard": {
+        "title": "运营仪表盘",
+        "description": "实时跟踪订单、收入和桌台。按日/周/月的详细分析报告。"
+      },
+      "tables": {
+        "title": "桌台与二维码管理",
+        "description": "为每张桌台生成二维码，管理平面图，可视化跟踪状态。"
+      },
+      "kds": {
+        "title": "实时厨房显示",
+        "description": "厨房即时接收订单，自动按优先级排序。"
+      },
+      "customerOrdering": {
+        "title": "顾客点餐",
+        "description": "顾客扫描二维码在手机上点餐，访问完整菜单。"
+      },
+      "payment": {
+        "title": "灵活支付",
+        "description": "集成 VNPay、微信支付、支付宝、Stripe。餐后支付或在线支付。"
+      },
+      "analytics": {
+        "title": "分析与报告",
+        "description": "收入报告、畅销品、业绩。导出 Excel/PDF。"
+      },
+      "roles": {
+        "title": "角色与权限",
+        "description": "详细访问控制：管理员、收银员、服务员、厨房。多级安全。"
+      },
+      "multiLang": {
+        "title": "多语言与多门店",
+        "description": "支持多语言，一个账号管理多家店铺。"
+      }
+    }
+  },
+  "howItWorks": {
+    "title": "简单易用",
+    "subtitle": "4个步骤数字化您的餐厅",
+    "steps": {
+      "step1": {
+        "title": "设置菜单与桌台",
+        "description": "创建菜品、分类和价格。设置桌台并生成二维码。"
+      },
+      "step2": {
+        "title": "顾客扫描二维码",
+        "description": "顾客扫描桌上的二维码，浏览菜单并直接点餐。"
+      },
+      "step3": {
+        "title": "厨房与服务员收到通知",
+        "description": "订单立即显示在厨房显示和服务员仪表盘上。"
+      },
+      "step4": {
+        "title": "上菜与结账",
+        "description": "按顺序上菜。顾客餐后结账，灵活选项。"
+      }
+    }
+  },
+  "builtForRoles": {
+    "title": "为每个角色打造",
+    "subtitle": "解决餐厅每个人的真正问题",
+    "painPointsTitle": "常见问题",
+    "solutionsTitle": "Qrenso 解决方案",
+    "roles": {
+      "owner": {
+        "label": "餐厅老板",
+        "painPoints": ["难以实时跟踪收入", "点餐错误导致投诉", "难以管理多张桌台"],
+        "solutions": ["全景仪表盘", "详细的时间段分析", "自动报告，轻松导出"]
+      },
+      "cashier": {
+        "label": "收银员",
+        "painPoints": ["手写订单容易出错", "结账慢，顾客等待时间长", "结业盘点困难"],
+        "solutions": ["顾客自助点餐", "即时准确结账", "自动结业报告"]
+      },
+      "waiter": {
+        "label": "服务员",
+        "painPoints": ["来回跑单", "同时服务太多顾客", "忘记订单或桌台混淆"],
+        "solutions": ["顾客通过二维码自助点餐", "实时订单通知", "每桌订单历史"]
+      },
+      "chef": {
+        "label": "厨房",
+        "painPoints": ["手写订单难以辨认", "难以确定菜品优先级", "高峰期忘记订单"],
+        "solutions": ["清晰可读的厨房显示", "自动优先级排序", "烹饪倒计时"]
+      }
+    }
+  },
+  "testimonials": {
+    "title": "客户评价",
+    "subtitle": "数百家餐厅的满意选择",
+    "items": [
+      {
+        "name": "张明",
+        "role": "老板",
+        "restaurant": "老北京餐厅",
+        "quote": "自从使用 Qrenso，我们的收入增长了30%，服务更快。错误几乎消失了。非常满意！"
+      },
+      {
+        "name": "李华",
+        "role": "经理",
+        "restaurant": "美味轩",
+        "quote": "厨房显示确保厨房不会漏掉任何菜品。实时仪表盘让我可以远程管理一切。非常实用！"
+      },
+      {
+        "name": "王强",
+        "role": "连锁店老板",
+        "restaurant": "餐饮连锁",
+        "quote": "我在一个账号上管理5家店。综合报告帮助我快速做出决策。非常值得投资！"
+      }
+    ]
+  },
+  "pricing": {
+    "title": "透明定价",
+    "subtitle": "选择适合您餐厅的方案",
+    "perMonth": "月",
+    "trialNote": "所有方案包含14天免费试用。无需信用卡。",
+    "plans": {
+      "starter": {
+        "name": "入门版",
+        "price": "1,990,000",
+        "description": "适合刚起步的小型餐厅",
+        "cta": "免费试用",
+        "features": [
+          "1家门店",
+          "最多20张桌台",
+          "基础二维码点餐",
+          "仪表盘与厨房显示",
+          "基础报告",
+          "邮件支持"
+        ]
+      },
+      "pro": {
+        "name": "专业版",
+        "price": "3,990,000",
+        "description": "适合中大型餐厅",
+        "cta": "预约演示",
+        "features": [
+          "最多3家门店",
+          "无限桌台",
+          "完整二维码点餐",
+          "实时仪表盘",
+          "高级分析",
+          "支付网关",
+          "多语言",
+          "24/7优先支持"
+        ]
+      },
+      "enterprise": {
+        "name": "企业版",
+        "price": "联系我们",
+        "description": "连锁餐厅解决方案",
+        "cta": "咨询顾问",
+        "features": [
+          "无限门店",
+          "无限桌台",
+          "所有专业版功能",
+          "定制开发",
+          "专属API",
+          "现场培训",
+          "专属客户经理"
+        ]
+      }
+    }
+  },
+  "faq": {
+    "title": "常见问题",
+    "subtitle": "关于 Qrenso 的常见问题解答",
+    "items": [
+      {
+        "question": "设置需要多长时间？",
+        "answer": "平均2-3小时。只需添加菜单、创建桌台和二维码。我们提供详细指南。"
+      },
+      {
+        "question": "交易有手续费吗？",
+        "answer": "交易手续费由支付合作伙伴设定（1-3%）。Qrenso 不收取额外费用。"
+      },
+      {
+        "question": "支持哪些设备？",
+        "answer": "网页软件，任何浏览器可访问：电脑、平板、手机。厨房显示在平板上效果最佳。"
+      },
+      {
+        "question": "支持多门店吗？",
+        "answer": "是的。专业版支持最多3家门店，企业版无限制。每家门店有独立仪表盘。"
+      },
+      {
+        "question": "如何快速导入菜单？",
+        "answer": "您可以通过Excel文件导入菜单（提供模板）或通过快速表单手动输入。"
+      },
+      {
+        "question": "数据安全吗？",
+        "answer": "数据加密并每日备份。我们符合国际安全标准。"
+      },
+      {
+        "question": "遇到问题有什么支持？",
+        "answer": "入门版邮件支持，专业版24/7电话支持，企业版专属客户经理。"
+      },
+      {
+        "question": "可以随时取消吗？",
+        "answer": "是的。无长期合约。取消后数据保留30天供导出。"
+      }
+    ]
+  },
+  "finalCta": {
+    "title": "准备好数字化您的餐厅了吗？",
+    "subtitle": "超过500家餐厅已使用 Qrenso 提升业务。今天就开始吧！",
+    "trustBadge": "14天免费试用 • 无需信用卡 • 24/7支持"
+  },
+  "footer": {
+    "tagline": "完整的二维码点餐和餐厅管理解决方案",
+    "product": {
+      "title": "产品",
+      "features": "功能",
+      "pricing": "价格",
+      "caseStudies": "案例研究",
+      "roadmap": "路线图"
+    },
+    "company": {
+      "title": "公司",
+      "about": "关于",
+      "blog": "博客",
+      "careers": "招聘",
+      "contact": "联系"
+    },
+    "legal": {
+      "title": "法律",
+      "terms": "服务条款",
+      "privacy": "隐私政策",
+      "refund": "退款政策"
+    },
+    "copyright": "© 2025 Qrenso. 保留所有权利。"
+  },
+  "contact": {
+    "pageTitle": "联系 Qrenso",
+    "pageSubtitle": "留下您的联系方式，获取适合您餐厅的解决方案",
+    "whatYouGet": "您将获得：",
+    "benefit1": "15分钟现场演示",
+    "benefit2": "免费运营咨询",
+    "benefit3": "定制化详细报价",
+    "benefit4": "部署帮助和培训",
+    "contactInfo": "联系信息",
+    "hotline": "热线",
+    "email": "邮箱",
+    "office": "办公室",
+    "workingHours": "工作时间",
+    "workingHoursValue": "周一至周五：8:30 - 18:00",
+    "sendRequest": "发送请求",
+    "fullName": "姓名",
+    "workEmail": "工作邮箱",
+    "phone": "电话号码",
+    "restaurantName": "餐厅名称",
+    "city": "城市 / 地区",
+    "branches": "门店/桌台数量",
+    "needs": "您的需求",
+    "selectNeeds": "选择您的需求",
+    "trial": "免费试用",
+    "demo": "预约演示",
+    "consultation": "实施咨询",
+    "other": "其他",
+    "notes": "备注",
+    "notesPlaceholder": "有任何问题或特殊要求吗？",
+    "optional": "可选",
+    "required": "*",
+    "submitting": "提交中...",
+    "submit": "提交请求",
+    "privacyNote": "我们仅使用您的数据为您提供建议。",
+    "successTitle": "感谢您联系我们！",
+    "successMessage": "Qrenso 团队将在24小时内与您联系。",
+    "backToHome": "返回首页",
+    "enterFullName": "请输入姓名",
+    "fullNameMinLength": "姓名至少需要2个字符",
+    "enterEmail": "请输入邮箱",
+    "invalidEmailFormat": "邮箱格式无效",
+    "enterPhone": "请输入电话号码",
+    "invalidPhoneFormat": "电话号码无效",
+    "enterRestaurantName": "请输入餐厅名称",
+    "errorOccurred": "发生错误。请稍后重试。"
+  }
+}

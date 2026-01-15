@@ -1,0 +1,149 @@
+{
+  "title": "Quản lý Voucher",
+  "description": "Tạo và quản lý các mã giảm giá cho nhà hàng",
+  "status": {
+    "draft": "Nháp",
+    "active": "Đang hoạt động",
+    "paused": "Tạm dừng",
+    "archived": "Đã lưu trữ"
+  },
+  "kind": {
+    "automatic": "Tự động áp dụng",
+    "staffOnly": "Nhân viên áp dụng",
+    "code": "Nhập mã"
+  },
+  "discountType": {
+    "percent": "Phần trăm (%)",
+    "fixedAmount": "Số tiền cố định"
+  },
+  "source": {
+    "auto": "Tự động",
+    "waiter": "Nhân viên",
+    "customerCode": "Khách nhập mã",
+    "admin": "Admin"
+  },
+  "filters": {
+    "searchPlaceholder": "Tìm theo mã hoặc tên...",
+    "status": "Trạng thái",
+    "allStatus": "Tất cả trạng thái",
+    "kind": "Loại voucher",
+    "allKind": "Tất cả loại"
+  },
+  "table": {
+    "code": "Mã voucher",
+    "name": "Tên",
+    "discount": "Giảm giá",
+    "kind": "Loại",
+    "status": "Trạng thái",
+    "usage": "Sử dụng",
+    "actions": "Thao tác",
+    "empty": "Chưa có voucher nào. Tạo voucher đầu tiên để bắt đầu.",
+    "emptyTitle": "Chưa có voucher",
+    "emptyDescription": "Tạo voucher đầu tiên để bắt đầu.",
+    "voucherLabel": "voucher"
+  },
+  "error": {
+    "title": "Lỗi",
+    "loadFailed": "Không thể tải danh sách voucher"
+  },
+  "actions": {
+    "create": "Tạo voucher",
+    "view": "Xem chi tiết",
+    "edit": "Chỉnh sửa",
+    "archive": "Lưu trữ",
+    "applyVoucher": "Áp dụng voucher",
+    "addAnotherVoucher": "Thêm voucher khác"
+  },
+  "pagination": {
+    "previous": "Trước",
+    "next": "Tiếp",
+    "page": "Trang {current} / {total}"
+  },
+  "form": {
+    "createTitle": "Tạo voucher mới",
+    "createDescription": "Tạo mã giảm giá mới cho khách hàng",
+    "editTitle": "Chỉnh sửa voucher",
+    "editDescription": "Cập nhật thông tin voucher",
+    "tabs": {
+      "basic": "Thông tin",
+      "discount": "Giảm giá",
+      "limits": "Giới hạn"
+    },
+    "code": "Mã voucher",
+    "name": "Tên voucher",
+    "namePlaceholder": "VD: Giảm giá khai trương",
+    "description": "Mô tả",
+    "descriptionPlaceholder": "Mô tả chi tiết về voucher...",
+    "status": "Trạng thái",
+    "kind": "Loại áp dụng",
+    "kindDescription": {
+      "automatic": "Voucher sẽ tự động áp dụng cho các đơn hàng đủ điều kiện",
+      "staff_only": "Chỉ nhân viên mới có thể áp dụng voucher này",
+      "code": "Khách hàng hoặc nhân viên nhập mã để áp dụng"
+    },
+    "autoApply": "Tự động áp dụng",
+    "autoApplyHint": "Tự động áp dụng cho đơn hàng đủ điều kiện",
+    "isPublic": "Hiển thị công khai",
+    "isPublicHint": "Hiển thị voucher cho khách hàng trên ứng dụng",
+    "discountType": "Loại giảm giá",
+    "percentOff": "Phần trăm giảm (%)",
+    "amountOff": "Số tiền giảm",
+    "maxDiscountAmount": "Giảm tối đa",
+    "maxDiscountAmountHint": "Giới hạn số tiền giảm tối đa cho voucher phần trăm",
+    "minSubtotal": "Đơn tối thiểu",
+    "minSubtotalHint": "Giá trị đơn hàng tối thiểu để áp dụng voucher",
+    "startsAt": "Bắt đầu từ",
+    "endsAt": "Kết thúc lúc",
+    "maxRedemptionsTotal": "Số lần sử dụng tối đa",
+    "maxRedemptionsTotalHint": "Tổng số lần voucher có thể được sử dụng",
+    "maxRedemptionsPerCustomer": "Giới hạn mỗi khách",
+    "minParty": "Số khách tối thiểu",
+    "minPartyHint": "Số người trong đoàn tối thiểu để áp dụng",
+    "priority": "Độ ưu tiên",
+    "priorityHint": "Voucher có độ ưu tiên cao hơn sẽ được áp dụng trước",
+    "cancel": "Hủy",
+    "save": "Lưu thay đổi",
+    "create": "Tạo voucher",
+    "saving": "Đang lưu..."
+  },
+  "detail": {
+    "discountInfo": "Thông tin giảm giá",
+    "discountValue": "Giá trị giảm",
+    "maxCap": "tối đa",
+    "minOrder": "Đơn tối thiểu",
+    "usageStats": "Thống kê sử dụng",
+    "timesUsed": "Lần đã dùng",
+    "remaining": "Còn lại",
+    "priority": "Độ ưu tiên",
+    "validity": "Thời hạn hiệu lực",
+    "startsAt": "Bắt đầu",
+    "endsAt": "Kết thúc",
+    "noLimit": "Không giới hạn",
+    "recentRedemptions": "Lịch sử sử dụng gần đây",
+    "noRedemptions": "Chưa có lần sử dụng nào",
+    "noRedemptionsDescription": "Voucher này chưa được sử dụng.",
+    "orderNumber": "Mã đơn",
+    "discountAmount": "Số tiền giảm",
+    "source": "Nguồn",
+    "time": "Thời gian",
+    "people": "người"
+  },
+  "archiveSuccess": "Voucher đã được lưu trữ",
+  "archiveError": "Không thể lưu trữ voucher",
+  "archiveDialog": {
+    "title": "Lưu trữ voucher?",
+    "description": "Voucher \"{code}\" sẽ được lưu trữ và không thể sử dụng nữa. Bạn có thể khôi phục sau."
+  },
+  "staffSelector": {
+    "title": "Áp dụng Voucher",
+    "subtitle": "Chọn voucher cho đơn hàng này",
+    "searchPlaceholder": "Tìm voucher...",
+    "noVouchers": "Không có voucher khả dụng",
+    "orEnterCode": "Hoặc nhập mã voucher:"
+  },
+  "applySuccess": "Áp dụng voucher thành công",
+  "applyError": "Không thể áp dụng voucher",
+  "revokeSuccess": "Đã gỡ voucher",
+  "revokeError": "Không thể gỡ voucher",
+  "invalidCode": "Mã voucher không hợp lệ"
+}

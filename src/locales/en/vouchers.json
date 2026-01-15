@@ -1,0 +1,149 @@
+{
+  "title": "Voucher Management",
+  "description": "Create and manage discount codes for your restaurant",
+  "status": {
+    "draft": "Draft",
+    "active": "Active",
+    "paused": "Paused",
+    "archived": "Archived"
+  },
+  "kind": {
+    "automatic": "Auto Apply",
+    "staffOnly": "Staff Only",
+    "code": "Enter Code"
+  },
+  "discountType": {
+    "percent": "Percentage (%)",
+    "fixedAmount": "Fixed Amount"
+  },
+  "source": {
+    "auto": "Auto",
+    "waiter": "Staff",
+    "customerCode": "Customer Code",
+    "admin": "Admin"
+  },
+  "filters": {
+    "searchPlaceholder": "Search by code or name...",
+    "status": "Status",
+    "allStatus": "All statuses",
+    "kind": "Voucher type",
+    "allKind": "All types"
+  },
+  "table": {
+    "code": "Voucher Code",
+    "name": "Name",
+    "discount": "Discount",
+    "kind": "Type",
+    "status": "Status",
+    "usage": "Usage",
+    "actions": "Actions",
+    "empty": "No vouchers yet. Create your first voucher to get started.",
+    "emptyTitle": "No vouchers",
+    "emptyDescription": "Create your first voucher to get started.",
+    "voucherLabel": "voucher"
+  },
+  "error": {
+    "title": "Error",
+    "loadFailed": "Could not load vouchers"
+  },
+  "actions": {
+    "create": "Create voucher",
+    "view": "View details",
+    "edit": "Edit",
+    "archive": "Archive",
+    "applyVoucher": "Apply voucher",
+    "addAnotherVoucher": "Add another voucher"
+  },
+  "pagination": {
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page {current} / {total}"
+  },
+  "form": {
+    "createTitle": "Create New Voucher",
+    "createDescription": "Create a new discount code for customers",
+    "editTitle": "Edit Voucher",
+    "editDescription": "Update voucher information",
+    "tabs": {
+      "basic": "Basic Info",
+      "discount": "Discount",
+      "limits": "Limits"
+    },
+    "code": "Voucher Code",
+    "name": "Voucher Name",
+    "namePlaceholder": "e.g. Grand Opening Discount",
+    "description": "Description",
+    "descriptionPlaceholder": "Detailed description of the voucher...",
+    "status": "Status",
+    "kind": "Apply Type",
+    "kindDescription": {
+      "automatic": "Voucher will be automatically applied to eligible orders",
+      "staff_only": "Only staff can apply this voucher",
+      "code": "Customer or staff enters code to apply"
+    },
+    "autoApply": "Auto Apply",
+    "autoApplyHint": "Automatically apply to eligible orders",
+    "isPublic": "Public Display",
+    "isPublicHint": "Show voucher to customers in the app",
+    "discountType": "Discount Type",
+    "percentOff": "Percent Off (%)",
+    "amountOff": "Amount Off",
+    "maxDiscountAmount": "Max Discount",
+    "maxDiscountAmountHint": "Maximum discount amount for percentage vouchers",
+    "minSubtotal": "Minimum Order",
+    "minSubtotalHint": "Minimum order value to apply voucher",
+    "startsAt": "Starts At",
+    "endsAt": "Ends At",
+    "maxRedemptionsTotal": "Max Total Uses",
+    "maxRedemptionsTotalHint": "Total number of times voucher can be used",
+    "maxRedemptionsPerCustomer": "Limit Per Customer",
+    "minParty": "Minimum Party Size",
+    "minPartyHint": "Minimum number of guests to apply",
+    "priority": "Priority",
+    "priorityHint": "Higher priority vouchers are applied first",
+    "cancel": "Cancel",
+    "save": "Save Changes",
+    "create": "Create Voucher",
+    "saving": "Saving..."
+  },
+  "detail": {
+    "discountInfo": "Discount Information",
+    "discountValue": "Discount Value",
+    "maxCap": "max",
+    "minOrder": "Minimum Order",
+    "usageStats": "Usage Statistics",
+    "timesUsed": "Times Used",
+    "remaining": "Remaining",
+    "priority": "Priority",
+    "validity": "Validity Period",
+    "startsAt": "Starts",
+    "endsAt": "Ends",
+    "noLimit": "No limit",
+    "recentRedemptions": "Recent Redemptions",
+    "noRedemptions": "No redemptions yet",
+    "noRedemptionsDescription": "This voucher has not been used.",
+    "orderNumber": "Order #",
+    "discountAmount": "Discount Amount",
+    "source": "Source",
+    "time": "Time",
+    "people": "people"
+  },
+  "archiveSuccess": "Voucher archived successfully",
+  "archiveError": "Could not archive voucher",
+  "archiveDialog": {
+    "title": "Archive Voucher?",
+    "description": "Voucher \"{code}\" will be archived and can no longer be used. You can restore it later."
+  },
+  "staffSelector": {
+    "title": "Apply Voucher",
+    "subtitle": "Select a voucher for this order",
+    "searchPlaceholder": "Search voucher...",
+    "noVouchers": "No vouchers available",
+    "orEnterCode": "Or enter voucher code:"
+  },
+  "applySuccess": "Voucher applied successfully",
+  "applyError": "Could not apply voucher",
+  "revokeSuccess": "Voucher removed",
+  "revokeError": "Could not remove voucher",
+  "invalidCode": "Invalid voucher code"
+}

@@ -1,0 +1,247 @@
+'use client'
+
+import type React from 'react'
+
+import { useState, useEffect } from 'react'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { extractErrorMessage } from '@/src/lib/helpers/error-handler'
+import { AuthContainer } from '@/src/features/auth/components/auth-container'
+import { Button } from '@/src/components/ui/button'
+import { Input } from '@/src/components/ui/input'
+import { Label } from '@/src/components/ui/label'
+import { Checkbox } from '@/src/components/ui/checkbox'
+import { Eye, EyeOff, Loader2, AlertCircle } from 'lucide-react'
+import { Alert, AlertDescription } from '@/src/components/ui/alert'
+import { useAuth } from '@/src/features/auth/hooks'
+import { useTranslations } from 'next-intl'
+
+import { loginSchema } from '@/src/features/auth/schemas'
+import { ROLES } from '@/src/types/roles'
+
+const REMEMBER_ME_KEY = 'rememberMe'
+const REMEMBERED_EMAIL_KEY = 'rememberedEmail'
+
+export default function LoginPage() {
+  const router = useRouter()
+  const { login, loginPending } = useAuth()
+  const t = useTranslations('auth')
+  const [showPassword, setShowPassword] = useState(false)
+  const [rememberMe, setRememberMe] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+  })
+
+  // Load rememberMe và email từ localStorage khi component mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedRememberMe = localStorage.getItem(REMEMBER_ME_KEY) === 'true'
+      const savedEmail = localStorage.getItem(REMEMBERED_EMAIL_KEY)
+
+      if (savedRememberMe) {
+        setRememberMe(true)
+      }
+      if (savedEmail) {
+        setFormData((prev) => ({ ...prev, email: savedEmail }))
+      }
+    }
+  }, [])
+
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError(null)
+    setFieldErrors({})
+
+    // Validate with Zod schema
+    const result = loginSchema.safeParse({ ...formData, rememberMe })
+
+    if (!result.success) {
+      const errors: Record<string, string> = {}
+      result.error.issues.forEach((issue) => {
+        const field = issue.path[0] as string
+        if (!errors[field]) {
+          errors[field] = issue.message
+        }
+      })
+      setFieldErrors(errors)
+      return
+    }
+
+    try {
+      // Lưu rememberMe preference vào localStorage
+      if (typeof window !== 'undefined') {
+        if (rememberMe) {
+          localStorage.setItem(REMEMBER_ME_KEY, 'true')
+          // Lưu email nếu rememberMe = true
+          localStorage.setItem(REMEMBERED_EMAIL_KEY, formData.email)
+        } else {
+          localStorage.removeItem(REMEMBER_ME_KEY)
+          localStorage.removeItem(REMEMBERED_EMAIL_KEY)
+        }
+      }
+
+      // Truyền rememberMe vào login call
+      const loginResult = await login({ ...formData, rememberMe, accountType: 'staff' })
+
+      // Check roles for redirecting to appropriate dashboard could be added here
+      let redirectUrl = '/admin/dashboard'
+      if (loginResult.user.role === ROLES.KITCHEN) {
+        redirectUrl = '/admin/kds'
+      } else if (loginResult.user.role === ROLES.WAITER) {
+        redirectUrl = '/admin/orders'
+      }
+
+      router.push(redirectUrl)
+    } catch (err) {
+      setError(extractErrorMessage(err))
+    }
+  }
+
+  return (
+    <AuthContainer>
+      <div className="mx-auto w-full max-w-sm">
+        {/* Mobile Logo */}
+        <div className="mb-8 flex items-center justify-center gap-3 lg:hidden">
+          <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl">
+            <img src="/logo.png" alt="Logo" className="h-full w-full object-contain" />
+          </div>
+        </div>
+
+        {/* Header */}
+        <div className="mb-8 space-y-2 text-center lg:text-left">
+          <h1 className="text-2xl font-bold text-slate-900 lg:text-3xl dark:text-white">
+            {t('loginTitle')}
+          </h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400">{t('loginSubtitle')}</p>
+        </div>
+
+        {/* Error Alert */}
+        {error && (
+          <Alert variant="destructive" className="mb-6">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+
+        {/* Login Form */}
+        <form onSubmit={handleSubmit} noValidate className="space-y-5">
+          {/* Email Field */}
+          <div className="space-y-2">
+            <Label htmlFor="email" className="text-sm font-medium text-slate-700 dark:text-white">
+              {t('email')}
+            </Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="you@example.com"
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              className="rounded-xl border-slate-200 bg-white px-4 py-2.5 text-sm shadow-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50 dark:focus:border-emerald-500 dark:focus:ring-emerald-500/20"
+              disabled={loginPending}
+            />
+            {fieldErrors.email && (
+              <p className="text-xs text-red-600 dark:text-red-400">{fieldErrors.email}</p>
+            )}
+          </div>
+
+          {/* Password Field */}
+          <div className="space-y-2">
+            <Label
+              htmlFor="password"
+              className="text-sm font-medium text-slate-700 dark:text-white"
+            >
+              {t('password')}
+            </Label>
+            <div className="relative">
+              <Input
+                id="password"
+                type={showPassword ? 'text' : 'password'}
+                placeholder="••••••••"
+                value={formData.password}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                className="rounded-xl border-slate-200 bg-white px-4 py-2.5 pr-10 text-sm shadow-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-50 dark:focus:border-emerald-500 dark:focus:ring-emerald-500/20"
+                disabled={loginPending}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute top-1/2 right-3 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300"
+                disabled={loginPending}
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
+            {fieldErrors.password && (
+              <p className="text-xs text-red-600 dark:text-red-400">{fieldErrors.password}</p>
+            )}
+            <p className="text-xs text-slate-500 dark:text-slate-400">{t('passwordHint')}</p>
+          </div>
+
+          {/* Remember Me & Forgot Password */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="remember"
+                checked={rememberMe}
+                onCheckedChange={(checked) => setRememberMe(checked as boolean)}
+                disabled={loginPending}
+              />
+              <label
+                htmlFor="remember"
+                className="text-xs font-medium text-slate-600 dark:text-slate-400"
+              >
+                {t('rememberMe')}
+              </label>
+            </div>
+            <Link
+              href="/auth/forgot-password"
+              className="text-xs font-medium text-emerald-600 hover:text-emerald-700 dark:text-white dark:hover:text-slate-200"
+            >
+              {t('forgotPassword')}
+            </Link>
+          </div>
+
+          {/* Submit Button */}
+          <Button
+            type="submit"
+            disabled={loginPending}
+            className="w-full rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60 dark:bg-emerald-500 dark:hover:bg-emerald-600"
+          >
+            {loginPending ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                {t('loggingIn')}
+              </>
+            ) : (
+              t('login')
+            )}
+          </Button>
+        </form>
+
+        {/* Footer */}
+        <div className="mt-8 space-y-4 border-t border-slate-200 pt-6 dark:border-slate-800">
+          <p className="text-center text-xs text-slate-500 dark:text-slate-400">
+            {t('guestInfo')}
+            <br />
+            {t('guestNoAccount')}
+          </p>
+          <p className="text-center text-xs text-slate-500 dark:text-slate-400">
+            {t('noAccount')}{' '}
+            <Link
+              href="/contact"
+              className="font-medium text-emerald-600 hover:text-emerald-700 dark:text-emerald-400"
+            >
+              {t('contactUs')}
+            </Link>{' '}
+            {t('contactToRegister')}
+          </p>
+        </div>
+      </div>
+    </AuthContainer>
+  )
+}

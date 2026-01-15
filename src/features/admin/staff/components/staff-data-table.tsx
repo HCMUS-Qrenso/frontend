@@ -5,22 +5,32 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableHead,
   TableHeader,
   TableRow,
+  AdminTableContainer,
+  AdminTableHeaderRow,
+  AdminTableHead,
+  AdminTableRow,
 } from '@/src/components/ui/table'
 import { Avatar, AvatarFallback, AvatarImage } from '@/src/components/ui/avatar'
 import { Button } from '@/src/components/ui/button'
-import { StatusBadge, USER_ROLE_CONFIG, USER_STATUS_CONFIG } from '@/src/components/ui/status-badge'
+import {
+  StatusBadge,
+  createUserStatusConfig,
+  createUserRoleConfig,
+} from '@/src/components/ui/status-badge'
 import { StaffRowActions } from '@/src/features/admin/staff/components/staff-row-actions'
 import { LoadingState } from '@/src/components/ui/loading-state'
 import { EmptyState } from '@/src/components/ui/empty-state'
-import { CheckCircle2, XCircle, Users, ChevronLeft, ChevronRight } from 'lucide-react'
+import { CheckCircle2, XCircle, Users } from 'lucide-react'
 import { cn } from '@/src/lib/utils'
 import { useStaffQuery } from '@/src/features/admin/staff/queries'
 import { SkeletonTableRows } from '@/src/components/loading'
 import { useSearchParams, useRouter } from 'next/navigation'
 import type { StaffQueryParams } from '@/src/features/admin/staff/types'
+import { TablePagination } from '@/src/components/ui/table-pagination'
+import { useTranslations } from 'next-intl'
+import { useFormat } from '@/src/hooks/use-format'
 
 interface StaffDataTableProps {
   role: 'admin' | 'waiter' | 'kitchen_staff'
@@ -29,6 +39,22 @@ interface StaffDataTableProps {
 export function StaffDataTable({ role }: StaffDataTableProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const t = useTranslations('staff')
+  const tUserStatus = useTranslations('statusBadge.user')
+  const tRole = useTranslations('statusBadge.role')
+  const { formatDateTime, formatShortDate } = useFormat()
+
+  // Create localized status configs
+  const userStatusConfig = createUserStatusConfig({
+    active: tUserStatus('active'),
+    inactive: tUserStatus('inactive'),
+    suspended: tUserStatus('suspended'),
+  })
+
+  const userRoleConfig = createUserRoleConfig({
+    waiter: tRole('waiter'),
+    kitchen_staff: tRole('kitchen_staff'),
+  })
 
   // Read filters from URL params
   const search = searchParams.get('search') || ''
@@ -75,25 +101,6 @@ export function StaffDataTable({ role }: StaffDataTableProps) {
     router.push(`/admin/staff?${params.toString()}`)
   }
 
-  const formatDate = (date: string | null) => {
-    if (!date) return '—'
-    return new Date(date).toLocaleDateString('vi-VN', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    })
-  }
-
-  const formatDateTime = (date: string | null) => {
-    if (!date) return '—'
-    return new Date(date).toLocaleString('vi-VN', {
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    })
-  }
-
   const getInitials = (name: string) => {
     return name
       .split(' ')
@@ -103,36 +110,28 @@ export function StaffDataTable({ role }: StaffDataTableProps) {
       .slice(0, 2)
   }
 
+  const getEmptyTitle = () => {
+    if (role === 'waiter') return t('noWaiterStaff')
+    if (role === 'kitchen_staff') return t('noKitchenStaff')
+    return t('noAdminStaff')
+  }
+
   // Loading state - skeleton rows to avoid layout shift
   if (isLoading) {
     return (
       <div className="space-y-4">
-        <div className="overflow-x-auto rounded-2xl border border-slate-100 bg-white/80 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
+        <AdminTableContainer>
           <Table>
             <TableHeader>
-              <TableRow className="border-b border-slate-100 bg-slate-50/80 hover:bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900">
-                <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                  Nhân viên
-                </TableHead>
-                <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                  Liên hệ
-                </TableHead>
-                <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                  Vai trò
-                </TableHead>
-                <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                  Trạng thái
-                </TableHead>
-                <TableHead className="px-6 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                  Xác thực
-                </TableHead>
-                <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                  Đăng nhập cuối
-                </TableHead>
-                <TableHead className="px-6 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                  Thao tác
-                </TableHead>
-              </TableRow>
+              <AdminTableHeaderRow>
+                <AdminTableHead>{t('staffHeader')}</AdminTableHead>
+                <AdminTableHead>{t('contactHeader')}</AdminTableHead>
+                <AdminTableHead>{t('roleHeader')}</AdminTableHead>
+                <AdminTableHead>{t('statusHeader')}</AdminTableHead>
+                <AdminTableHead align="center">{t('verifiedHeader')}</AdminTableHead>
+                <AdminTableHead>{t('lastLoginHeader')}</AdminTableHead>
+                <AdminTableHead align="right">{t('actionsHeader')}</AdminTableHead>
+              </AdminTableHeaderRow>
             </TableHeader>
             <TableBody>
               <SkeletonTableRows
@@ -149,7 +148,7 @@ export function StaffDataTable({ role }: StaffDataTableProps) {
               />
             </TableBody>
           </Table>
-        </div>
+        </AdminTableContainer>
       </div>
     )
   }
@@ -158,9 +157,7 @@ export function StaffDataTable({ role }: StaffDataTableProps) {
   if (error) {
     return (
       <div className="rounded-2xl border border-red-200 bg-red-50 p-6 dark:border-red-800 dark:bg-red-500/10">
-        <p className="text-sm text-red-600 dark:text-red-400">
-          Có lỗi xảy ra khi tải danh sách nhân viên. Vui lòng thử lại.
-        </p>
+        <p className="text-sm text-red-600 dark:text-red-400">{t('loadError')}</p>
       </div>
     )
   }
@@ -168,57 +165,29 @@ export function StaffDataTable({ role }: StaffDataTableProps) {
   return (
     <div className="space-y-4">
       {/* Table */}
-      <div className="overflow-x-auto rounded-2xl border border-slate-100 bg-white/80 shadow-sm dark:border-slate-800 dark:bg-slate-900/80">
+      <AdminTableContainer>
         <Table>
           <TableHeader>
-            <TableRow className="border-b border-slate-100 bg-slate-50/80 hover:bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900">
-              <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Nhân viên
-              </TableHead>
-              <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Liên hệ
-              </TableHead>
-              <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Vai trò
-              </TableHead>
-              <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Trạng thái
-              </TableHead>
-              <TableHead className="px-6 py-3 text-center text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Xác thực
-              </TableHead>
-              <TableHead className="px-6 py-3 text-left text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Đăng nhập cuối
-              </TableHead>
-              <TableHead className="px-6 py-3 text-right text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">
-                Thao tác
-              </TableHead>
-            </TableRow>
+            <AdminTableHeaderRow>
+              <AdminTableHead>{t('staffHeader')}</AdminTableHead>
+              <AdminTableHead>{t('contactHeader')}</AdminTableHead>
+              <AdminTableHead>{t('roleHeader')}</AdminTableHead>
+              <AdminTableHead>{t('statusHeader')}</AdminTableHead>
+              <AdminTableHead align="center">{t('verifiedHeader')}</AdminTableHead>
+              <AdminTableHead>{t('lastLoginHeader')}</AdminTableHead>
+              <AdminTableHead align="right">{t('actionsHeader')}</AdminTableHead>
+            </AdminTableHeaderRow>
           </TableHeader>
           <TableBody>
             {staffList.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={7} className="px-6 py-0">
-                  <EmptyState
-                    icon={Users}
-                    title={
-                      role === 'waiter'
-                        ? 'Chưa có nhân viên phục vụ nào'
-                        : 'Chưa có nhân viên bếp nào'
-                    }
-                    description="Nhấn 'Mời nhân viên' để thêm nhân viên mới"
-                  />
+                  <EmptyState icon={Users} title={getEmptyTitle()} description={t('inviteHint')} />
                 </TableCell>
               </TableRow>
             ) : (
               staffList.map((staff, index) => (
-                <TableRow
-                  key={staff.id}
-                  className={cn(
-                    'border-b border-slate-100 transition-colors hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800',
-                    index === staffList.length - 1 && 'border-b-0',
-                  )}
-                >
+                <AdminTableRow key={staff.id} isLast={index === staffList.length - 1}>
                   {/* Staff Info */}
                   <TableCell className="px-6 py-4">
                     <div className="flex items-center gap-3">
@@ -233,7 +202,7 @@ export function StaffDataTable({ role }: StaffDataTableProps) {
                           {staff.fullName}
                         </p>
                         <p className="text-xs text-slate-500 dark:text-slate-400">
-                          Tham gia {formatDate(staff.createdAt)}
+                          {t('joinedAt', { date: formatShortDate(staff.createdAt) })}
                         </p>
                       </div>
                     </div>
@@ -251,12 +220,12 @@ export function StaffDataTable({ role }: StaffDataTableProps) {
 
                   {/* Role */}
                   <TableCell className="px-6 py-4">
-                    <StatusBadge status={staff.role} config={USER_ROLE_CONFIG} />
+                    <StatusBadge status={staff.role} config={userRoleConfig} />
                   </TableCell>
 
                   {/* Status */}
                   <TableCell className="px-6 py-4">
-                    <StatusBadge status={staff.status} config={USER_STATUS_CONFIG} />
+                    <StatusBadge status={staff.status} config={userStatusConfig} />
                   </TableCell>
 
                   {/* Email Verified */}
@@ -281,62 +250,23 @@ export function StaffDataTable({ role }: StaffDataTableProps) {
                       <StaffRowActions staff={staff} />
                     </div>
                   </TableCell>
-                </TableRow>
+                </AdminTableRow>
               ))
             )}
           </TableBody>
         </Table>
-      </div>
+      </AdminTableContainer>
 
       {/* Pagination */}
-      {pagination && pagination.totalPages > 1 && (
-        <div className="flex items-center justify-between">
-          <p className="text-sm text-slate-500 dark:text-slate-400">
-            Hiển thị {(pagination.page - 1) * pagination.limit + 1}-
-            {Math.min(pagination.page * pagination.limit, pagination.total)} trên {pagination.total}{' '}
-            nhân viên
-          </p>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              className="rounded-full bg-transparent"
-              disabled={pagination.page === 1}
-              onClick={() => handlePageChange(pagination.page - 1)}
-            >
-              <ChevronLeft className="h-4 w-4" />
-              Trước
-            </Button>
-            {Array.from({ length: Math.min(pagination.totalPages, 5) }, (_, i) => i + 1).map(
-              (pageNum) => (
-                <Button
-                  key={pageNum}
-                  variant="outline"
-                  size="sm"
-                  className={cn(
-                    'h-8 w-8 rounded-full',
-                    pageNum === pagination.page
-                      ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10'
-                      : 'bg-transparent',
-                  )}
-                  onClick={() => handlePageChange(pageNum)}
-                >
-                  {pageNum}
-                </Button>
-              ),
-            )}
-            <Button
-              variant="outline"
-              size="sm"
-              className="rounded-full bg-transparent"
-              disabled={pagination.page === pagination.totalPages}
-              onClick={() => handlePageChange(pagination.page + 1)}
-            >
-              Sau
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
+      {pagination && (
+        <TablePagination
+          currentPage={pagination.page}
+          totalPages={pagination.totalPages}
+          total={pagination.total}
+          limit={pagination.limit}
+          itemLabel={t('staffLabel')}
+          onPageChange={handlePageChange}
+        />
       )}
     </div>
   )

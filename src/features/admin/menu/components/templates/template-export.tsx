@@ -15,9 +15,10 @@ import {
 import { useCategoriesQuery, useMenuItemsQuery } from '../../queries'
 import { useCurrentTenantQuery } from '../../../tenants/queries/tenants.queries'
 import type { MenuItem, Template } from '../../types'
-import { generatePDFBlob } from './utils'
+import { generatePDFBlob, getMaxItemsPerPage } from './utils'
 import { useRouter } from 'next/navigation'
 import { ContainerLoadingState, ContainerErrorState } from '@/components/ui/loading-state'
+import { useTranslations } from 'next-intl'
 
 interface TemplateExportProps {
   templates: Template[]
@@ -33,6 +34,7 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
   const [isMouseOverCanvas, setIsMouseOverCanvas] = useState(false)
   const canvasRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
+  const t = useTranslations('menu.templates.export')
 
   // Global wheel event handler to prevent page scroll when over canvas
   useEffect(() => {
@@ -73,6 +75,9 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
   const [isExporting, setIsExporting] = useState(false)
   const [activeTab, setActiveTab] = useState<'data' | 'style'>('data')
   const [fontSize, setFontSize] = useState<'small' | 'medium' | 'large'>('medium')
+  const [maxItemsPerPage, setMaxItemsPerPage] = useState(() =>
+    getMaxItemsPerPage(selectedTemplate || '1', 'medium'),
+  )
 
   // Fetch data
   const {
@@ -115,6 +120,11 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
       setSelectedCategories(new Set(categories.map((cat) => cat.id)))
     }
   }, [categories])
+
+  // Update maxItemsPerPage when template or font size changes
+  useEffect(() => {
+    setMaxItemsPerPage(getMaxItemsPerPage(selectedTemplate || '1', fontSize))
+  }, [selectedTemplate, fontSize])
 
   // Pan and zoom handlers
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -167,6 +177,11 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
       medium: 'text-2xl',
       large: 'text-3xl',
     }
+    const imageSizeClasses = {
+      small: 'h-21 w-21',
+      medium: 'h-29 w-29',
+      large: 'h-36 w-36',
+    }
 
     const effectiveTheme = theme
 
@@ -179,216 +194,56 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
     }
     const categoryAccentClass = accentColorClasses[accentColor as keyof typeof accentColorClasses]
 
-    // Calculate approximate items per page based on template
-    const getMaxItemsPerPage = (templateId: string) => {
-      switch (templateId) {
-        case '1':
-          return 16 // 2 columns, ~8 per column
-        case '2':
-          return 8 // Photo-forward, larger items
-        case '3':
-          return 20 // Simple layout
-        case '4':
-          return Infinity // Already paginated by categories
-        default:
-          return 15
-      }
-    }
-
-    const maxItemsPerPage = getMaxItemsPerPage(selectedTemplate || '')
-
     // Flatten all items for pagination
     const allItems = Object.entries(menuItemsByCategory).flatMap(([categoryId, items]) =>
       items.map((item) => ({ ...item, categoryId })),
     )
 
+    const totalItems = allItems.length
+    const itemsPerPage = maxItemsPerPage
+
     // Template-specific preview rendering - matching PDF logic exactly
     if (selectedTemplate === '1') {
-      // Minimal A4 2-Column - add pagination if too many items
-      const totalItems = allItems.length
-      if (totalItems > maxItemsPerPage) {
-        // Create multiple pages
-        const pages = []
-        const itemsPerPage = Math.ceil(totalItems / Math.ceil(totalItems / maxItemsPerPage))
+      // Create multiple pages
+      const pages = []
 
-        for (let pageIndex = 0; pageIndex < Math.ceil(totalItems / itemsPerPage); pageIndex++) {
-          const startItem = pageIndex * itemsPerPage
-          const endItem = startItem + itemsPerPage
-          const pageItems = allItems.slice(startItem, endItem)
+      for (let pageIndex = 0; pageIndex < Math.ceil(totalItems / itemsPerPage); pageIndex++) {
+        const startItem = pageIndex * itemsPerPage
+        const endItem = startItem + itemsPerPage
+        const pageItems = allItems.slice(startItem, endItem)
 
-          // Group by category for this page
-          const pageCategories = pageItems.reduce(
-            (acc, item) => {
-              if (!acc[item.categoryId]) acc[item.categoryId] = []
-              acc[item.categoryId].push(item)
-              return acc
-            },
-            {} as Record<string, any[]>,
-          )
+        // Group by category for this page
+        const pageCategories = pageItems.reduce(
+          (acc, item) => {
+            if (!acc[item.categoryId]) acc[item.categoryId] = []
+            acc[item.categoryId].push(item)
+            return acc
+          },
+          {} as Record<string, any[]>,
+        )
 
-          pages.push(
-            <div
-              key={pageIndex}
-              className={cn(
-                'flex h-full p-8',
-                fontSizeClasses[fontSize],
-                effectiveTheme === 'light'
-                  ? 'bg-white text-slate-900'
-                  : 'bg-slate-800 text-slate-100',
-              )}
-            >
-              {pageIndex === 0 && (
-                <div className="absolute top-4 left-1/2 -translate-x-1/2 transform text-center">
-                  <h1
-                    className={cn(
-                      titleSizeClasses[fontSize],
-                      'font-bold',
-                      effectiveTheme === 'light' ? 'text-slate-900' : 'text-white',
-                    )}
-                  >
-                    {restaurantInfo.name}
-                  </h1>
-                  <p className={effectiveTheme === 'light' ? 'text-slate-600' : 'text-slate-300'}>
-                    {restaurantInfo.address} • {restaurantInfo.phone}
-                  </p>
-                </div>
-              )}
-              <div className="mt-16 flex-1 pr-4">
-                {Object.entries(pageCategories)
-                  .slice(0, Math.ceil(Object.keys(pageCategories).length / 2))
-                  .map(([categoryId, items]) => {
-                    const category = categories.find((c) => c.id === categoryId)
-                    if (!category) return null
-                    return (
-                      <div key={categoryId} className="mb-4">
-                        <h2
-                          className={cn(
-                            'mb-2 border-b pb-1 font-bold',
-                            effectiveTheme === 'light' ? 'border-slate-200' : 'border-slate-600',
-                            categoryAccentClass,
-                          )}
-                        >
-                          {category.name}
-                        </h2>
-                        <div className="space-y-1">
-                          {items.map((item) => (
-                            <div key={item.id} className="flex justify-between">
-                              <div className="flex-1">
-                                <span
-                                  className={cn(
-                                    'font-medium',
-                                    effectiveTheme === 'light' ? 'text-slate-900' : 'text-white',
-                                  )}
-                                >
-                                  {item.name}
-                                  {displayOptions.showChefRecommendations &&
-                                    item.is_chef_recommendation && (
-                                      <span className="ml-1 text-amber-500">{chefIcon}</span>
-                                    )}
-                                </span>
-                                {displayOptions.showDescriptions && item.description && (
-                                  <p
-                                    className={cn(
-                                      'mt-1',
-                                      effectiveTheme === 'light'
-                                        ? 'text-slate-500'
-                                        : 'text-slate-400',
-                                    )}
-                                  >
-                                    {item.description}
-                                  </p>
-                                )}
-                              </div>
-                              {displayOptions.showPrices && (
-                                <span
-                                  className={cn(
-                                    'ml-2 font-semibold',
-                                    effectiveTheme === 'light' ? 'text-slate-900' : 'text-white',
-                                  )}
-                                >
-                                  {new Intl.NumberFormat('vi-VN').format(parseInt(item.base_price))}
-                                  đ
-                                </span>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )
-                  })}
-              </div>
-              <div className="mt-16 flex-1 pl-4">
-                {Object.entries(pageCategories)
-                  .slice(Math.ceil(Object.keys(pageCategories).length / 2))
-                  .map(([categoryId, items]) => {
-                    const category = categories.find((c) => c.id === categoryId)
-                    if (!category) return null
-                    return (
-                      <div key={categoryId} className="mb-4">
-                        <h2
-                          className={cn(
-                            'mb-2 border-b pb-1 font-bold',
-                            effectiveTheme === 'light' ? 'border-slate-200' : 'border-slate-600',
-                            categoryAccentClass,
-                          )}
-                        >
-                          {category.name}
-                        </h2>
-                        <div className="space-y-1">
-                          {items.map((item) => (
-                            <div key={item.id} className="flex justify-between">
-                              <div className="flex-1">
-                                <span
-                                  className={cn(
-                                    'font-medium',
-                                    effectiveTheme === 'light' ? 'text-slate-900' : 'text-white',
-                                  )}
-                                >
-                                  {item.name}
-                                  {displayOptions.showChefRecommendations &&
-                                    item.is_chef_recommendation && (
-                                      <span className="ml-1 text-amber-500">{chefIcon}</span>
-                                    )}
-                                </span>
-                                {displayOptions.showDescriptions && item.description && (
-                                  <p
-                                    className={cn(
-                                      'mt-1',
-                                      effectiveTheme === 'light'
-                                        ? 'text-slate-500'
-                                        : 'text-slate-400',
-                                    )}
-                                  >
-                                    {item.description}
-                                  </p>
-                                )}
-                              </div>
-                              {displayOptions.showPrices && (
-                                <span
-                                  className={cn(
-                                    'ml-2 font-semibold',
-                                    effectiveTheme === 'light' ? 'text-slate-900' : 'text-white',
-                                  )}
-                                >
-                                  {new Intl.NumberFormat('vi-VN').format(parseInt(item.base_price))}
-                                  đ
-                                </span>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )
-                  })}
-              </div>
-            </div>,
-          )
+        // Distribute categories into 2 columns, balancing total items
+        const distributeCategories2Col = (categories: [string, any[]][], numColumns: number) => {
+          // Sort categories by item count descending
+          const sortedCategories = categories.sort((a, b) => b[1].length - a[1].length)
+          const columns: [string, any[]][][] = Array.from({ length: numColumns }, () => [])
+          const columnTotals = Array(numColumns).fill(0)
+
+          for (const category of sortedCategories) {
+            // Find column with least items
+            const minIndex = columnTotals.indexOf(Math.min(...columnTotals))
+            columns[minIndex].push(category)
+            columnTotals[minIndex] += category[1].length
+          }
+
+          return columns
         }
-        return pages
-      } else {
-        // Single page - original logic
-        return (
+
+        const columns = distributeCategories2Col(Object.entries(pageCategories), 2)
+
+        pages.push(
           <div
+            key={pageIndex}
             className={cn(
               'flex h-full p-8',
               fontSizeClasses[fontSize],
@@ -397,296 +252,167 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
                 : 'bg-slate-800 text-slate-100',
             )}
           >
-            <div className="absolute top-4 left-1/2 -translate-x-1/2 transform text-center">
-              <h1
-                className={cn(
-                  titleSizeClasses[fontSize],
-                  'font-bold',
-                  effectiveTheme === 'light' ? 'text-slate-900' : 'text-white',
-                )}
-              >
-                {restaurantInfo.name}
-              </h1>
-              <p className={effectiveTheme === 'light' ? 'text-slate-600' : 'text-slate-300'}>
-                {restaurantInfo.address} • {restaurantInfo.phone}
-              </p>
-            </div>
-            <div className="mt-16 flex-1 pr-4">
-              {Object.entries(menuItemsByCategory)
-                .slice(0, Math.ceil(Object.keys(menuItemsByCategory).length / 2))
-                .map(([categoryId, items]) => {
-                  const category = categories.find((c) => c.id === categoryId)
-                  if (!category) return null
-                  return (
-                    <div key={categoryId} className="mb-4">
-                      <h2
-                        className={cn(
-                          'mb-2 border-b pb-1 font-bold',
-                          effectiveTheme === 'light' ? 'border-slate-200' : 'border-slate-600',
-                          categoryAccentClass,
-                        )}
-                      >
-                        {category.name}
-                      </h2>
-                      <div className="space-y-1">
-                        {items.map((item) => (
-                          <div key={item.id} className="flex justify-between">
-                            <div className="flex-1">
-                              <span
-                                className={cn(
-                                  'font-medium',
-                                  effectiveTheme === 'light' ? 'text-slate-900' : 'text-white',
-                                )}
-                              >
-                                {item.name}
-                                {displayOptions.showChefRecommendations &&
-                                  item.is_chef_recommendation && (
-                                    <span className="ml-1 text-amber-500">{chefIcon}</span>
-                                  )}
-                              </span>
-                              {displayOptions.showDescriptions && item.description && (
-                                <p
-                                  className={cn(
-                                    'mt-1',
-                                    effectiveTheme === 'light'
-                                      ? 'text-slate-500'
-                                      : 'text-slate-400',
-                                  )}
-                                >
-                                  {item.description}
-                                </p>
+            {pageIndex === 0 && (
+              <div className="absolute top-8 right-8 left-8 text-center">
+                <h1
+                  className={cn(
+                    titleSizeClasses[fontSize],
+                    'font-bold',
+                    effectiveTheme === 'light' ? 'text-slate-900' : 'text-white',
+                  )}
+                >
+                  {restaurantInfo.name}
+                </h1>
+                <p className={effectiveTheme === 'light' ? 'text-slate-600' : 'text-slate-300'}>
+                  {restaurantInfo.address} • {restaurantInfo.phone}
+                </p>
+              </div>
+            )}
+            <div className={cn('flex-1 pr-4', pageIndex === 0 ? 'mt-20' : '')}>
+              {columns[0].map(([categoryId, items]) => {
+                const category = categories.find((c) => c.id === categoryId)
+                if (!category) return null
+                return (
+                  <div key={categoryId} className="mb-4">
+                    <h2
+                      className={cn(
+                        'mb-2 border-b pb-1 font-bold',
+                        effectiveTheme === 'light' ? 'border-slate-200' : 'border-slate-600',
+                        categoryAccentClass,
+                      )}
+                    >
+                      {category.name}
+                    </h2>
+                    <div className="space-y-1">
+                      {items.map((item) => (
+                        <div key={item.id} className="flex justify-between">
+                          <div className="flex-1">
+                            <span
+                              className={cn(
+                                'font-medium',
+                                effectiveTheme === 'light' ? 'text-slate-900' : 'text-white',
                               )}
-                            </div>
-                            {displayOptions.showPrices && (
-                              <span
+                            >
+                              {item.name}
+                              {displayOptions.showChefRecommendations &&
+                                item.is_chef_recommendation && (
+                                  <span className="ml-1 text-amber-500">{chefIcon}</span>
+                                )}
+                            </span>
+                            {displayOptions.showDescriptions && item.description && (
+                              <p
                                 className={cn(
-                                  'ml-2 font-semibold',
-                                  effectiveTheme === 'light' ? 'text-slate-900' : 'text-white',
+                                  'mt-1',
+                                  effectiveTheme === 'light' ? 'text-slate-500' : 'text-slate-400',
                                 )}
                               >
-                                {new Intl.NumberFormat('vi-VN').format(parseInt(item.base_price))}đ
-                              </span>
+                                {item.description}
+                              </p>
                             )}
                           </div>
-                        ))}
-                      </div>
-                    </div>
-                  )
-                })}
-            </div>
-            <div className="mt-16 flex-1 pl-4">
-              {Object.entries(menuItemsByCategory)
-                .slice(Math.ceil(Object.keys(menuItemsByCategory).length / 2))
-                .map(([categoryId, items]) => {
-                  const category = categories.find((c) => c.id === categoryId)
-                  if (!category) return null
-                  return (
-                    <div key={categoryId} className="mb-4">
-                      <h2
-                        className={cn(
-                          'mb-2 border-b pb-1 font-bold',
-                          effectiveTheme === 'light' ? 'border-slate-200' : 'border-slate-600',
-                          categoryAccentClass,
-                        )}
-                      >
-                        {category.name}
-                      </h2>
-                      <div className="space-y-1">
-                        {items.map((item) => (
-                          <div key={item.id} className="flex justify-between">
-                            <div className="flex-1">
-                              <span
-                                className={cn(
-                                  'font-medium',
-                                  effectiveTheme === 'light' ? 'text-slate-900' : 'text-white',
-                                )}
-                              >
-                                {item.name}
-                                {displayOptions.showChefRecommendations &&
-                                  item.is_chef_recommendation && (
-                                    <span className="ml-1 text-amber-500">{chefIcon}</span>
-                                  )}
-                              </span>
-                              {displayOptions.showDescriptions && item.description && (
-                                <p
-                                  className={cn(
-                                    'mt-1',
-                                    effectiveTheme === 'light'
-                                      ? 'text-slate-500'
-                                      : 'text-slate-400',
-                                  )}
-                                >
-                                  {item.description}
-                                </p>
+                          {displayOptions.showPrices && (
+                            <span
+                              className={cn(
+                                'ml-2 font-semibold',
+                                effectiveTheme === 'light' ? 'text-slate-900' : 'text-white',
                               )}
-                            </div>
-                            {displayOptions.showPrices && (
-                              <span
+                            >
+                              {new Intl.NumberFormat('vi-VN').format(parseInt(item.base_price))}đ
+                            </span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+            <div className={cn('flex-1 pl-4', pageIndex === 0 ? 'mt-20' : '')}>
+              {columns[1].map(([categoryId, items]) => {
+                const category = categories.find((c) => c.id === categoryId)
+                if (!category) return null
+                return (
+                  <div key={categoryId} className="mb-4">
+                    <h2
+                      className={cn(
+                        'mb-2 border-b pb-1 font-bold',
+                        effectiveTheme === 'light' ? 'border-slate-200' : 'border-slate-600',
+                        categoryAccentClass,
+                      )}
+                    >
+                      {category.name}
+                    </h2>
+                    <div className="space-y-1">
+                      {items.map((item) => (
+                        <div key={item.id} className="flex justify-between">
+                          <div className="flex-1">
+                            <span
+                              className={cn(
+                                'font-medium',
+                                effectiveTheme === 'light' ? 'text-slate-900' : 'text-white',
+                              )}
+                            >
+                              {item.name}
+                              {displayOptions.showChefRecommendations &&
+                                item.is_chef_recommendation && (
+                                  <span className="ml-1 text-amber-500">{chefIcon}</span>
+                                )}
+                            </span>
+                            {displayOptions.showDescriptions && item.description && (
+                              <p
                                 className={cn(
-                                  'ml-2 font-semibold',
-                                  effectiveTheme === 'light' ? 'text-slate-900' : 'text-white',
+                                  'mt-1',
+                                  effectiveTheme === 'light' ? 'text-slate-500' : 'text-slate-400',
                                 )}
                               >
-                                {new Intl.NumberFormat('vi-VN').format(parseInt(item.base_price))}đ
-                              </span>
+                                {item.description}
+                              </p>
                             )}
                           </div>
-                        ))}
-                      </div>
+                          {displayOptions.showPrices && (
+                            <span
+                              className={cn(
+                                'ml-2 font-semibold',
+                                effectiveTheme === 'light' ? 'text-slate-900' : 'text-white',
+                              )}
+                            >
+                              {new Intl.NumberFormat('vi-VN').format(parseInt(item.base_price))}đ
+                            </span>
+                          )}
+                        </div>
+                      ))}
                     </div>
-                  )
-                })}
+                  </div>
+                )
+              })}
             </div>
-          </div>
+          </div>,
         )
       }
+      return pages
     } else if (selectedTemplate === '2') {
       // Photo-Forward Premium - add pagination if too many items
-      const totalItems = allItems.length
-      if (totalItems > maxItemsPerPage) {
-        // Create multiple pages
-        const pages = []
-        const itemsPerPage = Math.ceil(totalItems / Math.ceil(totalItems / maxItemsPerPage))
+      // Create multiple pages
+      const pages = []
 
-        for (let pageIndex = 0; pageIndex < Math.ceil(totalItems / itemsPerPage); pageIndex++) {
-          const startItem = pageIndex * itemsPerPage
-          const endItem = startItem + itemsPerPage
-          const pageItems = allItems.slice(startItem, endItem)
+      for (let pageIndex = 0; pageIndex < Math.ceil(totalItems / itemsPerPage); pageIndex++) {
+        const startItem = pageIndex * itemsPerPage
+        const endItem = startItem + itemsPerPage
+        const pageItems = allItems.slice(startItem, endItem)
 
-          // Group by category for this page
-          const pageCategories = pageItems.reduce(
-            (acc, item) => {
-              if (!acc[item.categoryId]) acc[item.categoryId] = []
-              acc[item.categoryId].push(item)
-              return acc
-            },
-            {} as Record<string, any[]>,
-          )
+        // Group by category for this page
+        const pageCategories = pageItems.reduce(
+          (acc, item) => {
+            if (!acc[item.categoryId]) acc[item.categoryId] = []
+            acc[item.categoryId].push(item)
+            return acc
+          },
+          {} as Record<string, any[]>,
+        )
 
-          pages.push(
-            <div
-              key={pageIndex}
-              className={cn(
-                'flex h-full flex-col p-8',
-                fontSizeClasses[fontSize],
-                effectiveTheme === 'light'
-                  ? 'bg-slate-50 text-slate-900'
-                  : 'bg-slate-900 text-slate-100',
-              )}
-            >
-              {pageIndex === 0 && (
-                <div className="mb-8 text-center">
-                  <h1
-                    className={cn(
-                      titleSizeClasses[fontSize],
-                      'font-bold',
-                      effectiveTheme === 'light' ? 'text-slate-900' : 'text-white',
-                    )}
-                  >
-                    {restaurantInfo.name}
-                  </h1>
-                  <p className={effectiveTheme === 'light' ? 'text-slate-600' : 'text-slate-300'}>
-                    {restaurantInfo.address} • {restaurantInfo.phone}
-                  </p>
-                </div>
-              )}
-              <div className="flex-1 space-y-6">
-                {Object.entries(pageCategories).map(([categoryId, items]) => {
-                  const category = categories.find((c) => c.id === categoryId)
-                  if (!category) return null
-                  return (
-                    <div key={categoryId}>
-                      <h2
-                        className={cn(
-                          'mb-3 border-b-2 pb-2 text-lg font-bold',
-                          effectiveTheme === 'light' ? 'border-slate-300' : 'border-slate-600',
-                          categoryAccentClass,
-                        )}
-                      >
-                        {category.name}
-                      </h2>
-                      <div className="grid grid-cols-1 gap-4">
-                        {items.map((item) => (
-                          <div
-                            key={item.id}
-                            className={cn(
-                              'flex gap-4 rounded-lg border p-4',
-                              effectiveTheme === 'light'
-                                ? 'border-slate-200 bg-white'
-                                : 'border-slate-700 bg-slate-800',
-                            )}
-                          >
-                            {item.images && item.images.length > 0 && (
-                              <div className="h-20 w-20 shrink-0">
-                                <img
-                                  src={
-                                    item.images.find((img: any) => img.is_primary)?.image_url ||
-                                    item.images[0]?.image_url ||
-                                    '/placeholder.jpg'
-                                  }
-                                  alt={item.name}
-                                  className="h-full w-full rounded-md object-cover"
-                                />
-                              </div>
-                            )}
-                            <div className="flex-1">
-                              <div className="flex items-start justify-between">
-                                <div className="flex-1">
-                                  <span
-                                    className={cn(
-                                      'text-lg font-semibold',
-                                      effectiveTheme === 'light' ? 'text-slate-900' : 'text-white',
-                                    )}
-                                  >
-                                    {item.name}
-                                    {displayOptions.showChefRecommendations &&
-                                      item.is_chef_recommendation && (
-                                        <span className="ml-2 text-amber-500">{chefIcon}</span>
-                                      )}
-                                  </span>
-                                  {displayOptions.showDescriptions && item.description && (
-                                    <p
-                                      className={cn(
-                                        'mt-2',
-                                        effectiveTheme === 'light'
-                                          ? 'text-slate-600'
-                                          : 'text-slate-300',
-                                      )}
-                                    >
-                                      {item.description}
-                                    </p>
-                                  )}
-                                </div>
-                                {displayOptions.showPrices && (
-                                  <span
-                                    className={cn(
-                                      'ml-4 text-lg font-bold',
-                                      effectiveTheme === 'light' ? 'text-slate-900' : 'text-white',
-                                    )}
-                                  >
-                                    {new Intl.NumberFormat('vi-VN').format(
-                                      parseInt(item.base_price),
-                                    )}
-                                    đ
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            </div>,
-          )
-        }
-        return pages
-      } else {
-        // Single page - original logic
-        return (
+        pages.push(
           <div
+            key={pageIndex}
             className={cn(
               'flex h-full flex-col p-8',
               fontSizeClasses[fontSize],
@@ -695,29 +421,31 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
                 : 'bg-slate-900 text-slate-100',
             )}
           >
-            <div className="mb-8 text-center">
-              <h1
-                className={cn(
-                  titleSizeClasses[fontSize],
-                  'font-bold',
-                  effectiveTheme === 'light' ? 'text-slate-900' : 'text-white',
-                )}
-              >
-                {restaurantInfo.name}
-              </h1>
-              <p className={effectiveTheme === 'light' ? 'text-slate-600' : 'text-slate-300'}>
-                {restaurantInfo.address} • {restaurantInfo.phone}
-              </p>
-            </div>
+            {pageIndex === 0 && (
+              <div className="mb-8 text-center">
+                <h1
+                  className={cn(
+                    titleSizeClasses[fontSize],
+                    'font-bold',
+                    effectiveTheme === 'light' ? 'text-slate-900' : 'text-white',
+                  )}
+                >
+                  {restaurantInfo.name}
+                </h1>
+                <p className={effectiveTheme === 'light' ? 'text-slate-600' : 'text-slate-300'}>
+                  {restaurantInfo.address} • {restaurantInfo.phone}
+                </p>
+              </div>
+            )}
             <div className="flex-1 space-y-6">
-              {Object.entries(menuItemsByCategory).map(([categoryId, items]) => {
+              {Object.entries(pageCategories).map(([categoryId, items]) => {
                 const category = categories.find((c) => c.id === categoryId)
                 if (!category) return null
                 return (
                   <div key={categoryId}>
                     <h2
                       className={cn(
-                        'mb-3 border-b-2 pb-2 text-lg font-bold',
+                        'mb-3 border-b-2 pb-2 font-bold',
                         effectiveTheme === 'light' ? 'border-slate-300' : 'border-slate-600',
                         categoryAccentClass,
                       )}
@@ -731,12 +459,12 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
                           className={cn(
                             'flex gap-4 rounded-lg border p-4',
                             effectiveTheme === 'light'
-                              ? 'border-slate-200 bg-white'
+                              ? 'border-slate-200 bg-slate-100'
                               : 'border-slate-700 bg-slate-800',
                           )}
                         >
                           {item.images && item.images.length > 0 && (
-                            <div className="h-20 w-20 shrink-0">
+                            <div className={cn(imageSizeClasses[fontSize], 'shrink-0')}>
                               <img
                                 src={
                                   item.images.find((img: any) => img.is_primary)?.image_url ||
@@ -753,7 +481,7 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
                               <div className="flex-1">
                                 <span
                                   className={cn(
-                                    'text-lg font-semibold',
+                                    'font-semibold',
                                     effectiveTheme === 'light' ? 'text-slate-900' : 'text-white',
                                   )}
                                 >
@@ -779,7 +507,7 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
                               {displayOptions.showPrices && (
                                 <span
                                   className={cn(
-                                    'ml-4 text-lg font-bold',
+                                    'ml-4 font-bold',
                                     effectiveTheme === 'light' ? 'text-slate-900' : 'text-white',
                                   )}
                                 >
@@ -796,128 +524,33 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
                 )
               })}
             </div>
-          </div>
+          </div>,
         )
       }
+      return pages
     } else if (selectedTemplate === '3') {
       // Chalkboard Dark - add pagination if too many items
-      const totalItems = allItems.length
-      if (totalItems > maxItemsPerPage) {
-        // Create multiple pages
-        const pages = []
-        const itemsPerPage = Math.ceil(totalItems / Math.ceil(totalItems / maxItemsPerPage))
+      // Create multiple pages
+      const pages = []
 
-        for (let pageIndex = 0; pageIndex < Math.ceil(totalItems / itemsPerPage); pageIndex++) {
-          const startItem = pageIndex * itemsPerPage
-          const endItem = startItem + itemsPerPage
-          const pageItems = allItems.slice(startItem, endItem)
+      for (let pageIndex = 0; pageIndex < Math.ceil(totalItems / itemsPerPage); pageIndex++) {
+        const startItem = pageIndex * itemsPerPage
+        const endItem = startItem + itemsPerPage
+        const pageItems = allItems.slice(startItem, endItem)
 
-          // Group by category for this page
-          const pageCategories = pageItems.reduce(
-            (acc, item) => {
-              if (!acc[item.categoryId]) acc[item.categoryId] = []
-              acc[item.categoryId].push(item)
-              return acc
-            },
-            {} as Record<string, any[]>,
-          )
+        // Group by category for this page
+        const pageCategories = pageItems.reduce(
+          (acc, item) => {
+            if (!acc[item.categoryId]) acc[item.categoryId] = []
+            acc[item.categoryId].push(item)
+            return acc
+          },
+          {} as Record<string, any[]>,
+        )
 
-          pages.push(
-            <div
-              key={pageIndex}
-              className={cn(
-                'flex h-full flex-col p-8',
-                fontSizeClasses[fontSize],
-                effectiveTheme === 'light'
-                  ? 'bg-white text-slate-900'
-                  : 'bg-slate-800 text-slate-100',
-              )}
-            >
-              {pageIndex === 0 && (
-                <div className="mb-6 text-center">
-                  <h1
-                    className={cn(
-                      titleSizeClasses[fontSize],
-                      'font-bold',
-                      effectiveTheme === 'light' ? 'text-slate-900' : 'text-white',
-                    )}
-                  >
-                    {restaurantInfo.name}
-                  </h1>
-                  <p className={effectiveTheme === 'light' ? 'text-slate-600' : 'text-slate-300'}>
-                    {restaurantInfo.address} • {restaurantInfo.phone}
-                  </p>
-                </div>
-              )}
-              <div className="flex-1 space-y-4">
-                {Object.entries(pageCategories).map(([categoryId, items]) => {
-                  const category = categories.find((c) => c.id === categoryId)
-                  if (!category) return null
-                  return (
-                    <div key={categoryId}>
-                      <h2
-                        className={cn(
-                          'mb-2 border-b pb-1 font-bold',
-                          effectiveTheme === 'light' ? 'border-slate-200' : 'border-slate-600',
-                          categoryAccentClass,
-                        )}
-                      >
-                        {category.name}
-                      </h2>
-                      <div className="space-y-2">
-                        {items.map((item) => (
-                          <div key={item.id} className="flex justify-between">
-                            <div className="flex-1">
-                              <span
-                                className={cn(
-                                  'font-medium',
-                                  effectiveTheme === 'light' ? 'text-slate-900' : 'text-white',
-                                )}
-                              >
-                                {item.name}
-                                {displayOptions.showChefRecommendations &&
-                                  item.is_chef_recommendation && (
-                                    <span className="ml-1 text-amber-500">{chefIcon}</span>
-                                  )}
-                              </span>
-                              {displayOptions.showDescriptions && item.description && (
-                                <p
-                                  className={cn(
-                                    'mt-1',
-                                    effectiveTheme === 'light'
-                                      ? 'text-slate-500'
-                                      : 'text-slate-400',
-                                  )}
-                                >
-                                  {item.description}
-                                </p>
-                              )}
-                            </div>
-                            {displayOptions.showPrices && (
-                              <span
-                                className={cn(
-                                  'ml-2 font-semibold',
-                                  effectiveTheme === 'light' ? 'text-slate-900' : 'text-white',
-                                )}
-                              >
-                                {new Intl.NumberFormat('vi-VN').format(parseInt(item.base_price))}đ
-                              </span>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            </div>,
-          )
-        }
-        return pages
-      } else {
-        // Single page - original logic
-        return (
+        pages.push(
           <div
+            key={pageIndex}
             className={cn(
               'flex h-full flex-col p-8',
               fontSizeClasses[fontSize],
@@ -926,22 +559,24 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
                 : 'bg-slate-800 text-slate-100',
             )}
           >
-            <div className="mb-6 text-center">
-              <h1
-                className={cn(
-                  titleSizeClasses[fontSize],
-                  'font-bold',
-                  effectiveTheme === 'light' ? 'text-slate-900' : 'text-white',
-                )}
-              >
-                {restaurantInfo.name}
-              </h1>
-              <p className={effectiveTheme === 'light' ? 'text-slate-600' : 'text-slate-300'}>
-                {restaurantInfo.address} • {restaurantInfo.phone}
-              </p>
-            </div>
+            {pageIndex === 0 && (
+              <div className="mb-6 text-center">
+                <h1
+                  className={cn(
+                    titleSizeClasses[fontSize],
+                    'font-bold',
+                    effectiveTheme === 'light' ? 'text-slate-900' : 'text-white',
+                  )}
+                >
+                  {restaurantInfo.name}
+                </h1>
+                <p className={effectiveTheme === 'light' ? 'text-slate-600' : 'text-slate-300'}>
+                  {restaurantInfo.address} • {restaurantInfo.phone}
+                </p>
+              </div>
+            )}
             <div className="flex-1 space-y-4">
-              {Object.entries(menuItemsByCategory).map(([categoryId, items]) => {
+              {Object.entries(pageCategories).map(([categoryId, items]) => {
                 const category = categories.find((c) => c.id === categoryId)
                 if (!category) return null
                 return (
@@ -999,13 +634,32 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
                 )
               })}
             </div>
-          </div>
+          </div>,
         )
       }
+      return pages
     } else if (selectedTemplate === '4') {
       // Tri-Fold Classic - Horizontal A4 with separators
       const categoriesArray = Object.entries(menuItemsByCategory)
-      const itemsPerSection = Math.ceil(categoriesArray.length / 3)
+
+      // Distribute categories into 3 columns, balancing total items
+      const distributeCategories = (categories: [string, MenuItem[]][], numColumns: number) => {
+        // Sort categories by item count descending
+        const sortedCategories = categories.sort((a, b) => b[1].length - a[1].length)
+        const columns: [string, MenuItem[]][][] = Array.from({ length: numColumns }, () => [])
+        const columnTotals = Array(numColumns).fill(0)
+
+        for (const category of sortedCategories) {
+          // Find column with least items
+          const minIndex = columnTotals.indexOf(Math.min(...columnTotals))
+          columns[minIndex].push(category)
+          columnTotals[minIndex] += category[1].length
+        }
+
+        return columns
+      }
+
+      const columns = distributeCategories(categoriesArray, 3)
 
       return (
         <div
@@ -1015,7 +669,7 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
             effectiveTheme === 'light' ? 'bg-white text-slate-900' : 'bg-slate-800 text-slate-100',
           )}
         >
-          <div className="absolute top-4 left-1/2 -translate-x-1/2 transform text-center">
+          <div className="absolute top-8 right-8 left-8 text-center">
             <h1
               className={cn(
                 titleSizeClasses[fontSize],
@@ -1029,10 +683,10 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
               {restaurantInfo.address} • {restaurantInfo.phone}
             </p>
           </div>
-          <div className="mt-16 flex flex-1">
+          <div className="mt-20 flex flex-1">
             {/* Section 1 */}
             <div className="flex-1 border-r border-slate-300 pr-4 dark:border-slate-600">
-              {categoriesArray.slice(0, itemsPerSection).map(([categoryId, items]) => {
+              {columns[0].map(([categoryId, items]) => {
                 const category = categories.find((c) => c.id === categoryId)
                 if (!category) return null
                 return (
@@ -1047,7 +701,7 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
                       {category.name}
                     </h2>
                     <div className="space-y-1">
-                      {items.map((item) => (
+                      {items.slice(0, maxItemsPerPage).map((item) => (
                         <div key={item.id} className="flex justify-between">
                           <div className="flex-1">
                             <span
@@ -1093,72 +747,7 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
 
             {/* Section 2 */}
             <div className="flex-1 border-r border-slate-300 px-4 dark:border-slate-600">
-              {categoriesArray
-                .slice(itemsPerSection, itemsPerSection * 2)
-                .map(([categoryId, items]) => {
-                  const category = categories.find((c) => c.id === categoryId)
-                  if (!category) return null
-                  return (
-                    <div key={categoryId} className="mb-4">
-                      <h2
-                        className={cn(
-                          'mb-2 border-b pb-1 font-bold',
-                          effectiveTheme === 'light' ? 'border-slate-200' : 'border-slate-600',
-                          categoryAccentClass,
-                        )}
-                      >
-                        {category.name}
-                      </h2>
-                      <div className="space-y-1">
-                        {items.map((item) => (
-                          <div key={item.id} className="flex justify-between">
-                            <div className="flex-1">
-                              <span
-                                className={cn(
-                                  'font-medium',
-                                  effectiveTheme === 'light' ? 'text-slate-900' : 'text-white',
-                                )}
-                              >
-                                {item.name}
-                                {displayOptions.showChefRecommendations &&
-                                  item.is_chef_recommendation && (
-                                    <span className="ml-1 text-amber-500">{chefIcon}</span>
-                                  )}
-                              </span>
-                              {displayOptions.showDescriptions && item.description && (
-                                <p
-                                  className={cn(
-                                    'mt-1',
-                                    effectiveTheme === 'light'
-                                      ? 'text-slate-500'
-                                      : 'text-slate-400',
-                                  )}
-                                >
-                                  {item.description}
-                                </p>
-                              )}
-                            </div>
-                            {displayOptions.showPrices && (
-                              <span
-                                className={cn(
-                                  'ml-2 font-semibold',
-                                  effectiveTheme === 'light' ? 'text-slate-900' : 'text-white',
-                                )}
-                              >
-                                {new Intl.NumberFormat('vi-VN').format(parseInt(item.base_price))}đ
-                              </span>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )
-                })}
-            </div>
-
-            {/* Section 3 */}
-            <div className="flex-1 pl-4">
-              {categoriesArray.slice(itemsPerSection * 2).map(([categoryId, items]) => {
+              {columns[1].map(([categoryId, items]) => {
                 const category = categories.find((c) => c.id === categoryId)
                 if (!category) return null
                 return (
@@ -1173,7 +762,68 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
                       {category.name}
                     </h2>
                     <div className="space-y-1">
-                      {items.map((item) => (
+                      {items.slice(0, maxItemsPerPage).map((item) => (
+                        <div key={item.id} className="flex justify-between">
+                          <div className="flex-1">
+                            <span
+                              className={cn(
+                                'font-medium',
+                                effectiveTheme === 'light' ? 'text-slate-900' : 'text-white',
+                              )}
+                            >
+                              {item.name}
+                              {displayOptions.showChefRecommendations &&
+                                item.is_chef_recommendation && (
+                                  <span className="ml-1 text-amber-500">{chefIcon}</span>
+                                )}
+                            </span>
+                            {displayOptions.showDescriptions && item.description && (
+                              <p
+                                className={cn(
+                                  'mt-1',
+                                  effectiveTheme === 'light' ? 'text-slate-500' : 'text-slate-400',
+                                )}
+                              >
+                                {item.description}
+                              </p>
+                            )}
+                          </div>
+                          {displayOptions.showPrices && (
+                            <span
+                              className={cn(
+                                'ml-2 font-semibold',
+                                effectiveTheme === 'light' ? 'text-slate-900' : 'text-white',
+                              )}
+                            >
+                              {new Intl.NumberFormat('vi-VN').format(parseInt(item.base_price))}đ
+                            </span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+
+            {/* Section 3 */}
+            <div className="flex-1 pl-4">
+              {columns[2].map(([categoryId, items]) => {
+                const category = categories.find((c) => c.id === categoryId)
+                if (!category) return null
+                return (
+                  <div key={categoryId} className="mb-4">
+                    <h2
+                      className={cn(
+                        'mb-2 border-b pb-1 font-bold',
+                        effectiveTheme === 'light' ? 'border-slate-200' : 'border-slate-600',
+                        categoryAccentClass,
+                      )}
+                    >
+                      {category.name}
+                    </h2>
+                    <div className="space-y-1">
+                      {items.slice(0, maxItemsPerPage).map((item) => (
                         <div key={item.id} className="flex justify-between">
                           <div className="flex-1">
                             <span
@@ -1221,149 +871,51 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
       )
     } else {
       // Default single column - add pagination if too many items
-      const totalItems = allItems.length
-      if (totalItems > maxItemsPerPage) {
-        // Create multiple pages
-        const pages = []
-        const itemsPerPage = Math.ceil(totalItems / Math.ceil(totalItems / maxItemsPerPage))
+      // Create multiple pages
+      const pages = []
 
-        for (let pageIndex = 0; pageIndex < Math.ceil(totalItems / itemsPerPage); pageIndex++) {
-          const startItem = pageIndex * itemsPerPage
-          const endItem = startItem + itemsPerPage
-          const pageItems = allItems.slice(startItem, endItem)
+      for (let pageIndex = 0; pageIndex < Math.ceil(totalItems / itemsPerPage); pageIndex++) {
+        const startItem = pageIndex * itemsPerPage
+        const endItem = startItem + itemsPerPage
+        const pageItems = allItems.slice(startItem, endItem)
 
-          // Group by category for this page
-          const pageCategories = pageItems.reduce(
-            (acc, item) => {
-              if (!acc[item.categoryId]) acc[item.categoryId] = []
-              acc[item.categoryId].push(item)
-              return acc
-            },
-            {} as Record<string, any[]>,
-          )
+        // Group by category for this page
+        const pageCategories = pageItems.reduce(
+          (acc, item) => {
+            if (!acc[item.categoryId]) acc[item.categoryId] = []
+            acc[item.categoryId].push(item)
+            return acc
+          },
+          {} as Record<string, any[]>,
+        )
 
-          pages.push(
-            <div
-              key={pageIndex}
-              className={cn(
-                'flex h-full flex-col p-8',
-                fontSizeClasses[fontSize],
-                effectiveTheme === 'light' ? 'text-slate-900' : 'text-slate-100',
-              )}
-            >
-              {pageIndex === 0 && (
-                <div className="mb-6 text-center">
-                  <h1
-                    className={cn(
-                      titleSizeClasses[fontSize],
-                      'font-bold',
-                      effectiveTheme === 'light' ? 'text-slate-900' : 'text-white',
-                    )}
-                  >
-                    {restaurantInfo.name}
-                  </h1>
-                  <p className={effectiveTheme === 'light' ? 'text-slate-600' : 'text-slate-300'}>
-                    {restaurantInfo.address} • {restaurantInfo.phone}
-                  </p>
-                </div>
-              )}
-              <div className="flex-1 space-y-4">
-                {Object.entries(pageCategories).map(([categoryId, items]) => {
-                  const category = categories.find((c) => c.id === categoryId)
-                  if (!category) return null
-
-                  return (
-                    <div key={categoryId}>
-                      <h2
-                        className={cn(
-                          'mb-2 pb-1 font-bold',
-                          selectedTemplate === '3'
-                            ? 'border-b border-slate-600'
-                            : effectiveTheme === 'light'
-                              ? 'border-b border-slate-200'
-                              : 'border-b border-slate-600',
-                          categoryAccentClass,
-                        )}
-                      >
-                        {category.name}
-                      </h2>
-                      <div className="space-y-2">
-                        {items.map((item) => (
-                          <div key={item.id} className="flex justify-between">
-                            <div className="flex-1">
-                              <span
-                                className={cn(
-                                  'font-medium',
-                                  effectiveTheme === 'light' ? 'text-slate-900' : 'text-white',
-                                )}
-                              >
-                                {item.name}
-                                {displayOptions.showChefRecommendations &&
-                                  item.is_chef_recommendation && (
-                                    <span className="ml-1 text-amber-500">{chefIcon}</span>
-                                  )}
-                              </span>
-                              {displayOptions.showDescriptions && item.description && (
-                                <p
-                                  className={cn(
-                                    'mt-1',
-                                    effectiveTheme === 'light'
-                                      ? 'text-slate-500'
-                                      : 'text-slate-400',
-                                  )}
-                                >
-                                  {item.description}
-                                </p>
-                              )}
-                            </div>
-                            {displayOptions.showPrices && (
-                              <span
-                                className={cn(
-                                  'ml-2 font-semibold',
-                                  effectiveTheme === 'light' ? 'text-slate-900' : 'text-white',
-                                )}
-                              >
-                                {new Intl.NumberFormat('vi-VN').format(parseInt(item.base_price))}đ
-                              </span>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )
-                })}
-                {Object.keys(pageCategories).length === 0 && (
-                  <div className="flex items-center justify-center py-8">
-                    <p className={effectiveTheme === 'light' ? 'text-slate-500' : 'text-slate-400'}>
-                      Chọn danh mục để xem trước
-                    </p>
-                  </div>
-                )}
+        pages.push(
+          <div
+            key={pageIndex}
+            className={cn(
+              'flex h-full flex-col p-8',
+              fontSizeClasses[fontSize],
+              effectiveTheme === 'light' ? 'text-slate-900' : 'text-slate-100',
+            )}
+          >
+            {pageIndex === 0 && (
+              <div className="mb-6 text-center">
+                <h1
+                  className={cn(
+                    titleSizeClasses[fontSize],
+                    'font-bold',
+                    effectiveTheme === 'light' ? 'text-slate-900' : 'text-white',
+                  )}
+                >
+                  {restaurantInfo.name}
+                </h1>
+                <p className={effectiveTheme === 'light' ? 'text-slate-600' : 'text-slate-300'}>
+                  {restaurantInfo.address} • {restaurantInfo.phone}
+                </p>
               </div>
-            </div>,
-          )
-        }
-        return pages
-      } else {
-        // Single page - original logic
-        return (
-          <div className={cn('flex h-full flex-col p-8', fontSizeClasses[fontSize])}>
-            <div className="mb-6 text-center">
-              <h1
-                className={cn(
-                  titleSizeClasses[fontSize],
-                  'font-bold',
-                  effectiveTheme === 'light' ? 'text-slate-900' : 'text-white',
-                )}
-              >
-                {restaurantInfo.name}
-              </h1>
-              <p className={effectiveTheme === 'light' ? 'text-slate-600' : 'text-slate-300'}>
-                {restaurantInfo.address} • {restaurantInfo.phone}
-              </p>
-            </div>
+            )}
             <div className="flex-1 space-y-4">
-              {Object.entries(menuItemsByCategory).map(([categoryId, items]) => {
+              {Object.entries(pageCategories).map(([categoryId, items]) => {
                 const category = categories.find((c) => c.id === categoryId)
                 if (!category) return null
 
@@ -1372,9 +924,11 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
                     <h2
                       className={cn(
                         'mb-2 pb-1 font-bold',
-                        effectiveTheme === 'light'
-                          ? 'border-b border-slate-200'
-                          : 'border-b border-slate-600',
+                        selectedTemplate === '3'
+                          ? 'border-b border-slate-600'
+                          : effectiveTheme === 'light'
+                            ? 'border-b border-slate-200'
+                            : 'border-b border-slate-600',
                         categoryAccentClass,
                       )}
                     >
@@ -1423,7 +977,7 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
                   </div>
                 )
               })}
-              {Object.keys(menuItemsByCategory).length === 0 && (
+              {Object.keys(pageCategories).length === 0 && (
                 <div className="flex items-center justify-center py-8">
                   <p className={effectiveTheme === 'light' ? 'text-slate-500' : 'text-slate-400'}>
                     Chọn danh mục để xem trước
@@ -1431,9 +985,10 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
                 </div>
               )}
             </div>
-          </div>
+          </div>,
         )
       }
+      return pages
     }
   }
 
@@ -1454,6 +1009,7 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
         selectedTemplate,
         fontSize,
         chefIcon,
+        maxItemsPerPage,
       )
 
       const url = URL.createObjectURL(pdfBlob)
@@ -1467,7 +1023,7 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
       URL.revokeObjectURL(url)
     } catch (error) {
       console.error('Export failed:', error)
-      alert('Xuất thất bại. Vui lòng thử lại hoặc liên hệ hỗ trợ nếu vấn đề vẫn tiếp tục.')
+      alert(t('exportError'))
     } finally {
       setIsExporting(false)
     }
@@ -1499,8 +1055,8 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
   if (!templates || templates.length === 0) {
     return (
       <ContainerErrorState
-        title="Không tìm thấy mẫu menu"
-        description="Không có mẫu menu nào khả dụng. Vui lòng tạo mẫu menu trước."
+        title={t('noTemplates')}
+        description={t('noTemplatesDesc')}
         withCard={false}
       />
     )
@@ -1510,8 +1066,8 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
   if (!selectedTemplateData) {
     return (
       <ContainerErrorState
-        title="Mẫu menu không tồn tại"
-        description="Mẫu menu đã chọn không tìm thấy. Vui lòng chọn mẫu khác."
+        title={t('templateNotFound')}
+        description={t('templateNotFoundDesc')}
         withCard={false}
       />
     )
@@ -1519,15 +1075,15 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
 
   // Check for loading states
   if (categoriesLoading || menuItemsLoading || tenantLoading) {
-    return <ContainerLoadingState text="Đang tải dữ liệu menu..." withCard={false} />
+    return <ContainerLoadingState text={t('loadingMenu')} withCard={false} />
   }
 
   // Check for error states
   if (categoriesError || menuItemsError || tenantError) {
     return (
       <ContainerErrorState
-        title="Lỗi tải dữ liệu"
-        description="Không thể tải dữ liệu menu. Vui lòng thử lại."
+        title={t('loadError')}
+        description={t('loadErrorDesc')}
         onRetry={() => {
           // Invalidate queries to retry
           // Note: This would require queryClient, but for simplicity we'll just show the error
@@ -1545,7 +1101,7 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
           <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
             {templates.find((t) => t.id === selectedTemplate)?.name}
           </h3>
-          <p className="text-sm text-slate-500 dark:text-slate-400">Thiết kế menu của bạn</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">{t('designYourMenu')}</p>
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -1586,7 +1142,7 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
                     : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400'
                 }`}
               >
-                Nguồn dữ liệu
+                {t('dataSource')}
               </button>
               <button
                 onClick={() => setActiveTab('style')}
@@ -1596,7 +1152,7 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
                     : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400'
                 }`}
               >
-                Tuỳ chỉnh style
+                {t('styleCustomization')}
               </button>
             </div>
           </div>
@@ -1608,11 +1164,11 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
                 {/* Restaurant Info */}
                 <div className="space-y-2">
                   <p className="text-xs font-medium text-slate-700 dark:text-slate-300">
-                    Thông tin nhà hàng
+                    {t('restaurantInfo')}
                   </p>
                   <input
                     type="text"
-                    placeholder="Tên nhà hàng"
+                    placeholder={t('restaurantName')}
                     value={restaurantInfo.name}
                     onChange={(e) =>
                       setRestaurantInfo((prev) => ({ ...prev, name: e.target.value }))
@@ -1621,7 +1177,7 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
                   />
                   <input
                     type="text"
-                    placeholder="Địa chỉ"
+                    placeholder={t('address')}
                     value={restaurantInfo.address}
                     onChange={(e) =>
                       setRestaurantInfo((prev) => ({ ...prev, address: e.target.value }))
@@ -1630,7 +1186,7 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
                   />
                   <input
                     type="text"
-                    placeholder="Hotline"
+                    placeholder={t('phone')}
                     value={restaurantInfo.phone}
                     onChange={(e) =>
                       setRestaurantInfo((prev) => ({ ...prev, phone: e.target.value }))
@@ -1641,7 +1197,7 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
 
                 <div className="space-y-2">
                   <p className="text-xs font-medium text-slate-700 dark:text-slate-300">
-                    Danh mục ({categories.length})
+                    {t('categories')} ({categories.length})
                   </p>
                   <div className="max-h-48 space-y-1 overflow-y-auto">
                     {/* All categories checkbox */}
@@ -1670,7 +1226,7 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
                         className="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
                       />
                       <span className="text-slate-700 dark:text-slate-300">
-                        Tất cả ({selectedCategories.size}/{categories.length})
+                        {t('selectAll')} ({selectedCategories.size}/{categories.length})
                       </span>
                     </label>
                     {categories.map((category) => (
@@ -1699,7 +1255,7 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
 
                 <div className="space-y-2">
                   <p className="text-xs font-medium text-slate-700 dark:text-slate-300">
-                    Trạng thái
+                    {t('status')}
                   </p>
                   <label className="flex items-center gap-2 text-sm">
                     <input
@@ -1708,17 +1264,17 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
                       className="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
                     />
                     <span className="text-slate-700 dark:text-slate-300">
-                      Ẩn món hết hàng/không khả dụng
+                      {t('hideUnavailable')}
                     </span>
                   </label>
                 </div>
 
                 <div className="rounded-lg bg-slate-50 p-3 dark:bg-slate-800">
                   <p className="text-xs font-medium text-slate-700 dark:text-slate-300">
-                    Tổng số món: {filteredMenuItems.length}
+                    {t('totalItems')}: {filteredMenuItems.length}
                   </p>
                   <p className="text-xs text-slate-500 dark:text-slate-400">
-                    {Object.keys(menuItemsByCategory).length} danh mục được chọn
+                    {Object.keys(menuItemsByCategory).length} {t('categoriesSelected')}
                   </p>
                 </div>
               </div>
@@ -1729,7 +1285,7 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
                 {/* Theme */}
                 <div className="space-y-2">
                   <p className="text-xs font-medium text-slate-700 dark:text-slate-300">
-                    Giao diện
+                    {t('theme')}
                   </p>
                   <div className="grid grid-cols-2 gap-2">
                     <button
@@ -1741,7 +1297,7 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
                           : 'border-slate-200 dark:border-slate-700',
                       )}
                     >
-                      Sáng
+                      {t('light')}
                     </button>
                     <button
                       onClick={() => setTheme('dark')}
@@ -1752,14 +1308,16 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
                           : 'border-slate-200 dark:border-slate-700',
                       )}
                     >
-                      Tối
+                      {t('dark')}
                     </button>
                   </div>
                 </div>
 
                 {/* Accent Color */}
                 <div className="space-y-2">
-                  <p className="text-xs font-medium text-slate-700 dark:text-slate-300">Màu nhấn</p>
+                  <p className="text-xs font-medium text-slate-700 dark:text-slate-300">
+                    {t('accentColor')}
+                  </p>
                   <div className="flex gap-2">
                     {['emerald', 'blue', 'amber', 'rose'].map((color) => (
                       <button
@@ -1782,7 +1340,9 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
 
                 {/* Options */}
                 <div className="space-y-2">
-                  <p className="text-xs font-medium text-slate-700 dark:text-slate-300">Hiển thị</p>
+                  <p className="text-xs font-medium text-slate-700 dark:text-slate-300">
+                    {t('display')}
+                  </p>
                   <div className="space-y-2 text-sm">
                     <label className="flex items-center gap-2">
                       <input
@@ -1793,7 +1353,7 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
                         }
                         className="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
                       />
-                      <span className="text-slate-700 dark:text-slate-300">Hiển thị giá</span>
+                      <span className="text-slate-700 dark:text-slate-300">{t('showPrices')}</span>
                     </label>
                     <label className="flex items-center gap-2">
                       <input
@@ -1807,7 +1367,9 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
                         }
                         className="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
                       />
-                      <span className="text-slate-700 dark:text-slate-300">Hiển thị mô tả</span>
+                      <span className="text-slate-700 dark:text-slate-300">
+                        {t('showDescriptions')}
+                      </span>
                     </label>
                     <label className="flex items-center gap-2">
                       <input
@@ -1822,16 +1384,59 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
                         className="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
                       />
                       <span className="text-slate-700 dark:text-slate-300">
-                        Biểu tượng món chef yêu thích
+                        {t('showChefBadge')}
                       </span>
                     </label>
                   </div>
                 </div>
+
+                {/* Max Items Per Page */}
+                <div className="space-y-2">
+                  <p className="text-xs font-medium text-slate-700 dark:text-slate-300">
+                    {selectedTemplate !== '4' ? t('maxItemsPerPage') : t('maxItemsPerCategory')}
+                  </p>
+                  <input
+                    type="number"
+                    min="1"
+                    max="100"
+                    value={maxItemsPerPage}
+                    onChange={(e) => setMaxItemsPerPage(parseInt(e.target.value) || 15)}
+                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+                  />
+                </div>
+
+                {/* Font Size */}
+                <div className="space-y-2">
+                  <p className="text-xs font-medium text-slate-700 dark:text-slate-300">
+                    {t('fontSize')}
+                  </p>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { value: 'small', label: t('fontSmall') },
+                      { value: 'medium', label: t('fontMedium') },
+                      { value: 'large', label: t('fontLarge') },
+                    ].map((size) => (
+                      <button
+                        key={size.value}
+                        onClick={() => setFontSize(size.value as 'small' | 'medium' | 'large')}
+                        className={cn(
+                          'rounded-lg border-2 p-2 text-sm transition-all',
+                          fontSize === size.value
+                            ? 'border-emerald-500 bg-emerald-50 dark:border-emerald-600 dark:bg-emerald-500/10'
+                            : 'border-slate-200 dark:border-slate-700',
+                        )}
+                      >
+                        {size.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
                 {/* Chef Icon Selection */}
                 {displayOptions.showChefRecommendations && (
                   <div className="space-y-2">
                     <p className="text-xs font-medium text-slate-700 dark:text-slate-300">
-                      Chọn biểu tượng chef
+                      {t('selectChefIcon')}
                     </p>
                     <div className="grid grid-cols-6 gap-2">
                       {['⭐', '👨‍🍳', '🔥', '❤️', '🌟', '👑', '🥇', '💎', '🎯', '🏆', '✨', '💫'].map(
@@ -1871,26 +1476,18 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
                     const allItems = Object.entries(menuItemsByCategory).flatMap(
                       ([categoryId, items]) => items.map((item) => ({ ...item, categoryId })),
                     )
-                    const maxItemsPerPage =
-                      selectedTemplate === '1'
-                        ? 16
-                        : selectedTemplate === '2'
-                          ? 8
-                          : selectedTemplate === '3'
-                            ? 20
-                            : 15
                     return allItems.length <= maxItemsPerPage
                       ? 1
                       : Math.ceil(allItems.length / maxItemsPerPage)
                   })()}{' '}
-                  trang
+                  {t('pages')}
                 </Badge>
               </div>
               <div className="flex items-center gap-2">
                 {/* Reset View */}
                 <Button variant="ghost" size="sm" onClick={resetView} className="h-8">
                   <Eye className="mr-1 h-4 w-4" />
-                  Đặt lại
+                  {t('resetView')}
                 </Button>
 
                 {/* Font Size */}
@@ -1898,16 +1495,24 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline" size="sm">
                       Font:{' '}
-                      {fontSize === 'small' ? 'Nhỏ' : fontSize === 'medium' ? 'Trung bình' : 'Lớn'}{' '}
+                      {fontSize === 'small'
+                        ? t('fontSmall')
+                        : fontSize === 'medium'
+                          ? t('fontMedium')
+                          : t('fontLarge')}{' '}
                       <ChevronDown className="ml-1 h-3 w-3" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => setFontSize('small')}>Nhỏ</DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setFontSize('medium')}>
-                      Trung bình
+                    <DropdownMenuItem onClick={() => setFontSize('small')}>
+                      {t('fontSmall')}
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setFontSize('large')}>Lớn</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setFontSize('medium')}>
+                      {t('fontMedium')}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setFontSize('large')}>
+                      {t('fontLarge')}
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
 
@@ -1922,12 +1527,12 @@ export function TemplateExport({ templates, selectedTemplate }: TemplateExportPr
                     {isExporting ? (
                       <>
                         <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                        Đang xuất...
+                        {t('exporting')}
                       </>
                     ) : (
                       <>
                         <Download className="mr-2 h-4 w-4" />
-                        Xuất PDF
+                        {t('exportPdf')}
                       </>
                     )}
                   </Button>

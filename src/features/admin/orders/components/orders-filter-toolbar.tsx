@@ -1,60 +1,100 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { Button } from '@/src/components/ui/button'
+import { useState, useEffect, useMemo } from 'react'
 import { Switch } from '@/src/components/ui/switch'
 import { SearchInput } from '@/src/components/ui/search-input'
 import { FilterDropdown, type FilterOption } from '@/src/components/ui/filter-dropdown'
-import { Download } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { AdminFilterToolbarWrapper } from '../../shared/components/admin-filter-toolbar-wrapper'
 import { cn } from '@/src/lib/utils'
-
-const STATUS_OPTIONS = [
-  { value: 'all', label: 'Tất cả' },
-  { value: 'new', label: 'Mới/Chờ xử lý' },
-  { value: 'accepted', label: 'Đã nhận' },
-  { value: 'preparing', label: 'Đang chuẩn bị' },
-  { value: 'ready', label: 'Sẵn sàng' },
-  { value: 'served', label: 'Đã phục vụ' },
-  { value: 'completed', label: 'Hoàn thành' },
-  { value: 'cancelled', label: 'Đã hủy' },
-]
-
-const TIME_RANGE_OPTIONS: FilterOption[] = [
-  { value: 'today', label: 'Hôm nay' },
-  { value: 'last24h', label: '24h qua' },
-  { value: 'last7d', label: '7 ngày qua' },
-  { value: 'custom', label: 'Tùy chỉnh' },
-]
-
-// Table options - currently mock data, will be from API later
-const TABLE_OPTIONS: FilterOption[] = [
-  { value: 'all', label: 'Tất cả' },
-  { value: '1', label: 'Bàn 1' },
-  { value: '2', label: 'Bàn 2' },
-  { value: '3', label: 'Bàn 3' },
-  { value: '5', label: 'Bàn 5' },
-  { value: '7', label: 'Bàn 7' },
-  { value: '12', label: 'Bàn 12' },
-]
+import { useOrdersSocket } from '../hooks'
+import { useTablesQuery } from '@/src/features/admin/tables/queries'
+import { useZonesSimpleQuery } from '@/src/features/admin/tables/queries/zones.queries'
+import { useTranslations } from 'next-intl'
 
 export function OrdersFilterToolbar() {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const t = useTranslations('orders')
+
+  const STATUS_OPTIONS = [
+    { value: 'all', label: t('all') },
+    { value: 'pending', label: t('pending') },
+    { value: 'accepted', label: t('accepted') },
+    { value: 'in_progress', label: t('preparing') },
+    { value: 'ready', label: t('ready') },
+    { value: 'served', label: t('served') },
+    { value: 'completed', label: t('completed') },
+    { value: 'rejected', label: t('rejected') },
+    { value: 'cancelled', label: t('cancelled') },
+    { value: 'abandoned', label: t('abandoned') },
+  ]
+
+  const TIME_RANGE_OPTIONS: FilterOption[] = [
+    { value: 'all', label: t('all') },
+    { value: 'today', label: t('today') },
+    { value: 'last24h', label: t('last24h') },
+    { value: 'last7d', label: t('last7d') },
+  ]
 
   const [search, setSearch] = useState(searchParams.get('q') || '')
   const [status, setStatus] = useState(searchParams.get('status') || 'all')
+  const [zoneId, setZoneId] = useState(searchParams.get('zoneId') || 'all')
   const [tableId, setTableId] = useState(searchParams.get('tableId') || 'all')
-  const [timeRange, setTimeRange] = useState(searchParams.get('timeRange') || 'today')
+  const [timeRange, setTimeRange] = useState(searchParams.get('timeRange') || 'all')
   const [autoRefresh, setAutoRefresh] = useState(true)
-  const [isConnected, setIsConnected] = useState(true)
+
+  // Connect to WebSocket for real-time updates
+  const { isConnected } = useOrdersSocket({
+    enabled: autoRefresh,
+    showNotifications: true,
+  })
+
+  // Fetch zones for filter dropdown
+  const { data: zonesData } = useZonesSimpleQuery()
+
+  // Fetch tables for filter dropdown (filtered by zone if selected)
+  const { data: tablesData } = useTablesQuery({
+    limit: 100,
+    ...(zoneId !== 'all' && { zone_id: zoneId }),
+  })
+
+  // Build zone options from API data
+  const zoneOptions = useMemo((): FilterOption[] => {
+    const options: FilterOption[] = [{ value: 'all', label: t('all') }]
+
+    if (zonesData?.zones) {
+      zonesData.zones.forEach((zone) => {
+        options.push({
+          value: zone.id,
+          label: zone.name,
+        })
+      })
+    }
+
+    return options
+  }, [zonesData, t])
+
+  // Build table options from API data
+  const tableOptions = useMemo((): FilterOption[] => {
+    const options: FilterOption[] = [{ value: 'all', label: t('all') }]
+
+    if (tablesData?.data?.tables) {
+      tablesData.data.tables.forEach((table) => {
+        options.push({
+          value: table.id,
+          label: `${t('table')} ${table.table_number}`,
+        })
+      })
+    }
+
+    return options
+  }, [tablesData, t])
 
   // Update URL params when filters change
   const updateFilter = (key: string, value: string) => {
     const params = new URLSearchParams(searchParams.toString())
-    const isDefaultValue =
-      value === '' || value === 'all' || (key === 'timeRange' && value === 'today')
+    const isDefaultValue = value === '' || value === 'all'
 
     if (isDefaultValue) {
       params.delete(key)
@@ -76,6 +116,16 @@ export function OrdersFilterToolbar() {
   const handleStatusChange = (value: string) => {
     setStatus(value)
     updateFilter('status', value)
+  }
+
+  const handleZoneChange = (value: string) => {
+    setZoneId(value)
+    updateFilter('zoneId', value)
+    // Reset table when zone changes
+    if (tableId !== 'all') {
+      setTableId('all')
+      updateFilter('tableId', 'all')
+    }
   }
 
   const handleTableChange = (value: string) => {
@@ -112,22 +162,26 @@ export function OrdersFilterToolbar() {
       <AdminFilterToolbarWrapper>
         {/* Left: Filters */}
         <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
-          <SearchInput
-            placeholder="Tìm theo Order ID / khách / ghi chú..."
-            value={search}
-            onChange={setSearch}
+          <SearchInput placeholder={t('searchPlaceholder')} value={search} onChange={setSearch} />
+
+          <FilterDropdown
+            label={`${t('zone')}:`}
+            value={zoneId}
+            options={zoneOptions}
+            onChange={handleZoneChange}
+            placeholder={t('all')}
           />
 
           <FilterDropdown
-            label="Bàn:"
+            label={`${t('table')}:`}
             value={tableId}
-            options={TABLE_OPTIONS}
+            options={tableOptions}
             onChange={handleTableChange}
-            placeholder="Tất cả"
+            placeholder={t('all')}
           />
 
           <FilterDropdown
-            label="Thời gian:"
+            label={`${t('timeRange')}:`}
             value={timeRange}
             options={TIME_RANGE_OPTIONS}
             onChange={handleTimeRangeChange}
@@ -143,20 +197,14 @@ export function OrdersFilterToolbar() {
               htmlFor="auto-refresh"
               className="text-xs font-medium text-slate-700 dark:text-slate-300"
             >
-              Tự động làm mới
+              {t('autoRefresh')}
             </label>
             {/* Connection Status */}
             <div
               className={cn('h-2 w-2 rounded-full', isConnected ? 'bg-emerald-500' : 'bg-red-500')}
-              title={isConnected ? 'Đã kết nối' : 'Mất kết nối'}
+              title={isConnected ? t('connected') : t('disconnected')}
             />
           </div>
-
-          {/* Export Button */}
-          <Button variant="outline" className="h-8 gap-1 rounded-lg bg-transparent px-3">
-            <Download className="h-3 w-3" />
-            <span className="hidden text-sm sm:inline">Xuất báo cáo</span>
-          </Button>
         </div>
       </AdminFilterToolbarWrapper>
     </div>

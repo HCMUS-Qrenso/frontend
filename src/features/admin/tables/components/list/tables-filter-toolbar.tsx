@@ -9,32 +9,15 @@ import Link from 'next/link'
 import { AdminFilterToolbarWrapper } from '../../../shared/components/admin-filter-toolbar-wrapper'
 import { useRouter, useSearchParams } from 'next/navigation'
 import type { SimpleZone } from '@/src/features/admin/tables/types'
+import { useTranslations } from 'next-intl'
+import { useAuth } from '@/src/features/auth/hooks'
+import { ROLES } from '@/src/types/roles'
 
 interface TablesFilterToolbarProps {
   isTrashView?: boolean
   onCreate: () => void
   zones: SimpleZone[] | undefined
 }
-
-const STATUS_OPTIONS: FilterOption[] = [
-  { value: '', label: 'Tất cả' },
-  { value: 'available', label: 'Trống' },
-  { value: 'occupied', label: 'Đang sử dụng' },
-  { value: 'reserved', label: 'Đã đặt trước' },
-  { value: 'maintenance', label: 'Bảo trì' },
-]
-
-const SORT_BY_OPTIONS: FilterOption[] = [
-  { value: 'tableNumber', label: 'Số bàn' },
-  { value: 'status', label: 'Trạng thái' },
-  { value: 'createdAt', label: 'Ngày tạo' },
-  { value: 'updatedAt', label: 'Ngày cập nhật' },
-]
-
-const SORT_ORDER_OPTIONS: FilterOption[] = [
-  { value: 'asc', label: 'Tăng dần' },
-  { value: 'desc', label: 'Giảm dần' },
-]
 
 export function TablesFilterToolbar({
   isTrashView = false,
@@ -43,10 +26,32 @@ export function TablesFilterToolbar({
 }: TablesFilterToolbarProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const t = useTranslations('tables')
+  const { user } = useAuth()
+
+  const STATUS_OPTIONS: FilterOption[] = [
+    { value: '', label: t('all') },
+    { value: 'available', label: t('available') },
+    { value: 'occupied', label: t('inUse') },
+    { value: 'reserved', label: t('reserved') },
+    { value: 'maintenance', label: t('maintenance') },
+  ]
+
+  const SORT_BY_OPTIONS: FilterOption[] = [
+    { value: 'tableNumber', label: t('tableNumberSort') },
+    { value: 'status', label: t('statusSort') },
+    { value: 'createdAt', label: t('createdAtSort') },
+    { value: 'updatedAt', label: t('updatedAtSort') },
+  ]
+
+  const SORT_ORDER_OPTIONS: FilterOption[] = [
+    { value: 'asc', label: t('ascending') },
+    { value: 'desc', label: t('descending') },
+  ]
 
   // Build dynamic zone options from API data
   const zoneOptions: FilterOption[] = [
-    { value: '', label: 'Tất cả' },
+    { value: '', label: t('all') },
     ...(zones?.map((zone) => ({ value: zone.id, label: zone.name })) || []),
   ]
 
@@ -85,29 +90,29 @@ export function TablesFilterToolbar({
       {/* Left - Filters */}
       <div className="flex flex-col justify-center gap-2 sm:flex-row sm:flex-wrap sm:items-center md:justify-start">
         <SearchInput
-          placeholder="Tìm theo số bàn, tên khu vực..."
+          placeholder={t('searchPlaceholder')}
           value={localSearchQuery}
           onChange={setLocalSearchQuery}
         />
 
         <FilterDropdown
-          label="Khu vực:"
+          label={`${t('zone')}:`}
           value={selectedZoneId}
           options={zoneOptions}
           onChange={(value) => updateFilter('zone_id', value)}
-          placeholder="Tất cả"
-          emptyMessage="Chưa có khu vực"
+          placeholder={t('all')}
+          emptyMessage={t('noZones')}
         />
 
         <FilterDropdown
-          label="Trạng thái:"
+          label={`${t('status')}:`}
           value={selectedStatus}
           options={STATUS_OPTIONS}
           onChange={(value) => updateFilter('status', value)}
         />
 
         <FilterDropdown
-          label="Sắp xếp:"
+          label=""
           value={sortBy}
           options={SORT_BY_OPTIONS}
           onChange={(value) => updateFilter('sort_by', value)}
@@ -126,14 +131,14 @@ export function TablesFilterToolbar({
 
       {/* Right - Actions */}
       <div className="flex items-center justify-center gap-2 md:justify-start">
-        {!isTrashView && (
+        {!isTrashView && user?.role && user?.role !== ROLES.WAITER && (
           <>
             <Link href="/admin/tables/layout">
               <Button
                 variant="outline"
                 size="icon"
                 className="h-8 w-8 rounded-lg bg-transparent"
-                title="Xem sơ đồ"
+                title={t('viewLayout')}
               >
                 <LayoutGrid className="h-3 w-3" />
               </Button>
@@ -143,7 +148,7 @@ export function TablesFilterToolbar({
                 variant="outline"
                 size="icon"
                 className="h-8 w-8 rounded-lg bg-transparent"
-                title="Quản lý QR"
+                title={t('manageQR')}
               >
                 <QrCode className="h-3 w-3" />
               </Button>
@@ -153,7 +158,7 @@ export function TablesFilterToolbar({
               className="h-8 gap-1 rounded-lg bg-emerald-600 px-3 hover:bg-emerald-700"
             >
               <Plus className="h-3 w-3" />
-              <span className="hidden text-sm md:inline">Thêm bàn</span>
+              <span className="hidden text-sm md:inline">{t('addTable')}</span>
             </Button>
           </>
         )}
