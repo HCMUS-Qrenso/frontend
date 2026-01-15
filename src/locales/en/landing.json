@@ -58,7 +58,12 @@
       "tableCanvas": "Floor Plan",
       "tableQR": "QR Management",
       "dashboardOverview": "Dashboard Overview",
-      "dashboardAnalytics": "Dashboard Analytics"
+      "dashboardAnalytics": "Dashboard Analytics",
+      "kdsMain": "Kitchen Display System",
+      "customerOrdering_01": "Menu Browsing",
+      "customerOrdering_02": "Item Selection",
+      "customerOrdering_03": "Cart & Checkout",
+      "customerOrdering_04": "Order Confirmation"
     },
     "placeholder": "Screenshot will be added later"
   },
@@ -320,7 +325,7 @@
       "privacy": "Privacy Policy",
       "refund": "Refund Policy"
     },
-    "copyright": "© 2025 Qrenso. All rights reserved."
+    "copyright": "© 2026 Qrenso. All rights reserved."
   },
   "contact": {
     "pageTitle": "Contact Qrenso",

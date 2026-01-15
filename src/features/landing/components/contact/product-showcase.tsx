@@ -23,6 +23,15 @@ const dashboardImages = [
   { src: '/Dashboard-2.png', key: 'dashboardAnalytics' },
 ]
 
+const kdsImages = [{ src: '/kds.png', key: 'kdsMain' }]
+
+const orderImages = [
+  { src: '/order-01.png', key: 'customerOrdering_01' },
+  { src: '/order-02.png', key: 'customerOrdering_02' },
+  { src: '/order-03.png', key: 'customerOrdering_03' },
+  { src: '/order-04.png', key: 'customerOrdering_04' },
+]
+
 export function ProductShowcase() {
   const [activeTab, setActiveTab] = useState('dashboard')
   const t = useTranslations('landing.productShowcase')
@@ -34,6 +43,14 @@ export function ProductShowcase() {
   // Slideshow state for dashboard tab
   const [dashboardIndex, setDashboardIndex] = useState(0)
   const dashboardAutoPlayRef = useRef<NodeJS.Timeout | null>(null)
+
+  // Slideshow state for KDS tab
+  const [kdsIndex, setKdsIndex] = useState(0)
+  const kdsAutoPlayRef = useRef<NodeJS.Timeout | null>(null)
+
+  // Slideshow state for customer (order) tab
+  const [orderIndex, setOrderIndex] = useState(0)
+  const orderAutoPlayRef = useRef<NodeJS.Timeout | null>(null)
 
   // Auto-play logic for tables tab
   useEffect(() => {
@@ -97,6 +114,68 @@ export function ProductShowcase() {
     }
   }, [activeTab])
 
+  // Auto-play logic for KDS tab
+  useEffect(() => {
+    // Only auto-play for KDS tab
+    if (activeTab !== 'kds') {
+      if (kdsAutoPlayRef.current) {
+        clearInterval(kdsAutoPlayRef.current)
+      }
+      return
+    }
+
+    // Reset to first slide when switching to KDS tab
+    setKdsIndex(0)
+
+    // Clear existing interval
+    if (kdsAutoPlayRef.current) {
+      clearInterval(kdsAutoPlayRef.current)
+    }
+
+    // Set up auto-play (7 seconds)
+    kdsAutoPlayRef.current = setInterval(() => {
+      setKdsIndex((prev) => (prev + 1) % kdsImages.length)
+    }, 7000)
+
+    // Cleanup
+    return () => {
+      if (kdsAutoPlayRef.current) {
+        clearInterval(kdsAutoPlayRef.current)
+      }
+    }
+  }, [activeTab])
+
+  // Auto-play logic for customer (order) tab
+  useEffect(() => {
+    // Only auto-play for customer tab
+    if (activeTab !== 'customer') {
+      if (orderAutoPlayRef.current) {
+        clearInterval(orderAutoPlayRef.current)
+      }
+      return
+    }
+
+    // Reset to first slide when switching to customer tab
+    setOrderIndex(0)
+
+    // Clear existing interval
+    if (orderAutoPlayRef.current) {
+      clearInterval(orderAutoPlayRef.current)
+    }
+
+    // Set up auto-play (7 seconds)
+    orderAutoPlayRef.current = setInterval(() => {
+      setOrderIndex((prev) => (prev + 1) % orderImages.length)
+    }, 7000)
+
+    // Cleanup
+    return () => {
+      if (orderAutoPlayRef.current) {
+        clearInterval(orderAutoPlayRef.current)
+      }
+    }
+  }, [activeTab])
+
   // Handle tab change - reset slideshow
   const handleTabChange = (tabId: string) => {
     setActiveTab(tabId)
@@ -105,6 +184,12 @@ export function ProductShowcase() {
     }
     if (tabId !== 'dashboard') {
       setDashboardIndex(0)
+    }
+    if (tabId !== 'kds') {
+      setKdsIndex(0)
+    }
+    if (tabId !== 'customer') {
+      setOrderIndex(0)
     }
   }
 
@@ -132,6 +217,34 @@ export function ProductShowcase() {
     if (activeTab === 'dashboard') {
       dashboardAutoPlayRef.current = setInterval(() => {
         setDashboardIndex((prev) => (prev + 1) % dashboardImages.length)
+      }, 7000)
+    }
+  }
+
+  // Go to specific slide for KDS
+  const goToKdsSlide = (index: number) => {
+    setKdsIndex(index)
+    // Reset auto-play timer
+    if (kdsAutoPlayRef.current) {
+      clearInterval(kdsAutoPlayRef.current)
+    }
+    if (activeTab === 'kds') {
+      kdsAutoPlayRef.current = setInterval(() => {
+        setKdsIndex((prev) => (prev + 1) % kdsImages.length)
+      }, 7000)
+    }
+  }
+
+  // Go to specific slide for customer (order)
+  const goToOrderSlide = (index: number) => {
+    setOrderIndex(index)
+    // Reset auto-play timer
+    if (orderAutoPlayRef.current) {
+      clearInterval(orderAutoPlayRef.current)
+    }
+    if (activeTab === 'customer') {
+      orderAutoPlayRef.current = setInterval(() => {
+        setOrderIndex((prev) => (prev + 1) % orderImages.length)
       }, 7000)
     }
   }
@@ -251,6 +364,92 @@ export function ProductShowcase() {
                       className={cn(
                         'h-2 rounded-full transition-all duration-300',
                         dashboardIndex === index
+                          ? 'w-8 bg-emerald-500'
+                          : 'w-2 bg-slate-300 hover:bg-slate-400 dark:bg-slate-600 dark:hover:bg-slate-500',
+                      )}
+                      aria-label={`Go to slide ${index + 1}`}
+                    />
+                  ))}
+                </div>
+              </>
+            ) : activeTab === 'kds' ? (
+              <>
+                {/* Slideshow Container for KDS */}
+                <div className="relative overflow-hidden rounded-lg">
+                  {/* Slides Wrapper */}
+                  <div
+                    className="flex aspect-video transition-transform duration-500 ease-in-out"
+                    style={{ transform: `translateX(-${kdsIndex * 100}%)` }}
+                  >
+                    {kdsImages.map((image, index) => (
+                      <div
+                        key={index}
+                        className="flex min-w-full shrink-0 items-center justify-center"
+                      >
+                        <img
+                          src={image.src}
+                          alt={t(`images.${image.key}`)}
+                          className="h-full w-full rounded-lg object-contain"
+                          draggable={false}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Navigation Dots for KDS */}
+                {kdsImages.length > 1 && (
+                  <div className="mt-4 flex items-center justify-center gap-2">
+                    {kdsImages.map((_, index) => (
+                      <button
+                        key={index}
+                        onClick={() => goToKdsSlide(index)}
+                        className={cn(
+                          'h-2 rounded-full transition-all duration-300',
+                          kdsIndex === index
+                            ? 'w-8 bg-emerald-500'
+                            : 'w-2 bg-slate-300 hover:bg-slate-400 dark:bg-slate-600 dark:hover:bg-slate-500',
+                        )}
+                        aria-label={`Go to slide ${index + 1}`}
+                      />
+                    ))}
+                  </div>
+                )}
+              </>
+            ) : activeTab === 'customer' ? (
+              <>
+                {/* Slideshow Container for Customer (Order) */}
+                <div className="relative overflow-hidden rounded-lg">
+                  {/* Slides Wrapper */}
+                  <div
+                    className="flex aspect-video transition-transform duration-500 ease-in-out"
+                    style={{ transform: `translateX(-${orderIndex * 100}%)` }}
+                  >
+                    {orderImages.map((image, index) => (
+                      <div
+                        key={index}
+                        className="flex min-w-full shrink-0 items-center justify-center"
+                      >
+                        <img
+                          src={image.src}
+                          alt={t(`images.${image.key}`)}
+                          className="h-full w-full rounded-lg object-contain"
+                          draggable={false}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Navigation Dots for Customer (Order) */}
+                <div className="mt-4 flex items-center justify-center gap-2">
+                  {orderImages.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => goToOrderSlide(index)}
+                      className={cn(
+                        'h-2 rounded-full transition-all duration-300',
+                        orderIndex === index
                           ? 'w-8 bg-emerald-500'
                           : 'w-2 bg-slate-300 hover:bg-slate-400 dark:bg-slate-600 dark:hover:bg-slate-500',
                       )}

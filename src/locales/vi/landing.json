@@ -58,7 +58,12 @@
       "tableCanvas": "Sơ đồ mặt bằng",
       "tableQR": "Quản lý QR",
       "dashboardOverview": "Dashboard Overview",
-      "dashboardAnalytics": "Dashboard Analytics"
+      "dashboardAnalytics": "Dashboard Analytics",
+      "kdsMain": "Màn hình bếp",
+      "customerOrdering_01": "Xem thực đơn",
+      "customerOrdering_02": "Chọn món",
+      "customerOrdering_03": "Giỏ hàng & Thanh toán",
+      "customerOrdering_04": "Xác nhận đơn hàng"
     },
     "placeholder": "Screenshot sẽ được thay thế sau"
   },
@@ -324,7 +329,7 @@
       "privacy": "Chính sách bảo mật",
       "refund": "Chính sách hoàn tiền"
     },
-    "copyright": "© 2025 Qrenso. All rights reserved."
+    "copyright": "© 2026 Qrenso. All rights reserved."
   },
   "contact": {
     "pageTitle": "Liên hệ với Qrenso",
