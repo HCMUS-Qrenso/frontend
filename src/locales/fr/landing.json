@@ -58,7 +58,12 @@
       "tableCanvas": "Plan de salle",
       "tableQR": "Gestion des QR",
       "dashboardOverview": "Aperçu général",
-      "dashboardAnalytics": "Analyses"
+      "dashboardAnalytics": "Analyses",
+      "kdsMain": "Écran cuisine",
+      "customerOrdering_01": "Parcourir le menu",
+      "customerOrdering_02": "Sélection des articles",
+      "customerOrdering_03": "Panier & Paiement",
+      "customerOrdering_04": "Confirmation de commande"
     },
     "placeholder": "Captures d'écran bientôt disponibles"
   },
@@ -324,7 +329,7 @@
       "privacy": "Confidentialité",
       "refund": "Politique de remboursement"
     },
-    "copyright": "© 2025 Qrenso. Tous droits réservés."
+    "copyright": "© 2026 Qrenso. Tous droits réservés."
   },
   "contact": {
     "pageTitle": "Contacter Qrenso",

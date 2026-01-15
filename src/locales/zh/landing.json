@@ -58,7 +58,12 @@
       "tableCanvas": "平面图",
       "tableQR": "二维码管理",
       "dashboardOverview": "全局概览",
-      "dashboardAnalytics": "数据分析"
+      "dashboardAnalytics": "数据分析",
+      "kdsMain": "厨房显示系统",
+      "customerOrdering_01": "浏览菜单",
+      "customerOrdering_02": "选择商品",
+      "customerOrdering_03": "购物车与结账",
+      "customerOrdering_04": "订单确认"
     },
     "placeholder": "截图即将推出"
   },
@@ -292,7 +297,7 @@
       "privacy": "隐私政策",
       "refund": "退款政策"
     },
-    "copyright": "© 2025 Qrenso. 保留所有权利。"
+    "copyright": "© 2026 Qrenso. 保留所有权利。"
   },
   "contact": {
     "pageTitle": "联系 Qrenso",

@@ -102,7 +102,8 @@
   "paymentMethod": {
     "cash": "现金",
     "qr": "二维码支付",
-    "undefined": "未定义"
+    "undefined": "未定义",
+    "payos": "二维码支付"
   },
   "header": {
     "orders": "订单",
