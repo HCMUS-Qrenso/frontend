@@ -39,8 +39,8 @@ export const authApi = {
     }
   },
 
-  refresh: async (): Promise<AuthResponse> => {
-    const { data } = await apiClient.post<AuthResponse>('/auth/refresh')
+  refresh: async (payload: { accountType?: string }): Promise<AuthResponse> => {
+    const { data } = await apiClient.post<AuthResponse>('/auth/refresh', payload)
     return data
   },
 

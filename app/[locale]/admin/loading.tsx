@@ -1,4 +1,4 @@
-import { AdminShellSkeleton } from '@/src/components/loading'
+import { AdminShellSkeleton, PageContentSkeleton } from '@/src/components/loading'
 
 /**
  * Route-level loading for all /admin/* routes
@@ -12,5 +12,5 @@ import { AdminShellSkeleton } from '@/src/components/loading'
  * In App Router, loading.tsx already lives inside the parent layout.
  */
 export default function AdminLoading() {
-  return <AdminShellSkeleton />
+  return <PageContentSkeleton />
 }

@@ -155,7 +155,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       set({ authStatus: 'unknown' })
 
       // Gọi refresh endpoint để lấy access token mới từ refresh cookie
-      const authResponse = await authApi.refresh()
+      const authResponse = await authApi.refresh({ accountType: 'staff' })
 
       // Thành công: set access token vào memory
       setAccessToken(authResponse.accessToken)

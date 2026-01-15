@@ -129,7 +129,7 @@ const refreshAccessToken = async (): Promise<string | null> => {
   }
 
   refreshPromise = rawClient
-    .post('/auth/refresh')
+    .post('/auth/refresh', { accountType: 'staff' })
     .then((res) => {
       const newToken = res.data?.accessToken as string | null
       setAccessToken(newToken ?? null)
