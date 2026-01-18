@@ -181,7 +181,7 @@ export function OrderItemsList({ items, orderId }: OrderItemsListProps) {
                         {updateItemStatusMutation.isPending ? (
                           <Loader2 className="h-4 w-4 animate-spin" />
                         ) : (
-                          t('items.served')
+                          t('items.markServed')
                         )}
                       </Button>
                     )}
