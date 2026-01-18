@@ -49,10 +49,12 @@ NEXT_PUBLIC_APP_NAME=QRenso
 ```
 
 **Required Variables:**
+
 - `NEXT_PUBLIC_API_URL` - Backend API endpoint
 - `NEXT_PUBLIC_CUSTOMER_SITE_URL` - Base URL for customer-facing site (used in QR codes)
 
 **Optional Variables:**
+
 - `NEXT_PUBLIC_APP_NAME` - Application display name (default: "QRenso")
 
 ## Project Structure
@@ -211,11 +213,11 @@ All API calls go through the configured Axios client with:
 ### API Client Example
 
 ```typescript
-import { apiClient } from '@/lib/axios';
+import { apiClient } from '@/lib/axios'
 
 // API calls automatically include auth headers
-const response = await apiClient.get('/menu/items');
-const menuItems = response.data.data;
+const response = await apiClient.get('/menu/items')
+const menuItems = response.data.data
 ```
 
 ## State Management
@@ -236,6 +238,7 @@ const menuItems = response.data.data;
 ### React Query
 
 Used for server state management with:
+
 - **Automatic caching** - Reduce redundant API calls
 - **Background refetching** - Keep data fresh
 - **Optimistic updates** - Instant UI feedback
@@ -243,6 +246,7 @@ Used for server state management with:
 - **Pagination** - Infinite scroll and pagination support
 
 **Query Hooks:**
+
 - `use-menu-items-query.ts` - Menu items with filtering
 - `use-categories-query.ts` - Categories list
 - `use-tables-query.ts` - Tables and zones
@@ -254,6 +258,7 @@ Used for server state management with:
 ### Table Layout Editor
 
 **Features:**
+
 - Drag-and-drop tables on canvas
 - Resize and rotate tables
 - Grid snapping for alignment
@@ -262,6 +267,7 @@ Used for server state management with:
 - Real-time preview
 
 **Implementation:**
+
 - Uses `@dnd-kit/core` for drag and drop
 - Canvas rendering with CSS transforms
 - Table position stored as JSON: `{"x": 100, "y": 200, "rotation": 0}`
@@ -269,6 +275,7 @@ Used for server state management with:
 ### QR Code Generation
 
 **Features:**
+
 - JWT-based QR tokens (365-day expiry)
 - Embedded table and tenant information
 - Download formats: PNG, PDF, ZIP (all tables)
@@ -276,6 +283,7 @@ Used for server state management with:
 - Automatic regeneration on table changes
 
 **QR Code Data Structure:**
+
 ```json
 {
   "sub": "guest_table_{tableId}",
@@ -293,6 +301,7 @@ Used for server state management with:
 ### Multi-Tenant System
 
 **Architecture:**
+
 - **Super Admin**: Manage all tenants
 - **Owner**: Own multiple restaurants, full access to owned tenants
 - **Admin**: Manage single restaurant (assigned tenant)
@@ -300,6 +309,7 @@ Used for server state management with:
 - **Kitchen Staff**: View orders, update preparation status
 
 **Tenant Isolation:**
+
 - All API requests include `X-Tenant-Id` header
 - Database queries filtered by `tenantId`
 - Users can only access assigned tenant data
@@ -308,6 +318,7 @@ Used for server state management with:
 ### Real-time Order Updates
 
 **Features:**
+
 - WebSocket connection for live order updates
 - Desktop notifications for new orders
 - Sound alerts (configurable)
@@ -315,6 +326,7 @@ Used for server state management with:
 - Status change animations
 
 **Implementation:**
+
 - Socket.IO client for real-time communication
 - Event listeners for order status changes
 - React Query cache invalidation on updates
@@ -360,7 +372,8 @@ pnpm build
 pnpm start
 ```
 
-**Important:** 
+**Important:**
+
 - Set environment variables in your deployment platform
 - Ensure backend CORS allows frontend domain
 - Use HTTPS in production for secure cookies
@@ -370,27 +383,35 @@ pnpm start
 ### Common Issues
 
 **1. CORS Errors**
+
 ```
 Access to XMLHttpRequest blocked by CORS policy
 ```
+
 **Solution:** Ensure backend CORS configuration includes frontend URL
 
 **2. Token Refresh Loop**
+
 ```
 Infinite token refresh requests
 ```
+
 **Solution:** Check that backend returns valid refresh token in HTTP-only cookie
 
 **3. Route Protection Not Working**
+
 ```
 ProtectedRoute redirects even when authenticated
 ```
+
 **Solution:** Verify auth store is hydrated from localStorage before rendering
 
 **4. Multi-Tenant Context Missing**
+
 ```
 API returns 403 Forbidden
 ```
+
 **Solution:** Ensure `X-Tenant-Id` header is set in axios interceptor
 
 ## Testing
@@ -409,12 +430,14 @@ pnpm test:coverage
 ## Contributing
 
 ### Code Style
+
 - Use TypeScript for all new code
 - Follow existing file structure conventions
 - Run `pnpm lint` before committing
 - Use `pnpm format` to format code
 
 ### Git Workflow
+
 - Create feature branches from `develop`
 - Use conventional commit messages
 - Submit PR with detailed description
