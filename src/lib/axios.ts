@@ -133,6 +133,18 @@ const refreshAccessToken = async (): Promise<string | null> => {
     .then((res) => {
       const newToken = res.data?.accessToken as string | null
       setAccessToken(newToken ?? null)
+      
+      // Update auth store to trigger WebSocket reconnection
+      if (typeof window !== 'undefined' && newToken) {
+        try {
+          import('@/src/store/auth-store').then(({ useAuthStore }) => {
+            useAuthStore.getState().setToken(newToken)
+          })
+        } catch (e) {
+          console.warn('Failed to update auth store after token refresh')
+        }
+      }
+      
       processFailedRequestsQueue(null, newToken)
       return newToken ?? null
     })
